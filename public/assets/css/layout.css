@@ -1,0 +1,104 @@
+/* 
+    Created on  : Mar 12, 2014, 9:35:16 PM
+    Author      : Rifki Yandhi
+    Website     : http://www.rifkiyandhi.com
+    File        : layout.css
+*/
+
+
+/* Body
+================================================== */
+
+body {
+    background-color: #FFFFFF;
+    margin-top: 20px;
+}
+
+.mt10{
+    margin-top: 10px;
+}
+
+/* Breadcrumb
+================================================== */
+ol.breadcrumb{
+    display: inline-block;
+    border: 1px #CCC solid;
+    border-radius: 20px;
+    background-color: #FFF;
+    font-size: 12px;
+}
+
+ol.breadcrumb > li:first-child{
+    margin-left: 10px;
+}
+
+ol.breadcrumb > li:last-child{
+    margin-right: 10px;
+}
+
+/* Login Form
+================================================== */
+@media (min-width: 768px) {
+    #loginContainer .row-sm-offset-3 div:first-child[class*="col-"] {
+        margin-left: 25%;
+    }
+}
+.socialButtons a {
+    color: white; // In yourUse @body-bg 
+    opacity:0.9;
+}
+.socialButtons a:hover {
+    color: white;
+    opacity:1;    	
+}
+
+.btn-facebook, .btn-facebook:hover {background: #3b5998;}
+
+#loginContainer .spanOr {
+    position: relative;
+    font-size: 1.0em;
+    color: #aaa;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+}
+#loginContainer .spanOr {
+    display: block;
+    background-color: white;
+    text-align: center;
+    text-transform: uppercase;
+}			
+
+#loginContainer .loginForm .input-group.i {
+    width: 2em;
+}
+#loginContainer .loginForm  .help-block {
+    color: red;
+}
+
+
+@media (min-width: 768px) {
+    #loginContainer .forgotPwd {
+        text-align: right;
+        margin-top:10px;
+    }		
+}
+
+
+/* Register
+================================================== */
+/* Credit to bootsnipp.com for the css for the color graph */
+.line {
+    height: 1px;
+    border-top: 0;
+    background: #CCC;
+    border-radius: 5px;
+}
+
+/* Footer 
+================================================== */
+div.footer{
+    margin-top: 20px;
+}
+

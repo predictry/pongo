@@ -1,0 +1,1 @@
+D:\xampp\htdocs\predictry-pongo\app/views/frontend/panel/profile.blade.php

@@ -3,7 +3,8 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateAccountsTable extends Migration {
+class CreateAccountsTable extends Migration
+{
 
 	/**
 	 * Run the migrations.
@@ -12,14 +13,14 @@ class CreateAccountsTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('accounts', function($table)
-		{
+		Schema::create('accounts', function($table) {
 			$table->increments('id');
 			$table->string('name', 32);
 			$table->string('email', 64)->unique();
-			$table->string('password_hash', 64);
-			$table->String('password_salt', 64);
+			$table->string('password', 64);
 			$table->smallInteger('plan_id')->unsigned();
+			$table->smallInteger('confirmed')->unsigned();
+			$table->String('confirmation_code', 32);
 			$table->timestamps();
 			$table->softDeletes();
 
