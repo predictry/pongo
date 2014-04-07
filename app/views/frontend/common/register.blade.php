@@ -16,7 +16,6 @@
 			<div class="form-group  {{$var = $errors->first('email')}} {{ ($var !== '') ? 'has-error' : ''}}">
 				<?php echo Form::text('email', '', array('class' => 'form-control', 'placeholder' => 'Email', 'id' => 'email', "tabindex" => 2)); ?>
 				<span class="help-block">{{$errors->first('email')}}</span>
-
 			</div>
 			<div class="row">
 				<div class="col-xs-12 col-sm-6 col-md-6">

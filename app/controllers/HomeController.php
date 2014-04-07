@@ -5,22 +5,37 @@ class HomeController extends BaseController
 
 	protected $layout = 'frontend.layouts.basic';
 
+	/**
+	 * Display home view.
+	 * 
+	 * @return Response
+	 */
 	public function getHome()
 	{
 		return View::make('hello');
 	}
 
+	/**
+	 * Display login view.
+	 * 
+	 * @return Response
+	 */
 	public function getLogin()
 	{
 		$user = Auth::user();
 		if (!empty($user->id))
 		{
-			return Redirect::to('users/dashboard');
+			return Redirect::to('dashboard');
 		}
 
-		return View::make('frontend.site.login');
+		return View::make('frontend.common.login');
 	}
 
+	/**
+	 * Handle a POST request to logged in.
+	 * 
+	 * @return Response
+	 */
 	public function postLogin()
 	{
 		$input = array(
@@ -42,9 +57,9 @@ class HomeController extends BaseController
 			$account_id = Account::where("email", $input['email'])->get(array('id'))->first();
 			if (isset($account_id))
 			{
-				if (Auth::attempt(array('email' => $input['email'], 'password' => $input['password'])))
+				if (Auth::attempt(array('email' => $input['email'], 'password' => $input['password']), ($input['remember'])))
 				{
-					return Redirect::to('user/dashboard');
+					return Redirect::to('dashboard');
 				}
 
 				$flash_error = 'Your email/password combination was incorrect.';
@@ -61,11 +76,22 @@ class HomeController extends BaseController
 		}
 	}
 
+	/**
+	 * Display register view.
+	 * 
+	 * @return Response
+	 */
 	public function getRegister()
 	{
-		return View::make('frontend.site.register');
+		$this->siteInfo['pageTitle'] = "Signup Now";
+		return View::make('frontend.common.register');
 	}
 
+	/**
+	 * Handle a POST request to register new account
+	 * 
+	 * @return Response
+	 */
 	public function postRegister()
 	{
 		$input = array(
@@ -103,9 +129,110 @@ class HomeController extends BaseController
 		}
 	}
 
+	/**
+	 * Display forgot password view.
+	 * 
+	 * @return Response
+	 */
 	public function getForgotPassword()
 	{
-		
+		return View::make("frontend.common.forgot");
+	}
+
+	/**
+	 * Hanle a POST request to send forgot password email confirmation.
+	 * 
+	 * @return Response
+	 */
+	public function postForgotPassword()
+	{
+		$input = array(
+			'email' => Input::get('email')
+		);
+
+		$rules = array(
+			'email' => 'required|email'
+		);
+
+		$validator = Validator::make($input, $rules);
+		if ($validator->passes())
+		{
+			$user_id = Account::where("email", $input['email'])->get(array('id'))->first();
+			if (!$user_id)
+				return Redirect::to('forgot')->with('flash_error', "Email you have entered doesn't exists.");
+			else
+			{
+				$response = Password::remind(Input::only('email'), function($message) {
+							$message->subject = "Password Reminder";
+						});
+				switch ($response)
+				{
+					case Password::INVALID_USER:
+						return Redirect::back()->with('flash_message', Lang::get($response));
+
+					case Password::REMINDER_SENT:
+						return Redirect::back()->with('flash_message', Lang::get($response));
+				}
+			}
+		}
+		else
+		{
+			return Redirect::back()->withInput()->withErrors($validator);
+		}
+	}
+
+	/**
+	 * Display the password reset view for the given token.
+	 *
+	 * @param  string  $token
+	 * @return Response
+	 */
+	public function getReset($token = null)
+	{
+		if (is_null($token))
+			App::abort(404);
+
+		return View::make('frontend.common.reset')->with('token', $token);
+	}
+
+	/**
+	 * Handle a POST request to reset a user's password.
+	 *
+	 * @return Response
+	 */
+	public function postReset()
+	{
+		$credentials = Input::only('email', 'password', 'password_confirmation', 'token');
+
+		$rules = array(
+			'email'					 => 'required|email',
+			'password'				 => 'required|min:8|confirmed',
+			'password_confirmation'	 => 'required',
+			'token'					 => 'required'
+		);
+
+		$validator = Validator::make($credentials, $rules);
+
+		if ($validator->passes())
+		{
+			$response = Password::reset($credentials, function($user, $password) {
+						$user->password = Hash::make($password);
+						$user->save();
+					});
+
+			switch ($response)
+			{
+				case Password::INVALID_PASSWORD:
+				case Password::INVALID_TOKEN:
+				case Password::INVALID_USER:
+					return Redirect::back()->with('flash_error', Lang::get($response));
+				case Password::PASSWORD_RESET:
+					return Redirect::to('login')->with('flash_message', "Password has been changed. You can login now.");
+			}
+		}
+
+		$token = Input::get('token');
+		return Redirect::to('reset/' . $token)->withInput()->withErrors($validator);
 	}
 
 }

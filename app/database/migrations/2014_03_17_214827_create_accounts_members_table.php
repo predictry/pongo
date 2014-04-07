@@ -3,7 +3,8 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateAccountsMembersTable extends Migration {
+class CreateAccountsMembersTable extends Migration
+{
 
 	/**
 	 * Run the migrations.
@@ -12,8 +13,7 @@ class CreateAccountsMembersTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('accounts_members', function($table)
-		{
+		Schema::create('accounts_members', function($table) {
 			$table->smallInteger('account_id')->unsigned();
 			$table->smallInteger('member_id')->unsigned();
 
@@ -21,6 +21,8 @@ class CreateAccountsMembersTable extends Migration {
 
 			$table->foreign('account_id')->references('id')->on('accounts')->onDelete('restrict')->onUpdate('cascade');
 			$table->foreign('member_id')->references('id')->on('members')->onDelete('restrict')->onUpdate('cascade');
+
+			$table->softDeletes();
 		});
 	}
 

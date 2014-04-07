@@ -6,6 +6,6 @@
  * Function     : 
  */
 ?>
-@include('frontend.partials.header')
+@include('frontend.partials.header',  array('styles' => array(HTML::style('assets/css/layout.css'))))
 @yield('content')
 @include('frontend.partials.footer')

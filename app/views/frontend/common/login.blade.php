@@ -37,7 +37,7 @@
 				</label>
 				<div class="col-xs-12 col-sm-6">
 					<p class="forgotPwd">
-						<a href="#">Forgot password?</a> | 
+						<a href="<?php echo URL::to('forgot'); ?>">Forgot password?</a> | 
 						<a href="<?php echo URL::to('register'); ?>">Register Account</a>
 					</p>
 				</div>

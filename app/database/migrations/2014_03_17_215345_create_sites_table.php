@@ -16,6 +16,7 @@ class CreateSitesTable extends Migration {
 		{
 			$table->increments('id');
 			$table->string('name', 32);
+			$table->string('url', 64);
 			$table->string('api_key', 32);
 			$table->string('api_secret', 32);
 			$table->smallInteger('account_id')->unsigned();

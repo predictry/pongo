@@ -11,6 +11,15 @@
   |
  */
 
+
+/*
+  |--------------------------------------------------------------------------
+  | Routes Pattern
+  |--------------------------------------------------------------------------
+ */
+Route::pattern('token', '[A-Za-z0-9]+');
+Route::pattern('numeric', '[0-9]+');
+
 /*
   |--------------------------------------------------------------------------
   | Frontend Routes
@@ -27,15 +36,57 @@ Route::get('register', 'HomeController@getRegister');
 Route::post('register/submit', 'HomeController@postRegister');
 
 Route::get('forgot', 'HomeController@getForgotPassword');
-//Route::get('forgot/submit', 'HomeController@postForgotPassword');
+Route::post('forgot/submit', 'HomeController@postForgotPassword');
+
+Route::get('reset/{token}', 'HomeController@getReset');
+Route::post('reset/submit', 'HomeController@postReset');
 
 /*
  * User Routing
  */
-Route::resource('user/dashboard', 'UserController@getDashboard');
-Route::resource('user/logout', 'UserController@logout');
+Route::group(array('before' => 'auth'), function() {
 
+	#Dashboard
+	Route::get('user', 'UserController@getDashboard');
+	Route::get('dashboard', array('as' => 'dashboard', 'uses' => 'user\PanelController@index'));
 
-Route::resource('password', 'UserPasswordController', array('only' => array('show', 'edit', 'update')));
+	#Update Profile
+	Route::get('user/profile', 'UserController@getProfile');
+	Route::post('user/profile/submit', 'UserController@postProfile');
+	Route::get('user/profile', array('as' => 'profile', 'uses' => 'UserController@getProfile'));
 
+	#Update Password
+	Route::get('user/password', 'UserController@getPassword');
+	Route::post('user/password/submit', 'UserController@postPassword');
+	Route::get('user/password', array('as' => 'password', 'uses' => 'UserController@getPassword'));
 
+	#Member Management
+	Route::get('members/create', array("as" => "members.create", "uses" => 'user\MembersController@getCreate'));
+	Route::post('members/submit', array("as" => "members.submit", "uses" => 'user\MembersController@postCreate'));
+	Route::get('members/{numeric}/edit', array("as" => "members.{numieric}.edit", "uses" => 'user\MembersController@getEdit'));
+	Route::post('members/{numeric}/edit', array("as" => "members.update", "uses" => 'user\MembersController@postEdit'));
+	Route::get('members/{numeric}/delete', 'user\MembersController@getDelete');
+	Route::post('members/{numeric}/delete', 'user\MembersController@postDelete');
+	Route::get('members', array("as" => "members", "uses" => 'user\MembersController@index'));
+
+	#Sites Management
+	Route::get('sites/create', array("as" => "sites.create", "uses" => 'user\SitesController@getCreate'));
+	Route::post('sites/submit', array("as" => "sites.submit", "uses" => 'user\SitesController@postCreate'));
+	Route::get('sites/{numeric}/edit', array("as" => "sites.{numieric}.edit", "uses" => 'user\SitesController@getEdit'));
+	Route::post('sites/{numeric}/edit', array("as" => "sites.update", "uses" => 'user\SitesController@postEdit'));
+	Route::get('sites/{numeric}/delete', 'user\SitesController@getDelete');
+	Route::post('sites/{numeric}/delete', 'user\SitesController@postDelete');
+	Route::get("sites", array("as" => "sites", "uses" => "user\SitesController@index"));
+
+	#logout
+	Route::get('user/logout', 'UserController@logout');
+});
+
+Route::get('/authtest', array('before' => 'auth.basic', function() {
+return View::make('hello');
+}));
+
+// Route group for API versioning
+Route::group(array('prefix' => 'api/v1', 'before' => 'auth.basic'), function() {
+	Route::resource('predictry', 'api\ActionController', array("only" => array("index", "store", "show", "destroy")));
+});

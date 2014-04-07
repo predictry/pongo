@@ -1,0 +1,1 @@
+D:\xampp\htdocs\predictry-pongo\app/views/emails/auth/accountconfirmation.blade.php

@@ -15,7 +15,22 @@ class Site extends Eloquent
 	 *
 	 * @var string
 	 */
-	protected $table = 'sites';
+	protected $table			 = 'sites';
+	public $manage_table_header	 = array(
+		"name"		 => "Tenant ID",
+		"url"		 => "URL Address",
+		"api_key"	 => "API Key",
+		"api_secret" => "API Secret Key"
+	);
+	public $rules				 = array(
+		"name"	 => "required|max:32",
+		"url"	 => "required|active_url",
+	);
+
+	public function actions()
+	{
+		return $this->hasMany("Action");
+	}
 
 }
 
