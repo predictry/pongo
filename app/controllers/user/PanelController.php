@@ -18,15 +18,12 @@ class PanelController extends \BaseController
 	 *
 	 * @return Response
 	 */
-	private $active_site_id = null;
-
 	public function index()
 	{
 		$this->active_site_id = \Session::get('active_site_id');
 		if (!$this->active_site_id)
 		{
-			$this->active_site_id = 1;
-//			return "Not found any site activated as a default display.";
+			return "Not found any site activated as a default display.";
 		}
 
 		$dt_2_days_ago		 = new Carbon("2 days ago");
@@ -49,7 +46,7 @@ class PanelController extends \BaseController
 			array_push($graph_stats_data, $this->_populateTodayActionStats($dt_start, $dt_end, $graph_y_keys));
 		}
 
-		$total_action_today = \Action::where("site_id", $this->active_site_id)->whereBetween('created_at', [$dt_start, $dt_end])->count();
+		$total_action_today = \Action::getNumberOfTotalActionsRangeByDate($this->active_site_id, $dt_start, $dt_end);
 
 		$dt_end_range = $dt_2_days_ago->toDateString();
 

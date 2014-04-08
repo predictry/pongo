@@ -31,7 +31,7 @@ class ActionController extends \BaseController
 			"item_id"	 => \Input::get("item_id"),
 			"user_id"	 => \Input::get("user_id")
 		);
-		
+
 		$action				 = new \Action();
 		$action->name		 = \Input::get("action");
 		$action->site_id	 = $this->site_id;
@@ -54,11 +54,18 @@ class ActionController extends \BaseController
 				$action_meta->save();
 			}
 		}
-		
-		$item = new \Item();
-		$item->identifier = \Input::get("item_id");
-		$item->name = \Input::get("name");
 
+		$item_exists = \Item::where("identifier", \Input::get("item_id"))->first();
+
+		if (!isset($item_exists))
+		{
+			$item				 = new \Item();
+			$item->identifier	 = \Input::get("item_id");
+			$item->name			 = \Input::get("description");
+			$item->site_id		 = $this->site_id;
+			$item->type			 = "product";
+			$item->save();
+		}
 		return \Response::json($input);
 	}
 

@@ -16,7 +16,6 @@ class ActionMeta extends Eloquent
 	 * @var string
 	 */
 	protected $table = 'action_metas';
-
 }
 
 /* End of file ActionMeta.php */

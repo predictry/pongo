@@ -5,22 +5,22 @@ namespace user;
 class SitesController extends \BaseController
 {
 
+	public function __construct()
+	{
+		parent::__construct();
+		\View::share(array("ca" => get_class(), "moduleName" => "Site", "view" => false, "custom_action" => "true"));
+	}
+
 	/**
 	 * Display a listing of the resource.
 	 *
 	 * @return Response
 	 */
-	public function __construct()
-	{
-		parent::__construct();
-		\View::share(array("ca" => get_class(), "moduleName" => "Site"));
-	}
-
 	public function index()
 	{
 		$this->model = new \Site();
 		$page		 = \Input::get('page', 1);
-		$data		 = $this->getByPage($page);
+		$data		 = $this->getByPage($page, $this->manageViewConfig['limit_per_page'], "account_id", \Auth::user()->id);
 		$message	 = '';
 
 		if (!is_array($data) && !is_object($data))
@@ -34,11 +34,12 @@ class SitesController extends \BaseController
 		}
 
 		$output = array(
-			'paginator'		 => $paginator,
-			'str_message'	 => $message,
-			"pageTitle"		 => "Manage Members",
-			"table_header"	 => $this->model->manage_table_header,
-			"page"			 => $page
+			'paginator'			 => $paginator,
+			'str_message'		 => $message,
+			"pageTitle"			 => "Manage Members",
+			"table_header"		 => $this->model->manage_table_header,
+			"page"				 => $page,
+			"custom_action_view" => "frontend.panels.sites.customactionview"
 		);
 
 		return \View::make("frontend.panels.manage", $output);
@@ -106,40 +107,15 @@ class SitesController extends \BaseController
 		return \Redirect::back()->with("flash_message", "Site data has been removed.");
 	}
 
-	/**
-	 * Get results by page
-	 *
-	 * @param int $page
-	 * @param int $limit
-	 * @return StdClass
-	 */
-	protected function getByPage($page = 1, $limit = 5)
+	public function getDefault($id)
 	{
-		$results			 = new \stdClass;
-		$results->page		 = $page;
-		$results->limit		 = $limit;
-		$results->totalItems = 0;
-		$results->items		 = array();
-
-		$this->model = new \Site();
-
-		$rows = $this->model->where("account_id", \Auth::user()->id)->skip($limit * ($page - 1))
-				->take($limit)
-				->get();
-
-		$results->totalItems = $this->model->where("account_id", \Auth::user()->id)->count();
-
-		foreach ($rows as $row)
+		$site = \Site::where("id", $id)->where("account_id", \Auth::user()->id)->get()->first();
+		if ($site->id)
 		{
-			array_push($results->items, $row);
+			\Session::set("active_site_id", $id);
+			\Session::set("active_site_name", $site->name);
 		}
-
-		if (count($results->items) === 0)
-		{
-			return "No member records found.";
-		}
-
-		return $results;
+		return \Redirect::route("dashboard");
 	}
 
 }

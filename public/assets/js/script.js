@@ -1,22 +1,37 @@
 jQuery(document).ready(function() {
     $(".alert").alert();
     $('.dropdown-toggle').dropdown();
+    $('.tt').tooltip();
 
-    new Morris.Line({
-        // ID of the element in which to draw the chart.
-        element: 'myfirstchart',
-        // Chart data records -- each entry in this array corresponds to a point on
-        // the chart.
-        data: graph_data,
-        // The name of the data record attribute that contains x-values.
-        xkey: graph_x_keys,
-        // A list of names of data record attributes that contain y-values.
-        ykeys: graph_y_keys,
-        // Labels for the ykeys -- will be displayed when you hover over the
-        // chart.
-        labels: graph_y_keys,
-        xLabels: graph_x_keys
+
+    if (typeof graph_data !== 'undefined') {
+        new Morris.Line({
+            element: 'myfirstchart',
+            data: graph_data,
+            xkey: graph_x_keys,
+            ykeys: graph_y_keys,
+            labels: graph_y_keys,
+            xLabels: graph_x_keys
+        });
+    }
+
+    $('a.btnViewModal').on('click', function(e) {
+        var target_modal = $(e.currentTarget).data('target');
+        var remote_content = e.currentTarget.href;
+
+        var modal = $(target_modal);
+        var modalBody = $(target_modal + ' .modal-body');
+        var e = 1;
+        modal.on('show.bs.modal', function() {
+            if (e)
+                modalBody.load(remote_content);
+            e = 0;
+        }).modal();
+        return false;
     });
 
+    $('#viewModal').on('hidden.bs.modal', function() {
+        $(this).removeData('bs.modal');
+    });
 });
 

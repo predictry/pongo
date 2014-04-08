@@ -76,7 +76,17 @@ Route::group(array('before' => 'auth'), function() {
 	Route::post('sites/{numeric}/edit', array("as" => "sites.update", "uses" => 'user\SitesController@postEdit'));
 	Route::get('sites/{numeric}/delete', 'user\SitesController@getDelete');
 	Route::post('sites/{numeric}/delete', 'user\SitesController@postDelete');
+	Route::get('sites/{numeric}/default', 'user\SitesController@getDefault');
 	Route::get("sites", array("as" => "sites", "uses" => "user\SitesController@index"));
+
+	#Item Management
+	Route::get('items/{numeric}/view', array("as" => "items.{numeric}.view", "uses" => 'user\ItemsController@getView'));
+	Route::get('items/{numeric}/edit', array("as" => "items.{numieric}.edit", "uses" => 'user\ItemsController@getEdit'));
+	Route::post('items/{numeric}/edit', array("as" => "items.update", "uses" => 'user\ItemsController@postEdit'));
+	Route::get("items", array("as" => "items", "uses" => "user\ItemsController@index"));
+
+	#Statistics
+	Route::get("statistics", array("as" => "statistics", "uses" => "user\StatisticsController@index"));
 
 	#logout
 	Route::get('user/logout', 'UserController@logout');

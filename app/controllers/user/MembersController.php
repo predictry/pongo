@@ -5,12 +5,10 @@ namespace user;
 class MembersController extends \BaseController
 {
 
-	protected $table_header = array();
-
 	public function __construct()
 	{
 		parent::__construct();
-		\View::share(array("ca" => get_class(), "moduleName" => "Member"));
+		\View::share(array("ca" => get_class(), "moduleName" => "Member", "view" => false));
 	}
 
 	/**
@@ -20,12 +18,10 @@ class MembersController extends \BaseController
 	 */
 	public function index()
 	{
-//		$account_members = \AccountMember::where("account_id", \Auth::user()->id)->get();
-//		$queries		 = \DB::getQueryLog();
-
-		$page	 = \Input::get('page', 1);
-		$data	 = $this->getByPage($page, 5);
-		$items	 = array();
+		$this->model = new \AccountMember();
+		$page		 = \Input::get('page', 1);
+		$data		 = $this->getByPage($page, $this->manageViewConfig['limit_per_page'], "account_id", \Auth::user()->id);
+		$items		 = array();
 
 		foreach ($data->items as $member)
 		{
@@ -33,14 +29,9 @@ class MembersController extends \BaseController
 			array_push($items, $memberWithProfile);
 		}
 
-		$paginator	 = \Paginator::make($items, $data->totalItems, 5);
+		$paginator	 = \Paginator::make($items, $data->totalItems, $data->limit);
 		$member		 = new \Member();
 		$message	 = '';
-
-		if (count($items) === 0)
-		{
-			$message = "No member records found.";
-		}
 
 		$output = array(
 			'paginator'		 => $paginator,
@@ -51,34 +42,6 @@ class MembersController extends \BaseController
 		);
 
 		return \View::make("frontend.panels.manage", $output);
-	}
-
-	/**
-	 * Get results by page
-	 *
-	 * @param int $page
-	 * @param int $limit
-	 * @return StdClass
-	 */
-	public function getByPage($page = 1, $limit = 10)
-	{
-		$results			 = new \stdClass;
-		$results->page		 = $page;
-		$results->limit		 = $limit;
-		$results->totalItems = 0;
-		$results->items		 = array();
-
-		$rows = \Accountmember::where("account_id", \Auth::user()->id)->skip($limit * ($page - 1))
-				->take($limit)
-				->get();
-
-		$results->totalItems = \Accountmember::count();
-		foreach ($rows as $row)
-		{
-			array_push($results->items, $row);
-		}
-
-		return $results;
 	}
 
 	/**

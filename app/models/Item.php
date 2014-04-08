@@ -16,8 +16,17 @@ class Item extends Eloquent
 	 * @var string
 	 */
 	protected $table			 = 'items';
-	public $rules				 = array();
-	public $table_manage_header	 = array();
+	public $rules				 = array(
+		'identifier' => 'required',
+		'name'		 => 'required'
+	);
+	public $manage_table_header	 = array(
+		"identifier" => "Item ID",
+		"name"		 => "Description",
+		"type"		 => "Type",
+		"created_at" => "Date Created",
+		"active"	 => "Activated"
+	);
 
 }
 

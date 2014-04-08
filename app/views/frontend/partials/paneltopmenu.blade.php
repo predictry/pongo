@@ -7,7 +7,9 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="<?php echo URL::to('dashboard'); ?>">{{ $siteName or '' }}</a>
+			<a class="navbar-brand" href="<?php echo URL::to('dashboard'); ?>">{{ $siteName or '' }}
+				/ {{ $activeSiteName or '' }}
+			</a>
         </div>
 
         <div class="navbar-collapse collapse">
