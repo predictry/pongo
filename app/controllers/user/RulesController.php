@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Author       : Rifki Yandhi
+ * Date Created : Mar 18, 2014 5:10:42 PM
+ * File         : app/controllers/RulesController.php
+ * Copyright    : rifkiyandhi@gmail.com
+ * Function     :
+ */
+
 namespace App\Controllers\User;
 
 use View,
@@ -82,7 +90,7 @@ class RulesController extends \App\Controllers\BaseController
 
 	public function postCreate()
 	{
-		$input		 = Input::only("name", "description", "expiry_type", "expiry_value");
+		$input		 = Input::only("name", "description", "expiry_type", "expiry_value", "expiry_value_dt");
 		$items		 = Input::get("item_id");
 		$types		 = Input::get("type");
 		$likelihoods = Input::get("likelihood");
@@ -100,7 +108,7 @@ class RulesController extends \App\Controllers\BaseController
 					$ruleset_model->expiry_value			 = $input['expiry_value'];
 					break;
 				case "date/time":
-					$ruleset_model->rules['expiry_value']	 = "required|date:YY-mm-dd";
+					$ruleset_model->rules['expiry_value']	 = "required|date:YY-mm-dd H:i:s A";
 					$ruleset_model->expiry_value			 = 0;
 					break;
 				default:
@@ -153,7 +161,7 @@ class RulesController extends \App\Controllers\BaseController
 				if ($input['expiry_type'] === "date/time")
 				{
 					$obj_expiry_date				 = new \Carbon\Carbon();
-					$str_expiry_date				 = $obj_expiry_date->createFromFormat("Y-m-d", $input['expiry_value'])->hour("23")->minute("59")->second("59")->toDateTimeString();
+					$str_expiry_date				 = $obj_expiry_date->createFromFormat("Y-m-d H:i:s A", $input['expiry_value'])->second(0)->toDateTimeString();
 					$ruleset_model->expiry_datetime	 = $str_expiry_date;
 				}
 				$ruleset_model->save();
@@ -178,37 +186,6 @@ class RulesController extends \App\Controllers\BaseController
 		{
 			return \Redirect::back()->withErrors($ruleset_validator)->with("flash_error", "Inserting problem. Please check your inputs.");
 		}
-	}
-
-	public function getItemRule()
-	{
-		$index_item_rule = Input::get("index");
-
-		$enum_types = array(
-			"excluded"	 => "Excluded",
-			"included"	 => "Included"
-		);
-
-		$enum_expiry_types = array(
-			"no_expiry"	 => "No Expiry",
-			"pageviews"	 => "Page Views",
-			"date/time"	 => "Date & Time",
-			"clicks"	 => "Clicks"
-		);
-
-		$items = \App\Models\Item::where("site_id", $this->active_site_id)
-				->where("name", "!=", "")
-				->lists("name", "id");
-
-		return \Response::json(
-						array("status"	 => "success",
-							"response"	 => View::make("frontend.panels.rules.itemrule", array(
-								'enum_types'		 => $enum_types,
-								'enum_expiry_types'	 => $enum_expiry_types,
-								"items"				 => $items,
-								"index_item_rule"	 => $index_item_rule)
-							)->render()
-		));
 	}
 
 	public function postFetchItems()
@@ -267,7 +244,7 @@ class RulesController extends \App\Controllers\BaseController
 		{
 			$obj['last_index']	 = count($item_rules);
 			$json_obj			 = json_encode($obj);
-			$custom_script .= "editItemRule({$json_obj}, {$index_item_rule});";
+			$custom_script .= "editItemRule({$json_obj}, {$index_item_rule});"; //js func to make add itemruleedit
 			$index_item_rule+=1;
 		}
 		$custom_script.= "</script>";
@@ -288,7 +265,7 @@ class RulesController extends \App\Controllers\BaseController
 
 	public function postEdit($id)
 	{
-		$input				 = Input::only("name", "description", "expiry_type", "expiry_value");
+		$input				 = Input::only("name", "description", "expiry_type", "expiry_value", "expiry_value_dt");
 		$items				 = Input::get("item_id");
 		$types				 = Input::get("type");
 		$edit_item_rule_ids	 = Input::get("item_rule_id");
@@ -308,7 +285,7 @@ class RulesController extends \App\Controllers\BaseController
 					$ruleset->expiry_value					 = $input['expiry_value'];
 					break;
 				case "date/time":
-					$ruleset_model->rules['expiry_value']	 = "required|date:YY-mm-dd";
+					$ruleset_model->rules['expiry_value']	 = "required|date:YY-mm-dd H:i:s A";
 					$ruleset->expiry_value					 = 0;
 					break;
 				default:
@@ -361,14 +338,14 @@ class RulesController extends \App\Controllers\BaseController
 				if ($input['expiry_type'] === "date/time")
 				{
 					$obj_expiry_date			 = new \Carbon\Carbon();
-					$str_expiry_date			 = $obj_expiry_date->createFromFormat("Y-m-d", $input['expiry_value'])->hour("23")->minute("59")->second("59")->toDateTimeString();
+					$str_expiry_date			 = $obj_expiry_date->createFromFormat("Y-m-d H:i:s A", $input['expiry_value'])->second(0)->toDateTimeString();
 					$ruleset->expiry_datetime	 = $str_expiry_date;
+					$ruleset->expiry_value		 = 0;
 				}
 				else
 				{
 					$ruleset->expiry_datetime = null;
 				}
-
 				$ruleset->update();
 
 				$item_rules		 = \App\Models\Rule::where("ruleset_id", $id)->get()->toArray();
@@ -386,16 +363,18 @@ class RulesController extends \App\Controllers\BaseController
 					$item_rule->delete();
 				}
 
-
 				//new
 				foreach ($result_array_diff as $i => $value)
 				{
-					$rule				 = new \App\Models\Rule();
-					$rule->type			 = $types[$i];
-					$rule->item_id		 = $items[$i];
-					$rule->ruleset_id	 = $ruleset->id;
-					$rule->likelihood	 = ($likelihoods[$i] !== "") ? ($likelihoods[$i] / 1000) : 0.0;
-					$rule->save();
+					if ($i < count($items))
+					{
+						$rule				 = new \App\Models\Rule();
+						$rule->type			 = $types[$i];
+						$rule->item_id		 = $items[$i];
+						$rule->ruleset_id	 = $ruleset->id;
+						$rule->likelihood	 = ($likelihoods[$i] !== "") ? ($likelihoods[$i] / 1000) : 0.0;
+						$rule->save();
+					}
 				}
 
 				//update
@@ -403,7 +382,7 @@ class RulesController extends \App\Controllers\BaseController
 				{
 					$i = array_search($value, $edit_item_rule_ids);
 
-					if ($i > -1)
+					if ($i > -1 && ($i <= count($items)))
 					{
 						$item_rule				 = \App\Models\Rule::find($value);
 						$item_rule->type		 = $types[$i];
@@ -421,6 +400,48 @@ class RulesController extends \App\Controllers\BaseController
 		{
 			return \Redirect::back()->withErrors($ruleset_validator)->with("flash_error", "Inserting problem. Please check your inputs.");
 		}
+	}
+
+	public function postDelete($id)
+	{
+		$is_exists = \App\Models\Ruleset::where("id", $id)->where("site_id", $this->active_site_id)->count();
+		if ($is_exists)
+		{
+			$ruleset = \App\Models\Ruleset::find($id);
+			$ruleset->delete();
+		}
+		return \Redirect::route('rules')->with("flash_message", "Ruleset has been successfully removed.");
+	}
+
+	public function getItemRule()
+	{
+		$index_item_rule = Input::get("index");
+
+		$enum_types = array(
+			"excluded"	 => "Excluded",
+			"included"	 => "Included"
+		);
+
+		$enum_expiry_types = array(
+			"no_expiry"	 => "No Expiry",
+			"pageviews"	 => "Page Views",
+			"date/time"	 => "Date & Time",
+			"clicks"	 => "Clicks"
+		);
+
+		$items = \App\Models\Item::where("site_id", $this->active_site_id)
+				->where("name", "!=", "")
+				->lists("name", "id");
+
+		return \Response::json(
+						array("status"	 => "success",
+							"response"	 => View::make("frontend.panels.rules.itemrule", array(
+								'enum_types'		 => $enum_types,
+								'enum_expiry_types'	 => $enum_expiry_types,
+								"items"				 => $items,
+								"index_item_rule"	 => $index_item_rule)
+							)->render()
+		));
 	}
 
 	public function getItemEditRule()

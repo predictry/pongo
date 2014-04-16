@@ -41,31 +41,67 @@
 				<label for='expiry_type' class="col-sm-2 control-label">Expiry Type</label>
 				<div class="col-sm-4">
 					@if($type === 'edit')
-					<?php echo Form::select('expiry_type', $enum_expiry_types, $ruleset->expiry_type, array('class' => 'form-control')); ?>
+					<?php echo Form::select('expiry_type', $enum_expiry_types, $ruleset->expiry_type, array('class' => 'form-control', 'id' => 'expiry_type')); ?>
 					@else
-					<?php echo Form::select('expiry_type', $enum_expiry_types, "no_expiry", array('class' => 'form-control')); ?>
+					<?php echo Form::select('expiry_type', $enum_expiry_types, "no_expiry", array('class' => 'form-control', 'id' => 'expiry_type')); ?>
 					@endif
 				</div>
 				<span class="help-block">{{ $errors->first('expiry_type') }}</span>
 			</div>		
 			<div class="form-group {{ $var = $errors->first('expiry_value') }} {{ ($var !== '') ? 'has-error' : '' }}">
 				<label for='expiry_date_or_value' class="col-sm-2 control-label">Expiry Value</label>
-				<div class="col-sm-4">
-					@if($type === 'edit')
-					@if (!isset($ruleset->expiry_datetime))
-					<?php echo Form::text('expiry_value', null, array('class' => 'form-control', 'placeholder' => 'Expiry Value', 'id' => 'expiry_value')); ?>
-					@else
+				<div class="col-sm-4" id="expiry_value_box">
 					<?php
-					$expiry_datetime = new \Carbon\Carbon($ruleset->expiry_datetime);
-					echo Form::text('expiry_value', $expiry_datetime->toDateString(), array('class' => 'form-control', 'placeholder' => 'Expiry Value', 'id' => 'expiry_value'));
-					?>
-					@endif
-					@else
-					<?php echo Form::text('expiry_value', null, array('class' => 'form-control', 'placeholder' => 'Expiry Value', 'id' => 'expiry_value')); ?>
-					@endif
+					if ($type === 'edit')
+					{
+						if (!isset($ruleset->expiry_datetime))
+						{
+							echo Form::text('expiry_value', null, array('class' => 'form-control', 'placeholder' => 'Expiry Value', 'id' => 'expiry_value'));
+							?>
+							<script type="text/javascript">
+								var expiry_date = '';
+							</script>
+							<div class='input-group date hide' id='datetimepicker' data-date-format="YYYY-MM-DD hh:mm:ss A">
+								<input type='text' class="form-control disabled" name="expiry_value_temp" readonly="" />
+								<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+								</span>
+							</div>
+							<?php
+						}
+						else
+						{
+							$expiry_datetime = new \Carbon\Carbon($ruleset->expiry_datetime);
+							echo Form::text('expiry_value_temp', $expiry_datetime->toDateTimeString(), array('class' => 'form-control hide', 'placeholder' => 'Expiry Value', 'id' => 'expiry_value'));
+							?>
+							<script type="text/javascript">
+								var expiry_date = '<?php echo $expiry_datetime->toDateTimeString(); ?>';
+							</script>
+							<div class='input-group date' id='datetimepicker' data-date-format="YYYY-MM-DD hh:mm:ss A">
+								<input type='text' class="form-control disabled" name="expiry_value" readonly=""/>
+								<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+								</span>
+							</div>
+							<?php
+						}
+					}
+					else
+					{
+						echo Form::text('expiry_value', null, array('class' => 'form-control', 'placeholder' => 'Expiry Value', 'id' => 'expiry_value'));
+						?>
+						<script type="text/javascript">
+							var expiry_date = '';
+						</script>
+						<div class='input-group date hide' id='datetimepicker' data-date-format="YYYY-MM-DD hh:mm:ss A">
+							<input type='text' class="form-control disabled" name="expiry_value_temp" readonly="" />
+							<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+							</span>
+						</div>
+<?php } ?>
 				</div>
 				<span class="help-block">{{ $errors->first('expiry_value') }}</span>
 			</div>
+
+<?php echo Form::hidden("expiry_value_dt", "", array("id" => "expiry_value_dt")); ?>
 		</div>
 
 
@@ -74,7 +110,7 @@
 			<div class="row" id="item_rules_container">
 				<?php if ($type === "create") : ?>
 					@include('frontend.panels.rules.itemrule')	
-				<?php endif; ?>
+<?php endif; ?>
 			</div>
 		</div>
 		<div class="clearfix form-horizontal">

@@ -34,20 +34,21 @@
 		</div>
 		<span class="help-block">{{ $errors->first('img_url') }}</span>
 	</div>
-	<div class="form-group {{ $var = $errors->first('img_url') }} {{ ($var !== '') ? 'has-error' : '' }}">
+	<?php echo Form::hidden("active", true); ?>
+	<!--<div class="form-group">
 		<label for='img_url' class="col-sm-2 control-label"></label>
 		<div class="col-sm-4">
 			<div class="btn-group" data-toggle="buttons">
-				<label class="btn btn-default btn-sm <?php echo ($activated === true) ? 'active' : ''; ?>">
+				<label class="btn btn-default btn-sm <?php //echo ($activated === true) ? 'active' : '';   ?>">
 					<input type="radio" name="active" value="true" > Activated
 				</label>
-				<label class="btn btn-default btn-sm <?php echo ($activated === false) ? 'active' : ''; ?>">
+				<label class="btn btn-default btn-sm <?php //echo ($activated === false) ? 'active' : '';   ?>">
 					<input type="radio" name="active" value="false"> Deactivated
 				</label>
 			</div>
 		</div>
 		<span class="help-block">{{ $errors->first('img_url') }}</span>
-	</div>
+	</div>-->
 
 	<div class="form-group">
 		<div class="col-sm-offset-2 col-sm-4">
@@ -55,5 +56,4 @@
 		</div>
 	</div>
 	{{ Form::close() }}
-</div>
-@stop
+	@stop

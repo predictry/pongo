@@ -31,7 +31,7 @@ jQuery(document).ready(function() {
         $(this).removeData('bs.modal');
     });
 
-
+    //initilize 1st item rule that appear first time
     $("#item1").chosen();
     $("#type1").chosen();
 
@@ -40,6 +40,45 @@ jQuery(document).ready(function() {
             $('#item1').val("").trigger("chosen:updated");
         }
     });
+
+    $("#expiry_type").bind('change', function(e) {
+        var valueSelected = this.value;
+        var box = $("#expiry_value_box");
+
+        if (valueSelected === "date/time") {
+
+            box.find("input#expiry_value").addClass("hide").attr("name", "expiry_value_temp");
+            var dtpicker = box.find("div#datetimepicker");
+            dtpicker.find("input.form-control").attr("name", "expiry_value");
+            dtpicker.removeClass("hide");
+
+            $(function() {
+                $('#datetimepicker').datetimepicker();
+                if (expiry_date !== '')
+                    $('#datetimepicker').data("DateTimePicker").setDate(expiry_date);
+            });
+        }
+        else {
+            box.find("div#datetimepicker").addClass("hide").attr("name", "expiry_value_temp");
+            var dtpicker = box.find("div#datetimepicker");
+            dtpicker.find("input.form-control").attr("name", "expiry_value_temp");
+            dtpicker.addClass("hide");
+
+            box.find("input#expiry_value").removeClass("hide").attr("name", "expiry_value");
+            var val = box.find("input#expiry_value").val();
+            if (!$.isNumeric(val))
+                box.find("input#expiry_value").val(0);
+        }
+    });
+
+    $("#datetimepicker").bind("dp.change", function() {
+        var dt = $('#datetimepicker').data("DateTimePicker").getDate();
+        $("#expiry_value_dt").val(dt);
+
+    });
+
+    $("#expiry_type").change(function() {
+    }).trigger("change");
 });
 
 var numOfItemRules = 1;

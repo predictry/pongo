@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Author       : Rifki Yandhi
+ * Date Created : Mar 18, 2014 5:10:42 PM
+ * File         : app/controllers/ActionsController.php
+ * Copyright    : rifkiyandhi@gmail.com
+ * Function     :
+ */
+
 namespace App\Controllers\User;
 
 use View,
