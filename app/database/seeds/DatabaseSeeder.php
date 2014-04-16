@@ -17,7 +17,8 @@ class DatabaseSeeder extends Seeder
 //		$this->call('SitesTableSeeder');
 //		$this->call('PlanSeeder');
 //		$this->call('AccountSeeder');
-		$this->call('ActionsTableSeeder');
+//		$this->call('ActionsTableSeeder');
+		$this->call('ActionTypesSeeder');
 	}
 
 }
@@ -48,6 +49,40 @@ class PlanSeeder extends Seeder
 					'currency'		 => 'USD',
 					'price'			 => '99',
 					'limit_value'	 => '12',
+				)
+		);
+	}
+
+}
+
+class ActionsSeeder extends Seeder
+{
+
+	function run()
+	{
+		DB::table('actions')->delete();
+		Actions::create(
+				array(
+					'name'			 => 'view',
+					'description'	 => ''
+				)
+		);
+		ActionType::create(
+				array(
+					'name'	 => 'rate',
+					'score'	 => '2'
+				)
+		);
+		ActionType::create(
+				array(
+					'name'	 => 'add_to_cart',
+					'score'	 => '3'
+				)
+		);
+		ActionType::create(
+				array(
+					'name'	 => 'buy',
+					'score'	 => '4'
 				)
 		);
 	}

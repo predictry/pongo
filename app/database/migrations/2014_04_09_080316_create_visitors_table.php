@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateActionsTable extends Migration
+class CreateVisitorsTable extends Migration
 {
 
 	/**
@@ -13,14 +13,13 @@ class CreateActionsTable extends Migration
 	 */
 	public function up()
 	{
-		Schema::create('actions', function(Blueprint $table) {
+		Schema::create('visitors', function(Blueprint $table) {
 			$table->increments('id');
-			$table->string('name', 32);
-			$table->text('description');
-			$table->integer('site_id');
+			$table->string('identifier', 64)->nullable();
+			$table->string('email', 64)->nullable();
+			$table->string('ip', 20)->nullable();
+			$table->string('mac', 64)->nullable();
 			$table->timestamps();
-
-			$table->foreign('site_id')->references('id')->on('sites')->onDelete('restrict')->onUpdate('cascade');
 		});
 	}
 
@@ -31,7 +30,7 @@ class CreateActionsTable extends Migration
 	 */
 	public function down()
 	{
-		Schema::drop('actions');
+		Schema::drop('visitors');
 	}
 
 }

@@ -7,7 +7,10 @@
  * Copyright    : rifkiyandhi@gmail.com
  * Function     : 
  */
-class Item extends Eloquent
+
+namespace App\Models;
+
+class Item extends \Eloquent
 {
 
 	/**

@@ -7,7 +7,10 @@
  * Copyright    : rifkiyandhi@gmail.com
  * Function     : 
  */
-class Action extends Eloquent
+
+namespace App\Models;
+
+class Action extends \Eloquent
 {
 
 	/**
@@ -17,9 +20,14 @@ class Action extends Eloquent
 	 */
 	protected $table = 'actions';
 
-	public function metas()
+	public function action_metas()
 	{
-		return $this->hasMany("ActionMeta");
+		return $this->hasMany("App\Models\ActionMeta");
+	}
+
+	public function action_instances()
+	{
+		return $this->hasMany("App\Models\ActionInstance");
 	}
 
 	static function getNumberOfTotalActionsRangeByDate($site_id, $dt_start, $dt_end)
@@ -30,7 +38,7 @@ class Action extends Eloquent
 
 	static function getNumberOfUsers($site_id)
 	{
-		$total_users = DB::table("actions AS act")->select("meta.value")
+		$total_users = \DB::table("actions AS act")->select("meta.value")
 						->leftJoin('action_metas AS meta', 'act.id', '=', 'meta.action_id')
 						->where('act.site_id', $site_id)
 						->where('meta.key', 'user_id')
@@ -47,7 +55,7 @@ class Action extends Eloquent
 							WHERE act.site_id = {$site_id} and meta.key = 'user_id'
 							GROUP BY meta.value) AS tbl WHERE tbl.aggregator >= {$start} AND tbl.aggregator <= {$end}";
 
-		$total_actions = DB::select($query);
+		$total_actions = \DB::select($query);
 		return $total_actions[0]->count;
 	}
 

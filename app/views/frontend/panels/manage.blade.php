@@ -4,15 +4,22 @@
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 	@include('frontend.partials.notification')
 	<div class="row">
+		@if ($isManage)
 		<h1 class="col-sm-6 pull-left">Manage <?php echo ucfirst($moduleName) . "(s)"; ?></h1>
+		@else
+		<h1 class="col-sm-6 pull-left">{{ $pageTitle or 'Default' }}</h1>
+		@endif
 		@if ($create)
 		<div class="col-sm-6 action_buttons text-right">
 			<a href="{{ URL::to( URL::current() . "/create" ) }}" class="btn btn-primary btn-sm"><i class="fa fa-user"></i> Add New {{ $moduleName }}</a>
 		</div>
-		@else
 		@endif
 		<div class="clearfix"></div>
 		<hr class="line"/>
+
+		@if($selector)
+		@include($selector_view, $selector_vars)
+		@endif
 	</div>
 	<div class="table-responsive">
 		<table class="table table-striped">
@@ -22,7 +29,9 @@
 					@foreach($table_header as $key => $th)
 					<th>{{ $th }}</th>
 					@endforeach
+					@if ($edit || $delete || $view || $custom_action)
 					<th></th>
+					@endif
                 </tr>
 			</thead>
 			<tbody>
@@ -40,9 +49,15 @@
 						echo "<td>" . $val . "</td>";
 					}
 					else
-						echo "<td>" . $o->$key . "</td>";
+					{
+						if (isset($o->$key))
+							echo "<td>" . $o->$key . "</td>";
+						else
+							echo "<td>-</td>";
+					}
 					?>
 					@endforeach
+					@if ($edit || $delete || $view || $custom_action)
 					<td class="pull-right">
 						{{ Form::open(array('url' => URL::to( URL::current() . "/" . $o->id . "/delete" ), "class" => "mb0")) }}
 						{{ Form::hidden("member_id", $o->id) }}
@@ -54,6 +69,7 @@
 						@endif
 						{{ Form::close() }}
 					</td>
+					@endif
 				</tr>
 				<?php $i++; ?>
 				@endif

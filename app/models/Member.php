@@ -7,7 +7,10 @@
  * Copyright    : rifkiyandhi@gmail.com
  * Function     : 
  */
-class Member extends Eloquent
+
+namespace App\Models;
+
+class Member extends \Eloquent
 {
 
 	/**
@@ -23,7 +26,7 @@ class Member extends Eloquent
 		"email"		 => "Email",
 		"created_at" => "Date Created"
 	);
-	public $rules = array(
+	public $rules				 = array(
 		"name"		 => "required",
 		"email"		 => "required|email|unique:accounts|unique:members",
 		"password"	 => "required|min:8|confirmed"

@@ -1,6 +1,8 @@
 <?php
 
-class RemindersController extends Controller
+namespace App\Controllers;
+
+class RemindersController extends \Controller
 {
 
 	/**

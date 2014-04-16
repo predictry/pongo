@@ -7,7 +7,10 @@
  * Copyright    : rifkiyandhi@gmail.com
  * Function     : 
  */
-class Plan extends Eloquent
+
+namespace App\Models;
+
+class Plan extends \Eloquent
 {
 
 	/**

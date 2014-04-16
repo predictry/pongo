@@ -7,7 +7,10 @@
  * Copyright    : rifkiyandhi@gmail.com
  * Function     : 
  */
-class ActionMeta extends Eloquent
+
+namespace App\Models;
+
+class ActionMeta extends \Eloquent
 {
 
 	/**
@@ -15,7 +18,14 @@ class ActionMeta extends Eloquent
 	 *
 	 * @var string
 	 */
-	protected $table = 'action_metas';
+	public $timestamps	 = false;
+	protected $table	 = 'action_metas';
+
+	public function action()
+	{
+		return $this->hasMany("App\Models\Action", "action_id");
+	}
+
 }
 
 /* End of file ActionMeta.php */

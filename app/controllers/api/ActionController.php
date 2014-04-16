@@ -1,18 +1,20 @@
 <?php
 
-namespace api;
+namespace App\Controllers\Api;
 
-class ActionController extends \BaseController
+use Carbon\Carbon;
+use Input,
+	Response,
+	Request,
+	Validator;
+
+class ActionController extends \App\Controllers\ApiBaseController
 {
-
-	protected $predictry_server_api_key	 = null;
-	protected $site_id					 = null;
 
 	public function __construct()
 	{
-		$this->beforeFilter('@filterRequests');
 		parent::__construct();
-		$this->predictry_server_api_key = \Request::header("X-Predictry-Server-Api-Key");
+		$this->predictry_server_api_key = Request::header("X-Predictry-Server-Api-Key");
 	}
 
 	public function index()
@@ -27,96 +29,197 @@ class ActionController extends \BaseController
 	 */
 	public function store()
 	{
-		$input = array(
-			"item_id"	 => \Input::get("item_id"),
-			"user_id"	 => \Input::get("user_id")
+		$response = array(
+			"status"	 => "success",
+			"message"	 => ""
 		);
 
-		$action				 = new \Action();
-		$action->name		 = \Input::get("action");
-		$action->site_id	 = $this->site_id;
-		$action->description = json_encode(array_merge(array("score" => $this->_translateActionToRating(\Input::get("action"))), $input));
-		$action->save();
+		$action_name		 = Input::get("action");
+		$user_identifier_id	 = Input::get("user_id");
+		$item_identifier_id	 = Input::get("item_id");
+		$session			 = Input::get("session_id");
+		$item_name			 = Input::get("description");
+		$action_properties	 = Input::get("action_properties");
+		$item_properties	 = Input::get("item_properties");
 
-		if (isset($action->id) && $action->id > 0)
+		$action_properties	 = isset($action_properties) ? $action_properties : array();
+		$item_properties	 = isset($item_properties) ? $item_properties : array();
+
+		$rules = array(
+			"action"	 => "required",
+			"user_id"	 => "required",
+			"item_id"	 => "required",
+			"session_id" => "required"
+		);
+
+		$validator = Validator::make(array("action" => $action_name, "user_id" => $user_identifier_id, "item_id" => $item_identifier_id, "session_id" => $session), $rules);
+		if ($validator->passes())
 		{
-			$input["score"] = $this->_translateActionToRating(\Input::get("action"));
+			$action_data = array(
+				"name"			 => $action_name,
+				"description"	 => null,
+				"score"			 => Input::get("score"),
+			);
 
-			//storing meta
-			foreach ($input as $key => $val)
+			$item_data = array(
+				"name"		 => $item_name,
+				"identifier" => $item_identifier_id,
+				"properties" => $item_properties
+			);
+
+			$action_id			 = $this->_getActionID($action_data);
+			$visitor_id			 = $this->_getVisitorID($user_identifier_id);
+			$visitor_session_id	 = $this->_getSessionID($visitor_id, $session);
+			$item_id			 = $this->_getItemID($item_data);
+			if ($item_id)
 			{
-				$action_meta = new \ActionMeta();
+				//process action instance
+				$action_instance			 = new \App\Models\ActionInstance();
+				$action_instance->action_id	 = $action_id;
+				$action_instance->item_id	 = $item_id;
+				$action_instance->session_id = $visitor_session_id;
+				$action_instance->created	 = new Carbon("now");
+				$action_instance->save();
 
-				$action_meta->key		 = $key;
-				$action_meta->value		 = $val;
-				$action_meta->action_id	 = $action->id;
-
-				$action_meta->save();
+				$this->_setActionMeta($action_instance->id, $action_properties);
 			}
 		}
-
-		$item_exists = \Item::where("identifier", \Input::get("item_id"))->first();
-
-		if (!isset($item_exists))
+		else
 		{
-			$item				 = new \Item();
-			$item->identifier	 = \Input::get("item_id");
-			$item->name			 = \Input::get("description");
-			$item->site_id		 = $this->site_id;
-			$item->type			 = "product";
-			$item->save();
+			$response['status']	 = "failed";
+			$response['message'] = $validator->errors()->first();
+			return Response::json($response);
 		}
-		return \Response::json($input);
+
+		return Response::json($response);
 	}
 
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function show($id)
+	function _getActionID($action_data)
 	{
-		//
+		$action_id	 = 0;
+		//start processing action
+		$action		 = \App\Models\Action::where("name", strtolower($action_data['name']))->where("site_id", $this->site_id)->first();
+
+		if (!$action)
+		{
+			$action_id = $this->_setAction($action_data);
+		}
+		else
+		{
+			$action_id = $action->id;
+		}
+
+		return $action_id;
 	}
 
-	/**
-	 * Remove the specified resource from storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function destroy($id)
+	function _setAction($action_data)
 	{
-		//
+		$action				 = new \App\Models\Action();
+		$action->name		 = $action_data['name'];
+		$action->description = $action_data['description'];
+		$action->site_id	 = $this->site_id;
+		$action->save();
+
+		if (isset($action_data['score']) && $action->id)
+		{
+			$action_meta			 = new \App\Models\ActionMeta();
+			$action_meta->key		 = "score";
+			$action_meta->value		 = $action_data['score'];
+			$action_meta->action_id	 = $action->id;
+			$action_meta->save();
+		}
+		return $action->id;
+	}
+
+	function _setActionMeta($action_instance_id, $properties)
+	{
+		foreach ($properties as $key => $val)
+		{
+			$action_instance_meta						 = new \App\Models\ActionInstanceMeta();
+			$action_instance_meta->key					 = $key;
+			$action_instance_meta->value				 = $val;
+			$action_instance_meta->action_instance_id	 = $action_instance_id;
+			$action_instance_meta->save();
+		}
+	}
+
+	function _getVisitorID($identifier)
+	{
+		$visitor_id = 0;
+
+		//start processing visitor
+		$visitor_data = \App\Models\Visitor::where("identifier", $identifier)->first();
+		if (!$visitor_data)
+		{
+			$visitor			 = new \App\Models\Visitor();
+			$visitor->identifier = $identifier;
+			$visitor->save();
+			$visitor_id			 = $visitor->id;
+		}
+		else
+		{
+			$visitor_id = $visitor_data->id;
+		}
+
+		return $visitor_id;
+	}
+
+	function _getSessionID($visitor_id, $session)
+	{
+		$visitor_session_id	 = 0;
+		//start processing visitor
+		$visitor_data		 = \App\Models\Session::where("visitor_id", $visitor_id)->where("session", $session)->get()->first();
+		if (!$visitor_data)
+		{
+			$visitor_session			 = new \App\Models\Session();
+			$visitor_session->visitor_id = $visitor_id;
+			$visitor_session->site_id	 = $this->site_id;
+			$visitor_session->session	 = $session;
+			$visitor_session->save();
+
+			$visitor_session_id = $visitor_session->id;
+		}
+		else
+		{
+			$visitor_session_id = $visitor_data->id;
+		}
+		return $visitor_session_id;
+	}
+
+	function _getItemID($item_data)
+	{
+		$item = \App\Models\Item::where("identifier", $item_data['identifier'])->first();
+
+		if ($item)
+			return $item->id;
+		else
+		{
+			$item				 = new \App\Models\Item();
+			$item->identifier	 = $item_data['identifier'];
+			$item->name			 = $item_data['name'];
+			$item->site_id		 = $this->site_id;
+			$item->save();
+
+			if ($item->id)
+			{
+				foreach ($item_data['properties'] as $key => $value)
+				{
+					$item_meta			 = new \App\Models\Itemmeta();
+					$item_meta->item_id	 = $item->id;
+					$item_meta->key		 = $key;
+					$item_meta->value	 = $value;
+					$item_meta->save();
+				}
+				return $item->id;
+			}
+			else
+				return false;
+		}
 	}
 
 	public function missingMethod($parameters = array())
 	{
 		return "Missing methods";
-	}
-
-	/**
-	 * Filter the incoming requests.
-	 */
-	public function filterRequests($route, $request)
-	{
-		$this->site_id	 = false;
-		$api_credential	 = array(
-			"api_key"	 => "",
-			"secret_key" => ""
-		);
-
-		if (!empty(\Request::header("X-Predictry-Server-Api-Key")) && !empty(\Request::header("X-Predictry-Server-Secret-Key")))
-		{
-			$api_credential['api_key']		 = \Request::header("X-Predictry-Server-Api-Key");
-			$api_credential['secret_key']	 = \Request::header("X-Predictry-Server-Secret-Key");
-
-			$this->site_id = $this->validateApiKey($api_credential);
-		}
-
-		if (!$this->site_id)
-			return \Response::json(array("message" => "Auth failed", "status" => "401"), "401");
 	}
 
 	private function _translateActionToRating($str_action)

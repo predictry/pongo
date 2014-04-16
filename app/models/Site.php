@@ -7,7 +7,10 @@
  * Copyright    : rifkiyandhi@gmail.com
  * Function     : 
  */
-class Site extends Eloquent
+
+namespace App\Models;
+
+class Site extends \Eloquent
 {
 
 	/**

@@ -9,5 +9,6 @@
 @endforeach
 @endif
 {{ HTML::script('assets/js/script.js') }}
+{{ $custom_script or 'default' }}
 </body>
 </html>

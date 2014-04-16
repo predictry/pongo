@@ -1,7 +1,16 @@
-
 <?php
 
-class UserController extends BaseController
+namespace App\Controllers\User;
+
+use View,
+	Input,
+	Auth,
+	Redirect,
+	Hash,
+	Validator,
+	DateTime;
+
+class UserController extends \App\Controllers\BaseController
 {
 
 	protected $layout = 'frontend.layouts.dashboard';

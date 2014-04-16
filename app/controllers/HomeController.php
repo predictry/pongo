@@ -1,5 +1,17 @@
 <?php
 
+namespace App\Controllers;
+
+use View,
+	Auth,
+	Input,
+	Validator,
+	Redirect,
+	Hash,
+	Config,
+	Password,
+	App;
+
 class HomeController extends BaseController
 {
 
@@ -54,7 +66,7 @@ class HomeController extends BaseController
 		$flash_error = '';
 		if ($validator->passes())
 		{
-			$account_id = Account::where("email", $input['email'])->get(array('id'))->first();
+			$account_id = \App\Models\Account::where("email", $input['email'])->get(array('id'))->first();
 			if (isset($account_id))
 			{
 				if (Auth::attempt(array('email' => $input['email'], 'password' => $input['password']), ($input['remember'])))
@@ -111,7 +123,7 @@ class HomeController extends BaseController
 		$validator = Validator::make($input, $rules);
 		if ($validator->passes())
 		{
-			$account = new Account;
+			$account = new App\Models\Account;
 
 			$account->name				 = $input['name'];
 			$account->email				 = $input['email'];
@@ -157,7 +169,7 @@ class HomeController extends BaseController
 		$validator = Validator::make($input, $rules);
 		if ($validator->passes())
 		{
-			$user_id = Account::where("email", $input['email'])->get(array('id'))->first();
+			$user_id = \App\Models\Account::where("email", $input['email'])->get(array('id'))->first();
 			if (!$user_id)
 				return Redirect::to('forgot')->with('flash_error', "Email you have entered doesn't exists.");
 			else

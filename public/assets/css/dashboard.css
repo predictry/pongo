@@ -16,6 +16,26 @@ body {
     margin-bottom: 0;
 }
 
+.pt20{
+    padding-top: 20px;
+}
+
+.pb20{
+    padding-bottom: 20px;
+}
+.chosen-container{
+    width: 250px !important;
+    height: 31px !important;
+}
+
+.chosen-single, .chosen-single span{
+    line-height: 30px;
+    height: 33px !important;
+}
+.chosen-single > div > b{
+    margin-top: 5px;
+}
+
 /* Sidebar
 ================================================== */
 /* Hide for mobile, show later */

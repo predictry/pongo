@@ -1,10 +1,10 @@
 <?php
 
-namespace user;
+namespace App\Controllers\User;
 
 use Carbon\Carbon;
 
-class PanelController extends \BaseController
+class PanelController extends \App\Controllers\BaseController
 {
 
 	public function __construct()
@@ -20,18 +20,22 @@ class PanelController extends \BaseController
 	 */
 	public function index()
 	{
-		$this->active_site_id = \Session::get('active_site_id');
 		if (!$this->active_site_id)
 		{
 			return "Not found any site activated as a default display.";
 		}
 
 		$dt_2_days_ago		 = new Carbon("2 days ago");
-		$graph_y_keys		 = array("view", "rate", "add_to_cart", "buy");
 		$graph_x_keys		 = "date";
 		$graph_stats_data	 = array();
 
 		$dt_start_range = $dt_2_days_ago->toDateString();
+
+
+		$available_site_actions		 = \App\Models\Action::where("site_id", $this->active_site_id)->get()->toArray();
+		$available_site_action_ids	 = array_fetch($available_site_actions, "id");
+		$available_site_action_names = array_fetch($available_site_actions, "name");
+		$graph_y_keys				 = $available_site_action_names;
 
 		for ($i = 0; $i < 5; $i++)
 		{ //showing by day start from 2 days ago until 2 days after
@@ -43,10 +47,10 @@ class PanelController extends \BaseController
 			$dt_start	 = $dt_2_days_ago->createFromTimestamp($dt_2_days_ago->getTimestamp())->hour(0)->minute(0)->second(0);
 			$dt_end		 = $dt_2_days_ago->createFromTimestamp($dt_2_days_ago->getTimestamp())->hour(23)->minute(59)->second(59);
 
-			array_push($graph_stats_data, $this->_populateTodayActionStats($dt_start, $dt_end, $graph_y_keys));
+			array_push($graph_stats_data, $this->_populateTodayActionStats($dt_start, $dt_end, $available_site_action_ids, $available_site_action_names));
 		}
 
-		$total_action_today = \Action::getNumberOfTotalActionsRangeByDate($this->active_site_id, $dt_start, $dt_end);
+		$total_action_today = 0;
 
 		$dt_end_range = $dt_2_days_ago->toDateString();
 
@@ -63,19 +67,21 @@ class PanelController extends \BaseController
 		return \View::make('frontend.panels.dashboard', $output);
 	}
 
-	function _populateTodayActionStats($dt_start, $dt_end, $graph_y_keys)
+	function _populateTodayActionStats($dt_start, $dt_end, $action_ids, $action_names)
 	{
 		$graph_data = array("date" => $dt_start->toDateString());
 
-		foreach ($graph_y_keys as $val)
+		$i = 0;
+		foreach ($action_ids as $id)
 		{
-			$total_action			 = \Action::where("site_id", $this->active_site_id)->where("name", $val)->whereBetween('created_at', [$dt_start, $dt_end])->count();
-			$total_action_overall	 = \Action::where("site_id", $this->active_site_id)->where("name", $val)->count();
+			$total_action			 = \App\Models\ActionInstance::where("action_id", $id)->whereBetween('created', [$dt_start, $dt_end])->count();
+			$total_action_overall	 = \App\Models\ActionInstance::where("action_id", $id)->count();
 
 //			$total_action_today_details[$val]	 = $total_action;
 //			$total_action_overall_details[$val]	 = $total_action_overall;
 
-			$graph_data[$val] = $total_action;
+			$graph_data[$action_names[$i]] = $total_action;
+			$i++;
 		}
 
 		return $graph_data;

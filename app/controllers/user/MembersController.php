@@ -1,14 +1,22 @@
 <?php
 
-namespace user;
+namespace App\Controllers\User;
 
-class MembersController extends \BaseController
+use View,
+	Input,
+	Auth,
+	Redirect,
+	Hash,
+	Validator,
+	Paginator;
+
+class MembersController extends \App\Controllers\BaseController
 {
 
 	public function __construct()
 	{
 		parent::__construct();
-		\View::share(array("ca" => get_class(), "moduleName" => "Member", "view" => false));
+		View::share(array("ca" => get_class(), "moduleName" => "Member", "view" => false));
 	}
 
 	/**
@@ -18,30 +26,38 @@ class MembersController extends \BaseController
 	 */
 	public function index()
 	{
-		$this->model = new \AccountMember();
-		$page		 = \Input::get('page', 1);
-		$data		 = $this->getByPage($page, $this->manageViewConfig['limit_per_page'], "account_id", \Auth::user()->id);
+		$this->model = new \App\Models\SiteMember();
+		$page		 = Input::get('page', 1);
+		$data		 = $this->getByPage($page, $this->manageViewConfig['limit_per_page'], "site_id", $this->active_site_id);
 		$items		 = array();
+		$message	 = '';
 
-		foreach ($data->items as $member)
+		if (is_object($data))
 		{
-			$memberWithProfile = \AccountMember::find($member->member_id)->profile;
-			array_push($items, $memberWithProfile);
+			foreach ($data->items as $member)
+			{
+				$memberWithProfile = \App\Models\Member::find($member->member_id);
+				array_push($items, $memberWithProfile);
+			}
+			$paginator = Paginator::make($items, $data->totalItems, $data->limit);
+		}
+		else
+		{
+			$message	 = $data;
+			$paginator	 = null;
 		}
 
-		$paginator	 = \Paginator::make($items, $data->totalItems, $data->limit);
-		$member		 = new \Member();
-		$message	 = '';
+		$member = new \App\Models\Member();
 
 		$output = array(
 			'paginator'		 => $paginator,
-			"message"		 => $message,
+			"str_message"	 => $message,
 			"pageTitle"		 => "Manage Members",
 			"table_header"	 => $member->manage_table_header,
 			"page"			 => $page
 		);
 
-		return \View::make("frontend.panels.manage", $output);
+		return View::make("frontend.panels.manage", $output);
 	}
 
 	/**
@@ -52,52 +68,53 @@ class MembersController extends \BaseController
 	public function getCreate()
 	{
 		$this->customShare(array('pageTitle' => "Add New Member"));
-		return \View::make("frontend.panels.members.form", array("type" => "create"));
+		return View::make("frontend.panels.members.form", array("type" => "create"));
 	}
 
 	public function postCreate()
 	{
-		$input		 = \Input::only("name", "email", "password", "password_confirmation", "notify");
-		$member		 = new \Member();
-		$validator	 = \Validator::make($input, $member->rules);
+		$input		 = Input::only("name", "email", "password", "password_confirmation", "notify");
+		$member		 = new \App\Models\Member();
+		$validator	 = Validator::make($input, $member->rules);
 
 		if ($validator->passes())
 		{
 			$member->name			 = $input['name'];
 			$member->email			 = $input['email'];
-			$member->password_hash	 = \Hash::make($input['password']);
+			$member->password_hash	 = Hash::make($input['password']);
 			$member->password_salt	 = "TEST";
 			$id						 = $member->save();
 
 			if ($id)
 			{
-				$account_member				 = new \AccountMember();
-				$account_member->account_id	 = \Auth::user()->id;
+				$account_member				 = new \App\Models\SiteMember();
+				$account_member->site_id	 = $this->active_site_id;
 				$account_member->member_id	 = $member->id;
+				$account_member->access		 = "view";
 
 				$account_member->save();
-				return \Redirect::back()->with("flash_message", "Successfully added new member.");
+				return Redirect::to("members")->with("flash_message", "Successfully added new member.");
 			}
 			else
-				return \Redirect::back()->with("flash_error", "Inserting problem. Please try again.");
+				return Redirect::back()->with("flash_error", "Inserting problem. Please try again.");
 		}
 		else
 		{
-			return \Redirect::back()->withInput()->withErrors($validator);
+			return Redirect::back()->withInput()->withErrors($validator);
 		}
 	}
 
 	public function getEdit($id)
 	{
-		$member = \AccountMember::find($id)->profile;
+		$member = \App\Models\Member::find($id);
 		$this->customShare(array('pageTitle' => "Edit Member"));
-		return \View::make("frontend.panels.members.form", array("member" => $member, "type" => "edit"));
+		return View::make("frontend.panels.members.form", array("member" => $member, "type" => "edit"));
 	}
 
 	public function postEdit($id)
 	{
-		$member	 = \Member::find($id);
-		$input	 = \Input::only("name", "email", "password", "password_confirmation");
+		$member	 = \App\Models\Member::find($id);
+		$input	 = Input::only("name", "email", "password", "password_confirmation");
 
 		$existing_email = $member->email;
 
@@ -106,24 +123,24 @@ class MembersController extends \BaseController
 			"email"	 => ($input['email'] !== $existing_email) ? 'required|email|unique:accounts|unique:members' : 'required|email'
 		);
 
-		$validator = \Validator::make($input, $rules);
+		$validator = Validator::make($input, $rules);
 
 		if ($validator->passes()) // validator for name and email
 		{
-			if (isset($input['password']) && $input['password'] !== '')
+			if (isset($input['password']) && $input['password'] !== '') // i think can be change to Input::has('password') guess so
 			{
-				$validator = \Validator::make($input, array('password' => $member->rules['password']));
+				$validator = Validator::make($input, array('password' => $member->rules['password']));
 
 				if ($validator->passes()) // if password is not empty then validate
 				{
 					$member->name			 = $input['name'];
 					$member->email			 = $input['email'];
-					$member->password_hash	 = \Hash::make($input['password']);
+					$member->password_hash	 = Hash::make($input['password']);
 					$member->password_salt	 = "TEST";
 				}
 				else
 				{
-					return \Redirect::back()->withInput()->withErrors($validator);
+					return Redirect::back()->withInput()->withErrors($validator);
 				}
 			}
 			else
@@ -133,19 +150,19 @@ class MembersController extends \BaseController
 			}
 
 			$member->update();
-			return \Redirect::back()->with("flash_message", "Data successfully updated.");
+			return Redirect::to("members")->with("flash_message", "Data successfully updated.");
 		}
 		else
 		{
-			return \Redirect::back()->withInput()->withErrors($validator);
+			return Redirect::back()->withInput()->withErrors($validator);
 		}
 	}
 
 	public function postDelete($id)
 	{
-		\Member::find($id)->delete();
-		\AccountMember::where("account_id", \Auth::user()->id)->where("member_id", $id)->delete();
-		return \Redirect::back()->with("flash_message", "Member data has been removed.");
+		\App\Models\Member::find($id)->delete();
+		\App\Models\AccountMember::where("account_id", Auth::user()->id)->where("member_id", $id)->delete();
+		return Redirect::back()->with("flash_message", "Member data has been removed.");
 	}
 
 }

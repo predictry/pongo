@@ -7,7 +7,10 @@
  * Copyright    : rifkiyandhi@gmail.com
  * Function     : 
  */
-class AccountMember extends Eloquent
+
+namespace App\Models;
+
+class AccountMember extends \Eloquent
 {
 
 	/**
@@ -25,7 +28,7 @@ class AccountMember extends Eloquent
 
 	public function profile()
 	{
-		return $this->hasOne("Member", "id");
+		return $this->hasOne("\App\Models\Member", "id");
 	}
 
 }

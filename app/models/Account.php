@@ -7,10 +7,13 @@
  * Copyright    : rifkiyandhi@gmail.com
  * Function     :
  */
+
+namespace App\Models;
+
 use Illuminate\Auth\UserInterface;
 use Illuminate\Auth\Reminders\RemindableInterface;
 
-class Account extends Eloquent implements UserInterface, RemindableInterface
+class Account extends \Eloquent implements UserInterface, RemindableInterface
 {
 
 	/**
@@ -18,14 +21,14 @@ class Account extends Eloquent implements UserInterface, RemindableInterface
 	 *
 	 * @var string
 	 */
-	protected $table	 = 'accounts';
+	protected $table = 'accounts';
 
 	/**
 	 * The attributes excluded from the model's JSON form.
 	 *
 	 * @var array
 	 */
-	protected $hidden	 = array('password');
+	protected $hidden = array('password');
 
 	/**
 	 * Get the unique identifier for the user.

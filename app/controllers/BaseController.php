@@ -1,6 +1,12 @@
 <?php
 
-class BaseController extends Controller
+namespace App\Controllers;
+
+use View,
+	Auth,
+	Session;
+
+class BaseController extends \Controller
 {
 
 	public $siteInfo		 = array();
@@ -10,43 +16,53 @@ class BaseController extends Controller
 
 	public function __construct()
 	{
-		$this->siteInfo['siteName']	 = 'Predictry';
-		$this->siteInfo['pageTitle'] = '';
-		$this->siteInfo['metaDesc']	 = 'Predictry website description';
-		$this->siteInfo['metaKeys']	 = 'predictry, recommendation, engine';
-		$this->siteInfo['styles']	 = array();
-		$this->siteInfo['scripts']	 = array();
-		$this->siteInfo['ca']		 = '';
+		$this->siteInfo['siteName']		 = 'Predictry';
+		$this->siteInfo['pageTitle']	 = '';
+		$this->siteInfo['metaDesc']		 = 'Predictry website description';
+		$this->siteInfo['metaKeys']		 = 'predictry, recommendation, engine';
+		$this->siteInfo['styles']		 = array();
+		$this->siteInfo['scripts']		 = array();
+		$this->siteInfo['custom_script'] = '';
+		$this->siteInfo['ca']			 = '';
 
+		$this->manageViewConfig['isManage']			 = true;
 		$this->manageViewConfig['create']			 = true;
 		$this->manageViewConfig['edit']				 = true;
 		$this->manageViewConfig['view']				 = true;
 		$this->manageViewConfig['delete']			 = true;
 		$this->manageViewConfig['custom_action']	 = false;
-		$this->manageViewConfig['limit_per_page']	 = 5;
+		$this->manageViewConfig['selector']			 = false;
+		$this->manageViewConfig['limit_per_page']	 = 10;
 
 		View::share($this->siteInfo);
 		View::share($this->manageViewConfig);
 
-		//set default active site id
-		if (Session::get("active_site_id") !== null)
+		if (Auth::check())
 		{
-			$this->active_site_id = Session::get("active_site_id");
-			View::share(array("activeSiteName" => Session::get("active_site_name")));
-		}
-		else
-		{
-			$site = Site::where("account_id", Auth::user()->id)->get(array('id', 'name'))->first();
-
-			if ($site->id)
+			//set default active site id
+			$site_exists = false;
+			if (Session::get("active_site_id") !== null)
 			{
-				$this->active_site_id = $site->id;
-				Session::set("active_site_id", $site->id);
-				Session::set("active_site_name", $site->name);
+				$this->active_site_id	 = Session::get("active_site_id");
 				View::share(array("activeSiteName" => Session::get("active_site_name")));
+				$site_exists			 = \App\Models\Site::find($this->active_site_id)->count();
 			}
-			else
-				return Redirect::to('logout');
+
+			if (Session::get("active_site_id") === null && !$site_exists)
+			{
+				$site = \App\Models\Site::where("account_id", Auth::user()->id)->get(array('id', 'name'))->first();
+
+				if ($site->id)
+				{
+					$this->active_site_id = $site->id;
+					Session::set("active_site_id", $site->id);
+					Session::set("active_site_name", $site->name);
+					Session::remove("default_action_view");
+					View::share(array("activeSiteName" => Session::get("active_site_name")));
+				}
+				else
+					return Redirect::to('logout');
+			}
 		}
 	}
 
@@ -72,24 +88,6 @@ class BaseController extends Controller
 		View::share($this->siteInfo);
 	}
 
-	public function validateApiKey($api_credential)
-	{
-//		$site = Site::where("api_key", $api_credential['api_key'])->where("secret_key", $api_credential['secret_key'])->get();
-		$site = Site::where("api_key", "=", $api_credential['api_key'])
-						->where("api_secret", "=", $api_credential['secret_key'])
-						->get()->first();
-
-		if (is_object($site))
-			$site = $site->toArray();
-
-		if (count($site) > 0 && !empty($site['url']) && ($site['url'] === "http://www.rifkiyandhi.com"))
-		{
-			return $site['id'];
-		}
-
-		return false;
-	}
-
 	/**
 	 * Get results by page
 	 *
@@ -97,7 +95,7 @@ class BaseController extends Controller
 	 * @param int $limit
 	 * @return StdClass
 	 */
-	public function getByPage($page = 1, $limit = 10, $column = false, $value = false)
+	public function getByPage($page = 1, $limit = 10, $column = false, $value = false, $orderbyprimary = false, $orderbyasc = 'ASC')
 	{
 		$results			 = new \stdClass;
 		$results->page		 = $page;
@@ -107,17 +105,38 @@ class BaseController extends Controller
 
 		if ($column && $value)
 		{
-			$rows = $this->model->where($column, $value)->skip($limit * ($page - 1))
-					->take($limit)
-					->get();
+			if (!$orderbyprimary)
+			{
+				$rows = $this->model->where($column, $value)->skip($limit * ($page - 1))
+						->take($limit)
+						->get();
+			}
+			else
+			{
+				$rows = $this->model->where($column, $value)->skip($limit * ($page - 1))
+						->take($limit)
+						->orderBy($orderbyprimary, $orderbyasc)
+						->get();
+			}
 
 			$results->totalItems = $this->model->where($column, $value)->count();
 		}
 		else
 		{
-			$rows				 = $this->model->skip($limit * ($page - 1))
-					->take($limit)
-					->get();
+			if (!$orderbyprimary)
+			{
+				$rows = $this->model->skip($limit * ($page - 1))
+						->take($limit)
+						->get();
+			}
+			else
+			{
+				$rows = $this->model->skip($limit * ($page - 1))
+						->take($limit)
+						->orderBy($orderbyprimary, $orderbyasc)
+						->get();
+			}
+
 			$results->totalItems = $this->model->count();
 		}
 
