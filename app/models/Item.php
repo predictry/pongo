@@ -25,7 +25,7 @@ class Item extends \Eloquent
 	);
 	public $manage_table_header	 = array(
 		"identifier" => "Item ID",
-		"name"		 => "Description",
+		"name"		 => "Name",
 		"type"		 => "Type",
 		"created_at" => "Date Created",
 		"active"	 => "Activated"

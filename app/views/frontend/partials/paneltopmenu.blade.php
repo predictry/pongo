@@ -20,7 +20,9 @@
 					<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                         <li><a href="<?php echo URL::route('profile'); ?>">Edit Profile</a></li>
                         <li><a href="<?php echo URL::route('password'); ?>">Edit Password</a></li>
-						<li><a href="<?php echo URL::route('sites'); ?>">Manage Sites</a></li>
+						<?php if (Session::get("role") !== "member") : ?>
+							<li><a href="<?php echo URL::to('sites'); ?>">Manage Sites</a></li>
+						<?php endif; ?>
                         <li><a href="#">Help</a></li>
                         <li class="divider"></li>
                         <li><a href="<?php echo URL::to('user/logout'); ?>">Logout</a></li>

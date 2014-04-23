@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Author       : Rifki Yandhi
  * Date Created : Mar 18, 2014 5:10:42 PM
@@ -74,10 +75,24 @@ class HomeController extends BaseController
 		if ($validator->passes())
 		{
 			$account_id = \App\Models\Account::where("email", $input['email'])->get(array('id'))->first();
+
 			if (isset($account_id))
 			{
 				if (Auth::attempt(array('email' => $input['email'], 'password' => $input['password']), ($input['remember'])))
 				{
+					//validate if member or not
+					$member = App\Models\Member::where("account_id", Auth::user()->id)->get()->first();
+					if ($member)
+					{
+						$site_member = App\Models\SiteMember::where("member_id", $member->id)->get()->first();
+						$site		 = \App\Models\Site::find($site_member->site_id);
+						\Session::set("active_site_id", $site_member->site_id);
+						\Session::set("active_site_name", $site->name);
+						\Session::set("role", "member");
+					}
+					else
+						\Session::set("role", "admin");
+
 					return Redirect::to('dashboard');
 				}
 

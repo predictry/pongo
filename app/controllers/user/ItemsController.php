@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Author       : Rifki Yandhi
  * Date Created : Mar 18, 2014 5:10:42 PM
@@ -51,14 +52,15 @@ class ItemsController extends \App\Controllers\BaseController
 			"str_message"	 => $message,
 			"pageTitle"		 => "Manage Items",
 			"table_header"	 => $this->model->manage_table_header,
-			"page"			 => $page
+			"page"			 => $page,
+			"modalTitle"	 => "View Item"
 		);
 		return View::make("frontend.panels.manage", $output);
 	}
 
 	public function getEdit($id)
 	{
-		$item		 = \App\Models\Item::find($id)->first();
+		$item		 = \App\Models\Item::find($id);
 		$activated	 = ($item->active) ? true : false;
 		return View::make("frontend.panels.items.form", array("item" => $item, "type" => "edit", 'pageTitle' => "Edit Item", "activated" => $activated));
 	}
@@ -95,6 +97,7 @@ class ItemsController extends \App\Controllers\BaseController
 
 	public function postDelete($id)
 	{
+		\App\Models\Rule::where("item_id", $id)->delete();
 		\App\Models\Item::find($id)->delete();
 		return Redirect::back()->with("flash_message", "Data has been removed.");
 	}

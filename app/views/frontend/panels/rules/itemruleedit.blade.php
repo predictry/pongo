@@ -25,10 +25,9 @@
 	<div class="col-sm-3 form-group">
 		<label for='item1' class="control-label">&nbsp;</label>
 		<div class="clearfix"></div>
-		@if($obj['last_index'] === $index_item_rule)
-		<a href="javascript:void(0);" class="btn btn-default btnAddItemRule" onClick="addItemRule();">Add</a>
-		@else
-		<a href="javascript:void(0);" class="btn btnRemoveItemRule btn-danger" onClick="removeItemRule({{ $index_item_rule }});">Remove</a>
+		@if($index_item_rule > 1)
+		<a href="javascript:void(0);" class="btn btnRemoveItemRule btn-danger" onClick="removeItemRule({{ $index_item_rule }});"><i class="fa fa-minus"></i></a>
 		@endif
 	</div>
 </div>
+<div class="clearfix"></div>

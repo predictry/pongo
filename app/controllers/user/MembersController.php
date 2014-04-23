@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Author       : Rifki Yandhi
  * Date Created : Mar 18, 2014 5:10:42 PM
@@ -43,9 +44,11 @@ class MembersController extends \App\Controllers\BaseController
 		{
 			foreach ($data->items as $member)
 			{
-				$memberWithProfile = \App\Models\Member::find($member->member_id);
+				$memberWithProfile		 = \App\Models\Member::find($member->member_id)->detail;
+				$memberWithProfile->id	 = $member->member_id;
 				array_push($items, $memberWithProfile);
 			}
+
 			$paginator = Paginator::make($items, $data->totalItems, $data->limit);
 		}
 		else
@@ -80,20 +83,40 @@ class MembersController extends \App\Controllers\BaseController
 
 	public function postCreate()
 	{
-		$input		 = Input::only("name", "email", "password", "password_confirmation", "notify");
-		$member		 = new \App\Models\Member();
-		$validator	 = Validator::make($input, $member->rules);
+		$input = array(
+			'name'					 => \Input::get('name'),
+			'email'					 => \Input::get('email'),
+			'password'				 => \Input::get('password'),
+			'password_confirmation'	 => \Input::get('password_confirmation')
+		);
 
+		$rules = array(
+			'name'					 => 'required',
+			'password'				 => 'required|min:8|confirmed',
+			'password_confirmation'	 => 'required|min:8',
+			'email'					 => 'required|email|unique:accounts'
+		);
+
+		$validator = \Validator::make($input, $rules);
 		if ($validator->passes())
 		{
-			$member->name			 = $input['name'];
-			$member->email			 = $input['email'];
-			$member->password_hash	 = Hash::make($input['password']);
-			$member->password_salt	 = "TEST";
-			$id						 = $member->save();
+			$account = new \App\Models\Account;
 
-			if ($id)
+			$account->name				 = $input['name'];
+			$account->email				 = $input['email'];
+			$account->password			 = Hash::make($input['password']);
+			$account->plan_id			 = 1;
+			$account->confirmed			 = 1;
+			$account->confirmation_code	 = md5(microtime() . \Config::get('app.key'));
+			$account->save();
+
+			if ($account->id)
 			{
+
+				$member				 = new \App\Models\Member();
+				$member->account_id	 = $account->id;
+				$member->save();
+
 				$account_member				 = new \App\Models\SiteMember();
 				$account_member->site_id	 = $this->active_site_id;
 				$account_member->member_id	 = $member->id;
@@ -113,21 +136,24 @@ class MembersController extends \App\Controllers\BaseController
 
 	public function getEdit($id)
 	{
-		$member = \App\Models\Member::find($id);
+		$member		 = \App\Models\Member::find($id)->detail;
+		$member->id	 = $id;
 		$this->customShare(array('pageTitle' => "Edit Member"));
 		return View::make("frontend.panels.members.form", array("member" => $member, "type" => "edit"));
 	}
 
 	public function postEdit($id)
 	{
-		$member	 = \App\Models\Member::find($id);
+		$member	 = \App\Models\Member::find($id)->detail;
 		$input	 = Input::only("name", "email", "password", "password_confirmation");
 
 		$existing_email = $member->email;
 
+		$member_model = new \App\Models\Member();
+
 		$rules = array(
-			'name'	 => $member->rules['name'],
-			"email"	 => ($input['email'] !== $existing_email) ? 'required|email|unique:accounts|unique:members' : 'required|email'
+			'name'	 => $member_model->rules['name'],
+			"email"	 => ($input['email'] !== $existing_email) ? 'required|email|unique:accounts' : 'required|email'
 		);
 
 		$validator = Validator::make($input, $rules);
@@ -136,18 +162,23 @@ class MembersController extends \App\Controllers\BaseController
 		{
 			if (isset($input['password']) && $input['password'] !== '') // i think can be change to Input::has('password') guess so
 			{
-				$validator = Validator::make($input, array('password' => $member->rules['password']));
+				$input_password	 = Input::only("password", "password_confirmation");
+				$rules			 = array(
+					'password' => 'required|min:8|confirmed'
+				);
 
-				if ($validator->passes()) // if password is not empty then validate
+
+
+				$validator = Validator::make($input_password, $rules);
+				if ($validator->passes())
 				{
-					$member->name			 = $input['name'];
-					$member->email			 = $input['email'];
-					$member->password_hash	 = Hash::make($input['password']);
-					$member->password_salt	 = "TEST";
+					$member->password	 = Hash::make($input['password']);
+					$member->updated_at	 = new \DateTime;
+					$member->update();
 				}
 				else
 				{
-					return Redirect::back()->withInput()->withErrors($validator);
+					return Redirect::back()->withErrors($validator);
 				}
 			}
 			else
@@ -167,8 +198,12 @@ class MembersController extends \App\Controllers\BaseController
 
 	public function postDelete($id)
 	{
-		\App\Models\Member::find($id)->delete();
-		\App\Models\AccountMember::where("account_id", Auth::user()->id)->where("member_id", $id)->delete();
+		$member = \App\Models\Member::find($id);
+		if ($member)
+		{
+			$account = \App\Models\Account::find($member->account_id);
+			$account->delete();
+		}
 		return Redirect::back()->with("flash_message", "Member data has been removed.");
 	}
 

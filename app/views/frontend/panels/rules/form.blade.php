@@ -96,29 +96,40 @@
 							<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
 							</span>
 						</div>
-<?php } ?>
+					<?php } ?>
 				</div>
 				<span class="help-block">{{ $errors->first('expiry_value') }}</span>
 			</div>
 
-<?php echo Form::hidden("expiry_value_dt", "", array("id" => "expiry_value_dt")); ?>
+			<?php echo Form::hidden("expiry_value_dt", "", array("id" => "expiry_value_dt")); ?>
 		</div>
 
 
 		<div class="tab-pane pt20" id="tabRuleItem">
 			<!-- rule item -->
-			<div class="row" id="item_rules_container">
+			<div class="" id="item_rules_container">
+				<div class="action_buttons pull-right">
+					<a href="javascript:void(0);" class="btn btn-default" onClick="addItemRule();"><i class="fa fa-plus"></i></a>
+				</div>
+				<div class="clearfix"></div>
+
 				<?php if ($type === "create") : ?>
 					@include('frontend.panels.rules.itemrule')	
-<?php endif; ?>
+				<?php elseif ($type === "edit") : ?>
+					<?php
+					if ($number_of_items === 1)
+					{
+						?>
+						@include('frontend.panels.rules.itemrule')	
+						<?php
+					}
+				endif;
+				?>
 			</div>
 		</div>
-		<div class="clearfix form-horizontal">
-			<div class="form-group">
-				<div class="pull-right">
-					<button type="submit" class="btn btn-primary">Submit</button>
-				</div>
-			</div>
+		<div class="clearfix"></div>
+		<div class="pull-right">
+			<button type="submit" class="btn btn-primary">Submit</button>
 		</div>
 	</div><!-- end of tab-content -->
 	{{ Form::close(); }}

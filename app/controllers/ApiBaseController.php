@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Author       : Rifki Yandhi
  * Date Created : Mar 18, 2014 5:10:42 PM
@@ -30,25 +31,26 @@ class ApiBaseController extends \Controller
 	{
 		$this->site_id	 = false;
 		$api_credential	 = array(
+			"tenant_id"	 => "",
 			"api_key"	 => "",
 			"secret_key" => ""
 		);
 
-		if (!empty(\Request::header("X-Predictry-Server-Api-Key")) && !empty(\Request::header("X-Predictry-Server-Secret-Key")))
+		if (!empty(\Request::header("X-Predictry-Server-Api-Key")) && !empty(\Request::header("X-Predictry-Server-Tenant-ID")))
 		{
-			$api_credential['api_key']		 = \Request::header("X-Predictry-Server-Api-Key");
-			$api_credential['secret_key']	 = \Request::header("X-Predictry-Server-Secret-Key");
-			$this->site_id					 = $this->validateApiKey($api_credential);
+			$api_credential['tenant_id'] = \Request::header("X-Predictry-Server-Tenant-ID");
+			$api_credential['api_key']	 = \Request::header("X-Predictry-Server-Api-Key");
+//			$api_credential['secret_key']	 = \Request::header("X-Predictry-Server-Secret-Key");
+			$this->site_id				 = $this->validateApiKey($api_credential);
 		}
-
 		if (!$this->site_id)
 			return \Response::json(array("message" => "Auth failed", "status" => "401"), "401");
 	}
 
 	public function validateApiKey($api_credential)
 	{
-		$site = \App\Models\Site::where("api_key", "=", $api_credential['api_key'])
-						->where("api_secret", "=", $api_credential['secret_key'])
+		$site = \App\Models\Site::where("api_key", $api_credential['api_key'])
+						->where("name", $api_credential['tenant_id'])
 						->get()->first();
 
 		if (is_object($site))
@@ -60,6 +62,11 @@ class ApiBaseController extends \Controller
 		}
 
 		return false;
+	}
+
+	public function getTesting()
+	{
+		return \Response::json($_SERVER);
 	}
 
 }

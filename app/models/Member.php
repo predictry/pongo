@@ -18,9 +18,9 @@ class Member extends \Eloquent
 	 *
 	 * @var string
 	 */
+	public $timestamps			 = false;
 	protected $primaryKey		 = "id";
 	protected $table			 = 'members';
-	protected $softDelete		 = true;
 	public $manage_table_header	 = array(
 		"name"		 => "Name",
 		"email"		 => "Email",
@@ -31,6 +31,11 @@ class Member extends \Eloquent
 		"email"		 => "required|email|unique:accounts|unique:members",
 		"password"	 => "required|min:8|confirmed"
 	);
+
+	public function detail()
+	{
+		return $this->belongsTo("App\Models\Account", "account_id");
+	}
 
 }
 

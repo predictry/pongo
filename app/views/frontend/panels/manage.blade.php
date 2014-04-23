@@ -11,7 +11,7 @@
 		@endif
 		@if ($create)
 		<div class="col-sm-6 action_buttons text-right">
-			<a href="{{ URL::to( URL::current() . "/create" ) }}" class="btn btn-primary btn-sm"><i class="fa fa-user"></i> Add New {{ $moduleName }}</a>
+			<a href="{{ URL::to( URL::current() . "/create" ) }}" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> Add New {{ $moduleName }}</a>
 		</div>
 		@endif
 		<div class="clearfix"></div>

@@ -20,6 +20,10 @@ App::after(function($request, $response) {
 	//
 });
 
+App::missing(function($exception) {
+	return Response::view('errors.missing', array(), 404);
+//	return Redirect::to("dashboard");
+});
 /*
   |--------------------------------------------------------------------------
   | Authentication Filters
@@ -40,7 +44,6 @@ Route::filter('auth', function() {
 Route::filter('auth.basic', function() {
 	return Auth::basic();
 });
-
 /*
   |--------------------------------------------------------------------------
   | Guest Filter

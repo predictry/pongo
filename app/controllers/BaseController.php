@@ -52,7 +52,7 @@ class BaseController extends \Controller
 			{
 				$site = \App\Models\Site::where("account_id", Auth::user()->id)->get(array('id', 'name'))->first();
 
-				if ($site->id)
+				if ($site)
 				{
 					$this->active_site_id = $site->id;
 					Session::set("active_site_id", $site->id);
@@ -61,7 +61,7 @@ class BaseController extends \Controller
 					View::share(array("activeSiteName" => Session::get("active_site_name")));
 				}
 				else
-					return Redirect::to('logout');
+					return \Redirect::to('logout');
 			}
 		}
 	}

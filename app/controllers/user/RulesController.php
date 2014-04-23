@@ -88,6 +88,31 @@ class RulesController extends \App\Controllers\BaseController
 		));
 	}
 
+	public function getFormCreate()
+	{
+		$enum_types = array(
+			"excluded"	 => "Excluded",
+			"included"	 => "Included"
+		);
+
+		$enum_expiry_types = array(
+			"no_expiry"	 => "No Expiry",
+			"pageviews"	 => "Page Views",
+			"date/time"	 => "Date & Time",
+			"clicks"	 => "Clicks"
+		);
+
+		$items = \App\Models\Item::where("site_id", $this->active_site_id)->where("name", "!=", "")->lists("name", "id");
+		return View::make("frontend.panels.rules.modalform", array(
+					"type"				 => "create",
+					'enum_types'		 => $enum_types,
+					'enum_expiry_types'	 => $enum_expiry_types,
+					"items"				 => $items,
+					"index_item_rule"	 => 1,
+					"flash_error"		 => ""
+		));
+	}
+
 	public function postCreate()
 	{
 		$input		 = Input::only("name", "description", "expiry_type", "expiry_value", "expiry_value_dt");
@@ -133,7 +158,7 @@ class RulesController extends \App\Controllers\BaseController
 				$item_rule = array(
 					"item_id"	 => $items[$i],
 					"type"		 => $types[$i],
-					"likelihood" => ($likelihoods[$i] !== "") ? ($likelihoods[$i] / 100) : 0.0
+					"likelihood" => ($likelihoods[$i] !== "") ? ($likelihoods[$i] / 1000) : 0.0
 				);
 
 				$validator = \Validator::make($item_rule, $rule_model->rules);
@@ -248,17 +273,18 @@ class RulesController extends \App\Controllers\BaseController
 			$index_item_rule+=1;
 		}
 		$custom_script.= "</script>";
-
+		$numberOfItems = ( $index_item_rule > 1) ? $index_item_rule : 1;
 
 		return View::make("frontend.panels.rules.form", array(
 					"type"				 => "edit",
-					'pageTitle'			 => "Add New Ruleset",
+					'pageTitle'			 => "Edit Ruleset",
 					'enum_types'		 => $enum_types,
 					'enum_expiry_types'	 => $enum_expiry_types,
 					"items"				 => $items,
 					"item_rules"		 => $item_rules,
 					"ruleset"			 => $ruleset,
 					"index_item_rule"	 => 1,
+					"number_of_items"	 => $numberOfItems,
 					"custom_script"		 => $custom_script
 		));
 	}
@@ -407,6 +433,13 @@ class RulesController extends \App\Controllers\BaseController
 		$is_exists = \App\Models\Ruleset::where("id", $id)->where("site_id", $this->active_site_id)->count();
 		if ($is_exists)
 		{
+			$placement_rulesets = \App\Models\PlacementRuleSet::where("ruleset_id", $id)->get();
+			foreach ($placement_rulesets as $ruleset)
+			{
+				$placement_ruleset = \App\Models\PlacementRuleSet::find($ruleset->id);
+				$placement_ruleset->delete();
+			}
+
 			$ruleset = \App\Models\Ruleset::find($id);
 			$ruleset->delete();
 		}
@@ -436,6 +469,37 @@ class RulesController extends \App\Controllers\BaseController
 		return \Response::json(
 						array("status"	 => "success",
 							"response"	 => View::make("frontend.panels.rules.itemrule", array(
+								'enum_types'		 => $enum_types,
+								'enum_expiry_types'	 => $enum_expiry_types,
+								"items"				 => $items,
+								"index_item_rule"	 => $index_item_rule)
+							)->render()
+		));
+	}
+
+	public function getModalItemRule()
+	{
+		$index_item_rule = Input::get("index");
+
+		$enum_types = array(
+			"excluded"	 => "Excluded",
+			"included"	 => "Included"
+		);
+
+		$enum_expiry_types = array(
+			"no_expiry"	 => "No Expiry",
+			"pageviews"	 => "Page Views",
+			"date/time"	 => "Date & Time",
+			"clicks"	 => "Clicks"
+		);
+
+		$items = \App\Models\Item::where("site_id", $this->active_site_id)
+				->where("name", "!=", "")
+				->lists("name", "id");
+
+		return \Response::json(
+						array("status"	 => "success",
+							"response"	 => View::make("frontend.panels.rules.modalitemrule", array(
 								'enum_types'		 => $enum_types,
 								'enum_expiry_types'	 => $enum_expiry_types,
 								"items"				 => $items,

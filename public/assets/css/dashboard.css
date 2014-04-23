@@ -16,6 +16,14 @@ body {
     margin-bottom: 0;
 }
 
+.mb10{
+    margin-bottom: 10px;
+}
+
+.mb20{
+    margin-bottom: 20px;
+}
+
 .pt20{
     padding-top: 20px;
 }
@@ -24,17 +32,22 @@ body {
     padding-bottom: 20px;
 }
 .chosen-container{
+    width: 90% !important;
+}
+/*.chosen-container{
     width: 250px !important;
     height: 31px !important;
 }
-
-.chosen-single, .chosen-single span{
+.chosen-container-multi{
+    display: inline;
+}*/
+/*.chosen-single, .chosen-single span{
     line-height: 30px;
     height: 33px !important;
 }
 .chosen-single > div > b{
     margin-top: 5px;
-}
+}*/
 
 /* Sidebar
 ================================================== */
