@@ -57,7 +57,9 @@ class StatisticsController extends \App\Controllers\BaseController
 		$full_stats['number_of_total_actions_overall']		 = \App\Models\Action::getNumberOfTotalActionsOverall($this->active_site_id);
 		$full_stats['number_of_total_items']				 = \App\Models\Item::where('site_id', $this->active_site_id)->count();
 		$full_stats['number_of_total_users']				 = ($number_of_total_users !== null) ? $number_of_total_users : 0;
-		$average_per_user									 = floor($full_stats['number_of_total_actions_overall'] / ($full_stats['number_of_total_users'] !== 0 ? $full_stats['number_of_total_users'] : 1));
+
+//		$average_per_user									 = floor($full_stats['number_of_total_actions_overall'] / ($full_stats['number_of_total_users'] !== 0 ? $full_stats['number_of_total_users'] : 1));
+		$average_per_user									 = floor($full_stats['number_of_total_actions_overall'] / ($full_stats['number_of_total_users'] != 0 ? $full_stats['number_of_total_users'] : 1));
 		$full_stats['average_action_per_users']				 = $average_per_user;
 
 		$output = array(

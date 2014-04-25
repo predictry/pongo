@@ -2,9 +2,6 @@
 @include('frontend.partials.paneltopmenu')
 <div class="container-fluid">
 	<div class="row">
-		@if(Session::get("active_site_id") !== null)
-		@include('frontend.partials.panelsidebar')
-		@endif
 		@yield('content')
 	</div><!-- END OF ROW -->
 </div><!-- END OF CONTAINER FLUID -->

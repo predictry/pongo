@@ -77,6 +77,11 @@ class RulesController extends \App\Controllers\BaseController
 		$custom_script .= "var site_url = '" . \URL::to('/') . "';";
 		$custom_script .= "</script>";
 
+		if (count($items) <= 0)
+		{
+			return \Redirect::to("rules")->with("flash_error", "Currently, you don't have any items to set as a rule.");
+		}
+
 		return View::make("frontend.panels.rules.form", array(
 					"type"				 => "create",
 					'pageTitle'			 => "Add New Ruleset",

@@ -36,7 +36,6 @@ class BaseController extends \Controller
 
 		View::share($this->siteInfo);
 		View::share($this->manageViewConfig);
-
 		if (Auth::check())
 		{
 			//set default active site id
@@ -44,24 +43,24 @@ class BaseController extends \Controller
 			if (Session::get("active_site_id") !== null)
 			{
 				$this->active_site_id	 = Session::get("active_site_id");
-				View::share(array("activeSiteName" => Session::get("active_site_name")));
 				$site_exists			 = \App\Models\Site::find($this->active_site_id)->count();
+				$sites					 = \App\Models\Site::where("account_id", Auth::user()->id)->get()->toArray();
+				View::share(array("activeSiteName" => Session::get("active_site_name"), "sites" => $sites));
 			}
 
 			if (Session::get("active_site_id") === null && !$site_exists)
 			{
 				$site = \App\Models\Site::where("account_id", Auth::user()->id)->get(array('id', 'name'))->first();
-
 				if ($site)
 				{
-					$this->active_site_id = $site->id;
+					$this->active_site_id	 = $site->id;
 					Session::set("active_site_id", $site->id);
 					Session::set("active_site_name", $site->name);
 					Session::remove("default_action_view");
-					View::share(array("activeSiteName" => Session::get("active_site_name")));
+					$sites					 = \App\Models\Site::where("account_id", Auth::user()->id)->get()->toArray();
+
+					View::share(array("activeSiteName" => Session::get("active_site_name"), "sites" => $sites));
 				}
-				else
-					return \Redirect::to('logout');
 			}
 		}
 	}

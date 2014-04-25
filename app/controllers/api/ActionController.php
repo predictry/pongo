@@ -188,7 +188,7 @@ class ActionController extends \App\Controllers\ApiBaseController
 
 	function _getItemID($item_data)
 	{
-		$item = \App\Models\Item::where("identifier", $item_data['identifier'])->first();
+		$item = \App\Models\Item::where("identifier", $item_data['identifier'])->where("site_id", $this->site_id)->first();
 
 		if ($item)
 			return $item->id;

@@ -3,7 +3,7 @@
 @section('content')
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 	
-	<h1 class="page-header">Stats</h1>
+	<h1 class="page-header">Stats ({{$activeSiteName}})</h1>
 	<p class="pull-right">{{ $str_date_range }} </p>
 
 	<script type="text/javascript">

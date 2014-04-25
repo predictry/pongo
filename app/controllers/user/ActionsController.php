@@ -47,30 +47,21 @@ class ActionsController extends \App\Controllers\BaseController
 	{
 		$this->model = new \App\Models\ActionInstance();
 		$page		 = Input::get('page', 1);
-		$action_name = "";
 
-		$action_type_dropdown = \App\Models\Action::where("site_id", $this->active_site_id)->lists("name", "id");
-
+		$action_type_dropdown		 = \App\Models\Action::where("site_id", $this->active_site_id)->lists("name", "id");
 		$available_site_actions		 = \App\Models\Action::where("site_id", $this->active_site_id)->get()->toArray();
 		$available_site_action_ids	 = array_fetch($available_site_actions, "id");
 		$available_site_action_names = array_fetch($available_site_actions, "name");
 
-		if (count($available_site_action_ids) > 0)
-		{
-			$available_site_actual_actions = \App\Models\ActionMeta::whereIn("action_id", $available_site_action_ids)
-					->where("key", "score")
-					->get()
-					->toArray();
 
-			if ($this->default_action_view_id === null)
-			{ // if not set
-				$available_site_actual_action_ids	 = array_fetch($available_site_actual_actions, "action_id");
-				\Session::set("default_action_view", $available_site_actual_action_ids[0]);
-				$this->default_action_view_id		 = $available_site_actual_action_ids[0]; // set the first action as default
-			}
-			$index_name	 = array_search($this->default_action_view_id, $available_site_action_ids);
-			$action_name = $available_site_action_names[$index_name];
+		if ($this->default_action_view_id === null)
+		{ // if not set
+			\Session::set("default_action_view", $available_site_action_ids[0]);
+			$this->default_action_view_id = $available_site_action_ids[0]; // set the first action as default
 		}
+
+		$index_name	 = array_search($this->default_action_view_id, $available_site_action_ids);
+		$action_name = $available_site_action_names[$index_name];
 
 		$data = $this->getByPage($page, $this->manageViewConfig['limit_per_page'], "action_id", $this->default_action_view_id);
 
@@ -87,7 +78,11 @@ class ActionsController extends \App\Controllers\BaseController
 			{
 				$item->name		 = $action_name;
 				$visitor_session = \App\Models\Session::find($item->session_id)->visitor;
-				$item->user_id	 = $visitor_session->identifier;
+
+				$obj_item = \App\Models\Item::find($item->item_id);
+
+				$item->user_id				 = $visitor_session->identifier;
+				$item->item_identifier_id	 = $obj_item->identifier;
 			}
 			$paginator = Paginator::make($data->items, $data->totalItems, $data->limit);
 		}

@@ -105,6 +105,7 @@ class UserController extends \App\Controllers\BaseController
 	public function logout()
 	{
 		Auth::logout();
+		\Session::clear();
 		return Redirect::to('/');
 	}
 

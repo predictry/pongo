@@ -35,9 +35,9 @@
 		<div class="tab-pane pt20 form-horizontal" id="tabRulesetItem">
 			<!-- rule item -->
 			<div id="item_rules_container">
-				<div class="action_buttons pull-right">
+				{{-- <div class="action_buttons pull-right">
 					<a href="javascript:void(0);" class="btn btn-default" onClick="addItemPlacementRuleset();"><i class="fa fa-plus"></i></a>
-				</div>
+				</div> --}}
 				<div class="clearfix"></div>
 				<?php if ($type === "create") : ?>
 					@include('frontend.panels.placements.itemruleset')	

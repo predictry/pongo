@@ -48,7 +48,7 @@ class HomeController extends BaseController
 			return Redirect::to('dashboard');
 		}
 
-		return View::make('frontend.common.login');
+		return View::make('frontend.common.login', array("pageTitle" => "Login"));
 	}
 
 	/**
@@ -96,11 +96,11 @@ class HomeController extends BaseController
 					return Redirect::to('dashboard');
 				}
 
-				$flash_error = 'Your email/password combination was incorrect.';
+				$flash_error = 'error.login.failed';
 			}
 			else
 			{
-				$flash_error = "Email/password doesn't exists.";
+				$flash_error = "error.email.doesnt.exists";
 			}
 			return Redirect::to('login')->with('flash_error', $flash_error)->withInput();
 		}
@@ -117,7 +117,7 @@ class HomeController extends BaseController
 	 */
 	public function getRegister()
 	{
-		$this->siteInfo['pageTitle'] = "Signup Now";
+		$this->siteInfo['pageTitle'] = "signup.now";
 		return View::make('frontend.common.register');
 	}
 
@@ -155,7 +155,14 @@ class HomeController extends BaseController
 			$account->confirmation_code	 = md5(microtime() . Config::get('app.key'));
 
 			$account->save();
-			return Redirect::to('login')->with('flash_message', "You have sucessfully registered. Please login.");
+
+			//SEND VERIFICATION EMAIL
+			$email_data = array("fullname" => ucwords($input['name']));
+			\Mail::send('emails.auth.accountconfirmation', $email_data, function($message) {
+				$message->to('rifkiyandhi@gmail.com', 'John Smith')->subject('Welcome!');
+			});
+
+			return Redirect::to('login')->with('flash_message', "success.register");
 		}
 		else
 		{
@@ -193,19 +200,19 @@ class HomeController extends BaseController
 		{
 			$user_id = \App\Models\Account::where("email", $input['email'])->get(array('id'))->first();
 			if (!$user_id)
-				return Redirect::to('forgot')->with('flash_error', "Email you have entered doesn't exists.");
+				return Redirect::to('forgot')->with('flash_error', "error.email.doesnt.exists");
 			else
 			{
 				$response = Password::remind(Input::only('email'), function($message) {
-							$message->subject = "Password Reminder";
+							$message->subject = "subject.password.reminder";
 						});
 				switch ($response)
 				{
 					case Password::INVALID_USER:
-						return Redirect::back()->with('flash_message', Lang::get($response));
+						return Redirect::back()->with('flash_message', \Lang::get($response));
 
 					case Password::REMINDER_SENT:
-						return Redirect::back()->with('flash_message', Lang::get($response));
+						return Redirect::back()->with('flash_message', \Lang::get($response));
 				}
 			}
 		}
@@ -261,7 +268,7 @@ class HomeController extends BaseController
 				case Password::INVALID_USER:
 					return Redirect::back()->with('flash_error', Lang::get($response));
 				case Password::PASSWORD_RESET:
-					return Redirect::to('login')->with('flash_message', "Password has been changed. You can login now.");
+					return Redirect::to('login')->with('flash_message', "success.password.changed");
 			}
 		}
 

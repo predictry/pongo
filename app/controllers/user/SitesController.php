@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Author       : Rifki Yandhi
  * Date Created : Mar 18, 2014 5:10:42 PM
@@ -23,7 +24,7 @@ class SitesController extends \App\Controllers\BaseController
 	public function __construct()
 	{
 		parent::__construct();
-		View::share(array("ca" => get_class(), "moduleName" => "Site", "view" => false, "custom_action" => "true"));
+		View::share(array("ca" => get_class(), "moduleName" => "Site", "view" => false, "custom_action" => "true", "delete" => false));
 	}
 
 	/**
@@ -111,13 +112,38 @@ class SitesController extends \App\Controllers\BaseController
 				}
 			}
 
-			if ($id)
-				return \Redirect::route('sites')->with("flash_message", "Successfully added new site.");
-			else
-				return \Redirect::back()->with("flash_error", "Inserting problem. Please try again.");
+			if (\Request::ajax())
+			{
+				if ($id)
+					return \Response::json(array("status" => "success", "response" => "/dashboard"));
+				else
+					return \Response::json(
+									array("status"	 => "error",
+										"response"	 => \View::make("frontend.panels.sites.addform", array(
+											"flash_error" => "Inserting problem. Please check your inputs."
+										))->render()));
+			}else
+			{
+
+				if ($id)
+					return \Redirect::route('sites')->with("flash_message", "Successfully added new site.");
+				else
+					return \Redirect::back()->with("flash_error", "Inserting problem. Please try again.");
+			}
 		}
 		else
-			return \Redirect::back()->withInput()->withErrors($validator);
+		{
+			if (\Request::ajax())
+			{
+				return \Response::json(
+								array("status"	 => "error",
+									"response"	 => \View::make("frontend.panels.sites.addform", array(
+										"flash_error" => "Inserting problem. Please check your inputs."
+									))->withInput($input)->withErrors($validator)->render()));
+			}
+			else
+				return \Redirect::back()->withInput()->withErrors($validator);
+		}
 	}
 
 	public function getEdit($id)
@@ -147,8 +173,41 @@ class SitesController extends \App\Controllers\BaseController
 
 	public function postDelete($id)
 	{
-		\App\Models\Site::find($id)->delete();
-		return Redirect::back()->with("flash_message", "Site data has been removed.");
+		$exists_and_belongs_to_him = \App\Models\Site::where("id", $id)->where("account_id", \Auth::user()->id)->first();
+		if ($exists_and_belongs_to_him)
+		{
+			//REMOVE SITE_MEMBERS
+			$site_members = \App\Models\SiteMember::where("site_id", $id)->get();
+			foreach ($site_members as $site_member)
+			{
+				$account = \App\Models\Member::find($site_member->member_id);
+				$account->delete();
+				\App\Models\Account::find($account->account_id)->delete();
+			}
+			\App\Models\SiteMember::where("site_id", $id)->delete();
+
+			//REMOVE ACTIONS
+			$actions = \App\Models\Action::where("site_id", $id)->get();
+			foreach ($actions as $action)
+			{
+				\App\Models\ActionInstance::where("action_id", $action->id)->delete();
+				\App\Models\ActionMeta::where("action_id", $action->id)->delete();
+			}
+
+			\App\Models\Action::where("site_id", $id)->delete();
+
+			//REMOVE ITEMS
+			\App\Models\Item::where("site_id", $id)->delete();
+
+			//REMOVE SESSIONS
+			\App\Models\Session::where("site_id", $id)->delete();
+
+			\App\Models\Site::find($id)->delete();
+
+			Session::remove("active_site_id");
+			Session::remove("active_site_name");
+			return Redirect::back()->with("flash_message", "Site data has been removed.");
+		}
 	}
 
 	public function getDefault($id)
@@ -161,6 +220,90 @@ class SitesController extends \App\Controllers\BaseController
 			Session::remove("default_action_view");
 		}
 		return Redirect::route("dashboard");
+	}
+
+	public function getSiteWizard()
+	{
+		$custom_script = "<script type='text/javascript'>";
+		$custom_script .= "var site_url = '" . \URL::to('/') . "';";
+		$custom_script .= "</script>";
+
+		$output = array(
+			"pageTitle"		 => "Welcome to predictry. Create your first site.",
+			"modalTitle"	 => "Add New Site",
+			"custom_script"	 => $custom_script,
+			"sites"			 => array()
+		);
+
+		return \View::make('frontend.panels.sites.addwell', $output);
+	}
+
+	public function getModalCreate()
+	{
+		return View::make("frontend.panels.sites.addform");
+	}
+
+	public function postAjaxCreate()
+	{
+		$input				 = Input::only("name", "url");
+		$input['account_id'] = Auth::user()->id;
+
+		$site		 = new \App\Models\Site();
+		$validator	 = Validator::make($input, $site->rules);
+
+		if ($validator->passes())
+		{
+			$salt = uniqid(mt_rand(), true);
+
+			$site->name			 = $input['name'];
+			$site->api_key		 = md5($input['url']);
+			$site->api_secret	 = md5($input['url'] . $salt);
+			$site->account_id	 = $input['account_id'];
+			$site->url			 = $input['url'];
+			$id					 = $site->save();
+
+			//can be migrate to table
+			$default_actions = array(
+				"view"			 => array("score" => 1),
+				"rate"			 => array("score" => 2),
+				"add_to_cart"	 => array("score" => 3),
+				"buy"			 => array("score" => 4)
+			);
+
+			//set default action types for the site
+			foreach ($default_actions as $key => $arr)
+			{
+				$action				 = new \App\Models\Action();
+				$action->name		 = $key;
+				$action->description = null;
+				$action->site_id	 = $site->id;
+				$action->save();
+
+				foreach ($arr as $key2 => $val)
+				{
+					$action_meta			 = new \App\Models\ActionMeta();
+					$action_meta->key		 = $key2;
+					$action_meta->value		 = $val;
+					$action_meta->action_id	 = $action->id;
+					$action_meta->save();
+				}
+			}
+
+			if ($id)
+				return \Response::json(array("status" => "success"));
+			else
+				return \Response::json(
+								array("status"	 => "error",
+									"response"	 => \View::make("frontend.panels.sites.addform", array(
+										"flash_error" => "Inserting problem. Please check your inputs."
+									))->render()));
+		}
+		else
+			return \Response::json(
+							array("status"	 => "error",
+								"response"	 => \View::make("frontend.panels.sites.addform", array(
+									"flash_error" => "Inserting problem. Please check your inputs."
+								))->withInput($input)->withErrors($validator)->render()));
 	}
 
 }

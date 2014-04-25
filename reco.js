@@ -1,7 +1,7 @@
 /************This should be from predictry-api.js*******************/
 
-var predictry_tenant_id = "JOHN_SNOW";
-var predictry_api_key = "9c768029791f5a0d92744dfe33c76b3e";
+var predictry_tenant_id = window.PE_tenantId;
+var predictry_api_key = window.PE_apiKey;
 
 /******************************************************************/
 

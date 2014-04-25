@@ -21,6 +21,7 @@ class CreateAccountsTable extends Migration
 			$table->smallInteger('plan_id')->unsigned();
 			$table->smallInteger('confirmed')->unsigned();
 			$table->String('confirmation_code', 32);
+			$table->String('remember_token', 100)->nullable();
 			$table->timestamps();
 			$table->softDeletes();
 

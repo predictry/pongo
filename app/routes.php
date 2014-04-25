@@ -51,6 +51,9 @@ Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), f
 
 	Route::get('user', 'UserController@getDashboard');
 	Route::get('dashboard', array('as' => 'dashboard', 'uses' => 'PanelController@index'));
+	Route::get('sites/wizard', array('as' => 'sites', 'uses' => 'SitesController@getSiteWizard'));
+	Route::get('sites/getModal', array('as' => 'sites', 'uses' => 'SitesController@getModalCreate'));
+	Route::post('sites/ajaxSubmitSite', array('as' => 'sites', 'uses' => 'SitesController@postCreate'));
 
 	#Update Profile
 	Route::get('user/profile', 'UserController@getProfile');
@@ -132,7 +135,7 @@ Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), f
 		Route::post('placements/ajaxSubmitWizardAddRuleset', array("as" => "placements.ajaxSubmitWizardAddRuleset", "uses" => 'PlacementsController@postAjaxWizardAddRuleset'));
 		Route::post('placements/ajaxSubmitCompleteWizard', array("as" => "placements.ajaxSubmitCompleteWizard", "uses" => 'PlacementsController@postAjaxWizardCompletePlacement'));
 	}
-#logout
+	#logout
 	Route::get('user/logout', 'UserController@logout');
 });
 

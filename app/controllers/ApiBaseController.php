@@ -40,8 +40,9 @@ class ApiBaseController extends \Controller
 		{
 			$api_credential['tenant_id'] = \Request::header("X-Predictry-Server-Tenant-ID");
 			$api_credential['api_key']	 = \Request::header("X-Predictry-Server-Api-Key");
+
 //			$api_credential['secret_key']	 = \Request::header("X-Predictry-Server-Secret-Key");
-			$this->site_id				 = $this->validateApiKey($api_credential);
+			$this->site_id = $this->validateApiKey($api_credential);
 		}
 		if (!$this->site_id)
 			return \Response::json(array("message" => "Auth failed", "status" => "401"), "401");

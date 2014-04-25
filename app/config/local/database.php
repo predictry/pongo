@@ -66,7 +66,7 @@ return array(
 		'pgsql' => array(
 			'driver'   => 'pgsql',
 			'host'     => 'localhost',
-			'database' => 'vv_predictry_pongo',
+			'database' => 'vv_predictry_pongo_final',
 			'username' => 'postgres',
 			'password' => 'password',
 			'charset'  => 'utf8',

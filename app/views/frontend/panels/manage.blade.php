@@ -5,13 +5,13 @@
 	@include('frontend.partials.notification')
 	<div class="row">
 		@if ($isManage)
-		<h1 class="col-sm-6 pull-left">Manage <?php echo ucfirst($moduleName) . "(s)"; ?></h1>
+		<h1 class="col-sm-6 pull-left"><?php echo Lang::get("panel.manage"); ?> <?php echo ucfirst($moduleName) . "(s)"; ?></h1>
 		@else
 		<h1 class="col-sm-6 pull-left">{{ $pageTitle or 'Default' }}</h1>
 		@endif
 		@if ($create)
 		<div class="col-sm-6 action_buttons text-right">
-			<a href="{{ URL::to( URL::current() . "/create" ) }}" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> Add New {{ $moduleName }}</a>
+			<a href="{{ URL::to( URL::current() . "/create" ) }}" class="btn btn-primary btn"><i class="fa fa-plus"></i> <?php echo Lang::get("panel.add.new"); ?> {{ $moduleName }}</a>
 		</div>
 		@endif
 		<div class="clearfix"></div>
@@ -45,7 +45,7 @@
 					<?php
 					if ($key === "active")
 					{
-						$val = ($o->$key) ? "Yes" : "No";
+						$val = ($o->$key) ? Lang::get("panel.yes") : Lang::get("panel.no");
 						echo "<td>" . $val . "</td>";
 					}
 					else
@@ -61,9 +61,9 @@
 					<td class="pull-right">
 						{{ Form::open(array('url' => URL::to( URL::current() . "/" . $o->id . "/delete" ), "class" => "mb0")) }}
 						{{ Form::hidden("member_id", $o->id) }}
-						@if ($edit) <a class="btn btn-default btn-sm tt" href=" {{ URL::to( URL::current() . "/" . $o->id . "/edit" ) }}"  data-toggle="tooltip" data-placement="bottom" title="Edit"><i class="fa fa-edit"></i></a> @endif
-						@if ($delete) <button type="submit" onclick="return confirm('Are you sure want to remove this?');" class="btn btn-default btn-sm tt" href="{{ URL::to( URL::current() . "/" . $o->id . "/delete" )  }}"  data-toggle="tooltip" data-placement="bottom" title="Remove"><i class="fa fa-trash-o"></i></button> @endif
-						@if ($view) <a data-toggle="modal" id="btnViewModal{{ $o->id }}" data-target="#viewModal" data-id="{{ $o->id }}" href=" {{ URL::to( URL::current() . "/" . $o->id . "/view" ) }}" class="btn btn-default btn-sm btnViewModal tt"  data-toggle="tooltip" data-placement="bottom" title="View" ><i class="fa fa-search"></i></a> @endif
+						@if ($edit) <a class="btn btn-default btn-sm tt" href=" {{ URL::to( URL::current() . "/" . $o->id . "/edit" ) }}"  data-toggle="tooltip" data-placement="bottom" title="{{Lang::get('panel.edit')}}"><i class="fa fa-edit"></i></a> @endif
+						@if ($delete) <button type="submit" onclick="return confirm('{{Lang::get('panel.remove.confirm')}}');" class="btn btn-default btn-sm tt" href="{{ URL::to( URL::current() . "/" . $o->id . "/delete" )  }}"  data-toggle="tooltip" data-placement="bottom" title="{{Lang::get('panel.remove')}}"><i class="fa fa-trash-o"></i></button> @endif
+						@if ($view) <a data-toggle="modal" id="btnViewModal{{ $o->id }}" data-target="#viewModal" data-id="{{ $o->id }}" href=" {{ URL::to( URL::current() . "/" . $o->id . "/view" ) }}" class="btn btn-default btn-sm btnViewModal tt"  data-toggle="tooltip" data-placement="bottom" title="{{Lang::get('panel.view')}}" ><i class="fa fa-search"></i></a> @endif
 						@if ($custom_action)
 						@include($custom_action_view, array('id' => $o->id))
 						@endif

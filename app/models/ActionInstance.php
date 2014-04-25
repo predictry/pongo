@@ -21,9 +21,9 @@ class ActionInstance extends \Eloquent
 	public $timestamps			 = false;
 	protected $table			 = 'action_instances';
 	public $manage_table_header	 = array(
-		"user_id"	 => "User ID",
-		"item_id"	 => "Item ID",
-		"created"	 => "Date Created"
+		"user_id"			 => "User ID",
+		"item_identifier_id" => "Item ID",
+		"created"			 => "Date Created"
 	);
 
 	public function action()

@@ -123,6 +123,25 @@ class MembersController extends \App\Controllers\BaseController
 				$account_member->access		 = "view";
 
 				$account_member->save();
+
+				$notify = \Input::get("notify");
+
+				if ($notify)
+				{
+					//SEND INVITE MEMBER EMAIL NOTIFICATION
+					$email_data = array(
+						"fullname"	 => ucwords($input['name']),
+						"friendname" => ucwords(Auth::user()->fullname),
+						"user_email" => $input['email'],
+						"password"	 => $input['password']
+					);
+
+					\Mail::send('emails.members.invitenotification', $email_data, function($message) use ($input) {
+
+						$message->to($input['email'], ucwords($input['name']))->subject('Hi, you\'ve just invited!');
+					});
+				}
+
 				return Redirect::to("members")->with("flash_message", "Successfully added new member.");
 			}
 			else
@@ -202,6 +221,8 @@ class MembersController extends \App\Controllers\BaseController
 		if ($member)
 		{
 			$account = \App\Models\Account::find($member->account_id);
+			\App\Models\SiteMember::where("site_id", $this->active_site_id)->where("member_id", $id)->delete();
+			$member->delete();
 			$account->delete();
 		}
 		return Redirect::back()->with("flash_message", "Member data has been removed.");

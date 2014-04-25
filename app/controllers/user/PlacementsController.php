@@ -77,6 +77,11 @@ class PlacementsController extends \App\Controllers\BaseController
 		$custom_script .= "var site_url = '" . \URL::to('/') . "';";
 		$custom_script .= "</script>";
 
+		if (count($ruleset_list) <= 0)
+		{
+			return \Redirect::to("placements")->with("flash_error", "Currently, you don't have any ruleset to set into placement.");
+		}
+
 		$output = array(
 			"type"							 => "create",
 			'ruleset_list'					 => $ruleset_list,
@@ -318,6 +323,11 @@ class PlacementsController extends \App\Controllers\BaseController
 		$custom_script = "<script type='text/javascript'>";
 		$custom_script .= "var site_url = '" . \URL::to('/') . "';";
 		$custom_script .= "</script>";
+
+		if (count($ruleset_list) <= 0)
+		{
+			return \Redirect::to("placements")->with("flash_error", "Currently, you don't have any ruleset to set into placement.");
+		}
 
 		$output = array(
 			"type"							 => "wizard_create",

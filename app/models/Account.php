@@ -62,7 +62,7 @@ class Account extends \Eloquent implements UserInterface, RemindableInterface
 
 	public function getReminderEmail()
 	{
-		
+		return $this->email;
 	}
 
 	public function setRememberToken($value)

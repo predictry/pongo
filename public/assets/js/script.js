@@ -34,13 +34,11 @@ jQuery(document).ready(function() {
     //initilize 1st item rule that appear first time
     $("#item1").chosen();
     $("#type1").chosen();
-
     $('#item1').on('change', function(evt, params) {
         if (!validateSelectedItem(params.selected)) {
             $('#item1').val("").trigger("chosen:updated");
         }
     });
-
     $("#expiry_type").bind('change', function(e) {
         var valueSelected = this.value;
         var box = $("#expiry_value_box");
@@ -70,16 +68,13 @@ jQuery(document).ready(function() {
                 box.find("input#expiry_value").val(0);
         }
     });
-
     $("#datetimepicker").bind("dp.change", function() {
         var dt = $('#datetimepicker').data("DateTimePicker").getDate();
         $("#expiry_value_dt").val(dt);
 
     });
-
     $("#expiry_type").change(function() {
     }).trigger("change");
-
     $(".multiple-chosen-select").chosen({no_results_text: "Oops, nothing found!"});
 
     //wizard
@@ -120,7 +115,7 @@ jQuery(document).ready(function() {
                     $('ul.setup-panel li a[href="#step-2"]').trigger('click');
                 }
                 else {
-                    $(".wizardPlacmeent").html(data.response);
+                    $(".wizardPlacement").html(data.response);
                 }
             },
             error: function() {
@@ -158,12 +153,6 @@ jQuery(document).ready(function() {
         return;
     });
 
-    // DEMO ONLY //
-    $('#activate-step-3').on('click', function(e) {
-        $('ul.setup-panel li:eq(2)').removeClass('disabled');
-        $('ul.setup-panel li a[href="#step-3"]').trigger('click');
-        $(this).remove();
-    });
 });
 
 var numOfItemRules = 1;

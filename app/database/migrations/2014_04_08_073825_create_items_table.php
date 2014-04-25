@@ -20,7 +20,7 @@ class CreateItemsTable extends Migration
 			$table->string('name', 64)->nullable();
 			$table->integer('site_id');
 			$table->enum('type', array('product', 'category', 'tag', 'keyword'))->default("product");
-			$table->tinyint('active')->default('true');
+			$table->boolean('active')->default('true');
 			$table->timestamps();
 		});
 	}

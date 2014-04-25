@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Author       : Rifki Yandhi
  * Date Created : Mar 18, 2014 5:10:42 PM
@@ -29,7 +30,9 @@ class PanelController extends \App\Controllers\BaseController
 	{
 		if (!$this->active_site_id)
 		{
-			return "Not found any site activated as a default display.";
+//			\Auth::logout();
+//			return "Not found any site activated as a default display.";
+			return \Redirect::to('sites/wizard');
 		}
 
 		$dt_2_days_ago		 = new Carbon("2 days ago");
@@ -68,7 +71,7 @@ class PanelController extends \App\Controllers\BaseController
 			"graph_y_keys"			 => json_encode($graph_y_keys),
 			"graph_x_keys"			 => $graph_x_keys,
 			"str_date_range"		 => $dt_start_range . ' to ' . $dt_end_range,
-			"pageTitle"				 => "Dashboard"
+			"pageTitle"				 => "dashboard"
 		);
 
 		return \View::make('frontend.panels.dashboard', $output);
