@@ -9,13 +9,19 @@
 			</button>
 			<a class="navbar-brand" href="<?php echo URL::to('dashboard'); ?>">{{ $siteName or '' }}</a>
 			<ul class="nav navbar-nav navbar-left">
+			</ul>
+		</div>
+
+		<div class="navbar-collapse collapse">
+			<ul class="nav navbar-nav navbar-right">
+				<li class="navbar-text"><?php echo Lang::get("panel.welcome"); ?>, <span class="displayName"> <?php echo Auth::user()->name; ?></span></li>
 				<li><a href="<?php echo URL::to('dashboard'); ?>"><?php echo Lang::get("panel.dashboard"); ?></a></li>
 				@if (count($sites) > 0)
 				<li class="dropdown">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ $activeSiteName or '' }} <b class="caret"></b></a>
 					<ul class="dropdown-menu">
 						@if (count($sites) === 1)
-						<li><a href="#"><?php echo Lang::get("panel.create.site"); ?></a></li>
+						<li><a href="{{ URL::to('sites/create') }}"><?php echo Lang::get("panel.create.site"); ?></a></li>
 						@else
 						@foreach ($sites as $site)
 						@if ($site['id'] !== \Session::get("active_site_id"))
@@ -26,12 +32,6 @@
 					</ul>
 				</li>
 				@endif
-			</ul>
-		</div>
-
-		<div class="navbar-collapse collapse">
-			<ul class="nav navbar-nav navbar-right">
-				<li class="navbar-text"><?php echo Lang::get("panel.welcome"); ?>, <span class="displayName"> <?php echo Auth::user()->name; ?></span></li>
 				<li class="dropdown">
 					<a id="dLabel" role="button" data-toggle="dropdown" data-target="#" href="javascript:void(0);"><i class="fa fa-wrench"></i> <?php echo Lang::get("panel.settings"); ?> <span class="caret"></span></a>
 					<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">

@@ -1,7 +1,7 @@
 <div class="col-sm-3 col-md-2 sidebar">
 	<?php if (Session::get("role") !== "member") : ?>
 		<div class="text-center">
-			<a class="btn btn-success" href="{{ URL::to('placements/wizard'); }}"><?php echo Lang::get("panel.create.recommendation"); ?></a>
+			<a class="btn btn-success text-center" href="{{ URL::to('placements/wizard'); }}"><?php echo Lang::get("panel.create.recommendation"); ?></a>
 		</div>
 		<div class="clearfix mb20"></div>
 
