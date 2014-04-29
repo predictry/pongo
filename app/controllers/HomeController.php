@@ -158,8 +158,8 @@ class HomeController extends BaseController
 
 			//SEND VERIFICATION EMAIL
 			$email_data = array("fullname" => ucwords($input['name']));
-			\Mail::send('emails.auth.accountconfirmation', $email_data, function($message) {
-				$message->to('rifkiyandhi@gmail.com', 'John Smith')->subject('Welcome!');
+			\Mail::send('emails.auth.accountconfirmation', $email_data, function($message) use ($input) {
+				$message->to($input['email'], ucwords($input['name']))->subject('Welcome!');
 			});
 
 			return Redirect::to('login')->with('flash_message', "success.register");
