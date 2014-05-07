@@ -162,7 +162,7 @@ class HomeController extends BaseController
 				$message->to($input['email'], ucwords($input['name']))->subject('Welcome!');
 			});
 
-			return Redirect::to('login')->with('flash_message', "success.register");
+			return Redirect::to('login')->with('flash_message', "home.success.register");
 		}
 		else
 		{

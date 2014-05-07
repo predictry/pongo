@@ -67,6 +67,13 @@ Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), f
 
 	if ($role === "admin")
 	{
+		#Panel
+		Route::post('panel/submitFunel', array('as' => 'panel.submitFunel', 'uses' => 'PanelController@postCreateFunel'));
+		Route::post('panel/submitSelector', array('as' => 'panel.submitSelector', 'uses' => 'PanelController@postDefaultFunel'));
+		Route::get('panel/createFunel/{ismodal?}', array('as' => 'panel.createFunel', 'uses' => 'PanelController@getCreateFunel'));
+		Route::get('panel/itemFunel', array('as' => 'panel.itemFunel', 'uses' => 'PanelController@getItemFunel'));
+
+
 		#Member Management
 		Route::get('members/create', array("as" => "members.create", "uses" => 'MembersController@getCreate'));
 		Route::post('members/submit', array("as" => "members.submit", "uses" => 'MembersController@postCreate'));
@@ -77,12 +84,15 @@ Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), f
 		Route::get('members', array("as" => "members", "uses" => 'MembersController@index'));
 
 		#Sites Management
-		Route::get('sites/create', array("as" => "sites.create", "uses" => 'SitesController@getCreate'));
-		Route::post('sites/submit', array("as" => "sites.submit", "uses" => 'SitesController@postCreate'));
-		Route::get('sites/{numeric}/edit', array("as" => "sites.{numieric}.edit", "uses" => 'SitesController@getEdit'));
-		Route::post('sites/{numeric}/edit', array("as" => "sites.update", "uses" => 'SitesController@postEdit'));
-		Route::get('sites/{numeric}/delete', 'SitesController@getDelete');
-		Route::post('sites/{numeric}/delete', 'SitesController@postDelete');
+		if (Auth::user()->plan_id !== 3)
+		{
+			Route::get('sites/create', array("as" => "sites.create", "uses" => 'SitesController@getCreate'));
+			Route::post('sites/submit', array("as" => "sites.submit", "uses" => 'SitesController@postCreate'));
+			Route::get('sites/{numeric}/edit', array("as" => "sites.{numieric}.edit", "uses" => 'SitesController@getEdit'));
+			Route::post('sites/{numeric}/edit', array("as" => "sites.update", "uses" => 'SitesController@postEdit'));
+			Route::get('sites/{numeric}/delete', 'SitesController@getDelete');
+			Route::post('sites/{numeric}/delete', 'SitesController@postDelete');
+		}
 		Route::get('sites/{numeric}/default', 'SitesController@getDefault');
 		Route::get("sites", array("as" => "sites", "uses" => "SitesController@index"));
 

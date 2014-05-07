@@ -32,7 +32,16 @@ body {
     padding-bottom: 20px;
 }
 .chosen-container{
+    /*width: 90% !important;*/
+}
+
+#item_rules_container .chosen-container{
     width: 90% !important;
+
+}
+
+.chosen-container-multi .chosen-choices .search-field{
+    padding-left: 10px !important;
 }
 /*.chosen-container{
     width: 250px !important;
@@ -103,7 +112,7 @@ body {
         padding-left: 40px;
     }
 }
-.main .page-header {
+.main .page-header:first-child {
     margin-top: 0;
 }
 

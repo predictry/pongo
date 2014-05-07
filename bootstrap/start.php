@@ -26,7 +26,7 @@ $app = new Illuminate\Foundation\Application;
 
 $env = $app->detectEnvironment(array(
 
-	'local' => array('Verve1', 'your-machine-name'),
+	'local' => array('ikyandhi.local', 'your-machine-name'),
 
 ));
 

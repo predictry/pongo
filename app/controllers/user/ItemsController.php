@@ -61,7 +61,17 @@ class ItemsController extends \App\Controllers\BaseController
 	public function getEdit($id)
 	{
 		$item		 = \App\Models\Item::find($id);
-		$activated	 = ($item->active) ? true : false;
+		$item_metas	 = \App\Models\Itemmeta::where("item_id", $id)->get();
+
+		if ($item_metas)
+		{
+			foreach ($item_metas as $obj)
+			{
+				$item->{$obj->key} = $obj->value;
+			}
+		}
+		
+		$activated = ($item->active) ? true : false;
 		return View::make("frontend.panels.items.form", array("item" => $item, "type" => "edit", 'pageTitle' => "Edit Item", "activated" => $activated));
 	}
 

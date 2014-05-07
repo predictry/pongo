@@ -42,8 +42,8 @@ class ActionController extends \App\Controllers\ApiBaseController
 		$action_properties	 = Input::get("action_properties");
 		$item_properties	 = Input::get("item_properties");
 
-		$action_properties	 = isset($action_properties) ? $action_properties : array();
-		$item_properties	 = isset($item_properties) ? $item_properties : array();
+		$action_properties	 = isset($action_properties) && ($action_properties !== "null") ? $action_properties : array();
+		$item_properties	 = isset($item_properties) && ($item_properties !== "null") ? $item_properties : array();
 
 		$rules = array(
 			"action"	 => "required",
@@ -98,7 +98,7 @@ class ActionController extends \App\Controllers\ApiBaseController
 	{
 		$action_id	 = 0;
 		//start processing action
-		$action		 = \App\Models\Action::where("name", strtolower($action_data['name']))->where("site_id", $this->site_id)->first();
+		$action		 = \App\Models\Action::where("name", $action_data['name'])->where("site_id", $this->site_id)->first();
 
 		if (!$action)
 		{
@@ -191,7 +191,22 @@ class ActionController extends \App\Controllers\ApiBaseController
 		$item = \App\Models\Item::where("identifier", $item_data['identifier'])->where("site_id", $this->site_id)->first();
 
 		if ($item)
+		{
+			$item->name = $item_data['name'];
+			$item->update();
+
+			\App\Models\Itemmeta::where("item_id", $item->id)->delete();
+			foreach ($item_data['properties'] as $key => $value)
+			{
+				$item_meta			 = new \App\Models\Itemmeta();
+				$item_meta->item_id	 = $item->id;
+				$item_meta->key		 = $key;
+				$item_meta->value	 = $value;
+				$item_meta->save();
+			}
+			
 			return $item->id;
+		}
 		else
 		{
 			$item				 = new \App\Models\Item();

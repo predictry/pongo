@@ -25,7 +25,7 @@
 		<label for='item1' class="control-label">&nbsp;</label>
 		<div class="clearfix"></div>
 		@if ($index_item_rule > 1)
-		<a href="javascript:void(0);" class="btn btnRemoveItemPlacementRuleset btn-danger" onClick="removeItemRule({{ $index_item_rule }});"><i class="fa fa-minus"></i></a>
+		<a href="javascript:void(0);" class="btn btnRemoveItemPlacementRuleset btn-danger" onClick="removeItemRule({{ $index_item_rule }}, 'item_rule');"><i class="fa fa-minus"></i></a>
 		@endif
 	</div>
 </div>

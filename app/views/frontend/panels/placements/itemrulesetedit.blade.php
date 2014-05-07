@@ -23,7 +23,7 @@
 		@if($obj['last_index'] === $index_item_placement_ruleset)
 		<a href="javascript:void(0);" class="btn btn-default btnAddItemPlacementRuleset" onClick="addItemPlacementRuleset();">Add</a>
 		@else
-		<a href="javascript:void(0);" class="btn btnRemoveItemRule btn-danger" onClick="removeItemRule({{ $index_item_placement_ruleset }});">Remove</a>
+		<a href="javascript:void(0);" class="btn btnRemoveItemRule btn-danger" onClick="removeItemRule({{ $index_item_placement_ruleset }}, 'item_rule');">Remove</a>
 		@endif
 	</div>
 </div>

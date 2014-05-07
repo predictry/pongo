@@ -24,7 +24,13 @@ class SitesController extends \App\Controllers\BaseController
 	public function __construct()
 	{
 		parent::__construct();
+
 		View::share(array("ca" => get_class(), "moduleName" => "Site", "view" => false, "custom_action" => "true", "delete" => false));
+
+		if (Auth::user()->plan_id === 3) //redmart
+		{
+			View::share(array("create" => false, "edit" => false));
+		}
 	}
 
 	/**
@@ -111,6 +117,12 @@ class SitesController extends \App\Controllers\BaseController
 					$action_meta->save();
 				}
 			}
+
+			$default_funel_preference				 = new \App\Models\FunelPreference();
+			$default_funel_preference->site_id		 = $site->id;
+			$default_funel_preference->name			 = "Default";
+			$default_funel_preference->is_default	 = true;
+			$default_funel_preference->save();
 
 			if (\Request::ajax())
 			{

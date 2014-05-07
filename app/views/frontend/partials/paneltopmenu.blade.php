@@ -20,7 +20,7 @@
 				<li class="dropdown">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ $activeSiteName or '' }} <b class="caret"></b></a>
 					<ul class="dropdown-menu">
-						@if (count($sites) === 1)
+						@if (count($sites) === 1 && Auth::user()->plan_id !== 3)
 						<li><a href="{{ URL::to('sites/create') }}"><?php echo Lang::get("panel.create.site"); ?></a></li>
 						@else
 						@foreach ($sites as $site)

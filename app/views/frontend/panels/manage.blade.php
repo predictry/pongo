@@ -7,7 +7,7 @@
 		@if ($isManage)
 		<h1 class="col-sm-6 pull-left"><?php echo Lang::get("panel.manage"); ?> <?php echo ucfirst($moduleName) . "(s)"; ?></h1>
 		@else
-		<h1 class="col-sm-6 pull-left">{{ $pageTitle or 'Default' }}</h1>
+		<h1 class="col-sm-9 pull-left">{{ $pageTitle or 'Default' }}</h1>
 		@endif
 		@if ($create)
 		<div class="col-sm-6 action_buttons text-right">

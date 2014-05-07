@@ -22,7 +22,7 @@ class Itemmeta extends \Eloquent
 
 	public function item()
 	{
-		return $this->belongsTo("Item");
+		return $this->belongsTo("App\Models\Item");
 	}
 
 }

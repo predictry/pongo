@@ -66,9 +66,9 @@ return array(
 		'pgsql' => array(
 			'driver'   => 'pgsql',
 			'host'     => 'localhost',
-			'database' => 'vv_predictry_pongo_final',
-			'username' => 'postgres',
-			'password' => 'password',
+			'database' => 'vv_predictry_pongo',
+			'username' => 'rifkiyandhi',
+			'password' => '',
 			'charset'  => 'utf8',
 			'prefix'   => '',
 			'schema'   => 'public',
