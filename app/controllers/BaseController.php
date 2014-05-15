@@ -32,7 +32,7 @@ class BaseController extends \Controller
 		$this->manageViewConfig['delete']			 = true;
 		$this->manageViewConfig['custom_action']	 = false;
 		$this->manageViewConfig['selector']			 = false;
-		$this->manageViewConfig['limit_per_page']	 = 10;
+		$this->manageViewConfig['limit_per_page']	 = 100;
 
 		View::share($this->siteInfo);
 		View::share($this->manageViewConfig);

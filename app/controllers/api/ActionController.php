@@ -19,7 +19,7 @@ class ActionController extends \App\Controllers\ApiBaseController
 
 	public function index()
 	{
-		return "INDEX";
+		return "gotcha";
 	}
 
 	/**
@@ -29,22 +29,58 @@ class ActionController extends \App\Controllers\ApiBaseController
 	 */
 	public function store()
 	{
+		$action_type = \Input::get('action_type');
+		if (isset($action_type))
+		{
+			$action_name		 = Input::get("action");
+			$user_identifier_id	 = Input::get("user_id");
+			$session_id			 = Input::get("session_id");
+			if ($action_type === "single")
+			{
+				$action_data['item_id']				 = Input::get("item_id");
+				$action_data['description']			 = Input::get("description");
+				$action_data['action_properties']	 = Input::get("action_properties");
+				$action_data['item_properties']		 = Input::get("item_properties");
+				$validator							 = $this->_validateProceedAction($action_name, $user_identifier_id, $session_id, $action_data);
+				if ($validator->passes())
+				{
+					$response = $this->_proceedAction($action_name, $user_identifier_id, $session_id, $action_data);
+				}
+				else
+				{
+					$response['status']	 = "failed";
+					$response['message'] = $validator->errors()->first();
+					return Response::json($response);
+				}
+			}
+			else if ($action_type === "bulk")
+			{
+				$actions = \Input::get("actions");
+
+				foreach ($actions as $act)
+				{
+					$action_data['item_id']				 = $act['item_id'];
+					$action_data['description']			 = $act['description'];
+					$action_data['action_properties']	 = isset($act['action_properties']) ? $act['action_properties'] : array();
+					$action_data['item_properties']		 = isset($act['item_properties']) ? $act['item_properties'] : array();
+					$validator							 = $this->_validateProceedAction($action_name, $user_identifier_id, $session_id, $action_data);
+					if ($validator->passes())
+					{
+						$response = $this->_proceedAction($action_name, $user_identifier_id, $session_id, $action_data);
+					}
+				}
+			}
+		}
+
 		$response = array(
 			"status"	 => "success",
 			"message"	 => ""
 		);
+		return Response::json($response);
+	}
 
-		$action_name		 = Input::get("action");
-		$user_identifier_id	 = Input::get("user_id");
-		$item_identifier_id	 = Input::get("item_id");
-		$session			 = Input::get("session_id");
-		$item_name			 = Input::get("description");
-		$action_properties	 = Input::get("action_properties");
-		$item_properties	 = Input::get("item_properties");
-
-		$action_properties	 = isset($action_properties) && ($action_properties !== "null") ? $action_properties : array();
-		$item_properties	 = isset($item_properties) && ($item_properties !== "null") ? $item_properties : array();
-
+	function _validateProceedAction($action_name, $user_identifier_id, $session_id, $action_data)
+	{
 		$rules = array(
 			"action"	 => "required",
 			"user_id"	 => "required",
@@ -52,46 +88,51 @@ class ActionController extends \App\Controllers\ApiBaseController
 			"session_id" => "required"
 		);
 
-		$validator = Validator::make(array("action" => $action_name, "user_id" => $user_identifier_id, "item_id" => $item_identifier_id, "session_id" => $session), $rules);
-		if ($validator->passes())
+		$validator = Validator::make(array("action" => $action_name, "user_id" => $user_identifier_id, "item_id" => $action_data['item_id'], "session_id" => $session_id), $rules);
+		return $validator;
+	}
+
+	function _proceedAction($action_name, $user_identifier_id, $session_id, $action_data)
+	{
+		$item_identifier_id	 = $action_data['item_id'];
+		$session			 = $session_id;
+		$item_name			 = $action_data['description'];
+		$action_properties	 = $action_data['action_properties'];
+		$item_properties	 = $action_data['item_properties'];
+
+		$action_properties	 = isset($action_properties) && ($action_properties !== "null") ? $action_properties : array();
+		$item_properties	 = isset($item_properties) && ($item_properties !== "null") ? $item_properties : array();
+
+		$action_data = array(
+			"name"			 => $action_name,
+			"description"	 => null,
+			"score"			 => Input::get("score"),
+		);
+
+		$item_data = array(
+			"name"		 => $item_name,
+			"identifier" => $item_identifier_id,
+			"properties" => $item_properties
+		);
+
+		$action_id			 = $this->_getActionID($action_data);
+		$visitor_id			 = $this->_getVisitorID($user_identifier_id);
+		$visitor_session_id	 = $this->_getSessionID($visitor_id, $session);
+		$item_id			 = $this->_getItemID($item_data);
+		if ($item_id)
 		{
-			$action_data = array(
-				"name"			 => $action_name,
-				"description"	 => null,
-				"score"			 => Input::get("score"),
-			);
+			//process action instance
+			$action_instance			 = new \App\Models\ActionInstance();
+			$action_instance->action_id	 = $action_id;
+			$action_instance->item_id	 = $item_id;
+			$action_instance->session_id = $visitor_session_id;
+			$action_instance->created	 = new Carbon("now");
+			$action_instance->save();
 
-			$item_data = array(
-				"name"		 => $item_name,
-				"identifier" => $item_identifier_id,
-				"properties" => $item_properties
-			);
-
-			$action_id			 = $this->_getActionID($action_data);
-			$visitor_id			 = $this->_getVisitorID($user_identifier_id);
-			$visitor_session_id	 = $this->_getSessionID($visitor_id, $session);
-			$item_id			 = $this->_getItemID($item_data);
-			if ($item_id)
-			{
-				//process action instance
-				$action_instance			 = new \App\Models\ActionInstance();
-				$action_instance->action_id	 = $action_id;
-				$action_instance->item_id	 = $item_id;
-				$action_instance->session_id = $visitor_session_id;
-				$action_instance->created	 = new Carbon("now");
-				$action_instance->save();
-
-				$this->_setActionMeta($action_instance->id, $action_properties);
-			}
-		}
-		else
-		{
-			$response['status']	 = "failed";
-			$response['message'] = $validator->errors()->first();
-			return Response::json($response);
+			$this->_setActionMeta($action_instance->id, $action_properties);
 		}
 
-		return Response::json($response);
+		return true;
 	}
 
 	function _getActionID($action_data)
@@ -195,16 +236,24 @@ class ActionController extends \App\Controllers\ApiBaseController
 			$item->name = $item_data['name'];
 			$item->update();
 
-			\App\Models\Itemmeta::where("item_id", $item->id)->delete();
 			foreach ($item_data['properties'] as $key => $value)
 			{
-				$item_meta			 = new \App\Models\Itemmeta();
-				$item_meta->item_id	 = $item->id;
-				$item_meta->key		 = $key;
-				$item_meta->value	 = $value;
-				$item_meta->save();
+				$item_meta = \App\Models\Itemmeta::where("key", $key)->where("item_id", $item->id)->get()->first();
+				if (!isset($item_meta))
+				{
+					$new_item_meta			 = new \App\Models\Itemmeta();
+					$new_item_meta->item_id	 = $item->id;
+					$new_item_meta->key		 = $key;
+					$new_item_meta->value	 = $value;
+					$new_item_meta->save();
+				}
+				else
+				{
+					$item_meta->value = $value;
+					$item_meta->update();
+				}
 			}
-			
+
 			return $item->id;
 		}
 		else

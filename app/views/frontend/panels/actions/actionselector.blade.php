@@ -1,4 +1,4 @@
-<div class="col-sm-6 pull-right">
+<div class="col-sm-8 pull-right">
 	{{ Form::open(array('url' => 'actions/submitSelector', 'class' => 'form-inline text-right actionSelectorForm')) }}
 	<div class="form-group">
 		<label class="" for="name">Choose Action</label>

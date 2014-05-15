@@ -61,9 +61,16 @@ class PanelController extends \App\Controllers\BaseController
 			if (strtolower($funel_default->name) === "default")
 				$this->_setDefaultFunelPreferenceMetas($funel_default->id, $available_non_default_site_action_ids);
 
-			$funel_default_preference_metas_ids			 = \App\Models\FunelPreferenceMeta::where("funel_preference_id", $funel_default->id)->get()->lists("action_id");
-			$funel_default_preference_meta_names		 = \App\Models\Action::whereIn("id", $funel_default_preference_metas_ids)->get()->lists("name");
-			$graph_default_funel_preference_stats_data	 = $this->_getActionGraphLineStats($dt_2_days_ago, $funel_default_preference_metas_ids, $funel_default_preference_meta_names, 5);
+			$funel_default_preference_metas_ids	 = \App\Models\FunelPreferenceMeta::where("funel_preference_id", $funel_default->id)->orderBy('sort', 'ASC')->get()->lists("action_id");
+			$funel_default_preference_meta_names = array();
+			foreach ($funel_default_preference_metas_ids as $val)
+			{
+				$o = \App\Models\Action::find($val);
+				if ($o)
+					array_push($funel_default_preference_meta_names, $o->name);
+			}
+
+			$graph_default_funel_preference_stats_data = $this->_getActionGraphLineStats($dt_2_days_ago, $funel_default_preference_metas_ids, $funel_default_preference_meta_names, 5);
 		}
 
 		$graph_default_stats_data		 = $this->_getActionGraphLineStats($dt_2_days_ago, $available_site_action_ids, $available_site_action_names, 5);

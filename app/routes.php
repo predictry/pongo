@@ -40,6 +40,8 @@ Route::group(array('namespace' => 'App\Controllers'), function() {
 
 	Route::get('reset/{token}', 'HomeController@getReset');
 	Route::post('reset/submit', 'HomeController@postReset');
+	
+	Route::get('datamigration', 'RedmartMigrationController@index');
 });
 
 /*

@@ -27,8 +27,8 @@ class Item extends \Eloquent
 		"identifier" => "Item ID",
 		"name"		 => "Name",
 		"type"		 => "Type",
-		"created_at" => "Date Created",
-		"active"	 => "Activated"
+//		"created_at" => "Date Created",
+//		"active"	 => "Activated"
 	);
 
 }

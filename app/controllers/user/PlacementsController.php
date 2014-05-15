@@ -17,10 +17,10 @@ class PlacementsController extends \App\Controllers\BaseController
 	{
 		parent::__construct();
 		\View::share(array("ca" => get_class(), "moduleName" => "Placement", "view" => true));
-		if(\Auth::user()->plan_id === 3) //redmart
+		if (\Auth::user()->plan_id === 3) //redmart
 		{
 			\View::share(array("create" => false, "edit" => false, "delete" => false));
-		}		
+		}
 	}
 
 	/**
