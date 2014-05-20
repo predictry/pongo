@@ -32,7 +32,7 @@
 			<div class="tiles-inner text-center">
 				<p class="tiles-title">Completion Rate</p>
 				<h1 class="bolded">{{ $overviews['completion_rate'] }}%</h1>
-				<p class="tiles-sub-title">Purchase flow of recommended item</p>
+				<p class="tiles-sub-title">{{ $overviews['funel_default_name'] }}</p>
 			</div>
 		</div>
 	</div>

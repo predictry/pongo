@@ -365,6 +365,7 @@ class PanelController extends \App\Controllers\BaseController
 			'today_total_items'		 => $today_total_items,
 			'today_total_buy_action' => $today_total_buy_action,
 			'completion_rate'		 => (count($rates) > 0) ? number_format(end($rates), 2) : 0,
+			"funel_default_name"	 => $funel_default->name
 		);
 
 		return $overview_results;
