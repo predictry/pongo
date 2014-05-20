@@ -30,11 +30,21 @@ class Action extends \Eloquent
 		return $this->hasMany("App\Models\ActionInstance");
 	}
 
-	static function getNumberOfTotalActionsOverall($site_id)
+	static function getNumberOfTotalActionsOverall($site_id, $action_ids = array())
 	{
-		$site_actions	 = Action::where("site_id", $site_id)->get()->toArray();
-		$action_ids		 = array_fetch($site_actions, "id");
-		$total_action	 = ActionInstance::whereIn("action_id", $action_ids)->count();
+		if (count($action_ids) <= 0)
+		{
+			$site_actions	 = Action::where("site_id", $site_id)->get()->toArray();
+			$action_ids		 = array_fetch($site_actions, "id");
+		}
+
+		$total_action = ActionInstance::whereIn("action_id", $action_ids)->count();
+		return $total_action;
+	}
+
+	static function getNumberOfTotalActionsOverallByActionId($action_id)
+	{
+		$total_action = ActionInstance::where("action_id", $action_id)->count();
 		return $total_action;
 	}
 

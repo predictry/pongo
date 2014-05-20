@@ -8,7 +8,7 @@
 		<?php endif; ?>
 		<ul class="nav nav-sidebar">
 			<li class="<?php if ($ca === 'App\Controllers\User\PanelController') echo 'active'; ?>"><a href="{{ URL::to('dashboard'); }}"><i class="fa fa-anchor"></i> <?php echo Lang::get("panel.overview"); ?></a></li>
-			<li class="<?php if ($ca === 'App\Controllers\User\MembersController') echo 'active'; ?>"><a href="{{ URL::to('members'); }}"><i class="fa fa-users"></i> <?php echo Lang::get("panel.members"); ?></a></li>
+			<!--<li class="<?php // if ($ca === 'App\Controllers\User\MembersController') echo 'active'; ?>"><a href="{{ URL::to('members'); }}"><i class="fa fa-users"></i> <?php echo Lang::get("panel.members"); ?></a></li>-->
 			<li class="<?php if ($ca === 'App\Controllers\User\ItemsController') echo 'active'; ?>"><a href="{{ URL::to('items'); }}"><i class="fa fa-exchange"></i> <?php echo Lang::get("panel.items"); ?></a></li>
 			<li class="<?php if ($ca === 'App\Controllers\User\StatisticsController') echo 'active'; ?>"><a href="{{ URL::to('statistics'); }}"><i class="fa fa-signal"></i> <?php echo Lang::get("panel.statistics"); ?></a></li>
 			<li class="<?php if ($ca === 'App\Controllers\User\ActionsController') echo 'active'; ?>"><a href="{{ URL::to('actions'); }}"><i class="fa fa-tasks"></i> <?php echo Lang::get("panel.actions"); ?></a></li>

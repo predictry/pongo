@@ -190,6 +190,10 @@ jQuery(document).ready(function() {
 
         return;
     });
+
+    $("#funel_preference_id").change(function() {
+        $('#funelSelector').submit();
+    });
 });
 
 var numOfItems = 1;

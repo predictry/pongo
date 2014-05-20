@@ -39,6 +39,8 @@ class PanelController extends \App\Controllers\BaseController
 			return \Redirect::to('sites/wizard');
 		}
 
+		$overviews = $this->_getOverviewSummary();
+
 		$dt_2_days_ago	 = new Carbon("2 days ago");
 		$graph_x_keys	 = "date";
 		$dt_start_range	 = $dt_2_days_ago->toDateString();
@@ -70,7 +72,7 @@ class PanelController extends \App\Controllers\BaseController
 					array_push($funel_default_preference_meta_names, $o->name);
 			}
 
-			$graph_default_funel_preference_stats_data = $this->_getActionGraphLineStats($dt_2_days_ago, $funel_default_preference_metas_ids, $funel_default_preference_meta_names, 5);
+			$graph_default_funel_preference_stats_data = $this->_getActionGraphLineStats($dt_2_days_ago, $funel_default_preference_metas_ids, $funel_default_preference_meta_names, 3);
 		}
 
 		$graph_default_stats_data		 = $this->_getActionGraphLineStats($dt_2_days_ago, $available_site_action_ids, $available_site_action_names, 5);
@@ -108,6 +110,7 @@ class PanelController extends \App\Controllers\BaseController
 			"str_date_range"			 => $dt_start_range . ' to ' . $dt_end_range,
 			"funel_selected_dropdown"	 => isset($funel_default) && isset($graph_default_funel_preference_stats_data) ? $funel_default->id : null,
 			"funel_dropdown"			 => $funel_dropdown,
+			"overviews"					 => $overviews,
 			"pageTitle"					 => "dashboard"
 		);
 		$output	 = array_merge($output, $graph_default_data, $graph_non_default_data);
@@ -218,9 +221,35 @@ class PanelController extends \App\Controllers\BaseController
 		return \Redirect::to("dashboard");
 	}
 
-	function _populateTodayActionStats($dt_start, $dt_end, $action_ids, $action_names)
+	public function postDeleteFunel()
 	{
-		$graph_data = array("date" => $dt_start->toDateString());
+		$funel_preference_id = \Input::get("funel_preference_id");
+
+		if ($funel_preference_id)
+		{
+			$funel_default = \App\Models\FunelPreference::where("site_id", $this->active_site_id)->where("name", "Default")->get()->first();
+
+
+			if ($funel_default)
+			{
+				$funel_default->is_default = true;
+				$funel_default->update();
+			}
+			\App\Models\FunelPreferenceMeta::where("funel_preference_id", $funel_preference_id)->delete();
+			\App\Models\FunelPreference::where("site_id", $this->active_site_id)->where("id", $funel_preference_id)->delete();
+		}
+
+		return \Redirect::to("dashboard");
+	}
+
+	function _populateTodayActionStats($dt_start, $dt_end, $action_ids, $action_names, $index = false)
+	{
+
+		if (!$index)
+			$graph_data		 = array("date" => $dt_start->toDateString());
+		else
+			$graph_data[]	 = $dt_start->toDateString();
+
 
 		$i = 0;
 		foreach ($action_ids as $id)
@@ -231,14 +260,17 @@ class PanelController extends \App\Controllers\BaseController
 //			$total_action_today_details[$val]	 = $total_action;
 //			$total_action_overall_details[$val]	 = $total_action_overall;
 
-			$graph_data[$action_names[$i]] = $total_action;
+			if (!$index)
+				$graph_data[$action_names[$i]]	 = $total_action;
+			else
+				$graph_data[]					 = $total_action;
 			$i++;
 		}
 
 		return $graph_data;
 	}
 
-	function _getActionGraphLineStats($dt_start, $ids, $names, $until_next_few_days = 1)
+	function _getActionGraphLineStats($dt_start, $ids, $names, $until_next_few_days = 1, $index = false)
 	{
 		$graph_stats_data = array();
 
@@ -252,13 +284,13 @@ class PanelController extends \App\Controllers\BaseController
 			$dt_start	 = $dt_start->createFromTimestamp($dt_start->getTimestamp())->hour(0)->minute(0)->second(0);
 			$dt_end		 = $dt_start->createFromTimestamp($dt_start->getTimestamp())->hour(23)->minute(59)->second(59);
 
-			array_push($graph_stats_data, $this->_populateTodayActionStats($dt_start, $dt_end, $ids, $names));
+			array_push($graph_stats_data, $this->_populateTodayActionStats($dt_start, $dt_end, $ids, $names, $index));
 		}
 
 		return $graph_stats_data;
 	}
 
-	public function _setDefaultFunelPreferenceMetas($funel_preference_id, $non_default_action_ids)
+	function _setDefaultFunelPreferenceMetas($funel_preference_id, $non_default_action_ids)
 	{
 		\App\Models\FunelPreferenceMeta::where("funel_preference_id", $funel_preference_id)->delete();
 		$i = 0;
@@ -270,6 +302,72 @@ class PanelController extends \App\Controllers\BaseController
 			$funel_preference_meta->sort				 = $i++;
 			$funel_preference_meta->save();
 		}
+	}
+
+	function _getOverviewSummary()
+	{
+		$today				 = new Carbon("today"); //today begining
+		$tomorrow			 = new Carbon("tomorrow"); //tomorrow
+		$end_of_today		 = $tomorrow->subSeconds(1); //today ending
+		//today actions
+		$action_ids			 = \App\Models\Action::where("site_id", $this->active_site_id)->get()->lists("id");
+		$today_total_actions = \App\Models\ActionInstance::whereIn("action_id", $action_ids)->whereBetween('created', [$today, $end_of_today])->count();
+
+		//today items
+		$today_total_items = \App\Models\Item::where("site_id", $this->active_site_id)->whereBetween('created_at', [$today, $end_of_today])->count();
+
+		//today buy
+		$today_total_buy_action	 = 0;
+		$buy_action				 = \App\Models\Action::where("site_id", $this->active_site_id)->where("name", "buy")->get()->first();
+		if ($buy_action)
+			$today_total_buy_action	 = \App\Models\ActionInstance::where("action_id", $buy_action->id)->whereBetween('created', [$today, $end_of_today])->count();
+
+		//completion rate
+		//check if he have default funnel preference
+		$funel_default		 = \App\Models\FunelPreference::where("site_id", $this->active_site_id)->where("is_default", true)->first();
+		$funnel_stats_data	 = array();
+		$rates				 = array();
+
+		if ($funel_default && strtolower($funel_default->name) !== "default")
+		{
+			$funnel_action_ids = \App\Models\FunelPreferenceMeta::where("funel_preference_id", $funel_default->id)->orderBy('sort', 'ASC')->get()->lists("action_id");
+			foreach ($funnel_action_ids as $action_id)
+			{
+				$funnel_stats_data[] = \App\Models\Action::getNumberOfTotalActionsOverallByActionId($action_id);
+			}
+
+			for ($i = 0; $i < count($funnel_stats_data); $i++)
+			{
+				if (($i + 1) <= count($funnel_stats_data) - 1)
+				{
+					$rates[] = ($funnel_stats_data[$i + 1] / $funnel_stats_data[$i]) * 100;
+				}
+			}
+		}
+
+//		echo '<pre>';
+//		print_r($today_total_actions);
+//		echo "<br/>----<br/>";
+//		print_r($today_total_items);
+//		echo "<br/>----<br/>";
+//		print_r($today_total_buy_action);
+//		echo "<br/>----<br/>";
+//		print_r($tomorrow);
+//		echo "<br/>----<br/>";
+//		print_r($funnel_stats_data);
+//		echo "<br/>----<br/>";
+//		print_r($rates);
+//		echo '</pre>';
+//		die;
+
+		$overview_results = array(
+			'today_total_actions'	 => $today_total_actions,
+			'today_total_items'		 => $today_total_items,
+			'today_total_buy_action' => $today_total_buy_action,
+			'completion_rate'		 => (count($rates) > 0) ? number_format(end($rates), 2) : 0,
+		);
+
+		return $overview_results;
 	}
 
 }

@@ -39,6 +39,7 @@
 						<li><a href="<?php echo URL::route('password'); ?>"><i class="fa fa-lock"></i> <?php echo Lang::get("panel.edit.password"); ?></a></li>
 						<?php if (Session::get("role") !== "member" && Session::get("active_site_id") !== null) : ?>
 							<li><a href="<?php echo URL::to('sites'); ?>"><i class="fa fa-globe"></i> <?php echo Lang::get("panel.manage.sites"); ?></a></li>
+							<li><a href="<?php echo URL::to('members'); ?>"><i class="fa fa-globe"></i> <?php echo Lang::get("panel.manage.members"); ?></a></li>
 						<?php endif; ?>
 						<li><a href="#"><i class="fa fa-puzzle-piece"></i> <?php echo Lang::get("panel.help"); ?></a></li>
 						<li class="divider"></li>

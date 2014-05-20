@@ -14,6 +14,7 @@ return array(
 	"edit.profile"			 => "Edit Profile",
 	"edit.password"			 => "Edit Password",
 	"manage.sites"			 => "Manage Sites",
+	"manage.members"		 => "Manage Members",
 	"help"					 => "Help",
 	"logout"				 => "Logout",
 	"create.recommendation"	 => "Create Recommendation",
