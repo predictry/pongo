@@ -48,10 +48,10 @@ return array(
 
 		'pgsql' => array(
 			'driver'   => 'pgsql',
-			'host'     => 'localhost',
-			'database' => 'predictry_pongo',
-			'username' => 'predictry',
-			'password' => 'predictrypassword',
+			'host'     => $_ENV['PGSQL_HOST'],
+			'database' => $_ENV['PGSQL_DATABASE'],
+			'username' => $_ENV['PGSQL_USERNAME'],
+			'password' => $_ENV['PGSQL_PASSWORD'],
 			'charset'  => 'utf8',
 			'prefix'   => '',
 			'schema'   => 'public',
