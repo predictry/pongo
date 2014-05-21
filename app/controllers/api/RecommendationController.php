@@ -38,8 +38,8 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 
 			if ($input_reco_data)
 			{
-				$this->curl	 = new \Curl();
-				$response	 = $this->curl->_simple_call("get", $easyrec_url_with_method, $input_reco_data);
+				$this->curl			 = new \Curl();
+				$response			 = $this->curl->_simple_call("get", $easyrec_url_with_method, $input_reco_data);
 				$recommended_items	 = $this->_extractEasyRecResult(json_decode($response));
 				if ($recommended_items)
 				{
@@ -92,10 +92,30 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 		{
 			foreach ($response->recommendeditems as $items)
 			{
-				foreach ($items as $item_result)
+				if (!is_object($items))
 				{
-					$item = \App\Models\Item::where("identifier", $item_result->id)->get()->first();
 
+					foreach ($items as $item_result)
+					{
+						$item = \App\Models\Item::where("identifier", $item_result->id)->get()->first();
+
+						if ($item)
+						{
+							$item_reco = array(
+								"id"				 => $item->identifier,
+								"description"		 => $item->name,
+								"created_at"		 => $item->created_at->toDateTimeString(),
+								"item_properties"	 => $this->_getRecoItemProperties($item)
+							);
+
+							array_push($recommended_items, $item_reco);
+						}
+					}
+				}
+				else
+				{
+					$item_result = $items;
+					$item		 = \App\Models\Item::where("identifier", $item_result->id)->get()->first();
 					if ($item)
 					{
 						$item_reco = array(

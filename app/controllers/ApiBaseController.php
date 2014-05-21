@@ -40,8 +40,8 @@ class ApiBaseController extends \Controller
 		{
 			$api_credential['tenant_id'] = \Request::header("X-Predictry-Server-Tenant-ID");
 			$api_credential['api_key']	 = \Request::header("X-Predictry-Server-Api-Key");
-
 //			$api_credential['secret_key']	 = \Request::header("X-Predictry-Server-Secret-Key");
+
 			$this->site_id = $this->validateApiKey($api_credential);
 		}
 		if (!$this->site_id)
@@ -57,7 +57,7 @@ class ApiBaseController extends \Controller
 		if (is_object($site))
 			$site = $site->toArray();
 
-		if (count($site) > 0 && !empty($site['url']) && (($site['url'] === "http://" . Request::getHost()) || $site['url'] === Request::getHost()))
+		if (count($site) > 0 && !empty($site['url']))// && (($site['url'] === "http://" . \Request::server("HTTP_ORIGIN")) || $site['url'] === \Request::server("HTTP_ORIGIN")))
 		{
 			return $site['id'];
 		}

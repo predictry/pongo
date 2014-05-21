@@ -30,8 +30,17 @@ class HomeController extends BaseController
 	 * 
 	 * @return Response
 	 */
-	public function getHome()
+	public function getHome($id, $str)
 	{
+		echo '<pre>';
+		echo "id=>";
+		print_r($id);
+		echo "<br/>----<br/>";
+		echo "str=>";
+		print_r($str);
+		echo '</pre>';
+		die;
+
 		return View::make('hello');
 	}
 

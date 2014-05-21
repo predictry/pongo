@@ -51,6 +51,17 @@ class PlanSeeder extends Seeder
 					'limit_value'	 => '12',
 				)
 		);
+
+		App\Models\Plan::create(
+				array(
+					'id'			 => '3',
+					'name'			 => 'Plan C',
+					'description'	 => 'Plan C',
+					'currency'		 => 'USD',
+					'price'			 => '999',
+					'limit_value'	 => '12',
+				)
+		);
 	}
 
 }

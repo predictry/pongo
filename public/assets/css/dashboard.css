@@ -31,6 +31,13 @@ body {
 .pb20{
     padding-bottom: 20px;
 }
+.ml10{
+    margin-left: 10px;
+}
+
+.ml20{
+    margin-left: 20px;
+}
 .chosen-container{
     /*width: 90% !important;*/
 }
@@ -129,6 +136,7 @@ body {
     padding: 15px;
     margin-bottom: 30px;
     background: #FFF;
+    border: 1px solid #CCC;
 }
 
 .the-box p.tiles-title{

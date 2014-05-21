@@ -4,7 +4,7 @@ jQuery(document).ready(function() {
     $('.tt').tooltip();
 
     if (typeof graph_data !== 'undefined') {
-        new Morris.Line({
+        new Morris.Bar({
             element: 'defaultActionsChart',
             data: graph_data,
             xkey: graph_x_keys,

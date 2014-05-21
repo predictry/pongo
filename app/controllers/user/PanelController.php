@@ -38,23 +38,74 @@ class PanelController extends \App\Controllers\BaseController
 //			return "Not found any site activated as a default display.";
 			return \Redirect::to('sites/wizard');
 		}
+		$today			 = new Carbon("today"); //today begining
+		$tomorrow		 = new Carbon("tomorrow"); //tomorrow
+		$end_of_today	 = $tomorrow->subSeconds(1); //today ending
+		$graph_x_keys	 = "date";
+		$dt_start_range	 = $today->toDateTimeString();
+		$dt_end_range	 = $end_of_today->toDateTimeString();
 
 		$overviews = $this->_getOverviewSummary();
 
-		$dt_2_days_ago	 = new Carbon("2 days ago");
-		$graph_x_keys	 = "date";
-		$dt_start_range	 = $dt_2_days_ago->toDateString();
-
 		$available_default_site_actions	 = \App\Models\Action::where("site_id", $this->active_site_id)->limit(4)->get()->toArray(); //limit 4 (first 4 are default actions)
-		$available_site_action_ids		 = array_fetch($available_default_site_actions, "id");
-		$available_site_action_names	 = array_fetch($available_default_site_actions, "name");
-		$graph_y_keys					 = $available_site_action_names;
+		$today_default_data				 = $this->_getActionStatsInfo($available_default_site_actions, $today, $end_of_today);
+		$output_today_default_data		 = array(
+			"graph_today_stats_data" => $today_default_data['stats']['data'],
+			"js_graph_stats_data"	 => json_encode($today_default_data['stats']['data']),
+			"graph_y_keys"			 => json_encode($today_default_data['stats']['y_keys']));
 
+
+		$available_site_action_ids		 = $today_default_data['action_ids'];
+		$today_funel_default_data		 = $this->_getFunelStatsInfo($available_site_action_ids, $today, $end_of_today);
+		$output_today_funel_default_data = array(
+			"graph_non_default_today_stats_data" => $today_funel_default_data['stats']['data'],
+			"js_non_default_graph_stats_data"	 => json_encode($today_funel_default_data['stats']['data']),
+			"graph_y_non_defaulty_keys"			 => json_encode($today_funel_default_data['stats']['y_keys']));
+
+		//funel dropdown
+		$funel_dropdown = \App\Models\FunelPreference::where("site_id", $this->active_site_id)->get()->lists("name", "id");
+
+		$output = array(
+			"total_action_today"		 => 0,
+			"graph_x_keys"				 => $graph_x_keys,
+			"str_date_range"			 => $dt_start_range . ' to ' . $dt_end_range,
+			"funel_name"				 => $today_funel_default_data['funel_name'],
+			"funel_selected_dropdown"	 => $today_funel_default_data['funel_selected_dropdown'],
+			"funel_dropdown"			 => $funel_dropdown,
+			"overviews"					 => $overviews,
+			"pageTitle"					 => "dashboard"
+		);
+
+		$output = array_merge($output, $output_today_default_data, $output_today_funel_default_data);
+
+		return \View::make('frontend.panels.dashboard', $output);
+	}
+
+	function _getActionStatsInfo($site_actions, $dt_start, $dt_end)
+	{
+		$action_ids		 = array_fetch($site_actions, "id");
+		$action_names	 = array_fetch($site_actions, "name");
+		$graph_data[]	 = $this->_populateTodayActionStats($dt_start, $dt_end, $action_ids, $action_names);
+
+		$output = array(
+			"stats"			 => array(
+				"data"	 => $graph_data,
+				"x_keys" => "date",
+				"y_keys" => $action_names
+			),
+			"action_ids"	 => $action_ids,
+			"action_names"	 => $action_names
+		);
+
+		return $output;
+	}
+
+	function _getFunelStatsInfo($action_ids, $dt_start, $dt_end)
+	{
 		//this is basically funnel
-		$available_non_default_site_actions		 = \App\Models\Action::where("site_id", $this->active_site_id)->whereNotIn("id", $available_site_action_ids)->get()->toArray();
+		$available_non_default_site_actions		 = \App\Models\Action::where("site_id", $this->active_site_id)->whereNotIn("id", $action_ids)->get()->toArray();
 		$available_non_default_site_action_ids	 = array_fetch($available_non_default_site_actions, "id");
 		$available_non_default_site_action_names = array_fetch($available_non_default_site_actions, "name");
-		$graph_y_non_default_keys				 = $available_non_default_site_action_names;
 
 		//check if he have default funnel preference
 		$funel_default = \App\Models\FunelPreference::where("site_id", $this->active_site_id)->where("is_default", true)->first();
@@ -72,50 +123,37 @@ class PanelController extends \App\Controllers\BaseController
 					array_push($funel_default_preference_meta_names, $o->name);
 			}
 
-			$graph_default_funel_preference_stats_data = $this->_getActionGraphLineStats($dt_2_days_ago, $funel_default_preference_metas_ids, $funel_default_preference_meta_names, 3);
-		}
+			$graph_data[] = $this->_populateTodayActionStats($dt_start, $dt_end, $funel_default_preference_metas_ids, $funel_default_preference_meta_names);
 
-		$graph_default_stats_data		 = $this->_getActionGraphLineStats($dt_2_days_ago, $available_site_action_ids, $available_site_action_names, 5);
-		$graph_non_default_stats_data	 = $this->_getActionGraphLineStats($dt_2_days_ago, $available_non_default_site_action_ids, $available_non_default_site_action_names, 5);
-
-		$total_action_today = 0;
-
-		$dt_end_range = $dt_2_days_ago->toDateString();
-
-		$graph_default_data = array(
-			"graph_today_stats_data" => $graph_default_stats_data,
-			"js_graph_stats_data"	 => json_encode($graph_default_stats_data),
-			"graph_y_keys"			 => json_encode($graph_y_keys));
-
-		if ($funel_default && count($funel_default_preference_metas_ids) > 0)
+			$output = array(
+				"stats"						 => array(
+					"data"	 => $graph_data,
+					"x_keys" => "date",
+					"y_keys" => $funel_default_preference_meta_names
+				),
+				"action_ids"				 => $funel_default_preference_metas_ids,
+				"action_names"				 => $funel_default_preference_meta_names,
+				'funel_selected_dropdown'	 => $funel_default->id,
+				'funel_name'				 => strtolower($funel_default->name)
+			);
+		}else
 		{
-			$graph_non_default_data = array(
-				"graph_non_default_today_stats_data" => $graph_default_funel_preference_stats_data,
-				"js_non_default_graph_stats_data"	 => json_encode($graph_default_funel_preference_stats_data),
-				"graph_y_non_defaulty_keys"			 => json_encode($funel_default_preference_meta_names));
-		}
-		else
-		{
-			$graph_non_default_data = array(
-				"graph_non_default_today_stats_data" => $graph_non_default_stats_data,
-				"js_non_default_graph_stats_data"	 => json_encode($graph_non_default_stats_data),
-				"graph_y_non_defaulty_keys"			 => json_encode($available_non_default_site_action_names));
-		}
-		//funel dropdown
-		$funel_dropdown = \App\Models\FunelPreference::where("site_id", $this->active_site_id)->get()->lists("name", "id");
+			$graph_data[] = $this->_populateTodayActionStats($dt_start, $dt_end, $available_non_default_site_action_ids, $available_non_default_site_action_names);
 
-		$output	 = array(
-			"total_action_today"		 => $total_action_today,
-			"graph_x_keys"				 => $graph_x_keys,
-			"str_date_range"			 => $dt_start_range . ' to ' . $dt_end_range,
-			"funel_selected_dropdown"	 => isset($funel_default) && isset($graph_default_funel_preference_stats_data) ? $funel_default->id : null,
-			"funel_dropdown"			 => $funel_dropdown,
-			"overviews"					 => $overviews,
-			"pageTitle"					 => "dashboard"
-		);
-		$output	 = array_merge($output, $graph_default_data, $graph_non_default_data);
+			$output = array(
+				"stats"						 => array(
+					"data"	 => $graph_data,
+					"x_keys" => "date",
+					"y_keys" => $funel_default_preference_meta_names
+				),
+				"action_ids"				 => $available_non_default_site_action_ids,
+				"action_names"				 => $available_non_default_site_action_names,
+				'funel_selected_dropdown'	 => null,
+				'funel_name'				 => 'not found'
+			);
+		}
 
-		return \View::make('frontend.panels.dashboard', $output);
+		return $output;
 	}
 
 	public function getCreateFunel($is_modal = false)
@@ -254,9 +292,8 @@ class PanelController extends \App\Controllers\BaseController
 		$i = 0;
 		foreach ($action_ids as $id)
 		{
-			$total_action			 = \App\Models\ActionInstance::where("action_id", $id)->whereBetween('created', [$dt_start, $dt_end])->count();
-			$total_action_overall	 = \App\Models\ActionInstance::where("action_id", $id)->count();
-
+			$total_action = \App\Models\ActionInstance::where("action_id", $id)->whereBetween('created', [$dt_start, $dt_end])->count();
+//			$total_action_overall	 = \App\Models\ActionInstance::where("action_id", $id)->count();
 //			$total_action_today_details[$val]	 = $total_action;
 //			$total_action_overall_details[$val]	 = $total_action_overall;
 

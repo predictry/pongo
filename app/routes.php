@@ -19,15 +19,20 @@
  */
 Route::pattern('token', '[A-Za-z0-9]+');
 Route::pattern('numeric', '[0-9]+');
+if (App::isLocal())
+	Route::pattern('domain', 'predictryapp.dev');
+else
+	Route::pattern('domain', 'predictry.com');
+
 
 /*
   |--------------------------------------------------------------------------
   | Frontend Routes
   |--------------------------------------------------------------------------
  */
-Route::group(array('namespace' => 'App\Controllers'), function() {
+Route::group(array('domain' => 'dashboard.{domain}', 'namespace' => 'App\Controllers'), function() {
 	Route::get('/', 'HomeController@getLogin');
-	Route::get('/home', 'HomeController@getHome');
+	Route::get('/home/{numeric}/{token}', 'HomeController@getHome');
 
 	Route::get('login', 'HomeController@getLogin');
 	Route::post('login/submit', 'HomeController@postLogin');
@@ -45,9 +50,11 @@ Route::group(array('namespace' => 'App\Controllers'), function() {
 });
 
 /*
- * User Routing
+  |--------------------------------------------------------------------------
+  | User Dashboard Routing
+  |--------------------------------------------------------------------------
  */
-Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
+Route::group(array('domain' => 'dashboard.{domain}', 'before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
 	#Dashboard
 	$role = Session::get("role");
 
@@ -58,12 +65,12 @@ Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), f
 	Route::post('sites/ajaxSubmitSite', array('as' => 'sites', 'uses' => 'SitesController@postCreate'));
 
 	#Update Profile
-	Route::get('user/profile', 'UserController@getProfile');
+	Route::get('profile', 'UserController@getProfile');
 	Route::post('user/profile/submit', 'UserController@postProfile');
 	Route::get('user/profile', array('as' => 'profile', 'uses' => 'UserController@getProfile'));
 
 	#Update Password
-	Route::get('user/password', 'UserController@getPassword');
+	Route::get('password', 'UserController@getPassword');
 	Route::post('user/password/submit', 'UserController@postPassword');
 	Route::get('user/password', array('as' => 'password', 'uses' => 'UserController@getPassword'));
 
@@ -96,7 +103,7 @@ Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), f
 			Route::get('sites/{numeric}/delete', 'SitesController@getDelete');
 			Route::post('sites/{numeric}/delete', 'SitesController@postDelete');
 		}
-		Route::get('sites/{numeric}/default', 'SitesController@getDefault');
+		Route::get('sites/{numeric}/default', array("as" => "sites.{numieric}.edit", "uses" => 'SitesController@getDefault'));
 		Route::get("sites", array("as" => "sites", "uses" => "SitesController@index"));
 
 		#Item Management
@@ -151,17 +158,20 @@ Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), f
 	#logout
 	Route::get('user/logout', 'UserController@logout');
 });
-// Route group for API versioning
-Route::group(array('prefix' => 'api/v1', 'namespace' => 'App\Controllers\Api'), function() {
-// Route group for API versioning
-	// Allow from any origin
+
+/*
+  |--------------------------------------------------------------------------
+  | API Routing
+  |--------------------------------------------------------------------------
+ */
+Route::group(array('domain' => 'api.{domain}', 'prefix' => 'v1', 'namespace' => 'App\Controllers\Api'), function() {
+	//	 Allow from any origin
 	if (isset($_SERVER['HTTP_ORIGIN']))
 	{
 		header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
 		header('Access-Control-Allow-Credentials: true');
 		header('Access-Control-Max-Age: 86400'); // cache for 1 day
 	}
-
 	// Access-Control headers are received during OPTIONS requests
 	if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS')
 	{
@@ -174,6 +184,8 @@ Route::group(array('prefix' => 'api/v1', 'namespace' => 'App\Controllers\Api'), 
 
 		exit(0);
 	}
+
 	Route::resource('predictry', 'ActionController', array("only" => array("index", "store", "show", "destroy")));
 	Route::resource('recommendation', 'RecommendationController', array("only" => array("index")));
 });
+

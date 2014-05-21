@@ -21,7 +21,7 @@ App::after(function($request, $response) {
 });
 
 App::missing(function($exception) {
-	return Response::view('errors.missing', array(), 404);
+	return Response::view('frontend.errors.missing', array('exception' => $exception), 404);
 //	return Redirect::to("dashboard");
 });
 /*
