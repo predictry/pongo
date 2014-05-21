@@ -20,7 +20,7 @@
 Route::pattern('token', '[A-Za-z0-9]+');
 Route::pattern('numeric', '[0-9]+');
 if (App::isLocal())
-	Route::pattern('domain', 'predictryapp.dev');
+	Route::pattern('domain', 'predictry.dev');
 else
 	Route::pattern('domain', 'predictry.com');
 
@@ -30,7 +30,8 @@ else
   | Frontend Routes
   |--------------------------------------------------------------------------
  */
-Route::group(array('domain' => 'dashboard.{domain}', 'namespace' => 'App\Controllers'), function() {
+//Route::group(array('domain' => 'dashboard.{domain}', 'namespace' => 'App\Controllers'), function() {
+Route::group(array('domain' => 'demo.{domain}', 'namespace' => 'App\Controllers'), function() {
 	Route::get('/', 'HomeController@getLogin');
 	Route::get('/home/{numeric}/{token}', 'HomeController@getHome');
 
@@ -54,7 +55,8 @@ Route::group(array('domain' => 'dashboard.{domain}', 'namespace' => 'App\Control
   | User Dashboard Routing
   |--------------------------------------------------------------------------
  */
-Route::group(array('domain' => 'dashboard.{domain}', 'before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
+//Route::group(array('domain' => 'dashboard.{domain}', 'before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
+Route::group(array('domain' => 'demo.{domain}', 'before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
 	#Dashboard
 	$role = Session::get("role");
 
@@ -185,6 +187,16 @@ Route::group(array('domain' => 'api.{domain}', 'prefix' => 'v1', 'namespace' => 
 		exit(0);
 	}
 
+	Route::resource('predictry', 'ActionController', array("only" => array("index", "store", "show", "destroy")));
+	Route::resource('recommendation', 'RecommendationController', array("only" => array("index")));
+});
+
+/*
+  |--------------------------------------------------------------------------
+  | API Routing (can be removed later, testing purpose only)
+  |--------------------------------------------------------------------------
+ */
+Route::group(array('prefix' => 'api/v1', 'namespace' => 'App\Controllers\Api'), function() {
 	Route::resource('predictry', 'ActionController', array("only" => array("index", "store", "show", "destroy")));
 	Route::resource('recommendation', 'RecommendationController', array("only" => array("index")));
 });

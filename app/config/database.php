@@ -66,9 +66,9 @@ return array(
 		'pgsql' => array(
 			'driver'   => 'pgsql',
 			'host'     => 'localhost',
-			'database' => 'database',
-			'username' => 'root',
-			'password' => '',
+			'database' => 'predictry_pongo',
+			'username' => 'predictry',
+			'password' => 'predictrypassword',
 			'charset'  => 'utf8',
 			'prefix'   => '',
 			'schema'   => 'public',
