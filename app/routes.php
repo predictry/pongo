@@ -19,11 +19,10 @@
  */
 Route::pattern('token', '[A-Za-z0-9]+');
 Route::pattern('numeric', '[0-9]+');
-if (App::isLocal())
-	Route::pattern('domain', 'predictry.dev');
-else
-	Route::pattern('domain', 'predictry.com');
 
+$dashboard_domain	 = str_replace("http://", "", Config::get('app.url'));
+$domains			 = explode(".", $dashboard_domain);
+$tld				 = $domains[1] . "." . $domains[2];
 
 /*
   |--------------------------------------------------------------------------
@@ -31,7 +30,7 @@ else
   |--------------------------------------------------------------------------
  */
 //Route::group(array('domain' => 'dashboard.{domain}', 'namespace' => 'App\Controllers'), function() {
-Route::group(array('domain' => 'demo.predictry.dev', 'namespace' => 'App\Controllers'), function() {
+Route::group(array('domain' => 'dashboard.' . $tld, 'namespace' => 'App\Controllers'), function() {
 	Route::get('/', 'HomeController@getLogin');
 	Route::get('/home/{numeric}/{token}', 'HomeController@getHome');
 
@@ -56,7 +55,7 @@ Route::group(array('domain' => 'demo.predictry.dev', 'namespace' => 'App\Control
   |--------------------------------------------------------------------------
  */
 //Route::group(array('domain' => 'dashboard.{domain}', 'before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
-Route::group(array('domain' => 'demo.predictry.dev', 'before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
+Route::group(array('domain' => 'dashboard.' . $tld, 'before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
 
 	#Dashboard
 	$role = Session::get("role");
@@ -167,7 +166,7 @@ Route::group(array('domain' => 'demo.predictry.dev', 'before' => 'auth', 'namesp
   | API Routing
   |--------------------------------------------------------------------------
  */
-Route::group(array('domain' => 'api.{domain}', 'prefix' => 'v1', 'namespace' => 'App\Controllers\Api'), function() {
+Route::group(array('domain' => 'api.' . $tld, 'prefix' => 'v1', 'namespace' => 'App\Controllers\Api'), function() {
 	//	 Allow from any origin
 	if (isset($_SERVER['HTTP_ORIGIN']))
 	{
