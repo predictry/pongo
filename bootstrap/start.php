@@ -26,7 +26,8 @@ $app = new Illuminate\Foundation\Application;
 
 $env = $app->detectEnvironment(array(
 
-	'local' => array('ikyandhi.local', 'your-machine-name'),
+	'local' => array(''), // empty string make Laravel to default to 'local'
+	'production' => array('perfectsen2'), // hostname of the Production server
 
 ));
 
