@@ -10,7 +10,8 @@ jQuery(document).ready(function() {
             xkey: graph_x_keys,
             ykeys: graph_y_keys,
             labels: graph_y_keys,
-            xLabels: "day"
+            xLabels: "day",
+            hideHover: true
         });
     }
     if (typeof graph_non_default_data !== 'undefined') {
@@ -193,6 +194,33 @@ jQuery(document).ready(function() {
 
     $("#funel_preference_id").change(function() {
         $('#funelSelector').submit();
+    });
+
+    $('div.btn-group .btn').click(function() {
+        $(this).find('input:radio').attr('checked', true);
+        var type = $(this).find('input[name=options]').val();
+
+        $('.options_trend').each(function() {
+            if ($(this).val() !== type)
+                $(this).attr('checked', false);
+        });
+
+        $.ajax({
+            url: site_url + "/panel/trends",
+            type: 'POST',
+            data: {type: type},
+            dataType: 'json',
+            success: function(data)
+            {
+                if (data.status === "success") {
+                    $("#trendsContent").html(data.response);
+                }
+            },
+            error: function() {
+            }
+        });
+
+        return;
     });
 });
 

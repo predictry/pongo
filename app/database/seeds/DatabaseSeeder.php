@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
 		$this->call('AccountSeeder');
 		$this->call('SitesTableSeeder');
 		$this->call('ActionsSeeder');
+		$this->call('CombinationTableSeeder');
 //		$this->call('ItemTableSeeder');
 	}
 
@@ -107,9 +108,18 @@ class AccountSeeder extends Seeder
 	{
 		DB::table('accounts')->delete();
 
-		$faker = Faker::create();
+		App\Models\Account::create(array(
+			'id'				 => 1,
+			'name'				 => 'Rifki Yandhi',
+			'email'				 => 'rifkiyandhi@gmail.com',
+			'password'			 => Hash::make('password'),
+			'confirmed'			 => 1,
+			'confirmation_code'	 => md5(microtime() . Config::get('app.key')),
+			'plan_id'			 => 1
+		));
 
-		foreach (range(1, 10) as $index)
+		$faker = Faker::create();
+		foreach (range(2, 10) as $index)
 		{
 			App\Models\Account::create(array(
 				'id'				 => $index,
@@ -164,6 +174,22 @@ class ItemTableSeeder extends Seeder
 						"type"		 => "product"
 			));
 		}
+	}
+
+}
+
+class CombinationTableSeeder extends Seeder
+{
+
+	public function run()
+	{
+		DB::table('combinations')->delete();
+		\App\Models\Combination::create(
+				array(
+					'name'			 => 'Default',
+					'description'	 => 'Default'
+				)
+		);
 	}
 
 }

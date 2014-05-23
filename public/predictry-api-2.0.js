@@ -7,7 +7,7 @@
 
 //var PREDICTRY_API_URL = "http://localhost/predictry-pongo/public/index.php/api/v1/";
 //var PREDICTRY_API_URL = "http://demo.predictry.com/api/v1/";
-var PREDICTRY_API_URL = "http://api.predictryapp.dev/v1/";
+var PREDICTRY_API_URL = "http://api.predictry.dev/v1/";
 
 var compulsary_params = new Array("user_id", "action", "item_id", "session_id", "description");
 var optional_params = new Array("item_properties", "action_properties");

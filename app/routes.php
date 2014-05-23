@@ -31,7 +31,7 @@ else
   |--------------------------------------------------------------------------
  */
 //Route::group(array('domain' => 'dashboard.{domain}', 'namespace' => 'App\Controllers'), function() {
-Route::group(array('domain' => 'demo.{domain}', 'namespace' => 'App\Controllers'), function() {
+Route::group(array('domain' => 'demo.predictry.dev', 'namespace' => 'App\Controllers'), function() {
 	Route::get('/', 'HomeController@getLogin');
 	Route::get('/home/{numeric}/{token}', 'HomeController@getHome');
 
@@ -56,7 +56,8 @@ Route::group(array('domain' => 'demo.{domain}', 'namespace' => 'App\Controllers'
   |--------------------------------------------------------------------------
  */
 //Route::group(array('domain' => 'dashboard.{domain}', 'before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
-Route::group(array('domain' => 'demo.{domain}', 'before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
+Route::group(array('domain' => 'demo.predictry.dev', 'before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
+
 	#Dashboard
 	$role = Session::get("role");
 
@@ -84,7 +85,7 @@ Route::group(array('domain' => 'demo.{domain}', 'before' => 'auth', 'namespace' 
 		Route::get('panel/createFunel/{ismodal?}', array('as' => 'panel.createFunel', 'uses' => 'PanelController@getCreateFunel'));
 		Route::get('panel/itemFunel', array('as' => 'panel.itemFunel', 'uses' => 'PanelController@getItemFunel'));
 		Route::post('panel/deleteFunel', array('as' => 'panel.deleteFunel', 'uses' => 'PanelController@postDeleteFunel'));
-
+		Route::post("panel/trends", array('as' => 'panel.trends', 'uses' => 'PanelController@getTrends'));
 
 		#Member Management
 		Route::get('members/create', array("as" => "members.create", "uses" => 'MembersController@getCreate'));
@@ -175,9 +176,8 @@ Route::group(array('domain' => 'api.{domain}', 'prefix' => 'v1', 'namespace' => 
 		header('Access-Control-Max-Age: 86400'); // cache for 1 day
 	}
 	// Access-Control headers are received during OPTIONS requests
-	if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS')
+	if (isset($_SERVER['REQUEST_METHOD']) && ($_SERVER['REQUEST_METHOD'] == 'OPTIONS'))
 	{
-
 		if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']))
 			header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 

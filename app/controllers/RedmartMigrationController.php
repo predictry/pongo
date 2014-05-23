@@ -14,7 +14,7 @@ class RedmartMigrationController extends BaseController
 
 	public function __construct()
 	{
-		$this->migration_site_id = 15; //redmart site id
+		$this->migration_site_id = 11; //redmart site id
 	}
 
 	/**
@@ -27,29 +27,30 @@ class RedmartMigrationController extends BaseController
 		$action_ids						 = \App\Models\Action::where("site_id", $this->migration_site_id)->get(array("id"))->toArray();
 		$migration_action_file_dump_path = public_path() . "/vv_reco_redmart/tbl_actions.csv";
 		$migration_item_file_dump_path	 = public_path() . "/vv_reco_redmart/tbl_items.csv";
-//		$migration_outbox_file_dump_path = public_path() . "/vv_reco_redmart/tbl_outbox.csv";
+		$migration_outbox_file_dump_path = public_path() . "/vv_reco_redmart/tbl_outbox.csv";
 //		$migration_hello_file_dump_path	 = public_path() . "/vv_reco_redmart/hello.csv";
 //		$migration_outbox_header = array(
 //			"id", "action_guid", "dt_added", "dt_proceed", "dt_sent", "executed"
 //		);
 
 		$migration_action_header = array(
-			"id", "user_id", "action_type", "item_id", "ip", "browser", "dt_added", "sessionid", "guid"
+//			"id", "user_id", "action_type", "item_id", "ip", "browser", "dt_added", "sessionid", "guid"
+			"id", "user_id", "action_type", "item_id", "ip", "dt_added", "sessionid", "guid"
 		);
 		$migration_item_header	 = array(
 			"id", "description", "item_url", "img_url", "price", "dt_added"
 		);
 
-		$migration_actions	 = $this->_csvToArray($migration_action_header, $migration_action_file_dump_path);
-		$i					 = 0;
-		foreach ($migration_actions as $row)
-		{
-			if ($i === 0)
-			{
-				$i++;
-				continue;
-			}
-
+		$migration_actions = $this->_csvToArray($migration_action_header, $migration_action_file_dump_path);
+//		$i					 = 0;
+//		foreach ($migration_actions as $row)
+//		{
+//			if ($i === 0)
+//			{
+//				$i++;
+//				continue;
+//			}
+//
 //			//ADD VISITOR AND SESSIONS
 //			$new_visitor = array(
 //				"user_id" => $row['user_id']
@@ -60,70 +61,71 @@ class RedmartMigrationController extends BaseController
 //			{
 //				$this->_setSession($new_visitor_id, $row['sessionid']);
 //			}
-			//ADD ACTIONS
-			$visitor = \App\Models\Visitor::where("identifier", $row['user_id'])->get()->first();
-			if ($visitor)
-			{
-				$session = \App\Models\Session::where("visitor_id", $visitor->id)->where("session", $row['sessionid'])->get()->first();
-				if ($session)
-				{
-					$action = \App\Models\Action::where("name", $row['action_type'])->where("site_id", $this->migration_site_id)->get(array("id"))->first();
-
-					$item = \App\Models\Item::where("identifier", $row['item_id'])->get()->first();
-
-					if ($item)
-					{
-						$new_action_instance = array(
-							'id'		 => $row['id'],
-							'item_id'	 => $item->id,
-							'session_id' => $session->id,
-							'dt_added'	 => $row['dt_added']
-						);
-
-						$new_action_instance_id = $this->_setActionInstance($action->id, $new_action_instance);
-						if ($new_action_instance_id)
-						{
-							$new_action_instance_metas = array(
-								"browser"	 => $row['browser'],
-								"guid"		 => $row['guid']
-							);
-
-							$this->_setActionInstanceMeta($new_action_instance_id, $new_action_instance_metas);
-						}
-
-						echo $row['id'] . " => " . $new_action_instance_id . "<br/>";
-					}
-					else
-					{
-						echo $row['id'] . " => not data item (" . $row['item_id'] . ") <br/>";
-					}
-				}
-			}
-		}
-
-
-//		$migration_items = $this->_csvToArray($migration_item_header, $migration_item_file_dump_path);
-//		echo count($migration_actions); die;
-//		echo count($migration_items);
-//		die;
-//		foreach ($migration_items as $row)
-//		{
-//			$new_item = array(
-//				"item_id"		 => $row['id'],
-//				"description"	 => $row['description']
-//			);
 //
-//			$new_item_id = $this->_setItem($new_item);
-//
-//			if ($new_item_id)
+//			//ADD ACTIONS
+//			$visitor = \App\Models\Visitor::where("identifier", $row['user_id'])->get()->first();
+//			if ($visitor)
 //			{
-//				$new_item_metas	 = array();
-//				$new_item_metas	 = ($row['item_url'] !== "") ? array_merge($new_item_metas, array("item_url" => $row['item_url'])) : $new_item_metas;
-//				$new_item_metas	 = ($row['img_url'] !== "") ? array_merge($new_item_metas, array("img_url" => $row['img_url'])) : $new_item_metas;
-//				$new_item_metas	 = ($row['price'] !== "") ? array_merge($new_item_metas, array("price" => $row['price'])) : $new_item_metas;
-//				$this->_setItemMeta($new_item_id, $new_item_metas);
+//				$session = \App\Models\Session::where("visitor_id", $visitor->id)->where("session", $row['sessionid'])->get()->first();
+//				if ($session)
+//				{
+//					$action = \App\Models\Action::where("name", $row['action_type'])->where("site_id", $this->migration_site_id)->get(array("id"))->first();
+//
+//					$item = \App\Models\Item::where("identifier", $row['item_id'])->get()->first();
+//
+//					if ($item)
+//					{
+//						$new_action_instance = array(
+//							'id'		 => $row['id'],
+//							'item_id'	 => $item->id,
+//							'session_id' => $session->id,
+//							'dt_added'	 => $row['dt_added']
+//						);
+//
+//						$new_action_instance_id = $this->_setActionInstance($action->id, $new_action_instance);
+//						if ($new_action_instance_id)
+//						{
+//							$new_action_instance_metas = array(
+//								"browser"	 => $row['browser'],
+//								"guid"		 => $row['guid']
+//							);
+//
+//							$this->_setActionInstanceMeta($new_action_instance_id, $new_action_instance_metas);
+//						}
+//
+//						echo $row['id'] . " => " . $new_action_instance_id . "<br/>";
+//					}
+//					else
+//					{
+//						echo $row['id'] . " => not data item (" . $row['item_id'] . ") <br/>";
+//					}
+//				}
 //			}
 //		}
+
+		$migration_items = $this->_csvToArray($migration_item_header, $migration_item_file_dump_path);
+//		echo count($migration_actions);
+//		die;
+//		echo count($migration_items);
+//		die;
+		foreach ($migration_items as $row)
+		{
+			$new_item = array(
+				"item_id"		 => $row['id'],
+				"description"	 => $row['description']
+			);
+
+			$new_item_id = $this->_setItem($new_item);
+
+			if ($new_item_id)
+			{
+				$new_item_metas	 = array();
+				$new_item_metas	 = ($row['item_url'] !== "") ? array_merge($new_item_metas, array("item_url" => $row['item_url'])) : $new_item_metas;
+				$new_item_metas	 = ($row['img_url'] !== "") ? array_merge($new_item_metas, array("img_url" => $row['img_url'])) : $new_item_metas;
+				$new_item_metas	 = ($row['price'] !== "") ? array_merge($new_item_metas, array("price" => $row['price'])) : $new_item_metas;
+				$this->_setItemMeta($new_item_id, $new_item_metas);
+			}
+		}
 	}
 
 	public function _setActionInstance($action_id, $data)
@@ -238,7 +240,16 @@ class RedmartMigrationController extends BaseController
 		{
 			while (($row = fgetcsv($handle, 1000, ',')) !== FALSE)
 			{
-				$contents[] = array_combine($header, $row);
+				if (count($row) == count($header))
+					$contents[] = array_combine($header, $row);
+				else
+				{
+					echo '<pre>';
+					print_r($row);
+					echo "<br/>----<br/>";
+					echo '</pre>';
+					die;
+				}
 			}
 		}
 

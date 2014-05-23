@@ -16,7 +16,7 @@ class CreateFunelPreferencesTable extends Migration
 		Schema::create('funel_preferences', function(Blueprint $table) {
 			$table->increments('id');
 			$table->integer("site_id")->unsigned();
-			$table->string('name', 45);
+			$table->string('name', 100);
 			$table->boolean('is_default')->default(false);
 			$table->timestamps();
 

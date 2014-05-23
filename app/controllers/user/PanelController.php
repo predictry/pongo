@@ -38,6 +38,7 @@ class PanelController extends \App\Controllers\BaseController
 //			return "Not found any site activated as a default display.";
 			return \Redirect::to('sites/wizard');
 		}
+
 		$today			 = new Carbon("today"); //today begining
 		$tomorrow		 = new Carbon("tomorrow"); //tomorrow
 		$end_of_today	 = $tomorrow->subSeconds(1); //today ending
@@ -45,7 +46,6 @@ class PanelController extends \App\Controllers\BaseController
 		$dt_start_range	 = $today->toDateTimeString();
 		$dt_end_range	 = $end_of_today->toDateTimeString();
 
-		$overviews = $this->_getOverviewSummary();
 
 		$available_default_site_actions	 = \App\Models\Action::where("site_id", $this->active_site_id)->limit(4)->get()->toArray(); //limit 4 (first 4 are default actions)
 		$today_default_data				 = $this->_getActionStatsInfo($available_default_site_actions, $today, $end_of_today);
@@ -62,6 +62,12 @@ class PanelController extends \App\Controllers\BaseController
 			"js_non_default_graph_stats_data"	 => json_encode($today_funel_default_data['stats']['data']),
 			"graph_y_non_defaulty_keys"			 => json_encode($today_funel_default_data['stats']['y_keys']));
 
+		//trends data
+		$output_trends_data['trends_data'] = $this->_getActionTrends("today");
+
+		//overview data
+		$overviews = $this->_getOverviewSummary();
+
 		//funel dropdown
 		$funel_dropdown = \App\Models\FunelPreference::where("site_id", $this->active_site_id)->get()->lists("name", "id");
 
@@ -76,7 +82,17 @@ class PanelController extends \App\Controllers\BaseController
 			"pageTitle"					 => "dashboard"
 		);
 
-		$output = array_merge($output, $output_today_default_data, $output_today_funel_default_data);
+
+		$buy_action	 = \App\Models\Action::where("site_id", $this->active_site_id)->where("name", "buy")->get()->first(); //buy action
+		$view_action = \App\Models\Action::where("site_id", $this->active_site_id)->where("name", "view")->get()->first(); //view action
+
+		if ($buy_action)
+			$output_top_items['top_purchased_items'] = \App\Models\ActionInstance::getMostItems($buy_action->id);
+
+		if ($view_action)
+			$output_top_items['top_viewed_items'] = \App\Models\ActionInstance::getMostItems($view_action->id);
+
+		$output = array_merge($output, $output_today_default_data, $output_today_funel_default_data, $output_trends_data, $output_top_items);
 
 		return \View::make('frontend.panels.dashboard', $output);
 	}
@@ -108,6 +124,27 @@ class PanelController extends \App\Controllers\BaseController
 		$available_non_default_site_action_names = array_fetch($available_non_default_site_actions, "name");
 
 		//check if he have default funnel preference
+		$total_funnels = \App\Models\FunelPreference::where("site_id", $this->active_site_id)->get()->count();
+
+		if ($total_funnels <= 0)
+		{
+			$funel_preference				 = new \App\Models\FunelPreference();
+			$funel_preference->site_id		 = $this->active_site_id;
+			$funel_preference->name			 = "Default";
+			$funel_preference->is_default	 = true;
+			$funel_preference->save();
+
+			$i = 1;
+			foreach ($available_non_default_site_action_ids as $action_id)
+			{
+				$funel_preference_meta						 = new \App\Models\FunelPreferenceMeta();
+				$funel_preference_meta->action_id			 = $action_id;
+				$funel_preference_meta->funel_preference_id	 = $funel_preference->id;
+				$funel_preference_meta->sort				 = $i++;
+				$funel_preference_meta->save();
+			}
+		}
+
 		$funel_default = \App\Models\FunelPreference::where("site_id", $this->active_site_id)->where("is_default", true)->first();
 		if ($funel_default)
 		{
@@ -154,6 +191,99 @@ class PanelController extends \App\Controllers\BaseController
 		}
 
 		return $output;
+	}
+
+	function _getActionTrends($type = "today")
+	{
+		$site_actions = \App\Models\Action::where("site_id", $this->active_site_id)->get(array("id", "name"))->toArray();
+
+		$before_dt_start = $before_dt_end	 = $after_dt_start	 = $after_dt_end	 = null;
+		$head_after		 = "today";
+		$head_before	 = "yesterday";
+		switch ($type)
+		{
+			case "today":
+				$today				 = new Carbon("today"); //today begining
+				$tomorrow			 = new Carbon("tomorrow"); //tomorrow
+				$yesterday			 = new Carbon("yesterday");
+				$end_of_today		 = $tomorrow->subSeconds(1); //today ending
+				$end_of_yesterday	 = $today->subSeconds(1);
+
+				$after_dt_start	 = $today;
+				$after_dt_end	 = $end_of_today;
+				$before_dt_start = $yesterday;
+				$before_dt_end	 = $end_of_yesterday;
+				break;
+
+			case "week":
+				$this_week	 = new Carbon("this week");
+				$last_week	 = new Carbon("last week");
+				$next_week	 = new Carbon("next week");
+
+				$after_dt_start	 = $this_week->createFromTimestamp($this_week->getTimestamp())->hour(0)->minute(0)->second(0);
+				$after_dt_end	 = $next_week->createFromTimestamp($next_week->getTimestamp())->hour(0)->minute(0)->second(0)->subSeconds(1);
+				$before_dt_start = $last_week->createFromTimestamp($last_week->getTimestamp())->hour(0)->minute(0)->second(0);
+				$before_dt_end	 = $this_week->createFromTimestamp($this_week->getTimestamp())->hour(0)->minute(0)->second(0)->subSeconds(1);
+				$head_after		 = "this week";
+				$head_before	 = "last week";
+				break;
+
+			default:
+				$this_month	 = new Carbon("this month");
+				$last_month	 = new Carbon("last month");
+				$next_month	 = new Carbon("next month");
+
+				$after_dt_start	 = $this_month->createFromTimestamp($this_month->getTimestamp())->hour(0)->minute(0)->second(0);
+				$after_dt_end	 = $next_month->createFromTimestamp($next_month->getTimestamp())->hour(0)->minute(0)->second(0)->subSeconds(1);
+				$before_dt_start = $last_month->createFromTimestamp($last_month->getTimestamp())->hour(0)->minute(0)->second(0);
+				$before_dt_end	 = $this_month->createFromTimestamp($this_month->getTimestamp())->hour(0)->minute(0)->second(0)->subSeconds(1);
+				$head_after		 = "this month";
+				$head_before	 = "last month";
+				break;
+		}
+
+		$trends_data = array(
+			'header' => array(
+				'#', 'name', $head_after, $head_before, 'changes'
+			),
+			'data'	 => array()
+		);
+
+		$i = 0;
+		foreach ($site_actions as $action)
+		{
+			$total_after	 = \App\Models\ActionInstance::where("action_id", $action['id'])->whereBetween('created', [$after_dt_start, $after_dt_end])->count();
+			$total_before	 = \App\Models\ActionInstance::where("action_id", $action['id'])->whereBetween('created', [$before_dt_start, $before_dt_end])->count();
+
+			$changes = ($total_before > 0) ? (($total_after - $total_before) / $total_before) * 100 : 0;
+
+			if ($changes !== 0)
+				$trends_data['data'][] = array(
+					"#"			 => $i+=1,
+					"name"		 => $action['name'],
+					"after"		 => $total_after,
+					"before"	 => $total_before,
+					"changes"	 => number_format($changes, 2)
+				);
+		}
+
+		return $trends_data;
+	}
+
+	function getTrends()
+	{
+		if (\Request::ajax())
+		{
+			$type		 = \Input::get("type");
+			$trends_data = $this->_getActionTrends($type);
+
+			return \Response::json(
+							array("status"	 => "success",
+								"response"	 => \View::make("frontend.panels.dashboard.trendscontentsummary", array(
+									"trends_data" => $trends_data)
+								)->render()
+			));
+		}
 	}
 
 	public function getCreateFunel($is_modal = false)

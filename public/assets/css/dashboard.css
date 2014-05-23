@@ -54,6 +54,14 @@ body {
 .text-error{
     color: #E9573F;
 }
+
+.panel-heading > i{
+    font-size: 18px;
+    color: #666;
+    line-height: 24px;
+    cursor: help;
+}
+
 /*.chosen-container{
     width: 250px !important;
     height: 31px !important;
@@ -124,6 +132,10 @@ body {
     }
 }
 .main .page-header:first-child {
+    margin-top: 0;
+}
+
+.main .page-header > h1 {
     margin-top: 0;
 }
 

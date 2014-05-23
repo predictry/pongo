@@ -4,18 +4,20 @@
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 	@include('frontend.partials.notification')
 	<div class="row">
-		@if ($isManage)
-		<h1 class="col-sm-6 pull-left"><?php echo Lang::get("panel.manage"); ?> <?php echo ucfirst($moduleName) . "(s)"; ?></h1>
-		@else
-		<h1 class="col-sm-9 pull-left">{{ $pageTitle or 'Default' }}</h1>
-		@endif
-		@if ($create)
-		<div class="col-sm-6 action_buttons text-right">
-			<a href="{{ URL::to( URL::current() . "/create" ) }}" class="btn btn-primary btn"><i class="fa fa-plus"></i> <?php echo Lang::get("panel.add.new"); ?> {{ $moduleName }}</a>
+		<div class="page-header">
+			@if ($isManage)
+			<h1 class="col-sm-6 pull-left">
+				<?php echo Lang::get("panel.manage"); ?> <?php echo ucfirst($moduleName) . "(s)"; ?></h1>
+			@else
+			<h1 class="col-sm-9 pull-left">{{ $pageTitle or 'Default' }}</h1>
+			@endif
+			@if ($create)
+			<div class="col-sm-6 action_buttons text-right">
+				<a href="{{ URL::to( URL::current() . "/create" ) }}" class="btn btn-primary btn"><i class="fa fa-plus"></i> <?php echo Lang::get("panel.add.new"); ?> {{ $moduleName }}</a>
+			</div>
+			@endif
+			<div class="clearfix"></div>
 		</div>
-		@endif
-		<div class="clearfix"></div>
-		<hr class="line"/>
 
 		@if($selector)
 		@include($selector_view, $selector_vars)

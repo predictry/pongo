@@ -17,7 +17,7 @@ class CreateItemsTable extends Migration
 		Schema::create('items', function(Blueprint $table) {
 			$table->increments('id');
 			$table->string('identifier', 64);
-			$table->string('name', 64)->nullable();
+			$table->string('name', 255)->nullable();
 			$table->integer('site_id');
 			$table->enum('type', array('product', 'category', 'tag', 'keyword'))->default("product");
 			$table->boolean('active')->default('true');

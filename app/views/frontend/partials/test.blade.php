@@ -1,0 +1,1 @@
+/Applications/MAMP/htdocs/predictry-pongo/app/views/frontend/partials/test.blade.php
