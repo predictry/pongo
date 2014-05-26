@@ -99,7 +99,7 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 					{
 						$item = \App\Models\Item::where("identifier", $item_result->id)->get()->first();
 
-						if ($item)
+						if ($item && $item->active)
 						{
 							$item_reco = array(
 								"id"				 => $item->identifier,

@@ -19,7 +19,8 @@ class ActionController extends \App\Controllers\ApiBaseController
 
 	public function index()
 	{
-		return "gotcha";
+		$name = Input::get("name");
+		return "gotcha " . $name;
 	}
 
 	/**

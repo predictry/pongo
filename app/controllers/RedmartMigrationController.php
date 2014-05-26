@@ -14,7 +14,7 @@ class RedmartMigrationController extends BaseController
 
 	public function __construct()
 	{
-		$this->migration_site_id = 11; //redmart site id
+		$this->migration_site_id = 10; //redmart site id
 	}
 
 	/**
@@ -41,75 +41,18 @@ class RedmartMigrationController extends BaseController
 			"id", "description", "item_url", "img_url", "price", "dt_added"
 		);
 
-		$migration_actions = $this->_csvToArray($migration_action_header, $migration_action_file_dump_path);
-//		$i					 = 0;
-//		foreach ($migration_actions as $row)
-//		{
-//			if ($i === 0)
-//			{
-//				$i++;
-//				continue;
-//			}
-//
-//			//ADD VISITOR AND SESSIONS
-//			$new_visitor = array(
-//				"user_id" => $row['user_id']
-//			);
-//
-//			$new_visitor_id = $this->_setVisitor($new_visitor);
-//			if ($new_visitor_id)
-//			{
-//				$this->_setSession($new_visitor_id, $row['sessionid']);
-//			}
-//
-//			//ADD ACTIONS
-//			$visitor = \App\Models\Visitor::where("identifier", $row['user_id'])->get()->first();
-//			if ($visitor)
-//			{
-//				$session = \App\Models\Session::where("visitor_id", $visitor->id)->where("session", $row['sessionid'])->get()->first();
-//				if ($session)
-//				{
-//					$action = \App\Models\Action::where("name", $row['action_type'])->where("site_id", $this->migration_site_id)->get(array("id"))->first();
-//
-//					$item = \App\Models\Item::where("identifier", $row['item_id'])->get()->first();
-//
-//					if ($item)
-//					{
-//						$new_action_instance = array(
-//							'id'		 => $row['id'],
-//							'item_id'	 => $item->id,
-//							'session_id' => $session->id,
-//							'dt_added'	 => $row['dt_added']
-//						);
-//
-//						$new_action_instance_id = $this->_setActionInstance($action->id, $new_action_instance);
-//						if ($new_action_instance_id)
-//						{
-//							$new_action_instance_metas = array(
-//								"browser"	 => $row['browser'],
-//								"guid"		 => $row['guid']
-//							);
-//
-//							$this->_setActionInstanceMeta($new_action_instance_id, $new_action_instance_metas);
-//						}
-//
-//						echo $row['id'] . " => " . $new_action_instance_id . "<br/>";
-//					}
-//					else
-//					{
-//						echo $row['id'] . " => not data item (" . $row['item_id'] . ") <br/>";
-//					}
-//				}
-//			}
-//		}
-
+		//migrate items
 		$migration_items = $this->_csvToArray($migration_item_header, $migration_item_file_dump_path);
-//		echo count($migration_actions);
-//		die;
-//		echo count($migration_items);
-//		die;
+
+		$i = 0;
 		foreach ($migration_items as $row)
 		{
+			if ($i === 0)
+			{
+				$i++;
+				continue;
+			}
+
 			$new_item = array(
 				"item_id"		 => $row['id'],
 				"description"	 => $row['description']
@@ -126,6 +69,71 @@ class RedmartMigrationController extends BaseController
 				$this->_setItemMeta($new_item_id, $new_item_metas);
 			}
 		}
+
+		$migration_actions = $this->_csvToArray($migration_action_header, $migration_action_file_dump_path);
+
+		$i = 0;
+		foreach ($migration_actions as $row)
+		{
+			if ($i === 0)
+			{
+				$i++;
+				continue;
+			}
+
+			//ADD VISITOR AND SESSIONS
+			$new_visitor = array(
+				"user_id" => $row['user_id']
+			);
+
+			$new_visitor_id = $this->_setVisitor($new_visitor);
+			if ($new_visitor_id)
+			{
+				$this->_setSession($new_visitor_id, $row['sessionid']);
+			}
+
+			//ADD ACTIONS
+			$visitor = \App\Models\Visitor::where("identifier", $row['user_id'])->get()->first();
+			if ($visitor)
+			{
+				$session = \App\Models\Session::where("visitor_id", $visitor->id)->where("session", $row['sessionid'])->get()->first();
+				if ($session)
+				{
+					$action = \App\Models\Action::where("name", $row['action_type'])->where("site_id", $this->migration_site_id)->get(array("id"))->first();
+
+					$item = \App\Models\Item::where("identifier", $row['item_id'])->get()->first();
+
+					if ($item)
+					{
+						$new_action_instance = array(
+							'id'		 => $row['id'],
+							'item_id'	 => $item->id,
+							'session_id' => $session->id,
+							'dt_added'	 => $row['dt_added']
+						);
+
+						$new_action_instance_id = $this->_setActionInstance($action->id, $new_action_instance);
+						if ($new_action_instance_id)
+						{
+							$new_action_instance_metas = array(
+//								"browser"	 => $row['browser'],
+								"guid" => $row['guid']
+							);
+
+							$this->_setActionInstanceMeta($new_action_instance_id, $new_action_instance_metas);
+						}
+
+						echo $row['id'] . " => " . $new_action_instance_id . "<br/>";
+					}
+					else
+					{
+						echo $row['id'] . " => not data item (" . $row['item_id'] . ") <br/>";
+					}
+				}
+			}
+		}
+
+		die("done");
 	}
 
 	public function _setActionInstance($action_id, $data)

@@ -188,6 +188,7 @@ Route::group(array('domain' => 'api.' . $tld, 'prefix' => 'v1', 'namespace' => '
 
 	Route::resource('predictry', 'ActionController', array("only" => array("index", "store", "show", "destroy")));
 	Route::resource('recommendation', 'RecommendationController', array("only" => array("index")));
+	Route::resource('activation', 'ItemActivationController', array("only" => array("index", "store")));
 });
 
 /*
@@ -198,5 +199,6 @@ Route::group(array('domain' => 'api.' . $tld, 'prefix' => 'v1', 'namespace' => '
 Route::group(array('prefix' => 'api/v1', 'namespace' => 'App\Controllers\Api'), function() {
 	Route::resource('predictry', 'ActionController', array("only" => array("index", "store", "show", "destroy")));
 	Route::resource('recommendation', 'RecommendationController', array("only" => array("index")));
+	Route::resource('activation', 'ItemActivationController', array("only" => array("index", "store")));
 });
 
