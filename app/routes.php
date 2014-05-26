@@ -61,7 +61,7 @@ Route::group(array('domain' => 'dashboard.' . $tld, 'before' => 'auth', 'namespa
 	$role = Session::get("role");
 
 	Route::get('user', 'UserController@getDashboard');
-	Route::get('dashboard', array('as' => 'dashboard', 'uses' => 'PanelController@index'));
+	Route::get('home', array('as' => 'home', 'uses' => 'PanelController@index'));
 	Route::get('sites/wizard', array('as' => 'sites', 'uses' => 'SitesController@getSiteWizard'));
 	Route::get('sites/getModal', array('as' => 'sites', 'uses' => 'SitesController@getModalCreate'));
 	Route::post('sites/ajaxSubmitSite', array('as' => 'sites', 'uses' => 'SitesController@postCreate'));

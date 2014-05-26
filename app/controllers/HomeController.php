@@ -54,7 +54,7 @@ class HomeController extends BaseController
 		$user = Auth::user();
 		if (!empty($user->id))
 		{
-			return Redirect::to('dashboard');
+			return Redirect::to('home');
 		}
 
 		return View::make('frontend.common.login', array("pageTitle" => "Login"));
@@ -102,7 +102,7 @@ class HomeController extends BaseController
 					else
 						\Session::set("role", "admin");
 
-					return Redirect::to('dashboard');
+					return Redirect::to('home');
 				}
 
 				$flash_error = 'error.login.failed';

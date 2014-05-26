@@ -7,7 +7,7 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="<?php echo URL::to('dashboard'); ?>">{{ $siteName or '' }}</a>
+			<a class="navbar-brand" href="<?php echo URL::to('home'); ?>">{{ $siteName or '' }}</a>
 			<ul class="nav navbar-nav navbar-left">
 			</ul>
 		</div>

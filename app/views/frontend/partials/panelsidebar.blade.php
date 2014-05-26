@@ -7,7 +7,7 @@
 			<div class="clearfix mb20"></div>
 		<?php endif; ?>
 		<ul class="nav nav-sidebar">
-			<li class="<?php if ($ca === 'App\Controllers\User\PanelController') echo 'active'; ?>"><a href="{{ URL::to('dashboard'); }}"><i class="fa fa-anchor"></i> <?php echo Lang::get("panel.overview"); ?></a></li>
+			<li class="<?php if ($ca === 'App\Controllers\User\PanelController') echo 'active'; ?>"><a href="{{ URL::to('home'); }}"><i class="fa fa-anchor"></i> <?php echo Lang::get("panel.overview"); ?></a></li>
 			<!--<li class="<?php // if ($ca === 'App\Controllers\User\MembersController') echo 'active'; ?>"><a href="{{ URL::to('members'); }}"><i class="fa fa-users"></i> <?php echo Lang::get("panel.members"); ?></a></li>-->
 			<li class="<?php if ($ca === 'App\Controllers\User\ItemsController') echo 'active'; ?>"><a href="{{ URL::to('items'); }}"><i class="fa fa-exchange"></i> <?php echo Lang::get("panel.items"); ?></a></li>
 			<li class="<?php if ($ca === 'App\Controllers\User\StatisticsController') echo 'active'; ?>"><a href="{{ URL::to('statistics'); }}"><i class="fa fa-signal"></i> <?php echo Lang::get("panel.statistics"); ?></a></li>
@@ -19,7 +19,7 @@
 		</ul>
 	<?php else: ?>
 		<ul class="nav nav-sidebar">
-			<li class="<?php if ($ca === 'App\Controllers\User\PanelController') echo 'active'; ?>"><a href="{{ URL::to('dashboard'); }}"><?php echo Lang::get("panel.overview"); ?></a></li>
+			<li class="<?php if ($ca === 'App\Controllers\User\PanelController') echo 'active'; ?>"><a href="{{ URL::to('home'); }}"><?php echo Lang::get("panel.overview"); ?></a></li>
 		</ul>
 z
 	<?php endif; ?>

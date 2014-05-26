@@ -231,7 +231,7 @@ class SitesController extends \App\Controllers\BaseController
 			Session::set("active_site_name", $site->name);
 			Session::remove("default_action_view");
 		}
-		return Redirect::route("dashboard");
+		return Redirect::route('home');
 	}
 
 	public function getSiteWizard()

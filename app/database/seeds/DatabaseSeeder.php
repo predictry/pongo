@@ -73,30 +73,33 @@ class ActionsSeeder extends Seeder
 	function run()
 	{
 		DB::table('actions')->delete();
-		\App\Models\Action::create(
-				array(
-					'name'		 => 'view',
-					'site_id'	 => 1
-				)
-		);
-		\App\Models\Action::create(
-				array(
-					'name'		 => 'rate',
-					'site_id'	 => 1
-				)
-		);
-		\App\Models\Action::create(
-				array(
-					'name'		 => 'add_to_cart',
-					'site_id'	 => 1
-				)
-		);
-		\App\Models\Action::create(
-				array(
-					'name'		 => 'buy',
-					'site_id'	 => 1
-				)
-		);
+		foreach (range(1, 10) as $index)
+		{
+			\App\Models\Action::create(
+					array(
+						'name'		 => 'view',
+						'site_id'	 => $index
+					)
+			);
+			\App\Models\Action::create(
+					array(
+						'name'		 => 'rate',
+						'site_id'	 => $index
+					)
+			);
+			\App\Models\Action::create(
+					array(
+						'name'		 => 'add_to_cart',
+						'site_id'	 => $index
+					)
+			);
+			\App\Models\Action::create(
+					array(
+						'name'		 => 'buy',
+						'site_id'	 => $index
+					)
+			);
+		}
 	}
 
 }
@@ -142,7 +145,7 @@ class SitesTableSeeder extends Seeder
 	{
 		DB::table('sites')->delete();
 		$faker = Faker::create();
-		foreach (range(1, 10) as $index)
+		foreach (range(2, 10) as $index)
 		{
 			App\Models\Site::create(
 					array(
@@ -150,9 +153,17 @@ class SitesTableSeeder extends Seeder
 						'url'		 => $faker->url,
 						'api_key'	 => md5($faker->url),
 						"api_secret" => md5($faker->url . "TEST"),
-						"account_id" => rand(1, 10)
+						"account_id" => $index
 			));
 		}
+		App\Models\Site::create(
+				array(
+					'name'		 => "REDMART",
+					'url'		 => $faker->url,
+					'api_key'	 => md5($faker->url),
+					"api_secret" => md5($faker->url . "TEST"),
+					"account_id" => 1
+		));
 	}
 
 }

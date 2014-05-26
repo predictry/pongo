@@ -22,7 +22,7 @@ App::after(function($request, $response) {
 
 App::missing(function($exception) {
 	return Response::view('frontend.errors.missing', array('exception' => $exception), 404);
-//	return Redirect::to("dashboard");
+//	return Redirect::to('home');
 });
 /*
   |--------------------------------------------------------------------------

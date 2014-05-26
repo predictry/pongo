@@ -209,9 +209,9 @@ class PanelController extends \App\Controllers\BaseController
 				$end_of_today		 = $tomorrow->subSeconds(1); //today ending
 				$end_of_yesterday	 = $today->subSeconds(1);
 
-				$after_dt_start	 = $today;
+				$after_dt_start	 = new Carbon("today");
 				$after_dt_end	 = $end_of_today;
-				$before_dt_start = $yesterday;
+				$before_dt_start = new Carbon("yesterday");
 				$before_dt_end	 = $end_of_yesterday;
 				break;
 
@@ -249,13 +249,26 @@ class PanelController extends \App\Controllers\BaseController
 			'data'	 => array()
 		);
 
+//		echo '<pre>';
+//		print_r($after_dt_start);
+//		echo "<br/>----<br/>";
+//		print_r($after_dt_end);
+//		echo "<br/>----<br/>";
+//		print_r($before_dt_start);
+//		echo "<br/>----<br/>";
+//		print_r($before_dt_end);
+//		echo "<br/>----<br/>";
+//		echo '</pre>';
+//		die;
+
+
 		$i = 0;
 		foreach ($site_actions as $action)
 		{
 			$total_after	 = \App\Models\ActionInstance::where("action_id", $action['id'])->whereBetween('created', [$after_dt_start, $after_dt_end])->count();
 			$total_before	 = \App\Models\ActionInstance::where("action_id", $action['id'])->whereBetween('created', [$before_dt_start, $before_dt_end])->count();
 
-			$changes = ($total_before > 0) ? (($total_after - $total_before) / $total_before) * 100 : 0;
+			$changes = ($total_before > 0) ? (($total_after - $total_before) / $total_before) * 100 : ($total_after) * 100;
 
 			if ($changes !== 0)
 				$trends_data['data'][] = array(
@@ -356,7 +369,7 @@ class PanelController extends \App\Controllers\BaseController
 			}
 			else
 			{
-				return \Redirect::route('dashboard')->with("flash_message", "Successfully added funel.");
+				return \Redirect::route('home')->with("flash_message", "Successfully added funel.");
 			}
 		}
 
@@ -386,7 +399,7 @@ class PanelController extends \App\Controllers\BaseController
 		$funel->is_default	 = true;
 		$funel->update();
 
-		return \Redirect::to("dashboard");
+		return \Redirect::to('home');
 	}
 
 	public function postDeleteFunel()
@@ -407,7 +420,7 @@ class PanelController extends \App\Controllers\BaseController
 			\App\Models\FunelPreference::where("site_id", $this->active_site_id)->where("id", $funel_preference_id)->delete();
 		}
 
-		return \Redirect::to("dashboard");
+		return \Redirect::to('home');
 	}
 
 	function _populateTodayActionStats($dt_start, $dt_end, $action_ids, $action_names, $index = false)
