@@ -47,6 +47,7 @@ jQuery(document).ready(function() {
     $("#item1").chosen();
     $("#type1").chosen();
     $("#action1").chosen();
+    $("#itemfilter1").chosen();
     $('#item1').on('change', function(evt, params) {
         if (!validateSelectedItem(params.selected)) {
             $('#item1').val("").trigger("chosen:updated");
@@ -444,6 +445,43 @@ function editItemPlacementRuleset(obj, index)
     });
 }
 
+function editItemPlacementFilter(obj, index)
+{
+    var form_data = {
+        obj: obj,
+        index: index,
+        is_ajax: 1
+    };
+
+    $.ajax({
+        url: site_url + "/placements/itemFilterEdit",
+        type: 'GET',
+        data: form_data,
+        dataType: 'json',
+        success: function(data)
+        {
+            if (data.status === "success") {
+                $("#item_filters_container").append(data.response);
+                $(".chosen-select").chosen();
+                $("#itemfilter" + index).chosen();
+                $("#type" + index).chosen();
+                $("#itemfilter" + index).val(obj.filter_id).trigger('chosen:updated');
+
+                $("#itemfilter" + index).on('change', function(evt, params) {
+                    if (!validateSelectedItem(params.selected, "item_id")) {
+                        $("#itemfilter" + index).val("").trigger('chosen:updated');
+                    }
+                });
+
+                indexOfItem = index;
+            }
+        },
+        error: function() {
+            alert('error!');
+        }
+    });
+}
+
 function addItemFunel()
 {
     var btn = $("a.btnAddItem");
@@ -475,6 +513,87 @@ function addItemFunel()
                         $("#action" + indexOfItem).val("").trigger('chosen:updated');
                     }
                 });
+            }
+        },
+        error: function() {
+            alert('error!');
+        }
+    });
+}
+
+/**
+ * Add Item Filter
+ */
+function addItemFilter() {
+    var btn = $('a.btnAddItem');
+    btn.removeClass("btnAddItem btn-default").addClass("btnRemoveItem btn-danger").html("Remove");
+    btn.attr("onClick", "removeItem(" + indexOfItem + ", 'item_funel');");
+    indexOfItem += 1;
+
+    var form_data = {
+        index: indexOfItem,
+        is_ajax: 1
+    };
+
+    $.ajax({
+        url: site_url + "/filters/item",
+        type: 'GET',
+        data: form_data,
+        dataType: 'json',
+        success: function(data)
+        {
+            if (data.status === "success") {
+                $("#filter_item_container").append(data.response);
+                numOfItems += 1;
+
+                $(".chosen-select").chosen();
+                $("#action" + indexOfItem).chosen();
+
+                $("#item_funel" + indexOfItem).on('change', function(evt, params) {
+                    if (!validateSelectedItem(params.selected, "action_id")) {
+                        $("#action" + indexOfItem).val("").trigger('chosen:updated');
+                    }
+                });
+            }
+        },
+        error: function() {
+            alert('error!');
+        }
+    });
+}
+
+/**
+ * Edit Item Filter
+ */
+function editItemFilter(obj, index)
+{
+    var form_data = {
+        obj: obj,
+        index: index,
+        is_ajax: 1
+    };
+
+    $.ajax({
+        url: site_url + "/filters/itemEdit",
+        type: 'GET',
+        data: form_data,
+        dataType: 'json',
+        success: function(data)
+        {
+            if (data.status === "success") {
+                $("#filter_item_container").append(data.response);
+                $(".chosen-select").chosen();
+                $("#action" + index).chosen();
+                $("#type" + index).chosen();
+                $("#item" + index).val(obj.ruleset_id).trigger('chosen:updated');
+
+                $("#item_funel" + index).on('change', function(evt, params) {
+                    if (!validateSelectedItem(params.selected, "action_id")) {
+                        $("#action" + index).val("").trigger('chosen:updated');
+                    }
+                });
+
+                indexOfItem = index;
             }
         },
         error: function() {

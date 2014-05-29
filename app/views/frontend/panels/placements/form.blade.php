@@ -13,7 +13,7 @@
 	<hr/>
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="#tabPlacementInfo" data-toggle="tab">Info</a></li>
-		<li><a href="#tabRulesetItem" data-toggle="tab">Rulesets</a></li>
+		<li><a href="#tabRulesetItem" data-toggle="tab">Ruleset &amp; Filter</a></li>
 	</ul>
 	<div class="tab-content">
 		<div class="tab-pane active pt20 form-horizontal" id="tabPlacementInfo">
@@ -42,13 +42,22 @@
 				<?php if ($type === "create") : ?>
 					@include('frontend.panels.placements.itemruleset')	
 				<?php elseif ($type === "edit") : ?>
+					@if ($number_of_items === 1)
+					@include('frontend.panels.placements.itemruleset')	
+					@endif
 					<?php
-					if ($number_of_items === 1)
-					{
-						?>
-						@include('frontend.panels.placements.itemruleset')	
-						<?php
-					}
+				endif;
+				?>
+			</div>
+			<div id="item_filters_container">
+				<div class="clearfix"></div>
+				<?php if ($type === "create") : ?>
+					@include('frontend.panels.placements.itemfilter')	
+				<?php elseif ($type === "edit") : ?>
+					@if ($number_of_items === 1)
+					@include('frontend.panels.placements.itemfilter')	
+					@endif
+					<?php
 				endif;
 				?>
 			</div>

@@ -75,7 +75,9 @@ class PlacementsController extends \App\Controllers\BaseController
 
 	public function getCreate()
 	{
-		$ruleset_list = \App\Models\Ruleset::where("site_id", $this->active_site_id)->lists("name", "id");
+		$ruleset_list	 = \App\Models\Ruleset::where("site_id", $this->active_site_id)->lists("name", "id");
+		$filter_list	 = \App\Models\Filter::where("site_id", $this->active_site_id)->lists("name", "id");
+
 
 		$custom_script = "<script type='text/javascript'>";
 		$custom_script .= "var site_url = '" . \URL::to('/') . "';";
@@ -89,7 +91,9 @@ class PlacementsController extends \App\Controllers\BaseController
 		$output = array(
 			"type"							 => "create",
 			'ruleset_list'					 => $ruleset_list,
+			'filter_list'					 => $filter_list,
 			"index_item_placement_ruleset"	 => 1,
+			"index_item_placement_filter"	 => 1,
 			"custom_script"					 => $custom_script,
 			"pageTitle"						 => "Add New Placement"
 		);
@@ -98,60 +102,78 @@ class PlacementsController extends \App\Controllers\BaseController
 
 	public function postCreate()
 	{
-		$input			 = \Input::only("name", "description");
+		$inputs			 = \Input::only("name", "description");
 		$ruleset_ids	 = \Input::get("item_id");
+		$filter_ids		 = \Input::get("filter_id");
 		$ruleset_actives = array();
+		$filter_actives	 = array();
 
 		for ($i = 1; $i <= count($ruleset_ids); $i++)
 		{
 			array_push($ruleset_actives, \Input::get("active{$i}"));
+			array_push($filter_actives, \Input::get("filter_active{$i}"));
 		}
 
-		$placement_model				 = new \App\Models\Placement();
-		$placement_validator			 = \Validator::make($input, $placement_model->rules);
-		$placement_ruleset_validators	 = array();
-		$placement_ruleset_objs			 = array();
+		$placement			 = new \App\Models\Placement();
+		$placement_validator = \Validator::make($inputs, $placement->rules);
 
+		$placement_ruleset_validators	 = $placement_filter_validators	 = $placement_ruleset_objs			 = $placement_filter_objs			 = array();
 		if ($placement_validator->passes())
 		{
-			$placement_model->name			 = $input['name'];
-			$placement_model->site_id		 = $this->active_site_id;
-			$placement_model->description	 = ($input['description'] !== "") ? $input['description'] : null;
-			$placement_model->save();
+			$placement->name		 = $inputs['name'];
+			$placement->site_id		 = $this->active_site_id;
+			$placement->description	 = ($inputs['description'] !== "") ? $inputs['description'] : null;
+			$placement->save();
 
-			if ($placement_model->id)
+			if ($placement->id)
 			{
 				for ($i = 0; $i < count($ruleset_ids); $i++)
 				{
 					//loop through ruleset ids
-					$ruleset_validator = \Validator::make(
-									array(
-								"ruleset_id" => $ruleset_ids[$i],
-								"active"	 => $ruleset_actives[$i]
-									), array(
-								"ruleset_id" => "required",
-								"active"	 => "required"));
-
-					$placement_rule_sets				 = new \App\Models\PlacementRuleSet();
-					$placement_rule_sets->placement_id	 = $placement_model->id;
-					$placement_rule_sets->ruleset_id	 = $ruleset_ids[$i];
-					$placement_rule_sets->active		 = $ruleset_actives[$i];
-					array_push($placement_ruleset_objs, $placement_rule_sets);
+					$ruleset_validator = \Validator::make(array("ruleset_id" => $ruleset_ids[$i], "active" => $ruleset_actives[$i]), array("ruleset_id" => "required", "active" => "required"));
 
 					//validate then insert
-					if (!$ruleset_validator->passes())
+					if ($ruleset_validator->passes())
+					{
+						$placement_rule_sets				 = new \App\Models\PlacementRuleSet();
+						$placement_rule_sets->placement_id	 = $placement->id;
+						$placement_rule_sets->ruleset_id	 = $ruleset_ids[$i];
+						$placement_rule_sets->active		 = $ruleset_actives[$i];
+						array_push($placement_ruleset_objs, $placement_rule_sets);
+					}
+					else
 						array_push($placement_ruleset_validators, $ruleset_validator);
+				}
+
+				for ($i = 0; $i < count($filter_ids); $i++)
+				{
+					$filter_validator = \Validator::make(array('filter_id' => $filter_ids[$i], "active" => $filter_actives[$i]), array("filter_id" => "required", "active" => "required"));
+					if ($filter_validator->passes())
+					{
+						$placement_filter				 = new \App\Models\PlacementFilter();
+						$placement_filter->placement_id	 = $placement->id;
+						$placement_filter->filter_id	 = $filter_ids[$i];
+						$placement_filter->active		 = $filter_actives[$i];
+						array_push($placement_filter_objs, $placement_filter);
+					}
+					else
+						array_push($placement_filter_validators, $filter_validator);
 				}
 			}
 		}
 
-		if ($placement_validator->passes() && count($placement_ruleset_validators) === 0)
+		if ($placement_validator->passes() && count($placement_ruleset_validators) === 0 && count($placement_filter_validators) === 0)
 		{
 			foreach ($placement_ruleset_objs as $obj)
 				$obj->save(); //save it
 
-			return \Redirect::route('placements')->with("flash_message", "Successfully added new rule.");
+			foreach ($placement_filter_objs as $obj)
+				$obj->save();
+
+			return \Redirect::route('placements')->with("flash_message", "Successfully added new placement.");
 		}
+		else
+			$placement->delete();
 
 		return \Redirect::back()->withErrors($placement_validator)->with("flash_error", "Inserting problem. Please try again.");
 	}
@@ -163,7 +185,9 @@ class PlacementsController extends \App\Controllers\BaseController
 		{
 			$placement				 = \App\Models\Placement::where("id", $id)->where("site_id", $this->active_site_id)->first();
 			$placement_item_rulesets = \App\Models\PlacementRuleSet::where("placement_id", $id)->get()->toArray();
+			$placement_item_filters	 = \App\Models\PlacementFilter::where("placement_id", $id)->get()->toArray();
 			$ruleset_list			 = \App\Models\Ruleset::where("site_id", $this->active_site_id)->lists("name", "id");
+			$filter_list			 = \App\Models\Filter::where("site_id", $this->active_site_id)->lists("name", "id");
 
 			$custom_script = "<script type='text/javascript'>";
 			$custom_script .= "var site_url = '" . \URL::to('/') . "';";
@@ -176,8 +200,18 @@ class PlacementsController extends \App\Controllers\BaseController
 				$custom_script .= "editItemPlacementRuleset({$json_obj}, {$index_item_rule});"; //js func to make add itemruleedit
 				$index_item_rule+=1;
 			}
+
+			$index_item_filter = 1;
+			foreach ($placement_item_filters as $obj)
+			{
+				$obj['last_index']	 = count($placement_item_filters);
+				$json_obj			 = json_encode($obj);
+				$custom_script .= "editItemPlacementFilter({$json_obj}, {$index_item_filter});"; //js func to make add itemruleedit
+				$index_item_filter+=1;
+			}
 			$custom_script.= "</script>";
-			$numberOfItems = ( $index_item_rule > 1) ? $index_item_rule : 1;
+			$numberOfItems		 = ( $index_item_rule > 1) ? $index_item_rule : 1;
+			$numberOfFilterItems = ($index_item_filter > 1) ? $index_item_filter : 1;
 
 			return \View::make("frontend.panels.placements.form", array(
 						"type"							 => "edit",
@@ -185,9 +219,12 @@ class PlacementsController extends \App\Controllers\BaseController
 						"placement"						 => $placement,
 						"placement_item_rulesets"		 => $placement_item_rulesets,
 						"ruleset_list"					 => $ruleset_list,
+						"filter_list"					 => $filter_list,
 						"custom_script"					 => $custom_script,
 						"number_of_items"				 => $numberOfItems,
-						"index_item_placement_ruleset"	 => 1
+						"number_of_filter_items"		 => $numberOfFilterItems,
+						"index_item_placement_ruleset"	 => 1,
+						"index_item_placement_filter"	 => 1
 			));
 		}
 	}
@@ -197,11 +234,14 @@ class PlacementsController extends \App\Controllers\BaseController
 		$input						 = \Input::only("name", "description");
 		$placement_item_ruleset_ids	 = \Input::get("item_id");
 		$edit_placement_ruleset_ids	 = \Input::get("item_ruleset_id");
-		$ruleset_actives			 = array();
+		$placement_item_filter_ids	 = \Input::get("filter_id");
+		$edit_placement_filter_ids	 = \Input::get("item_filter_id");
+		$ruleset_actives			 = $filter_actives				 = array();
 
 		for ($i = 1; $i <= count($placement_item_ruleset_ids); $i++)
 		{
 			array_push($ruleset_actives, \Input::get("active{$i}"));
+			array_push($filter_actives, \Input::get("filter_active{$i}"));
 		}
 
 		$placement			 = \App\Models\Placement::where('id', $id)->where("site_id", $this->active_site_id)->first();
@@ -221,6 +261,25 @@ class PlacementsController extends \App\Controllers\BaseController
 
 			$combine_both_new_and_remove = array_merge($result_array_diff, $result_array_diff_round);
 			$result_array_diff_updated	 = array_diff($placement_item_ids, $combine_both_new_and_remove); // possible to update (combine new and remove) then compare to existing
+
+			$placement_filter_ids				 = \App\Models\PlacementFilter::where("placement_id", $id)->get()->lists("id");
+			$result_filter_array_diff			 = array_diff($edit_placement_filter_ids, $placement_filter_ids);
+			$result_filter_array_diff_round		 = array_diff($placement_filter_ids, $edit_placement_filter_ids);
+			$combine_filter_both_new_and_remove	 = array_merge($result_filter_array_diff, $result_filter_array_diff_round);
+			$result_filter_array_diff_updated	 = array_diff($placement_filter_ids, $combine_filter_both_new_and_remove); // possible to update (combine new and remove) then compare to existing
+//			echo '<pre>';
+//			print_r($placement_filter_ids);
+//			echo "<br/>----<br/>";
+//			print_r($result_filter_array_diff);
+//			echo "<br/>----<br/>";
+//			print_r($result_filter_array_diff_round);
+//			echo "<br/>----<br/>";
+//			print_r($combine_filter_both_new_and_remove);
+//			echo "<br/>----<br/>";
+//			print_r($result_filter_array_diff_updated);
+//			echo "<br/>----<br/>";
+//			echo '</pre>';
+//			die;
 //			echo '<pre>';
 //			print_r($placement_item_rules);
 //			print_r($placement_item_ids);
@@ -236,6 +295,11 @@ class PlacementsController extends \App\Controllers\BaseController
 				$placement_ruleset = \App\Models\PlacementRuleSet::find($value);
 				$placement_ruleset->delete();
 			}
+			foreach ($result_filter_array_diff_round as $value)
+			{
+				$placement_filter = \App\Models\PlacementFilter::find($value);
+				$placement_filter->delete();
+			}
 
 			//new
 			foreach ($result_array_diff as $i => $value)
@@ -250,6 +314,19 @@ class PlacementsController extends \App\Controllers\BaseController
 				}
 			}
 
+			//new
+			foreach ($result_filter_array_diff as $i => $value)
+			{
+				if ($i < count($placement_item_filter_ids))
+				{
+					$placement_filter				 = new \App\Models\PlacementFilter();
+					$placement_filter->filter_id	 = $placement_item_filter_ids[$i];
+					$placement_filter->placement_id	 = $placement->id;
+					$placement_filter->active		 = $filter_actives[$i];
+					$placement_filter->save();
+				}
+			}
+
 			//update
 			foreach ($result_array_diff_updated as $value)
 			{
@@ -261,6 +338,20 @@ class PlacementsController extends \App\Controllers\BaseController
 					$placement_ruleset->ruleset_id	 = $placement_item_ruleset_ids[$i];
 					$placement_ruleset->active		 = $ruleset_actives[$i];
 					$placement_ruleset->update();
+				}
+			}
+
+			//update
+			foreach ($result_filter_array_diff_updated as $value)
+			{
+				$i = array_search($value, $edit_placement_filter_ids);
+
+				if ($i > -1 && ($i <= count($placement_item_filter_ids)))
+				{
+					$placement_filter			 = \App\Models\PlacementFilter::find($value);
+					$placement_filter->filter_id = $placement_item_filter_ids[$i];
+					$placement_filter->active	 = $filter_actives[$i];
+					$placement_filter->update();
 				}
 			}
 		}
@@ -305,11 +396,38 @@ class PlacementsController extends \App\Controllers\BaseController
 							"response"	 => \View::make("frontend.panels.placements.itemrulesetedit", $output)->render()));
 	}
 
+	public function getItemEditPlacementFilter()
+	{
+		$obj			 = \Input::get("obj");
+		$index_item_rule = \Input::get("index");
+		$filter_list	 = \App\Models\Filter::where("site_id", $this->active_site_id)->lists("name", "id");
+
+		$custom_script = "<script type='text/javascript'>";
+		$custom_script .= "var site_url = '" . \URL::to('/') . "';";
+		$custom_script .= "</script>";
+
+		$output = array(
+			"type"							 => "create",
+			'filter_list'					 => $filter_list,
+			"custom_script"					 => $custom_script,
+			"obj"							 => $obj,
+			"index_item_placement_filter"	 => $index_item_rule,
+		);
+
+		return \Response::json(
+						array("status"	 => "success",
+							"response"	 => \View::make("frontend.panels.placements.itemfilteredit", $output)->render()));
+	}
+
 	public function postDelete($id)
 	{
 		$is_exists = \App\Models\Placement::where("id", $id)->where("site_id", $this->active_site_id)->count();
 		if ($is_exists)
 		{
+
+			\App\Models\PlacementRuleSet::where("placement_id", $id)->delete();
+			\App\Models\PlacementFilter::where("placement_id", $id)->delete();
+
 			$ruleset = \App\Models\Placement::find($id);
 			$ruleset->delete();
 		}

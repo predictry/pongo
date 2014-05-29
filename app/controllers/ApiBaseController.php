@@ -18,6 +18,7 @@ class ApiBaseController extends \Controller
 
 	public $predictry_server_api_key = null;
 	public $site_id					 = null;
+	private $message				 = "";
 
 	public function __construct()
 	{
@@ -44,8 +45,13 @@ class ApiBaseController extends \Controller
 
 			$this->site_id = $this->validateApiKey($api_credential);
 		}
+		else
+		{
+			return \Response::json(array("message" => "Auth failed " . $this->message, "status" => "401"), "401");
+		}
+
 		if (!$this->site_id)
-			return \Response::json(array("message" => "Auth failed", "status" => "401"), "401");
+			return \Response::json(array("message" => "Auth failed " . $this->message, "status" => "401"), "401");
 	}
 
 	public function validateApiKey($api_credential)
@@ -56,11 +62,18 @@ class ApiBaseController extends \Controller
 
 		if (is_object($site))
 			$site = $site->toArray();
+		else
+		{
+			$this->message = "[credential hasn't assigned or wrong]";
+			return false;
+		}
 
 		if (count($site) > 0 && !empty($site['url']))// && (($site['url'] === "http://" . \Request::server("HTTP_ORIGIN")) || $site['url'] === \Request::server("HTTP_ORIGIN")))
 		{
 			return $site['id'];
 		}
+		else
+			$this->message = "[unknown site]";
 
 		return false;
 	}

@@ -188,9 +188,9 @@ function makeACall(method, url) {
 /**
  * jQuery Ajax Call
  * 
- * @param {type} method
- * @param {type} url
- * @param {type} params
+ * @param {string} method
+ * @param {string} url
+ * @param {object} params
  * @returns {undefined|ready_data|String}
  */
 function makeJqueryAjaxCall(method, url, params)
@@ -370,6 +370,37 @@ function drawTextListRecommendation(json)
 function drawListGridRecommendation(json)
 {
 
+}
+
+/**
+ * Set active of item
+ * @param {string} item_id
+ * @param {boolean} activated
+ * @returns {undefined}
+ */
+function setActivation(item_id, activated)
+{
+    var data = {
+        item_id: item_id,
+        activated: (activated) ? 'yes' : 'no'
+    };
+    return makeJqueryAjaxCall("POST", PREDICTRY_API_URL + "activation?", data);
+}
+
+/**
+ * 
+ * @param {type} item_id
+ * @param {type} description
+ * @param {type} properties
+ * @returns {undefined}
+ */
+function setItemMeta(item_id, description, properties) {
+    var data = {
+        item_id: item_id,
+        description: description,
+        properties: properties
+    };
+    return makeJqueryAjaxCall("POST", PREDICTRY_API_URL + "item?", data);
 }
 
 /**

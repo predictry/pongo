@@ -46,11 +46,14 @@ class RulesController extends \App\Controllers\BaseController
 			$paginator = Paginator::make($data->items, $data->totalItems, $data->limit);
 		}
 
+		$custom_create = '<a href="" class="btn btn-primary btn"><i class="fa fa-plus"></i> Add New Filter</a>';
+
 		$output = array(
 			'paginator'		 => $paginator,
 			'str_message'	 => $message,
 			"pageTitle"		 => "Manage Ruleset",
 			"table_header"	 => $this->model->manage_table_header,
+			'custom_create'	 => $custom_create,
 			"page"			 => $page
 		);
 

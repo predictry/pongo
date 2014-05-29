@@ -14,6 +14,7 @@
 			<li class="<?php if ($ca === 'App\Controllers\User\ActionsController') echo 'active'; ?>"><a href="{{ URL::to('actions'); }}"><i class="fa fa-tasks"></i> <?php echo Lang::get("panel.actions"); ?></a></li>
 			<?php if (Auth::user()->plan_id !== 3) : ?>
 				<li class="<?php if ($ca === 'App\Controllers\User\RulesController') echo 'active'; ?>"><a href="{{ URL::to('rules'); }}"><i class="fa fa-beer"></i> <?php echo Lang::get("panel.rulesets"); ?></a></li>
+				<li class="<?php if ($ca === 'App\Controllers\User\FiltersController') echo 'active'; ?>"><a href="{{ URL::to('filters'); }}"><i class="fa fa-filter"></i> <?php echo Lang::get("panel.filters"); ?></a></li>
 			<?php endif; ?>
 			<li class="<?php if ($ca === 'App\Controllers\User\PlacementsController') echo 'active'; ?>"><a href="{{ URL::to('placements'); }}"><i class="fa fa-tasks"></i> <?php echo Lang::get("panel.placements"); ?></a></li>
 		</ul>

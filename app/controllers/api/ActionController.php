@@ -31,6 +31,7 @@ class ActionController extends \App\Controllers\ApiBaseController
 	public function store()
 	{
 		$action_type = \Input::get('action_type');
+		
 		if (isset($action_type))
 		{
 			$action_name		 = Input::get("action");
@@ -232,28 +233,47 @@ class ActionController extends \App\Controllers\ApiBaseController
 	{
 		$item = \App\Models\Item::where("identifier", $item_data['identifier'])->where("site_id", $this->site_id)->first();
 
+		$properties = $item_data['properties'];
+
 		if ($item)
 		{
-			$item->name = $item_data['name'];
-			$item->update();
-
-			foreach ($item_data['properties'] as $key => $value)
+			if (isset($item_data['name']) && ($item->name !== $item_data['name']))
 			{
-				$item_meta = \App\Models\Itemmeta::where("key", $key)->where("item_id", $item->id)->get()->first();
-				if (!isset($item_meta))
+				$item->name = $item_data['name'];
+				$item->update();
+			}
+			$properties_keys = array_keys($properties);
+
+			$item_metas = \App\Models\Itemmeta::where("item_id", $item->id)->get();
+			foreach ($item_metas as $meta)
+			{
+				if (in_array($meta->key, $properties_keys))
 				{
-					$new_item_meta			 = new \App\Models\Itemmeta();
-					$new_item_meta->item_id	 = $item->id;
-					$new_item_meta->key		 = $key;
-					$new_item_meta->value	 = $value;
-					$new_item_meta->save();
+					if ($meta->value !== trim($properties[$meta->key]))
+					{
+						$meta->value = trim($properties[$meta->key]);
+						$meta->update();
+					}
+					$index = array_search($meta->key, $properties_keys);
+					unset($properties_keys[$index]);
 				}
 				else
+					$meta->delete();
+			}
+
+
+			if (count($properties_keys) > 0)
+			{//means have new additional properties
+				foreach ($properties_keys as $key)
 				{
-					$item_meta->value = $value;
-					$item_meta->update();
+					$item_meta			 = new \App\Models\Itemmeta();
+					$item_meta->key		 = $key;
+					$item_meta->value	 = $properties[$key];
+					$item_meta->item_id	 = $item->id;
+					$item_meta->save();
 				}
 			}
+
 
 			return $item->id;
 		}

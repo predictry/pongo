@@ -147,6 +147,7 @@ Route::group(array('domain' => 'dashboard.' . $tld, 'before' => 'auth', 'namespa
 		Route::post('placements/submit', array("as" => "placements.submit", "uses" => 'PlacementsController@postCreate'));
 		Route::get('placements/item', array("as" => "placements.item", "uses" => 'PlacementsController@getItemPlacementRuleset'));
 		Route::get('placements/itemEdit', array("as" => "placements.itemEdit", "uses" => 'PlacementsController@getItemEditPlacementRuleset'));
+		Route::get('placements/itemFilterEdit', array("as" => "placements.itemFilterEdit", "uses" => 'PlacementsController@getItemEditPlacementFilter'));
 		Route::get('placements/{numeric}/edit', array("as" => "placements.{numieric}.edit", "uses" => 'PlacementsController@getEdit'));
 		Route::post('placements/{numeric}/edit', array("as" => "placements.update", "uses" => 'PlacementsController@postEdit'));
 		Route::get('placements/{numeric}/delete', 'PlacementsController@getDelete');
@@ -156,6 +157,16 @@ Route::group(array('domain' => 'dashboard.' . $tld, 'before' => 'auth', 'namespa
 		Route::post('placements/ajaxSubmitWizardPlacement', array("as" => "placements.ajaxSubmitWizardPlacement", "uses" => 'PlacementsController@postAjaxWizardPlacement'));
 		Route::post('placements/ajaxSubmitWizardAddRuleset', array("as" => "placements.ajaxSubmitWizardAddRuleset", "uses" => 'PlacementsController@postAjaxWizardAddRuleset'));
 		Route::post('placements/ajaxSubmitCompleteWizard', array("as" => "placements.ajaxSubmitCompleteWizard", "uses" => 'PlacementsController@postAjaxWizardCompletePlacement'));
+
+		Route::get("filters", array("as" => "filters", "uses" => "FiltersController@index"));
+		Route::get('filters/create', array("as" => "filters.create", "uses" => 'FiltersController@getCreate'));
+		Route::post('filters/submit', array("as" => "filters.submit", "uses" => 'FiltersController@postCreate'));
+		Route::get('filters/item', array("as" => "filters.item", "uses" => 'FiltersController@getItem'));
+		Route::get('filters/{numeric}/edit', array("as" => "filters.{numieric}.edit", "uses" => 'FiltersController@getEdit'));
+		Route::get('filters/itemEdit', array("as" => "filters.itemEdit", "uses" => 'FiltersController@getItemEdit'));
+		Route::post('filters/{numeric}/edit', array("as" => "filters.update", "uses" => 'FiltersController@postEdit'));
+		Route::get('filters/{numeric}/delete', 'FiltersController@getDelete');
+		Route::post('filters/{numeric}/delete', 'FiltersController@postDelete');
 	}
 	#logout
 	Route::get('user/logout', 'UserController@logout');
@@ -189,6 +200,7 @@ Route::group(array('domain' => 'api.' . $tld, 'prefix' => 'v1', 'namespace' => '
 	Route::resource('predictry', 'ActionController', array("only" => array("index", "store", "show", "destroy")));
 	Route::resource('recommendation', 'RecommendationController', array("only" => array("index")));
 	Route::resource('activation', 'ItemActivationController', array("only" => array("index", "store")));
+	Route::resource('item', 'ItemController', array("only" => array("store")));
 });
 
 /*
@@ -200,5 +212,6 @@ Route::group(array('prefix' => 'api/v1', 'namespace' => 'App\Controllers\Api'), 
 	Route::resource('predictry', 'ActionController', array("only" => array("index", "store", "show", "destroy")));
 	Route::resource('recommendation', 'RecommendationController', array("only" => array("index")));
 	Route::resource('activation', 'ItemActivationController', array("only" => array("index", "store")));
+	Route::resource('item', 'ItemController', array("only" => array("store")));
 });
 

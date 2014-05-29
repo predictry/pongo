@@ -24,6 +24,7 @@ return array(
 	"statistics"			 => "Statistics",
 	"actions"				 => "Actions",
 	"rulesets"				 => "Rulesets",
+	"filters"				 => "Filters",
 	"placements"			 => "Placements",
 	"overview"				 => "Overview",
 	"add.new"				 => "Add New",

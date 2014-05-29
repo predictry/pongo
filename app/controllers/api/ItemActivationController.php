@@ -54,11 +54,11 @@ class ItemActivationController extends \App\Controllers\ApiBaseController
 				$item->active	 = $activated;
 				$item->update();
 
-				return \Response::json(array("message" => "Item updated", "status" => "success"), "200");
+				return \Response::json(array("message" => "Item active status updated", "status" => "success"), "200");
 			}
 			else
 			{
-				return \Response::json(array("message" => "Item not found", "status" => "failed"), "404");
+				return \Response::json(array("message" => "Item not found", "status" => "failed"), "202");
 			}
 		}
 		else

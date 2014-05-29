@@ -60,7 +60,7 @@ class BaseController extends \Controller
 					View::share(array("activeSiteName" => Session::get("active_site_name")));
 				}
 			}
-			
+
 			//Set Default Plan ID
 
 			$sites = \App\Models\Site::where("account_id", Auth::user()->id)->get()->toArray();
