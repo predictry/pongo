@@ -75,6 +75,7 @@ Route::group(array('domain' => 'dashboard.' . $tld, 'before' => 'auth', 'namespa
 	Route::get('password', 'UserController@getPassword');
 	Route::post('user/password/submit', 'UserController@postPassword');
 	Route::get('user/password', array('as' => 'password', 'uses' => 'UserController@getPassword'));
+	Route::get("panel/stats", array('as' => 'panel.stats', 'uses' => 'PanelController@getShowStats'));
 
 	if ($role === "admin")
 	{
@@ -213,5 +214,8 @@ Route::group(array('prefix' => 'api/v1', 'namespace' => 'App\Controllers\Api'), 
 	Route::resource('recommendation', 'RecommendationController', array("only" => array("index")));
 	Route::resource('activation', 'ItemActivationController', array("only" => array("index", "store")));
 	Route::resource('item', 'ItemController', array("only" => array("store")));
+	Route::resource('cart', 'CartController', array("only" => array("store")));
+	Route::resource('cartlog', 'CartLogController', array("only" => array("store")));
+	Route::resource('placement', 'PlacementInstanceController', array("only" => array("store")));
 });
 

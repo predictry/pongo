@@ -14,7 +14,26 @@ define('EASYREC_RESTAPI_URL', 'http://demo.easyrec.org:8080/api/1.0/json/');
 class RecommendationController extends \App\Controllers\ApiBaseController
 {
 
-	private $curl = null;
+	private $curl				 = null;
+	private $placement_id		 = null;
+	private $operator_types		 = array();
+	private $number_of_results	 = 10;
+
+	function __construct()
+	{
+		parent::__construct();
+		$this->operator_types = array(
+			'contain'			 => 'Contains',
+			'equal'				 => 'Equals',
+			'not_equal'			 => 'Not Equals',
+			'is_set'			 => 'Is Set',
+			'is_not_set'		 => 'Is Not Set',
+			'greater_than'		 => 'Greater Than',
+			'greater_than_equal' => 'Greater Than or Equal',
+			'less_than'			 => 'Less Than',
+			'less_than_equal'	 => 'Less Than or Equal'
+		);
+	}
 
 	/**
 	 * Display a listing of the resource.
@@ -23,7 +42,8 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 	 */
 	public function index()
 	{
-		$inputs = \Input::only("item_id", "user_id", "session_id", "number_of_results", "algo");
+		$inputs				 = \Input::only("item_id", "user_id", "session_id", "algo", "placement_id");
+		$this->placement_id	 = $inputs['placement_id'];
 
 		if (!isset($inputs['algo']))
 			$inputs['algo'] = "otherusersalsoviewed";
@@ -36,17 +56,47 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 			$input_reco_data		 = $this->_getEasyrecRecoOption($inputs);
 			$easyrec_url_with_method = EASYREC_RESTAPI_URL . $method_algo;
 
-			if ($input_reco_data)
+			if (!is_object($input_reco_data))
 			{
 				$this->curl			 = new \Curl();
 				$response			 = $this->curl->_simple_call("get", $easyrec_url_with_method, $input_reco_data);
 				$recommended_items	 = $this->_extractEasyRecResult(json_decode($response));
 				if ($recommended_items)
 				{
-					return \Response::json(array("recomm" => $recommended_items));
+					$rec_items = array_fetch($recommended_items, 'alias_id'); // item_id = alias_id
+					return \Response::json(array("status" => "success", "recomm" => $recommended_items, "placement_instance_id" => $this->_setPlacementInstance($rec_items, $inputs['session_id'])));
 				}
 			}
+			else
+				return \Response::json(array("status" => "failed", "message" => $input_reco_data->errors()->first()), "400");
+
+			return \Response::json(array('status' => 'success', 'message' => 'no results'), "200");
 		}
+		return \Response::json(array('status' => 'failed', 'message' => 'something wrong'), "400");
+	}
+
+	function _setPlacementInstance($rec_items, $session_id)
+	{
+		$placement_instance					 = new \App\Models\PlacementInstance();
+		$placement_instance->placement_id	 = $this->placement_id;
+
+		$obj_session					 = \App\Models\Session::where("session", $session_id)->get()->first();
+		$placement_instance->session_id	 = ($obj_session) ? $obj_session->id : 1;
+		$placement_instance->save();
+
+		if ($placement_instance->id)
+		{
+			//Added Placement Instance Metas
+			foreach ($rec_items as $item_id)
+			{
+				$placement_instance_item						 = new \App\Models\PlacementInstanceItem();
+				$placement_instance_item->placement_instance_id	 = $placement_instance->id;
+				$placement_instance_item->item_id				 = $item_id;
+				$placement_instance_item->save();
+			}
+		}
+
+		return $placement_instance->id;
 	}
 
 	function _isAlgoExists($algo)
@@ -73,7 +123,7 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 			$easyrec_inputs = array(
 				"itemid"			 => $inputs['item_id'],
 				"userid"			 => $inputs['user_id'],
-				"numberOfResults"	 => $inputs['number_of_results']
+				"numberOfResults"	 => $this->number_of_results
 			);
 
 			if ($options)
@@ -82,27 +132,32 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 				return array_merge($api_credential, $easyrec_inputs);
 		}
 		else
-			return false;
+			return $validator;
 	}
 
 	function _extractEasyRecResult($response)
 	{
-		$recommended_items = array();
+		$recommended_items	 = array();
+		$placement			 = null;
+
+		if (isset($this->placement_id))
+			$placement = \App\Models\Placement::where("id", $this->placement_id)->where("site_id", $this->site_id)->get()->first();
+
 		if (isset($response->recommendeditems) && $response->recommendeditems !== null)
 		{
 			foreach ($response->recommendeditems as $items)
 			{
 				if (!is_object($items))
 				{
-
 					foreach ($items as $item_result)
 					{
 						$item = \App\Models\Item::where("identifier", $item_result->id)->get()->first();
 
-						if ($item && $item->active)
+						if ($item && $item->active && (!isset($placement) || $this->_isAllowedBasedOnPropertiesFilter($item)))
 						{
 							$item_reco = array(
 								"id"				 => $item->identifier,
+								"alias_id"			 => $item->id,
 								"description"		 => $item->name,
 								"created_at"		 => $item->created_at->toDateTimeString(),
 								"item_properties"	 => $this->_getRecoItemProperties($item)
@@ -116,7 +171,7 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 				{
 					$item_result = $items;
 					$item		 = \App\Models\Item::where("identifier", $item_result->id)->get()->first();
-					if ($item)
+					if ($item && ($this->_isAllowedBasedOnPropertiesFilter($item) || $this->placement_id === null))
 					{
 						$item_reco = array(
 							"id"				 => $item->identifier,
@@ -149,7 +204,7 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 
 					if (!$this->_is_url_exist($imageUrl))
 					{
-//						$item_meta->value	 = 'holder.js/160x180/#EE4054:#FFF';
+						//$item_meta->value	 = 'holder.js/160x180/#EE4054:#FFF';
 						$item_meta->value = "https://s3-ap-southeast-1.amazonaws.com/media.redmart.com/newmedia/460x/coming_soon.jpg";
 					}
 				}
@@ -178,6 +233,67 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 		}
 		curl_close($ch);
 		return $status;
+	}
+
+	function _isAllowedBasedOnPropertiesFilter($item)
+	{
+		$placement_filters	 = \App\Models\PlacementFilter::where("placement_id", $this->placement_id)->get()->first();
+		$item_metas			 = \App\Models\Itemmeta::where("item_id", $item->id)->get()->lists("value", "key");
+		$bool				 = true;
+
+		if (!(is_array($item_metas) && count($item_metas) > 0))
+			return false;
+
+		if ($placement_filters && $placement_filters->active === 'activated')
+		{
+			$filter_metas = \App\Models\Filtermeta::where("filter_id", $placement_filters->filter_id)->get();
+			foreach ($filter_metas as $meta)
+			{
+				if (isset($item_metas["{$meta->property}"]) && array_key_exists($meta->operator, $this->operator_types))
+				{
+					$item_property_value = $item_metas["{$meta->property}"];
+
+					switch ($meta->operator)
+					{
+						case "contain":
+							$bool = \Str::contains($meta->value, $item_property_value);
+							break;
+
+						case "equal":
+							$bool = ($meta->value === $item_property_value) ? true : false;
+							break;
+
+						case "not_equal":
+							$bool = ($meta->value !== $item_property_value) ? true : false;
+							break;
+
+						case "greater_than":
+							$bool = (is_numeric($item_property_value)) ? ($item_property_value > $meta->value) : false;
+							break;
+
+						case "greater_than_equal":
+							$bool = (is_numeric($item_property_value)) ? ($item_property_value >= $meta->value) : false;
+							break;
+
+						case "less_than":
+							$bool = (is_numeric($item_property_value)) ? ($item_property_value < $meta->value) : false;
+							break;
+
+						case "less_than_equal":
+							$bool = (is_numeric($item_property_value)) ? ($item_property_value <= $meta->value) : false;
+							break;
+
+						default:
+							$bool = true;
+							break;
+					}
+				}
+
+				if (!$bool)
+					return false;
+			}
+		}
+		return $bool;
 	}
 
 }

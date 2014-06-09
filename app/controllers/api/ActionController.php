@@ -31,7 +31,7 @@ class ActionController extends \App\Controllers\ApiBaseController
 	public function store()
 	{
 		$action_type = \Input::get('action_type');
-		
+
 		if (isset($action_type))
 		{
 			$action_name		 = Input::get("action");
@@ -52,7 +52,7 @@ class ActionController extends \App\Controllers\ApiBaseController
 				{
 					$response['status']	 = "failed";
 					$response['message'] = $validator->errors()->first();
-					return Response::json($response);
+					return Response::json($response, "200");
 				}
 			}
 			else if ($action_type === "bulk")
@@ -78,7 +78,7 @@ class ActionController extends \App\Controllers\ApiBaseController
 			"status"	 => "success",
 			"message"	 => ""
 		);
-		return Response::json($response);
+		return Response::json($response, "202");
 	}
 
 	function _validateProceedAction($action_name, $user_identifier_id, $session_id, $action_data)
@@ -211,7 +211,7 @@ class ActionController extends \App\Controllers\ApiBaseController
 	{
 		$visitor_session_id	 = 0;
 		//start processing visitor
-		$visitor_data		 = \App\Models\Session::where("visitor_id", $visitor_id)->where("session", $session)->get()->first();
+		$visitor_data		 = \App\Models\Session::where("visitor_id", $visitor_id)->where("session", $session)->where("site_id", $this->site_id)->get()->first();
 		if (!$visitor_data)
 		{
 			$visitor_session			 = new \App\Models\Session();

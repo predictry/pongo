@@ -207,7 +207,7 @@ body {
 /* Top Menu
 ================================================== */
 .navbar-header, .navbar-collapse.collapse {
-    text-transform: uppercase;
+    /*text-transform: uppercase;*/
 }
 
 /* Date Picker

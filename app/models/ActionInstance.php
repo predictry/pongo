@@ -49,6 +49,17 @@ class ActionInstance extends \Eloquent
 		return $items;
 	}
 
+	static function getNumberOfSales($add_to_cart_action_id, $buy_action_id, $dt_start, $dt_end)
+	{
+		$add_to_cart_item_ids	 = ActionInstance::where("action_id", $add_to_cart_action_id)->whereBetween('created', [$dt_start, $dt_end])->get()->lists("item_id");
+		if (count($add_to_cart_item_ids) > 0)
+			$buy_item_ids			 = ActionInstance::where("action_id", $buy_action_id)->whereIn("item_id", $add_to_cart_item_ids)->whereBetween('created', [$dt_start, $dt_end])->get()->count();
+		else
+			return 0;
+		
+		return ($buy_item_ids >= count($add_to_cart_item_ids)) ? count($add_to_cart_item_ids) : $buy_item_ids;
+	}
+
 }
 
 /* End of file ActionInstance.php */

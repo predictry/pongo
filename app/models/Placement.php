@@ -23,6 +23,7 @@ class Placement extends \Eloquent
 		"name" => "required|max:64"
 	);
 	public $manage_table_header	 = array(
+		"id"				 => "Placement ID",
 		"name"				 => "Name",
 		"created_at"		 => "Date Created",
 		"number_of_rulesets" => "Number of Ruleset(s)"

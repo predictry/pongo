@@ -25,7 +25,8 @@ class ItemController extends \App\Controllers\ApiBaseController
 		$properties	 = \Input::get("properties");
 
 		$rules = array(
-			'item_id' => 'required'
+			'item_id'		 => 'required',
+			'description'	 => 'required'
 		);
 
 		$validator = \Validator::make(array('item_id' => $item_id, 'description' => $description, 'properties' => $properties), $rules);
@@ -73,7 +74,7 @@ class ItemController extends \App\Controllers\ApiBaseController
 						$item_meta->save();
 					}
 				}
-				
+
 				return \Response::json(array("status" => "success", "message" => "Item successfully updated"), "200");
 			}
 			else
