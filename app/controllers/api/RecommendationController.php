@@ -2,7 +2,7 @@
 
 namespace App\Controllers\Api;
 
-define('LOKE_RESTAPI_URL', 'http://95.85.48.155:8080/');
+define('LOKE_RESTAPI_URL', 'http://95.85.48.155:9003/');
 define('EASYREC_RESTAPI_URL', 'http://demo.easyrec.org:8080/api/1.0/json/');
 
 /**

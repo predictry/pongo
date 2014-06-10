@@ -8,8 +8,12 @@ use Input,
 	Request,
 	Validator;
 
+define('EASYREC_RESTAPI_URL', 'http://demo.easyrec.org:8080/api/1.0/json/');
+
 class ActionController extends \App\Controllers\ApiBaseController
 {
+
+	private $curl = null;
 
 	public function __construct()
 	{
@@ -21,6 +25,11 @@ class ActionController extends \App\Controllers\ApiBaseController
 	{
 		$name = Input::get("name");
 		return "gotcha " . $name;
+	}
+
+	public function missingMethod($parameters = array())
+	{
+		return "Missing methods";
 	}
 
 	/**
@@ -37,6 +46,7 @@ class ActionController extends \App\Controllers\ApiBaseController
 			$action_name		 = Input::get("action");
 			$user_identifier_id	 = Input::get("user_id");
 			$session_id			 = Input::get("session_id");
+
 			if ($action_type === "single")
 			{
 				$action_data['item_id']				 = Input::get("item_id");
@@ -72,13 +82,18 @@ class ActionController extends \App\Controllers\ApiBaseController
 					}
 				}
 			}
-		}
 
-		$response = array(
-			"status"	 => "success",
-			"message"	 => ""
-		);
-		return Response::json($response, "202");
+			$response = array(
+				"status"	 => "success",
+				"message"	 => ""
+			);
+		}
+		else
+		{
+			$response['status']	 = "failed";
+			$response['message'] = "action type unknown";
+		}
+		return Response::json($response, "200");
 	}
 
 	function _validateProceedAction($action_name, $user_identifier_id, $session_id, $action_data)
@@ -106,7 +121,7 @@ class ActionController extends \App\Controllers\ApiBaseController
 		$item_properties	 = isset($item_properties) && ($item_properties !== "null") ? $item_properties : array();
 
 		$action_data = array(
-			"name"			 => $action_name,
+			"name"			 => $this->_getBuyAlias($action_name),
 			"description"	 => null,
 			"score"			 => Input::get("score"),
 		);
@@ -133,6 +148,19 @@ class ActionController extends \App\Controllers\ApiBaseController
 
 			$this->_setActionMeta($action_instance->id, $action_properties);
 		}
+
+		$call_action_data = array(
+			'action'			 => $this->_getBuyAlias($action_name),
+			'userid'			 => $user_identifier_id,
+			'sessionid'			 => $session,
+			'itemid'			 => $item_identifier_id,
+			'itemdescription'	 => $item_name,
+			'itemurl'			 => isset($item_properties) && ($item_properties !== "null") && isset($item_properties['item_url']) ? $item_properties['item_url'] : '',
+			'itemimageurl'		 => isset($item_properties) && ($item_properties !== "null") && isset($item_properties['img_url']) ? $item_properties['img_url'] : ''
+		);
+
+//		$this->_callEngine($call_action_data, $this->site['tenant_engine_url'], 'loke_engine');
+		$this->_callEngine($call_action_data, EASYREC_RESTAPI_URL);
 
 		return true;
 	}
@@ -209,10 +237,11 @@ class ActionController extends \App\Controllers\ApiBaseController
 
 	function _getSessionID($visitor_id, $session)
 	{
-		$visitor_session_id	 = 0;
+		$session_visitor_id	 = 0;
 		//start processing visitor
-		$visitor_data		 = \App\Models\Session::where("visitor_id", $visitor_id)->where("session", $session)->where("site_id", $this->site_id)->get()->first();
-		if (!$visitor_data)
+		$visitor_session	 = \App\Models\Session::where("visitor_id", $visitor_id)->where("session", $session)->where("site_id", $this->site_id)->get()->first();
+
+		if (!$visitor_session)
 		{
 			$visitor_session			 = new \App\Models\Session();
 			$visitor_session->visitor_id = $visitor_id;
@@ -220,13 +249,14 @@ class ActionController extends \App\Controllers\ApiBaseController
 			$visitor_session->session	 = $session;
 			$visitor_session->save();
 
-			$visitor_session_id = $visitor_session->id;
+			$session_visitor_id = $visitor_session->id;
 		}
 		else
 		{
-			$visitor_session_id = $visitor_data->id;
+			$session_visitor_id = $visitor_session->id;
 		}
-		return $visitor_session_id;
+
+		return $session_visitor_id;
 	}
 
 	function _getItemID($item_data)
@@ -302,11 +332,6 @@ class ActionController extends \App\Controllers\ApiBaseController
 		}
 	}
 
-	public function missingMethod($parameters = array())
-	{
-		return "Missing methods";
-	}
-
 	private function _translateActionToRating($str_action)
 	{
 		$actions = array(
@@ -322,6 +347,59 @@ class ActionController extends \App\Controllers\ApiBaseController
 		}
 		else
 			return false;
+	}
+
+	private function _getBuyAlias($action_name)
+	{
+		if ($action_name === 'complete_purchase')
+			return 'buy';
+
+		return $action_name;
+	}
+
+	private function _callEngine($action_data, $engine_url, $engine = 'easyrec')
+	{
+		$this->curl = new \Curl();
+
+		if ($engine !== 'easyrec')
+		{
+			$new_action_data = array(
+				'ii'		 => "setRatings",
+				"user"		 => $action_data['userid'],
+				"score"		 => $this->_translateActionToRating($action_data['action']),
+				"product"	 => $action_data['itemid']
+			);
+		}
+		else
+		{
+			$easyrec_default_actions = array("view", "buy");
+			$action_name			 = $action_data['action'];
+			unset($action_data['action']);
+
+			$new_action_data = array_merge($action_data, array(
+				'actiontime' => date('d_m_Y_H_i_s'),
+				'itemtype'	 => 'ITEM',
+				'apikey'	 => $this->site['api_key'],
+				'tenantid'	 => $this->site['name']
+			));
+
+			if (!in_array($action_name, $easyrec_default_actions))
+			{
+				$custom_action = array(
+					'actiontype' => $action_name
+				);
+
+				$new_action_data = array_merge($custom_action, $new_action_data);
+				$engine_url .= "sendaction";
+			}
+			else
+			{
+				$engine_url .= $action_name;
+			}
+		}
+
+		$response = $this->curl->_simple_call("get", $engine_url, $new_action_data);
+		return $response;
 	}
 
 }

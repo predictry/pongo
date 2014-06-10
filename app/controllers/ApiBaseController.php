@@ -17,6 +17,7 @@ class ApiBaseController extends \Controller
 {
 
 	public $predictry_server_api_key = null;
+	public $site					 = null;
 	public $site_id					 = null;
 	private $message				 = "";
 
@@ -70,6 +71,7 @@ class ApiBaseController extends \Controller
 
 		if (count($site) > 0 && !empty($site['url']))// && (($site['url'] === "http://" . \Request::server("HTTP_ORIGIN")) || $site['url'] === \Request::server("HTTP_ORIGIN")))
 		{
+			$this->site = $site;
 			return $site['id'];
 		}
 		else
