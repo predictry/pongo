@@ -3,14 +3,14 @@
 /**
  * Author       : Rifki Yandhi
  * Date Created : Apr 17, 2014 11:06:40 AM
- * File         : app/models/Placement.php
+ * File         : app/models/Widget.php
  * Copyright    : rifkiyandhi@gmail.com
  * Function     : 
  */
 
 namespace App\Models;
 
-class Placement extends \Eloquent
+class Widget extends \Eloquent
 {
 
 	/**
@@ -18,12 +18,12 @@ class Placement extends \Eloquent
 	 *
 	 * @var string
 	 */
-	protected $table			 = 'placements';
+	protected $table			 = 'widgets';
 	public $rules				 = array(
 		"name" => "required|max:64"
 	);
 	public $manage_table_header	 = array(
-		"id"				 => "Placement ID",
+		"id"				 => "Widget ID",
 		"name"				 => "Name",
 		"created_at"		 => "Date Created",
 		"number_of_rulesets" => "Number of Ruleset(s)"
@@ -31,5 +31,5 @@ class Placement extends \Eloquent
 
 }
 
-/* End of file Placement.php */
-/* Location: ./app/models/Placement.php */
+/* End of file Widget.php */
+/* Location: ./app/models/Widget.php */

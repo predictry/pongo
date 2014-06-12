@@ -15,7 +15,7 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 {
 
 	private $curl				 = null;
-	private $placement_id		 = null;
+	private $widget_id			 = null;
 	private $operator_types		 = array();
 	private $number_of_results	 = 10;
 
@@ -42,8 +42,8 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 	 */
 	public function index()
 	{
-		$inputs				 = \Input::only("item_id", "user_id", "session_id", "algo", "placement_id");
-		$this->placement_id	 = $inputs['placement_id'];
+		$inputs			 = \Input::only("item_id", "user_id", "session_id", "algo", "widget_id");
+		$this->widget_id = $inputs['widget_id'];
 
 		if (!isset($inputs['algo']))
 			$inputs['algo'] = "otherusersalsoviewed";
@@ -64,7 +64,7 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 				if ($recommended_items)
 				{
 					$rec_items = array_fetch($recommended_items, 'alias_id'); // item_id = alias_id
-					return \Response::json(array("status" => "success", "recomm" => $recommended_items, "placement_instance_id" => $this->_setPlacementInstance($rec_items, $inputs['session_id'])));
+					return \Response::json(array("status" => "success", "recomm" => $recommended_items, "widget_instance_id" => $this->_setWidgetInstance($rec_items, $inputs['session_id'])));
 				}
 			}
 			else
@@ -75,28 +75,28 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 		return \Response::json(array('status' => 'failed', 'message' => 'something wrong'), "400");
 	}
 
-	function _setPlacementInstance($rec_items, $session_id)
+	function _setWidgetInstance($rec_items, $session_id)
 	{
-		$placement_instance					 = new \App\Models\PlacementInstance();
-		$placement_instance->placement_id	 = $this->placement_id;
+		$widget_instance			 = new \App\Models\WidgetInstance();
+		$widget_instance->widget_id	 = $this->widget_id;
 
-		$obj_session					 = \App\Models\Session::where("session", $session_id)->get()->first();
-		$placement_instance->session_id	 = ($obj_session) ? $obj_session->id : 1;
-		$placement_instance->save();
+		$obj_session				 = \App\Models\Session::where("session", $session_id)->get()->first();
+		$widget_instance->session_id = ($obj_session) ? $obj_session->id : 1;
+		$widget_instance->save();
 
-		if ($placement_instance->id)
+		if ($widget_instance->id)
 		{
-			//Added Placement Instance Metas
+			//Added widget Instance Metas
 			foreach ($rec_items as $item_id)
 			{
-				$placement_instance_item						 = new \App\Models\PlacementInstanceItem();
-				$placement_instance_item->placement_instance_id	 = $placement_instance->id;
-				$placement_instance_item->item_id				 = $item_id;
-				$placement_instance_item->save();
+				$widget_instance_item						 = new \App\Models\WidgetInstanceItem();
+				$widget_instance_item->widget_instance_id	 = $widget_instance->id;
+				$widget_instance_item->item_id				 = $item_id;
+				$widget_instance_item->save();
 			}
 		}
 
-		return $placement_instance->id;
+		return $widget_instance->id;
 	}
 
 	function _isAlgoExists($algo)
@@ -138,10 +138,10 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 	function _extractEasyRecResult($response)
 	{
 		$recommended_items	 = array();
-		$placement			 = null;
+		$widget				 = null;
 
-		if (isset($this->placement_id))
-			$placement = \App\Models\Placement::where("id", $this->placement_id)->where("site_id", $this->site_id)->get()->first();
+		if (isset($this->widget_id))
+			$widget = \App\Models\Widget::where("id", $this->widget_id)->where("site_id", $this->site_id)->get()->first();
 
 		if (isset($response->recommendeditems) && $response->recommendeditems !== null)
 		{
@@ -153,7 +153,7 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 					{
 						$item = \App\Models\Item::where("identifier", $item_result->id)->get()->first();
 
-						if ($item && $item->active && (!isset($placement) || $this->_isAllowedBasedOnPropertiesFilter($item)))
+						if ($item && $item->active && (!isset($widget) || $this->_isAllowedBasedOnPropertiesFilter($item)))
 						{
 							$item_reco = array(
 								"id"				 => $item->identifier,
@@ -171,7 +171,7 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 				{
 					$item_result = $items;
 					$item		 = \App\Models\Item::where("identifier", $item_result->id)->get()->first();
-					if ($item && ($this->_isAllowedBasedOnPropertiesFilter($item) || $this->placement_id === null))
+					if ($item && ($this->_isAllowedBasedOnPropertiesFilter($item) || $this->widget_id === null))
 					{
 						$item_reco = array(
 							"id"				 => $item->identifier,
@@ -237,16 +237,16 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 
 	function _isAllowedBasedOnPropertiesFilter($item)
 	{
-		$placement_filters	 = \App\Models\PlacementFilter::where("placement_id", $this->placement_id)->get()->first();
-		$item_metas			 = \App\Models\Itemmeta::where("item_id", $item->id)->get()->lists("value", "key");
-		$bool				 = true;
+		$widget_filters	 = \App\Models\WidgetFilter::where("widget_id", $this->widget_id)->get()->first();
+		$item_metas		 = \App\Models\Itemmeta::where("item_id", $item->id)->get()->lists("value", "key");
+		$bool			 = true;
 
 		if (!(is_array($item_metas) && count($item_metas) > 0))
 			return false;
 
-		if ($placement_filters && $placement_filters->active === 'activated')
+		if ($widget_filters && $widget_filters->active === 'activated')
 		{
-			$filter_metas = \App\Models\Filtermeta::where("filter_id", $placement_filters->filter_id)->get();
+			$filter_metas = \App\Models\Filtermeta::where("filter_id", $widget_filters->filter_id)->get();
 			foreach ($filter_metas as $meta)
 			{
 				if (isset($item_metas["{$meta->property}"]) && array_key_exists($meta->operator, $this->operator_types))

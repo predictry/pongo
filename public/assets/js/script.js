@@ -114,11 +114,11 @@ jQuery(document).ready(function() {
     $('ul.setup-panel li.active a').trigger('click');
 
     // WIZARD (PLACEMENT INFO) //
-    $('#btnWizardPlacementInfo').on('click', function(e) {
+    $('#btnWizardWidgetInfo').on('click', function(e) {
         e.preventDefault();
-        var form = $(".wizardPlacementForm");
+        var form = $(".wizardWidgetForm");
         $.ajax({
-            url: site_url + "/placements/ajaxSubmitWizardPlacement",
+            url: site_url + "/widgets/ajaxSubmitWizardWidget",
             type: 'POST',
             data: form.serialize(),
             dataType: 'json',
@@ -129,7 +129,7 @@ jQuery(document).ready(function() {
                     $('ul.setup-panel li a[href="#step-2"]').trigger('click');
                 }
                 else {
-                    $(".wizardPlacement").html(data.response);
+                    $(".wizardWidget").html(data.response);
                 }
             },
             error: function() {
@@ -145,7 +145,7 @@ jQuery(document).ready(function() {
         var form = $(".wizardRulesetForm");
 
         $.ajax({
-            url: site_url + "/placements/ajaxSubmitCompleteWizard",
+            url: site_url + "/widgets/ajaxSubmitCompleteWizard",
             type: 'POST',
             data: form.serialize(),
             dataType: 'json',
@@ -368,10 +368,10 @@ function editItemRule(obj, index) {
     });
 }
 
-function addItemPlacementRuleset()
+function addItemWidgetRuleset()
 {
-    var btn = $("a.btnAddItemPlacementRuleset");
-    btn.removeClass("btnAddItemPlacementRuleset btn-default").addClass("btnRemoveItemPlacementRuleset btn-danger").html("Remove");
+    var btn = $("a.btnAddItemWidgetRuleset");
+    btn.removeClass("btnAddItemWidgetRuleset btn-default").addClass("btnRemoveItemWidgetRuleset btn-danger").html("Remove");
     btn.attr("onClick", "removeItem(" + indexOfItem + ", 'item_rule');");
     indexOfItem += 1;
 
@@ -381,7 +381,7 @@ function addItemPlacementRuleset()
     };
 
     $.ajax({
-        url: site_url + "/placements/item",
+        url: site_url + "/widgets/item",
         type: 'GET',
         data: form_data,
         dataType: 'json',
@@ -408,7 +408,7 @@ function addItemPlacementRuleset()
 
 }
 
-function editItemPlacementRuleset(obj, index)
+function editItemWidgetRuleset(obj, index)
 {
     var form_data = {
         obj: obj,
@@ -417,7 +417,7 @@ function editItemPlacementRuleset(obj, index)
     };
 
     $.ajax({
-        url: site_url + "/placements/itemEdit",
+        url: site_url + "/widgets/itemEdit",
         type: 'GET',
         data: form_data,
         dataType: 'json',
@@ -445,7 +445,7 @@ function editItemPlacementRuleset(obj, index)
     });
 }
 
-function editItemPlacementFilter(obj, index)
+function editItemWidgetFilter(obj, index)
 {
     var form_data = {
         obj: obj,
@@ -454,7 +454,7 @@ function editItemPlacementFilter(obj, index)
     };
 
     $.ajax({
-        url: site_url + "/placements/itemFilterEdit",
+        url: site_url + "/widgets/itemFilterEdit",
         type: 'GET',
         data: form_data,
         dataType: 'json',

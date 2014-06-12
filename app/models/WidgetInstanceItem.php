@@ -3,14 +3,14 @@
 /**
  * Author       : Rifki Yandhi
  * Date Created : Jun 4, 2014 5:33:45 PM
- * File         : app/models/PlacementInstanceItem.php
+ * File         : app/models/WidgetInstanceItem.php
  * Copyright    : rifkiyandhi@gmail.com
  * Function     : 
  */
 
 namespace App\Models;
 
-class PlacementInstanceItem extends \Eloquent
+class WidgetInstanceItem extends \Eloquent
 {
 
 	/**
@@ -18,10 +18,10 @@ class PlacementInstanceItem extends \Eloquent
 	 *
 	 * @var string
 	 */
-	protected $table	 = 'placement_instance_items';
+	protected $table	 = 'widget_instance_items';
 	public $timestamps	 = false;
 
 }
 
-/* End of file PlacementInstanceItem.php */
-/* Location: ./app/models/PlacementInstanceItem.php */
+/* End of file WidgetInstanceItem.php */
+/* Location: ./app/models/WidgetInstanceItem.php */

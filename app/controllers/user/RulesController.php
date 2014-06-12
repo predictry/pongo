@@ -441,11 +441,11 @@ class RulesController extends \App\Controllers\BaseController
 		$is_exists = \App\Models\Ruleset::where("id", $id)->where("site_id", $this->active_site_id)->count();
 		if ($is_exists)
 		{
-			$placement_rulesets = \App\Models\PlacementRuleSet::where("ruleset_id", $id)->get();
-			foreach ($placement_rulesets as $ruleset)
+			$widget_rulesets = \App\Models\WidgetRuleSet::where("ruleset_id", $id)->get();
+			foreach ($widget_rulesets as $ruleset)
 			{
-				$placement_ruleset = \App\Models\PlacementRuleSet::find($ruleset->id);
-				$placement_ruleset->delete();
+				$widget_ruleset = \App\Models\WidgetRuleSet::find($ruleset->id);
+				$widget_ruleset->delete();
 			}
 
 			$ruleset = \App\Models\Ruleset::find($id);

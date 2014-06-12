@@ -22,8 +22,8 @@ class FiltersController extends \App\Controllers\BaseController
 			'contain'			 => 'Contains',
 			'equal'				 => 'Equals',
 			'not_equal'			 => 'Not Equals',
-			'is_set'			 => 'Is Set',
-			'is_not_set'		 => 'Is Not Set',
+//			'is_set'			 => 'Is Set',
+//			'is_not_set'		 => 'Is Not Set',
 			'greater_than'		 => 'Greater Than',
 			'greater_than_equal' => 'Greater Than or Equal',
 			'less_than'			 => 'Less Than',
@@ -287,10 +287,10 @@ class FiltersController extends \App\Controllers\BaseController
 		if ($filter)
 		{
 
-			//check if the filter associated with any placement
-			$number_of_placement_contain_this_filter = \App\Models\PlacementFilter::where("filter_id", $id)->get()->count();
-			if ($number_of_placement_contain_this_filter > 0)
-				return \Redirect::route('filters')->with("flash_error", "This filter cannot be removed. There is a placement that still associated with this filter.");
+			//check if the filter associated with any widget
+			$number_of_widget_contain_this_filter = \App\Models\WidgetFilter::where("filter_id", $id)->get()->count();
+			if ($number_of_widget_contain_this_filter > 0)
+				return \Redirect::route('filters')->with("flash_error", "This filter cannot be removed. There is a widget that still associated with this filter.");
 
 			\App\Models\Filtermeta::where("filter_id", $filter->id)->delete();
 			$filter->delete();

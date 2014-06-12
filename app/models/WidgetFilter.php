@@ -3,14 +3,14 @@
 /**
  * Author       : Rifki Yandhi
  * Date Created : May 29, 2014 12:25:13 PM
- * File         : app/models/PlacementFilter.php
+ * File         : app/models/WidgetFilter.php
  * Copyright    : rifkiyandhi@gmail.com
  * Function     : 
  */
 
 namespace App\Models;
 
-class PlacementFilter extends \Eloquent
+class WidgetFilter extends \Eloquent
 {
 
 	/**
@@ -18,10 +18,10 @@ class PlacementFilter extends \Eloquent
 	 *
 	 * @var string
 	 */
-	protected $table	 = 'placement_filters';
+	protected $table	 = 'widget_filters';
 	public $timestamps	 = false;
 
 }
 
-/* End of file PlacementFilter.php */
-/* Location: ./app/models/PlacementFilter.php */
+/* End of file WidgetFilter.php */
+/* Location: ./app/models/WidgetFilter.php */

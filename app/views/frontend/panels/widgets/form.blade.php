@@ -4,9 +4,9 @@
 	@include('frontend.partials.notification')
 	<!-- Nav tabs -->
 	<?php if ($type === "create") : ?>
-		{{ Form::open(array('url' => 'placements/submit', 'class' => 'placementForm')) }}
+		{{ Form::open(array('url' => 'widgets/submit', 'class' => 'widgetForm')) }}
 	<?php elseif ($type === "edit") : ?>
-		{{ Form::model($placement, array('route' => array('placements.update', $placement->id), 'url' => 'placements/' . $placement->id . '/edit', 'class' => 'form-horizontal itemForm')) }}
+		{{ Form::model($widget, array('route' => array('widgets.update', $widget->id), 'url' => 'widgets/' . $widget->id . '/edit', 'class' => 'form-horizontal itemForm')) }}
 	<?php endif; ?>
 	<a class="btn btn-default" href="{{ URL::previous(); }}"><i class="fa fa-reply"></i> Back</a>
 	<h2>{{ $pageTitle or '' }}</h2>
@@ -40,10 +40,10 @@
 				</div> --}}
 				<div class="clearfix"></div>
 				<?php if ($type === "create") : ?>
-					@include('frontend.panels.placements.itemruleset')	
+					@include('frontend.panels.widgets.itemruleset')	
 				<?php elseif ($type === "edit") : ?>
 					@if ($number_of_items === 1)
-					@include('frontend.panels.placements.itemruleset')	
+					@include('frontend.panels.widgets.itemruleset')	
 					@endif
 					<?php
 				endif;
@@ -52,10 +52,10 @@
 			<div id="item_filters_container">
 				<div class="clearfix"></div>
 				<?php if ($type === "create") : ?>
-					@include('frontend.panels.placements.itemfilter')	
+					@include('frontend.panels.widgets.itemfilter')	
 				<?php elseif ($type === "edit") : ?>
 					@if ($number_of_items === 1)
-					@include('frontend.panels.placements.itemfilter')	
+					@include('frontend.panels.widgets.itemfilter')	
 					@endif
 					<?php
 				endif;

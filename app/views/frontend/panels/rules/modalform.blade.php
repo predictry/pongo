@@ -135,7 +135,7 @@
 		var form = $(".modalRulesetForm");
 		console.log(form.serialize());
 		$.ajax({
-			url: site_url + "/placements/ajaxSubmitWizardAddRuleset",
+			url: site_url + "/widgets/ajaxSubmitWizardAddRuleset",
 			type: 'POST',
 			data: form.serialize(),
 			dataType: 'json',

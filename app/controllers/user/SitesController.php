@@ -93,10 +93,13 @@ class SitesController extends \App\Controllers\BaseController
 
 			//can be migrate to table
 			$default_actions = array(
-				"view"			 => array("score" => 1),
-				"rate"			 => array("score" => 2),
-				"add_to_cart"	 => array("score" => 3),
-				"buy"			 => array("score" => 4)
+				"view"				 => array("score" => 1),
+				"rate"				 => array("score" => 2),
+				"add_to_cart"		 => array("score" => 3),
+				"buy"				 => array("score" => 4),
+				"started_checkout"	 => array("score" => 5),
+				"started_payment"	 => array("score" => 6),
+				"complete_purchase"	 => array("score" => 7)
 			);
 
 			//set default action types for the site

@@ -2,12 +2,12 @@
 @section('content')
 <div class="col-xs-offset-2 col-xs-8 main">
 	@include('frontend.partials.notification')
-	@include('frontend.panels.placements.wizardsteps')
+	@include('frontend.panels.widgets.wizardsteps')
 
 	<div class="row setup-content form-horizontal" id="step-1">
 		<div class="col-xs-12">
 			<div class="wizardPlacement">
-				@include('frontend.panels.placements.wizardformplacement')
+				@include('frontend.panels.widgets.wizardformwidget')
 			</div>
 			<div class="clearfix"></div>
 			<button type="submit" class="btn btn-primary pull-right" id="btnWizardPlacementInfo">Next</button>
@@ -20,7 +20,7 @@
 				<a data-toggle="modal" id="btnViewModal" data-target="#viewModal" href=" {{ URL::to("/rules/formCreate") }}" class="btn btn-default btnViewModal"  data-toggle="tooltip" data-placement="bottom" title="View" >Add New Ruleset</a>
 			</div>--}}
 			<div class="clearfix"></div>
-			@include('frontend.panels.placements.wizardformruleset')
+			@include('frontend.panels.widgets.wizardformruleset')
 			<div class="clearfix"></div>
 			<button type="submit" class="btn btn-primary pull-right" id="btnWizardComplete">Submit &amp; Next</button>
 		</div>

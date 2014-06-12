@@ -18,6 +18,11 @@
   |--------------------------------------------------------------------------
  */
 Route::pattern('token', '[A-Za-z0-9]+');
+Route::pattern('type', '[A-Za-z0-9_]+');
+Route::pattern('type_by', '[A-Za-z0-9]+');
+Route::pattern('selected_comparison', '[A-Za-z0-9]+');
+Route::pattern('dt_start', '^([0-9]{4})-([0-9]{2})-([0-9]{2})$');
+Route::pattern('dt_end', '^([0-9]{4})-([0-9]{2})-([0-9]{2})$');
 Route::pattern('numeric', '[0-9]+');
 
 $dashboard_domain	 = str_replace("http://", "", Config::get('app.url'));
@@ -62,6 +67,7 @@ Route::group(array('domain' => 'dashboard.' . $tld, 'before' => 'auth', 'namespa
 
 	Route::get('user', 'UserController@getDashboard');
 	Route::get('home', array('as' => 'home', 'uses' => 'PanelController@index'));
+	Route::get('home2/{type?}/{type_by?}/{selected_comparison?}/{dt_start?}/{dt_end?}', array('as' => 'home2', 'uses' => 'PanelController@index2'));
 	Route::get('sites/wizard', array('as' => 'sites', 'uses' => 'SitesController@getSiteWizard'));
 	Route::get('sites/getModal', array('as' => 'sites', 'uses' => 'SitesController@getModalCreate'));
 	Route::post('sites/ajaxSubmitSite', array('as' => 'sites', 'uses' => 'SitesController@postCreate'));
@@ -141,23 +147,23 @@ Route::group(array('domain' => 'dashboard.' . $tld, 'before' => 'auth', 'namespa
 		Route::post('actions/submitSelector', array("as" => "actions.submitSelector", "uses" => 'ActionsController@postSelector'));
 		Route::get("actions", array("as" => "actions", "uses" => "ActionsController@index"));
 
-		#Placement Management
-		Route::get("placements", array("as" => "placements", "uses" => "PlacementsController@index"));
-		Route::get('placements/{numeric}/view', array("as" => "placements.{numeric}.view", "uses" => 'PlacementsController@getView'));
-		Route::get('placements/create', array("as" => "placements.create", "uses" => 'PlacementsController@getCreate'));
-		Route::post('placements/submit', array("as" => "placements.submit", "uses" => 'PlacementsController@postCreate'));
-		Route::get('placements/item', array("as" => "placements.item", "uses" => 'PlacementsController@getItemPlacementRuleset'));
-		Route::get('placements/itemEdit', array("as" => "placements.itemEdit", "uses" => 'PlacementsController@getItemEditPlacementRuleset'));
-		Route::get('placements/itemFilterEdit', array("as" => "placements.itemFilterEdit", "uses" => 'PlacementsController@getItemEditPlacementFilter'));
-		Route::get('placements/{numeric}/edit', array("as" => "placements.{numieric}.edit", "uses" => 'PlacementsController@getEdit'));
-		Route::post('placements/{numeric}/edit', array("as" => "placements.update", "uses" => 'PlacementsController@postEdit'));
-		Route::get('placements/{numeric}/delete', 'PlacementsController@getDelete');
-		Route::post('placements/{numeric}/delete', 'PlacementsController@postDelete');
+		#Widget Management
+		Route::get("widgets", array("as" => "widgets", "uses" => "WidgetsController@index"));
+		Route::get('widgets/{numeric}/view', array("as" => "widgets.{numeric}.view", "uses" => 'WidgetsController@getView'));
+		Route::get('widgets/create', array("as" => "widgets.create", "uses" => 'WidgetsController@getCreate'));
+		Route::post('widgets/submit', array("as" => "widgets.submit", "uses" => 'WidgetsController@postCreate'));
+		Route::get('widgets/item', array("as" => "widgets.item", "uses" => 'WidgetsController@getItemWidgetRuleset'));
+		Route::get('widgets/itemEdit', array("as" => "widgets.itemEdit", "uses" => 'WidgetsController@getItemEditWidgetRuleset'));
+		Route::get('widgets/itemFilterEdit', array("as" => "widgets.itemFilterEdit", "uses" => 'WidgetsController@getItemEditWidgetFilter'));
+		Route::get('widgets/{numeric}/edit', array("as" => "widgets.{numieric}.edit", "uses" => 'WidgetsController@getEdit'));
+		Route::post('widgets/{numeric}/edit', array("as" => "widgets.update", "uses" => 'WidgetsController@postEdit'));
+		Route::get('widgets/{numeric}/delete', 'WidgetsController@getDelete');
+		Route::post('widgets/{numeric}/delete', 'WidgetsController@postDelete');
 
-		Route::get('placements/wizard', array("as" => "placements.wizard", "uses" => 'PlacementsController@getWizard'));
-		Route::post('placements/ajaxSubmitWizardPlacement', array("as" => "placements.ajaxSubmitWizardPlacement", "uses" => 'PlacementsController@postAjaxWizardPlacement'));
-		Route::post('placements/ajaxSubmitWizardAddRuleset', array("as" => "placements.ajaxSubmitWizardAddRuleset", "uses" => 'PlacementsController@postAjaxWizardAddRuleset'));
-		Route::post('placements/ajaxSubmitCompleteWizard', array("as" => "placements.ajaxSubmitCompleteWizard", "uses" => 'PlacementsController@postAjaxWizardCompletePlacement'));
+		Route::get('widgets/wizard', array("as" => "widgets.wizard", "uses" => 'WidgetsController@getWizard'));
+		Route::post('widgets/ajaxSubmitWizardwidget', array("as" => "widgets.ajaxSubmitWizardWidget", "uses" => 'WidgetsController@postAjaxWizardWidget'));
+		Route::post('widgets/ajaxSubmitWizardAddRuleset', array("as" => "widgets.ajaxSubmitWizardAddRuleset", "uses" => 'WidgetsController@postAjaxWizardAddRuleset'));
+		Route::post('widgets/ajaxSubmitCompleteWizard', array("as" => "widgets.ajaxSubmitCompleteWizard", "uses" => 'WidgetsController@postAjaxWizardCompleteWidget'));
 
 		Route::get("filters", array("as" => "filters", "uses" => "FiltersController@index"));
 		Route::get('filters/create', array("as" => "filters.create", "uses" => 'FiltersController@getCreate'));
@@ -216,6 +222,6 @@ Route::group(array('prefix' => 'api/v1', 'namespace' => 'App\Controllers\Api'), 
 	Route::resource('item', 'ItemController', array("only" => array("store")));
 	Route::resource('cart', 'CartController', array("only" => array("store")));
 	Route::resource('cartlog', 'CartLogController', array("only" => array("store")));
-	Route::resource('placement', 'PlacementInstanceController', array("only" => array("store")));
+	Route::resource('widget', 'WidgetInstanceController', array("only" => array("store")));
 });
 

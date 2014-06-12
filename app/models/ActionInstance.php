@@ -31,6 +31,11 @@ class ActionInstance extends \Eloquent
 		return $this->belongsTo("App\Models\Action");
 	}
 
+	public function action_instance_metas()
+	{
+		return $this->hasMany("App\Models\ActionInstanceMeta");
+	}
+
 	static function getMostItems($action_id)
 	{
 		$top_items	 = \App\Models\ActionInstance::select(\DB::raw('count(item_id) as numb, item_id'))->where("action_id", $action_id)->groupBy("item_id")->orderBy("numb", "DESC")->limit(5)->get()->toArray();
@@ -38,9 +43,10 @@ class ActionInstance extends \Eloquent
 
 		foreach ($top_items as $top)
 		{
-			$item = Item::find($top['item_id'])->toArray();
+			$item = Item::find($top['item_id']);
 			if ($item)
 			{
+				$item			 = $item->toArray();
 				$item['total']	 = $top['numb'];
 				$items[]		 = $item;
 			}
@@ -56,7 +62,7 @@ class ActionInstance extends \Eloquent
 			$buy_item_ids			 = ActionInstance::where("action_id", $buy_action_id)->whereIn("item_id", $add_to_cart_item_ids)->whereBetween('created', [$dt_start, $dt_end])->get()->count();
 		else
 			return 0;
-		
+
 		return ($buy_item_ids >= count($add_to_cart_item_ids)) ? count($add_to_cart_item_ids) : $buy_item_ids;
 	}
 

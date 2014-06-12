@@ -30,6 +30,11 @@ class Action extends \Eloquent
 		return $this->hasMany("App\Models\ActionInstance");
 	}
 
+	public function action_instances_and_metas()
+	{
+		return $this->hasManyThrough("App\Models\ActionInstanceMeta", "App\Models\ActionInstance");
+	}
+
 	static function getNumberOfTotalActionsOverall($site_id, $action_ids = array())
 	{
 		if (count($action_ids) <= 0)

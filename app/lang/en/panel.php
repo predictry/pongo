@@ -27,7 +27,7 @@ return array(
 	"actions"				 => "Actions",
 	"rulesets"				 => "Rulesets",
 	"filters"				 => "Filters",
-	"placements"			 => "Placements",
+	"widgets"				 => "Widgets",
 	"overview"				 => "Overview",
 	"add.new"				 => "Add New",
 	"manage"				 => "Manage",

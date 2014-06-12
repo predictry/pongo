@@ -1,4 +1,4 @@
-{{ Form::open(array('url' => 'placements/postAjaxWizardPlacement', 'class' => 'wizardPlacementForm')) }}
+{{ Form::open(array('url' => 'widgets/postAjaxWizardPlacement', 'class' => 'wizardPlacementForm')) }}
 <div class="form-group {{ $var = $errors->first('name') }} {{ ($var !== '') ? 'has-error' : '' }}">
 	<label for='name' class="col-sm-2 control-label">Name</label>
 	<div class="col-sm-4">

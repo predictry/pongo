@@ -398,8 +398,9 @@ class ActionController extends \App\Controllers\ApiBaseController
 			}
 		}
 
-		$response = $this->curl->_simple_call("get", $engine_url, $new_action_data);
-		return $response;
+//		$response = $this->curl->_simple_call("get", $engine_url, $new_action_data);
+//		return $response;
+		return true;
 	}
 
 }

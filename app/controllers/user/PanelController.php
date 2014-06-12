@@ -18,6 +18,12 @@ class PanelController extends \App\Controllers\BaseController
 	public function __construct()
 	{
 		parent::__construct();
+
+		if (!$this->active_site_id)
+		{
+			return \Redirect::to('sites/wizard');
+		}
+
 		$custom_script = "<script type='text/javascript'>";
 		$custom_script .= "var site_url = '" . \URL::to('/') . "';";
 		$custom_script .= "</script>";
@@ -34,8 +40,6 @@ class PanelController extends \App\Controllers\BaseController
 	{
 		if (!$this->active_site_id)
 		{
-//			\Auth::logout();
-//			return "Not found any site activated as a default display.";
 			return \Redirect::to('sites/wizard');
 		}
 
@@ -97,11 +101,75 @@ class PanelController extends \App\Controllers\BaseController
 		return \View::make('frontend.panels.dashboard', $output);
 	}
 
-	function _getActionStatsInfo($site_actions, $dt_start, $dt_end)
+	/**
+	 * Display a listing of the resource.
+	 *
+	 * @return Response
+	 */
+	public function index2($type = "31_d_ago", $type_by = "day", $dt_start = null, $dt_end = null, $selected_comparison = "sales")
+	{
+		$inputs = array(
+			"type"					 => $type,
+			"type_by"				 => $type_by,
+			"dt_start"				 => $dt_start,
+			"dt_end"				 => $dt_end,
+			"selected_comparison"	 => $selected_comparison);
+
+		if (isset($dt_start) && isset($dt_end))
+		{
+			$inputs["dt_start"]	 = isset($dt_start) ? new Carbon($dt_start) : new Carbon('today');
+			$inputs["dt_end"]	 = isset($dt_end) ? new Carbon($dt_end) : new Carbon('today');
+		}
+
+		switch ($type)
+		{
+			case "range":
+				break;
+
+			case "36_w_ago":
+				$n		 = 36;
+				$type_by = "week";
+				break;
+
+			case "12_m_ago":
+				$n		 = 12;
+				$type_by = "month";
+				break;
+
+			case "31_d_ago":
+			default:
+				$n		 = 31;
+				$type_by = "day";
+				break;
+		}
+
+		$dt_ranges			 = $this->_getDateRanges($n, $type_by);
+		$sales_stats		 = $this->_populateSalesStatsByRanges($dt_ranges);
+		$page_views_stats	 = $this->_populatePageViewStatsByRanges($dt_ranges);
+
+		echo '<pre>';
+		print_r($page_views_stats);
+		echo "<br/>----<br/>";
+		print_r($sales_stats);
+		echo "<br/>----<br/>";
+		echo '</pre>';
+		die;
+
+		$output = array(
+			"bar_stats"	 => array(),
+			"pie_stats"	 => array("total_sales" => 0, "regular_sales" => 0, "recommended_sales" => 0),
+			"pageTitle"	 => "dashboard"
+		);
+
+		return \View::make('frontend.panels.dashboard', $output);
+	}
+
+	function _getActionStatsInfo($site_actions, $dt_start, $dt_end, $is_recommended = false, $all = true)
 	{
 		$action_ids		 = array_fetch($site_actions, "id");
 		$action_names	 = array_fetch($site_actions, "name");
-		$graph_data[]	 = $this->_populateTodayActionStats($dt_start, $dt_end, $action_ids, $action_names);
+
+		$graph_data[] = $this->_populateDateRangeActionStats($dt_start, $dt_end, $action_ids, $action_names, false, $is_recommended, $all);
 
 		$output = array(
 			"stats"			 => array(
@@ -119,9 +187,8 @@ class PanelController extends \App\Controllers\BaseController
 	function _getFunelStatsInfo($action_ids, $dt_start, $dt_end)
 	{
 		//this is basically funnel
-		$available_non_default_site_actions		 = \App\Models\Action::where("site_id", $this->active_site_id)->whereNotIn("id", $action_ids)->get()->toArray();
-		$available_non_default_site_action_ids	 = array_fetch($available_non_default_site_actions, "id");
-		$available_non_default_site_action_names = array_fetch($available_non_default_site_actions, "name");
+		$available_non_default_site_action_ids	 = \App\Models\Action::where("site_id", $this->active_site_id)->whereNotIn("id", $action_ids)->get()->lists("id");
+		$available_non_default_site_action_names = \App\Models\Action::where("site_id", $this->active_site_id)->whereNotIn("id", $action_ids)->get()->lists("name");
 
 		//check if he have default funnel preference
 		$total_funnels = \App\Models\FunelPreference::where("site_id", $this->active_site_id)->get()->count();
@@ -160,7 +227,7 @@ class PanelController extends \App\Controllers\BaseController
 					array_push($funel_default_preference_meta_names, $o->name);
 			}
 
-			$graph_data[] = $this->_populateTodayActionStats($dt_start, $dt_end, $funel_default_preference_metas_ids, $funel_default_preference_meta_names);
+			$graph_data[] = $this->_populateDateRangeActionStats($dt_start, $dt_end, $funel_default_preference_metas_ids, $funel_default_preference_meta_names);
 
 			$output = array(
 				"stats"						 => array(
@@ -175,7 +242,7 @@ class PanelController extends \App\Controllers\BaseController
 			);
 		}else
 		{
-			$graph_data[] = $this->_populateTodayActionStats($dt_start, $dt_end, $available_non_default_site_action_ids, $available_non_default_site_action_names);
+			$graph_data[] = $this->_populateDateRangeActionStats($dt_start, $dt_end, $available_non_default_site_action_ids, $available_non_default_site_action_names);
 
 			$output = array(
 				"stats"						 => array(
@@ -423,51 +490,56 @@ class PanelController extends \App\Controllers\BaseController
 		return \Redirect::to('home');
 	}
 
-	function _populateTodayActionStats($dt_start, $dt_end, $action_ids, $action_names, $index = false)
+	function _populateDateRangeActionStats($dt_start, $dt_end, $action_ids, $action_names, $index = false, $is_recommended = false, $all = true, $result_only = false)
 	{
 
-		if (!$index)
-			$graph_data		 = array("date" => $dt_start->toDateString());
-		else
-			$graph_data[]	 = $dt_start->toDateString();
-
+		if (!$result_only)
+		{
+			if (!$index)
+				$graph_data		 = array("date" => $dt_start->toDateString());
+			else
+				$graph_data[]	 = $dt_start->toDateString();
+		}
 
 		$i = 0;
+
 		foreach ($action_ids as $id)
 		{
-			$total_action = \App\Models\ActionInstance::where("action_id", $id)->whereBetween('created', [$dt_start, $dt_end])->count();
-//			$total_action_overall	 = \App\Models\ActionInstance::where("action_id", $id)->count();
-//			$total_action_today_details[$val]	 = $total_action;
-//			$total_action_overall_details[$val]	 = $total_action_overall;
+			if (!$all)
+			{
+				$total_recommended_action = \App\Models\Action::find($id)->action_instances_and_metas()
+								->where("action_instance_metas.key", "rec")
+								->where("action_instance_metas.value", "true")
+								->whereBetween('created', [$dt_start, $dt_end])
+								->get()->count();
 
-			if (!$index)
-				$graph_data[$action_names[$i]]	 = $total_action;
+				if ($is_recommended)
+					$total_action = $total_recommended_action;
+				else
+				{
+					$total_action = (\App\Models\Action::find($id)->action_instances()
+									->whereBetween('created', [$dt_start, $dt_end])
+									->get()->count()) - $total_recommended_action;
+				}
+			}
 			else
-				$graph_data[]					 = $total_action;
+				$total_action = \App\Models\Action::find($id)->action_instances()
+						->whereBetween('created', [$dt_start, $dt_end])
+						->count();
+
+			if (!$result_only)
+			{
+				if (!$index)
+					$graph_data[$action_names[$i]]	 = $total_action;
+				else
+					$graph_data[]					 = $total_action;
+			}
+			else
+				$graph_data[$action_names[$i]] = $total_action;
 			$i++;
 		}
 
 		return $graph_data;
-	}
-
-	function _getActionGraphLineStats($dt_start, $ids, $names, $until_next_few_days = 1, $index = false)
-	{
-		$graph_stats_data = array();
-
-		for ($i = 0; $i < $until_next_few_days; $i++)
-		{ //showing by day start from 2 days ago until 2 days after
-			if ($i > 0)
-			{
-				$dt_start = $dt_start->addDay($i);
-			}
-
-			$dt_start	 = $dt_start->createFromTimestamp($dt_start->getTimestamp())->hour(0)->minute(0)->second(0);
-			$dt_end		 = $dt_start->createFromTimestamp($dt_start->getTimestamp())->hour(23)->minute(59)->second(59);
-
-			array_push($graph_stats_data, $this->_populateTodayActionStats($dt_start, $dt_end, $ids, $names, $index));
-		}
-
-		return $graph_stats_data;
 	}
 
 	function _setDefaultFunelPreferenceMetas($funel_preference_id, $non_default_action_ids)
@@ -549,6 +621,207 @@ class PanelController extends \App\Controllers\BaseController
 		);
 
 		return $overview_results;
+	}
+
+	function _getTotalByRangeType($range_type = "today", $start = null, $end = null)
+	{
+		$graph = array();
+		switch ($range_type)
+		{
+			case "today":
+				$tomorrow		 = new Carbon("tomorrow"); //tomorrow
+				$today			 = new Carbon("today"); //today
+				$end_of_today	 = $tomorrow->subSeconds(1); //today ending
+				$dt_start		 = $today->toDateTimeString();
+				$dt_end			 = $end_of_today->toDateTimeString();
+
+
+				break;
+
+			case "past_31_days":
+				for ($i = 30; $i >= 1; $i--)
+				{
+					if ($i > 1)
+					{
+						$yesterday	 = new Carbon(($i - 1) . " days ago"); //tomorrow
+						$today		 = new Carbon($i . " days ago"); //today
+					}
+					else
+					{
+						$yesterday	 = new Carbon("today"); //tomorrow
+						$today		 = new Carbon("yesterday"); //today
+					}
+					$dt_start	 = $today->createFromTimestamp($today->getTimestamp())->hour(0)->minute(0)->second(0);
+					$dt_end		 = $yesterday->createFromTimestamp($yesterday->getTimestamp())->hour(0)->minute(0)->second(0)->subSeconds(1);
+				}
+
+				break;
+
+			case "range":
+				$dt_start	 = new Carbon($start);
+				$dt_end		 = new Carbon($end);
+				break;
+
+			default:
+				break;
+		}
+
+		return $graph;
+	}
+
+	function getShowStats()
+	{
+		$today			 = new Carbon("today"); //today begining
+		$tomorrow		 = new Carbon("tomorrow"); //tomorrow
+		$end_of_today	 = $tomorrow->subSeconds(1); //today ending
+		$dt_start_range	 = $today->toDateTimeString();
+		$dt_end_range	 = $end_of_today->toDateTimeString();
+
+		/*
+		 * TODAY OVERALL, REGULAR AND RECOMMENDED STATS OF VIEW AND COMPLETE_PURCHASE / BUY
+		 */
+		$page_view_stats = $this->_getPageViewStats();
+
+		/*
+		 * ALRIGHT, IT SEEMS NOW IS POSSIBLE TO FETCH THE SALES AMOUNT! SINCE WE HAVE SOME SORT OF 'AWESOME' ACTION INSTANCE META KEY CALLED 'SUB_TOTAL' OF BUY ACTION
+		 * 
+		 * REMEMBER COMPLETE_PURCHASE EQUAL (=) or SAME (SAMA) TO BUY
+		 */
+		$sales_stats = $this->_getSalesStats();
+
+		/*
+		 * FUNNEL (IS NOT REALLY SOMETHING THAT WE CAN RELY ON NOW. BETTER FIX THE FLOW BEFORE COME OUT WITH THE RESULTS)
+		 * "YOU KNOW NOTHING, JOHN SNOW."
+		 * 
+		 * KBYE
+		 */
+		$funnel_actions				 = \App\Models\Action::where("site_id", $this->active_site_id)->whereIn("name", array("view", "add_to_cart", "complete_purchase"))->get()->toArray(); //limit 4 (first 4 are default actions)
+		$funnel_regular_stats		 = $this->_getActionStatsInfo($funnel_actions, $today, $end_of_today, false, false);
+		$funnel_recommended_stats	 = $this->_getActionStatsInfo($funnel_actions, $today, $end_of_today, true, false);
+
+		echo "<h3>Today Stats ({$dt_start_range} - {$dt_end_range})</h3>";
+		echo "Total Overall Page Views => " . $page_view_stats['overall']['view'];
+		echo "<br/>----<br/>";
+		echo "Total Regular Page Views => " . $page_view_stats['regular']['view'];
+		echo "<br/>----<br/>";
+		echo "Total Recommended Page Views => " . $page_view_stats['recommended']['view'];
+		echo "<br/>----<br/>";
+		echo "Total Overall Item Purchased => " . $page_view_stats['overall']['buy'];
+		echo "<br/>----<br/>";
+		echo "Total Regular Item Purchased => " . $page_view_stats['regular']['buy'];
+		echo "<br/>----<br/>";
+		echo "Total Recommended Item Purchased => " . $page_view_stats['recommended']['buy'];
+		echo "<br/>----<br/>";
+		echo "Total Sales ($) Overall Item Purchased => {$sales_stats['overall']}";
+		echo "<br/>----<br/>";
+		echo "Total Sales ($) Regular Item Purchased => " . ($sales_stats['regular']);
+		echo "<br/>----<br/>";
+		echo "Total Sales ($) Recommended Item Purchased => {$sales_stats['recommended']}";
+		echo "<br/>----";
+
+		die;
+	}
+
+	function _getSalesStats()
+	{
+		if (!isset($dt_start) && !isset($dt_end))
+		{
+			$dt_start	 = new Carbon("today"); //today begining
+			$dt_end		 = new Carbon("today"); //today ending
+			$dt_end		 = $dt_end->endOfDay();
+		}
+
+		$complete_purchase_action = \App\Models\Action::where("name", "buy")->where("site_id", $this->active_site_id)->get()->first();
+
+		$sales_stats['overall'] = \App\Models\Action::find($complete_purchase_action->id)
+						->action_instances_and_metas()
+						->where("action_instance_metas.key", "sub_total")
+						->whereBetween('created', [$dt_start, $dt_end])
+						->get(array("action_instances.id AS action_instance_id", "action_instance_metas.key", "action_instance_metas.value"))->sum('value');
+
+		$action_instance_ids = \App\Models\Action::find($complete_purchase_action->id)
+						->action_instances_and_metas()
+						->where("action_instance_metas.key", "rec")
+						->where("action_instance_metas.value", "true")
+						->whereBetween('created', [$dt_start, $dt_end])
+						->get(array("action_instances.id AS action_instance_id", "action_instance_metas.key", "action_instance_metas.value"))->lists("action_instance_id");
+
+		if (count($action_instance_ids) > 0)
+		{
+			$sales_stats['recommended'] = \App\Models\ActionInstanceMeta::whereIn("action_instance_id", $action_instance_ids)
+					->where("action_instance_metas.key", "sub_total")
+					->get()
+					->sum('value');
+		}
+		else
+			$sales_stats['recommended'] = 0;
+
+		$sales_stats['regular'] = $sales_stats['overall'] - $sales_stats['recommended'];
+
+		return $sales_stats;
+	}
+
+	function _getPageViewStats($dt_start = null, $dt_end = null)
+	{
+		if (!isset($dt_start) && !isset($dt_end))
+		{
+			$dt_start	 = new Carbon("today"); //today begining
+			$dt_end		 = new Carbon("today"); //today ending
+			$dt_end		 = $dt_end->endOfDay();
+		}
+
+		$view_action = \App\Models\Action::where("name", "view")->where("site_id", $this->active_site_id)->get()->first();
+
+		/*
+		 * TODAY OVERALL, REGULAR AND RECOMMENDED STATS OF VIEW AND COMPLETE_PURCHASE / BUY
+		 */
+		$page_view_stats['overall']		 = current($this->_populateDateRangeActionStats($dt_start, $dt_end, array($view_action->id), array($view_action->name), false, false, true, true));
+		$page_view_stats['recommended']	 = current($this->_populateDateRangeActionStats($dt_start, $dt_end, array($view_action->id), array($view_action->name), false, true, false, true));
+		$page_view_stats['regular']		 = current($this->_populateDateRangeActionStats($dt_start, $dt_end, array($view_action->id), array($view_action->name), false, false, false, true));
+
+		return $page_view_stats;
+	}
+
+	function _getDateRanges($n, $type_by)
+	{
+		$dt_ranges = array();
+		for ($i = $n; $i >= 1; $i--)
+		{
+			if ($type_by === "day")
+			{
+				$dt_end		 = new Carbon("{$i} {$type_by} ago");
+				$dt_start	 = new Carbon("{$i} {$type_by} ago");
+			}
+			else
+			{
+				$dt_end		 = new Carbon("{$i} {$type_by} ago");
+				$dt_start	 = new Carbon(($i + 1) . " {$type_by} ago");
+			}
+			array_push($dt_ranges, array("start" => $dt_start->startOfDay(), "end" => $dt_end->endOfDay()));
+		}
+
+		return $dt_ranges;
+	}
+
+	function _populateSalesStatsByRanges($dt_ranges)
+	{
+		$stats = array();
+		foreach ($dt_ranges as $range)
+		{
+			array_push($stats, array('start' => $range['start']->toDateTimeString(), 'end' => $range['end']->toDateTimeString(), 'stat' => $this->_getSalesStats($range['start'], $range['end'])));
+		}
+
+		return $stats;
+	}
+
+	function _populatePageViewStatsByRanges($dt_ranges)
+	{
+		$stats = array();
+		foreach ($dt_ranges as $range)
+		{
+			array_push($stats, array('start' => $range['start']->toDateTimeString(), 'end' => $range['end']->toDateTimeString(), 'stat' => $this->_getPageViewStats($range['start'], $range['end'])));
+		}
+		return $stats;
 	}
 
 }

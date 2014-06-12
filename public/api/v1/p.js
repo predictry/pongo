@@ -1,7 +1,7 @@
 var Predictry = (function() {
 
     var PREDICTRY_API_URL = "http://dashboard.predictry.com/api/v1/";
-    var placement_instance_id = null;
+    var widget_instance_id = null;
     var win = window;
 
     var PE_defaults = {
@@ -13,7 +13,7 @@ var Predictry = (function() {
     };
 
     var PE_options = {
-        placementId: null,
+        widgetId: null,
         platformVer: null,
         recoType: null
     };
@@ -28,9 +28,7 @@ var Predictry = (function() {
         reco_data = data = {};
         this.cart_id = getCartID();
 
-        PE_options.placementId = win.PE_placementId;
-        PE_options.platformVer = win.PE_platformVer;
-        PE_options.recoType = win.PE_recoType;
+        PE_options.widgetId = win.PE_widgetId;
         PE_defaults.session_id = this.getSessionID();
 
         compulsary_params = new Array("user_id", "action", "item_id", "session_id", "description");
@@ -42,7 +40,7 @@ var Predictry = (function() {
 
         var query_params = getQueryParams(document.location.search);
         if (query_params !== undefined && typeof query_params === 'object' && query_params.predictry_src !== undefined) {
-            placement_instance_id = query_params.predictry_src;
+            widget_instance_id = query_params.predictry_src;
         }
     }
 
@@ -56,7 +54,7 @@ var Predictry = (function() {
     {
         data = eExtend(data, PE_defaults);
 
-        if (placement_instance_id !== null)
+        if (widget_instance_id !== null)
         {
             if (data.action_properties !== undefined)
             {
@@ -158,7 +156,7 @@ var Predictry = (function() {
             //this is to set cart log, and set cart session
             if (response.status === 'success' && ready_data.action === 'add_to_cart')
             {
-                if (placement_instance_id !== null)
+                if (widget_instance_id !== null)
                 {
                     if (data.action_properties !== undefined)
                         data.action_properties.rec = true;
@@ -451,18 +449,18 @@ var Predictry = (function() {
     }
 
     /**
-     * Get Placement Instance ID
+     * Get Widget Instance ID
      */
-    function getPlacementInstance(placement_id, properties, rec_items) {
+    function getWidgetInstance(widget_id, properties, rec_items) {
 
         var data = {
-            placement_id: placement_id,
+            widget_id: widget_id,
             properties: properties,
             rec_items: rec_items,
             session: getSessionID()
         };
 
-        return makeJqueryAjaxCall("POST", PREDICTRY_API_URL + "placement?", data);
+        return makeJqueryAjaxCall("POST", PREDICTRY_API_URL + "widget?", data);
     }
 
     /**
@@ -747,7 +745,7 @@ var Predictry = (function() {
         drawGrid: drawListGridRecommendation,
         drawList: drawTextListRecommendation,
         clone: clone,
-        placement_instance_id: placement_instance_id,
+        widget_instance_id: widget_instance_id,
         cart_id: cart_id
     };
 
