@@ -19,6 +19,7 @@
  */
 Route::pattern('token', '[A-Za-z0-9]+');
 Route::pattern('type', '[A-Za-z0-9_]+');
+Route::pattern('bar_type', '[A-Za-z0-9]+');
 Route::pattern('type_by', '[A-Za-z0-9]+');
 Route::pattern('selected_comparison', '[A-Za-z0-9]+');
 Route::pattern('dt_start', '^([0-9]{4})-([0-9]{2})-([0-9]{2})$');
@@ -67,7 +68,8 @@ Route::group(array('domain' => 'dashboard.' . $tld, 'before' => 'auth', 'namespa
 
 	Route::get('user', 'UserController@getDashboard');
 	Route::get('home', array('as' => 'home', 'uses' => 'PanelController@index'));
-	Route::get('home2/{type?}/{type_by?}/{selected_comparison?}/{dt_start?}/{dt_end?}', array('as' => 'home2', 'uses' => 'PanelController@index2'));
+//	Route::get('home2/{selected_comparison?}/{type?}/{bar_type?}/{type_by?}/{dt_start?}/{dt_end?}', array('as' => 'home2', 'uses' => 'PanelController@index2'));
+	Route::get('home2/{selected_comparison?}/{type?}/{type_by?}/{dt_start?}/{dt_end?}', array('as' => 'home2', 'uses' => 'PanelController@index2'));
 	Route::get('sites/wizard', array('as' => 'sites', 'uses' => 'SitesController@getSiteWizard'));
 	Route::get('sites/getModal', array('as' => 'sites', 'uses' => 'SitesController@getModalCreate'));
 	Route::post('sites/ajaxSubmitSite', array('as' => 'sites', 'uses' => 'SitesController@postCreate'));

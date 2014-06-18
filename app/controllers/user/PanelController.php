@@ -106,10 +106,13 @@ class PanelController extends \App\Controllers\BaseController
 	 *
 	 * @return Response
 	 */
-	public function index2($type = "31_d_ago", $type_by = "day", $dt_start = null, $dt_end = null, $selected_comparison = "sales")
+//	public function index2($selected_comparison = "sales", $type = "31_d_ago", $bar_type = 'stacked', $type_by = "day", $dt_start = null, $dt_end = null)
+	public function index2($selected_comparison = "sales", $type = "31_d_ago", $type_by = "day", $dt_start = null, $dt_end = null)
 	{
+
 		$inputs = array(
 			"type"					 => $type,
+//			"bar_type"				 => $bar_type,
 			"type_by"				 => $type_by,
 			"dt_start"				 => $dt_start,
 			"dt_end"				 => $dt_end,
@@ -121,47 +124,156 @@ class PanelController extends \App\Controllers\BaseController
 			$inputs["dt_end"]	 = isset($dt_end) ? new Carbon($dt_end) : new Carbon('today');
 		}
 
+		$today			 = new Carbon('today');
+		$end_of_today	 = $today->endOfDay();
+
 		switch ($type)
 		{
 			case "range":
 				break;
 
 			case "36_w_ago":
-				$n		 = 36;
-				$type_by = "week";
+				$type_by			 = ($type_by === "month") ? $type_by : "week";
+				$n					 = ($type_by === "month") ? (36 / 4) : 36;
+				$average_cart_items	 = $this->_getAverageOfCart(new Carbon("36 weeks ago"), $end_of_today);
 				break;
 
 			case "12_m_ago":
-				$n		 = 12;
-				$type_by = "month";
+				$n					 = 12;
+				$type_by			 = "month";
+				$average_cart_items	 = $this->_getAverageOfCart(new Carbon("12 months ago"), $end_of_today);
 				break;
 
 			case "31_d_ago":
 			default:
+				$type	 = "31_d_ago";
 				$n		 = 31;
-				$type_by = "day";
+
+				$type_by = ($type_by === "week" || $type_by === "month") ? $type_by : "day";
+
+				if ($type_by === "week")
+					$n = (31 / 7);
+
+				if ($type_by === "month")
+					$n = (31 / 30);
+
+				$average_cart_items = $this->_getAverageOfCart(new Carbon("31 days ago"), $end_of_today);
 				break;
 		}
 
-		$dt_ranges			 = $this->_getDateRanges($n, $type_by);
-		$sales_stats		 = $this->_populateSalesStatsByRanges($dt_ranges);
-		$page_views_stats	 = $this->_populatePageViewStatsByRanges($dt_ranges);
+		$dt_ranges = $this->_getDateRanges($n, $type_by);
 
-		echo '<pre>';
-		print_r($page_views_stats);
-		echo "<br/>----<br/>";
-		print_r($sales_stats);
-		echo "<br/>----<br/>";
-		echo '</pre>';
-		die;
+		$dt_begining = current($dt_ranges);
+		$dt_over	 = end($dt_ranges);
 
-		$output = array(
-			"bar_stats"	 => array(),
-			"pie_stats"	 => array("total_sales" => 0, "regular_sales" => 0, "recommended_sales" => 0),
-			"pageTitle"	 => "dashboard"
+
+		if ($selected_comparison === "sales")
+			$stats	 = $this->_populateSalesStatsByRanges($dt_ranges);
+		else
+			$stats	 = $this->_populatePageViewStatsByRanges($dt_ranges);
+
+		$graph_data			 = array();
+		$total_overall		 = 0;
+		$total_recommended	 = 0;
+
+		$stat_values = array();
+
+		$highchart_categories	 = array();
+		$highchart_series		 = array(
+			array('name' => 'Recommended', 'data' => array()),
+			array('name' => 'Regular', 'data' => array())
 		);
 
-		return \View::make('frontend.panels.dashboard', $output);
+		foreach ($stats as $stat)
+		{
+			if ($type_by === "day")
+				$xlabel	 = ($stat['start']->format('M. d'));
+			else
+				$xlabel	 = ($stat['start']->format('M. d')) . '-' . ($stat['end']->format('M. d'));
+
+			$total_overall += $stat['stat']['overall'];
+			$total_recommended += $stat['stat']['recommended'];
+
+			array_push($graph_data, array('y' => $xlabel, 'a' => $stat['stat']['regular'], 'b' => $stat['stat']['recommended']));
+			array_push($stat_values, $stat['stat']['regular']);
+			array_push($stat_values, $stat['stat']['recommended']);
+			array_push($highchart_categories, $xlabel);
+			array_push($highchart_series[0]['data'], $stat['stat']['recommended']);
+			array_push($highchart_series[1]['data'], $stat['stat']['regular']);
+		}
+
+//		$bar_type	 = isset($bar_type) && ($bar_type === "stacked" || $bar_type === 'grouped') ? $bar_type : "stacked";
+//		$bar_type	 = ($bar_type === "stacked") ? "true" : "false";
+
+		if ($selected_comparison === "sales")
+		{
+			$graph_labels		 = array('Regular ($)', 'Recommended ($)');
+			$highchart_pie_data	 = array(
+				array(ucwords("regular " . $selected_comparison . "($)"), ($total_overall - $total_recommended)),
+				array(ucwords("recommended " . $selected_comparison . "($)"), $total_recommended)
+			);
+		}
+		else
+		{
+			$graph_labels		 = array('Regular', 'Recommended');
+			$highchart_pie_data	 = array(
+				array(ucwords("regular " . $selected_comparison), ($total_overall - $total_recommended)),
+				array(ucwords("recommended " . $selected_comparison), $total_recommended)
+			);
+		}
+
+
+		$average_recommended_items_pie_data = array(
+			array("label" => "Recommended Cart Items", "value" => $average_cart_items['average_recommended_qty_items']),
+			array("label" => "Regular Cart Items", "value" => $average_cart_items['average_regular_qty_items'])
+		);
+
+		$average_recommended_items_highchart_pie_data = array(
+			array("Recommended Cart Items", $average_cart_items['average_recommended_qty_items'] * 1),
+			array("Regular Cart Items", $average_cart_items['average_regular_qty_items'] * 1)
+		);
+
+		if ($selected_comparison !== "sales")
+		{
+			$graph_title			 = $comparison_list[]		 = "Total Regular Page Views VS Page Views from Recommended Items";
+			$comparison_list[]		 = "Total Regular Sales VS Sales from Recommended Items";
+			$comparison_type_by[]	 = "pageviews";
+			$comparison_type_by[]	 = "sales";
+		}
+		else
+		{
+			$graph_title			 = $comparison_list[]		 = "Total Regular Sales VS Sales from Recommended Items";
+			$comparison_list[]		 = "Total Regular Page Views VS Page Views from Recommended Items";
+			$comparison_type_by[]	 = "sales";
+			$comparison_type_by[]	 = "pageviews";
+		}
+
+		$output = array(
+			"pageTitle"											 => "dashboard",
+			"type"												 => $type,
+			"type_by"											 => $type_by,
+			"bar_type"											 => true,
+			"comparison_list"									 => $comparison_list,
+			"comparison_type_by"								 => $comparison_type_by,
+			"selected_comparison"								 => $selected_comparison,
+			"total_overall"										 => $total_overall,
+			"total_regular"										 => ($total_overall - $total_recommended),
+			"total_recommended"									 => $total_recommended,
+			"js_graph_labels"									 => json_encode($graph_labels),
+			'js_graph_comparison_data'							 => json_encode($graph_data),
+			'js_highchart_pie_data'								 => json_encode($highchart_pie_data),
+			'js_donut_average_recommended_items_data'			 => json_encode($average_recommended_items_pie_data),
+			'js_highchart_categories_data'						 => json_encode($highchart_categories),
+			'js_highchart_series_data'							 => json_encode($highchart_series),
+			'js_average_recommended_items_highchart_pie_data'	 => json_encode($average_recommended_items_highchart_pie_data),
+			'js_graph_title'									 => $graph_title,
+			"average_cart_items"								 => $average_cart_items,
+			"ymax"												 => max($stat_values),
+			"dt_begining"										 => $dt_begining['start']->startOfDay()->format('d M Y'),
+			"dt_over"											 => $dt_over['end']->endOfday()->format('d M Y')
+		);
+
+		return \View::make('frontend.panels.dashboard2', $output);
 	}
 
 	function _getActionStatsInfo($site_actions, $dt_start, $dt_end, $is_recommended = false, $all = true)
@@ -722,7 +834,7 @@ class PanelController extends \App\Controllers\BaseController
 		die;
 	}
 
-	function _getSalesStats()
+	function _getSalesStats($dt_start = null, $dt_end = null)
 	{
 		if (!isset($dt_start) && !isset($dt_end))
 		{
@@ -784,22 +896,25 @@ class PanelController extends \App\Controllers\BaseController
 
 	function _getDateRanges($n, $type_by)
 	{
-		$dt_ranges = array();
-		for ($i = $n; $i >= 1; $i--)
+		$n			 = floor($n);
+		$dt_ranges	 = array();
+		for ($i = $n - 1; $i >= 0; $i--)
 		{
-			if ($type_by === "day")
+			$dt_end = new Carbon("{$i} {$type_by} ago");
+			if ($type_by === "day" || $type_by === "week")
 			{
-				$dt_end		 = new Carbon("{$i} {$type_by} ago");
-				$dt_start	 = new Carbon("{$i} {$type_by} ago");
+				if ($type_by === "week")
+					$dt_start	 = new Carbon(($i + 1) . " {$type_by} ago");
+				else
+					$dt_start	 = new Carbon("{$i} {$type_by} ago");
+				array_push($dt_ranges, array("start" => $dt_start->startOfDay(), "end" => $dt_end->endOfDay()));
 			}
 			else
 			{
-				$dt_end		 = new Carbon("{$i} {$type_by} ago");
-				$dt_start	 = new Carbon(($i + 1) . " {$type_by} ago");
+				$dt_start = new Carbon(($i + 1) . " {$type_by} ago");
+				array_push($dt_ranges, array("start" => $dt_start->firstOfMonth(), "end" => $dt_end->endOfMonth()));
 			}
-			array_push($dt_ranges, array("start" => $dt_start->startOfDay(), "end" => $dt_end->endOfDay()));
 		}
-
 		return $dt_ranges;
 	}
 
@@ -808,7 +923,9 @@ class PanelController extends \App\Controllers\BaseController
 		$stats = array();
 		foreach ($dt_ranges as $range)
 		{
-			array_push($stats, array('start' => $range['start']->toDateTimeString(), 'end' => $range['end']->toDateTimeString(), 'stat' => $this->_getSalesStats($range['start'], $range['end'])));
+			$start	 = $range['start'];
+			$end	 = $range['end'];
+			array_push($stats, array('start' => $start, 'end' => $end, 'stat' => $this->_getSalesStats($range['start'], $range['end'])));
 		}
 
 		return $stats;
@@ -819,9 +936,157 @@ class PanelController extends \App\Controllers\BaseController
 		$stats = array();
 		foreach ($dt_ranges as $range)
 		{
-			array_push($stats, array('start' => $range['start']->toDateTimeString(), 'end' => $range['end']->toDateTimeString(), 'stat' => $this->_getPageViewStats($range['start'], $range['end'])));
+			$start	 = $range['start'];
+			$end	 = $range['end'];
+			array_push($stats, array('start' => $start, 'end' => $end, 'stat' => $this->_getPageViewStats($range['start'], $range['end'])));
 		}
+
 		return $stats;
+	}
+
+	function _getAverageOfCart($dt_start = null, $dt_end = null)
+	{
+		if (!isset($dt_start) && !isset($dt_end))
+		{
+			$dt_start	 = new Carbon("today"); //today begining
+			$dt_end		 = new Carbon("today"); //today ending
+			$dt_end		 = $dt_end->endOfDay();
+		}
+
+		$complete_purchase_action = \App\Models\Action::where("name", "buy")->where("site_id", $this->active_site_id)->get()->first();
+
+		$action_instance_ids = \App\Models\Action::find($complete_purchase_action->id)
+						->action_instances()
+						->whereBetween('created', [$dt_start, $dt_end])
+						->get(array("action_instances.id AS action_instance_id"))->lists("action_instance_id");
+
+		$cart_ids = array_unique(\App\Models\ActionInstanceMeta::whereIn("action_instance_id", $action_instance_ids)
+						->where("action_instance_metas.key", "cart_id")
+						->get(array("action_instance_metas.value AS value"))->lists("value"));
+
+		$recommended_action_instance_metas = \App\Models\Action::find($complete_purchase_action->id)
+						->action_instances_and_metas()
+						->where("action_instance_metas.key", "rec")
+						->where("action_instance_metas.value", "true")
+						->whereBetween('created', [$dt_start, $dt_end])
+						->get(array("action_instances.id AS action_instance_id", "action_instance_metas.key", "action_instance_metas.value"))->lists("action_instance_id");
+
+		$regular_action_instance_metas = array_diff($action_instance_ids, $recommended_action_instance_metas);
+
+		if (count($recommended_action_instance_metas) > 0)
+		{
+			$sum_recommended_qty = \App\Models\ActionInstanceMeta::whereIn("action_instance_id", $recommended_action_instance_metas)
+					->where("action_instance_metas.key", "qty")
+					->get()
+					->sum('value');
+		}
+
+		if (count($regular_action_instance_metas) > 0)
+		{
+			$sum_regular_qty = \App\Models\ActionInstanceMeta::whereIn("action_instance_id", $regular_action_instance_metas)
+					->where("action_instance_metas.key", "qty")
+					->get()
+					->sum('value');
+		}
+
+
+		$average_recommended_qty_items	 = ($sum_recommended_qty) / count($cart_ids);
+		$average_regular_qty_items		 = ($sum_regular_qty) / count($cart_ids);
+
+		return array(
+			'total_carts'					 => count($cart_ids),
+			'sum_recommended_qty'			 => $sum_recommended_qty,
+			'average_recommended_qty_items'	 => number_format($average_recommended_qty_items, 2),
+			'sum_regular_qty'				 => $sum_regular_qty,
+			'average_regular_qty_items'		 => number_format($average_regular_qty_items, 2),
+		);
+
+//		echo '<pre>';
+//		print_r($cart_ids);
+//		echo "<br/>----<br/>";
+//		print_r($sum_recommended_qty);
+//		echo "<br/>----<br/>";
+//		print_r($average_recommended_qty_items);
+//		echo "<br/>----<br/>";
+//		print_r($sum_regular_qty);
+//		echo "<br/>----<br/>";
+//		print_r($average_regular_qty_items);
+//		echo "<br/>----<br/>";
+//		echo '</pre>';
+//		die;
+
+		/**
+		 * DETAIL OF RECOMMENDED & REGULAR INSIDE CART
+		 */
+//		if (count($regular_action_instance_metas) > 0)
+//		{
+//			$regular_qtys = \App\Models\ActionInstanceMeta::whereIn("action_instance_id", $regular_action_instance_metas)
+//							->where("action_instance_metas.key", "qty")
+//							->get(array("action_instance_metas.value AS value"))->lists("value");
+//		}
+//
+//		if (count($recommended_action_instance_metas) > 0)
+//		{
+//			$recommended_qtys = \App\Models\ActionInstanceMeta::whereIn("action_instance_id", $recommended_action_instance_metas)
+//							->where("action_instance_metas.key", "qty")
+//							->get(array("action_instance_metas.value AS value"))->lists("value");
+//		}
+//		if (count($cart_ids) > 0)
+//		{
+//			foreach ($cart_ids as $cart_id)
+//			{
+//				$cart[] = array(
+//					'cart_id'				 => $cart_id,
+//					'action_instance_ids'	 => \App\Models\ActionInstanceMeta::where("action_instance_metas.key", "cart_id")
+//							->where("action_instance_metas.value", $cart_id)
+//							->get(array("action_instance_metas.id AS action_instance_meta_id", "action_instance_id"))->lists("action_instance_id", "action_instance_meta_id")
+//				);
+//			}
+//
+//			for ($i = 0; $i < count($cart); $i++)
+//			{
+//				$c = $cart[$i];
+//
+//				$c['regular_qty']		 = $c['recommended_qty']	 = array();
+//
+//				foreach ($c['action_instance_ids'] as $key => $val)
+//				{
+//					if (in_array($val, $recommended_action_instance_metas))
+//					{
+//						$qty = \App\Models\ActionInstanceMeta::where("action_instance_id", $val)
+//										->where("key", "qty")
+//										->get()->first();
+//
+//						$sub_total = \App\Models\ActionInstanceMeta::where("action_instance_id", $val)
+//										->where("key", "sub_total")
+//										->get()->first();
+//
+//						if ($qty)
+//						{
+//							$c['recommended_qty'][$val]			 = $qty->value;
+//							$c['recommended_sub_total'][$val]	 = $sub_total->value;
+//						}
+//					}
+//					else
+//					{
+//						$qty = \App\Models\ActionInstanceMeta::where("action_instance_id", $val)
+//										->where("key", "qty")
+//										->get()->first();
+//
+//						$sub_total = \App\Models\ActionInstanceMeta::where("action_instance_id", $val)
+//										->where("key", "sub_total")
+//										->get()->first();
+//						if ($qty)
+//						{
+//							$c['regular_qty'][$val]			 = $qty->value;
+//							$c['regular_sub_total'][$val]	 = $sub_total->value;
+//						}
+//					}
+//				}
+//
+//				$cart[$i] = $c;
+//			}
+//		}
 	}
 
 }

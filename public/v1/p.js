@@ -1,6 +1,6 @@
 var Predictry = (function() {
 
-    var PREDICTRY_API_URL = "http://dashboard.predictry.com/api/v1/";
+    var PREDICTRY_API_URL = "http://dashboard.predictry.dev/api/v1/";
     var widget_instance_id = null;
     var win = window;
 
@@ -29,6 +29,8 @@ var Predictry = (function() {
         this.cart_id = getCartID();
 
         PE_options.widgetId = win.PE_widgetId;
+        PE_options.platformVer = win.PE_platformVer;
+        PE_options.recoType = win.PE_recoType;
         PE_defaults.session_id = this.getSessionID();
 
         compulsary_params = new Array("user_id", "action", "item_id", "session_id", "description");

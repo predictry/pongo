@@ -7,7 +7,7 @@
 	@include('frontend.panels.dashboard.overviewsummary')	
 
 	<div class="row">
- 		<div class="col-sm-6">
+		<div class="col-sm-6">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					Tracking Stats
@@ -47,6 +47,7 @@
 				</div>
 			</div>
 		</div>
+
 	</div>
 	@include('frontend.panels.dashboard.trendssumary')	
 

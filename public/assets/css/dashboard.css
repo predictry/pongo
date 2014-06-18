@@ -187,6 +187,13 @@ body {
 }
 
 
+/* Graph
+================================================== */
+#comparisonDonut, #averageRecommendedItemsDonut
+{
+    height: 300px;
+}
+
 /* Placeholder Dashboard
 ================================================== */
 .placeholders {

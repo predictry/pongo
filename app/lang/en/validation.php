@@ -77,7 +77,7 @@ return array(
 	  | specify a specific custom language line for a given attribute rule.
 	  |
 	 */
-	'custom' => array(),
+	'custom'			 => array(),
 	/*
 	  |--------------------------------------------------------------------------
 	  | Custom Validation Attributes
@@ -88,5 +88,5 @@ return array(
 	  | of "email". This simply helps us make messages a little cleaner.
 	  |
 	 */
-	'attributes' => array(),
+	'attributes'		 => array(),
 );

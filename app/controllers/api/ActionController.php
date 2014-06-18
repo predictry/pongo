@@ -160,7 +160,7 @@ class ActionController extends \App\Controllers\ApiBaseController
 		);
 
 //		$this->_callEngine($call_action_data, $this->site['tenant_engine_url'], 'loke_engine');
-		$this->_callEngine($call_action_data, EASYREC_RESTAPI_URL);
+//		$this->_callEngine($call_action_data, EASYREC_RESTAPI_URL);
 
 		return true;
 	}
@@ -398,9 +398,8 @@ class ActionController extends \App\Controllers\ApiBaseController
 			}
 		}
 
-//		$response = $this->curl->_simple_call("get", $engine_url, $new_action_data);
-//		return $response;
-		return true;
+		$response = $this->curl->_simple_call("get", $engine_url, $new_action_data);
+		return $response;
 	}
 
 }

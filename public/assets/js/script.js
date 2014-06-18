@@ -25,6 +25,70 @@ jQuery(document).ready(function() {
         });
     }
 
+//    if (typeof graph_comparison_data !== 'undefined')
+//    {
+//        new Morris.Bar({
+//            element: 'comparisonGraph',
+//            data: graph_comparison_data,
+//            xkey: comparison_graph_x_keys,
+//            ykeys: comparison_graph_y_keys,
+//            stacked: bar_type,
+//            ymax: y_max,
+//            labels: comparison_labels,
+//            hideHover: true
+//        });
+//    }
+
+    if (typeof highchart_pie_data !== 'undefined')
+    {
+        getGraphPieComparison(highchart_pie_data);
+    }
+
+    if (typeof donut_average_recommended_items_data !== 'undefined')
+    {
+        new Morris.Donut({
+            element: 'averageRecommendedItemsDonut',
+            data: donut_average_recommended_items_data,
+            colors: ["#005dff", "#afafaf"]
+        }).select(0);
+    }
+
+    if (typeof highchart_series_data !== 'undefined')
+    {
+        getGraphBarComparison();
+
+        $('div#graph_type.btn-group .btn').click(function() {
+            $(this).find('input:radio').attr('checked', true);
+            var type = $(this).find('input[name=options]').val();
+
+            $('.options_graph_style').each(function() {
+                if ($(this).val() !== type)
+                    $(this).attr('checked', false);
+            });
+
+            if (type === "bar")
+            {
+                getGraphBarComparison();
+            }
+            else {
+                getGraphLineComparison();
+            }
+
+            return;
+        });
+
+    }
+
+
+    $('div#range-type.btn-group ul.dropdown-menu li a').click(function(e) {
+        var $div = $(this).parent().parent().parent();
+        var $btn = $div.find('button');
+        $btn.html($(this).text() + ' <span class="caret"></span>');
+        $div.removeClass('open');
+//        e.preventDefault();
+//        return false;
+    });
+
     $('a.btnViewModal').on('click', function(e) {
         var target_modal = $(e.currentTarget).data('target');
         var remote_content = e.currentTarget.href;
@@ -231,6 +295,157 @@ var excludeOptionIDs = new Array();
 var indexes = new Array();
 
 indexes.push(1);
+
+/**
+ * Load Bar Graph of Comparison
+ */
+function getGraphBarComparison() {
+    $("#highChartComparisonGraph").highcharts({
+        title: {
+            text: graph_title,
+            x: -20, //center
+            y: 5
+        },
+        chart: {
+            type: 'column'
+        },
+        xAxis: {
+            categories: highchart_categories_data
+        },
+        yAxis: {
+            min: 0,
+            stackLabels: {
+                enabled: true,
+                style: {
+                    fontWeight: 'bold',
+                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                }
+            }
+        },
+        legend: {
+            align: 'right',
+            x: -70,
+            verticalAlign: 'top',
+            y: 20,
+            floating: true,
+            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+            borderColor: '#CCC',
+            borderWidth: 1,
+            shadow: false
+        },
+        tooltip: {
+            formatter: function() {
+                return '<b>' + this.x + '</b><br/>' +
+                        this.series.name + ': ' + this.y + '<br/>' +
+                        'Total: ' + this.point.stackTotal;
+            }
+        },
+        plotOptions: {
+            column: {
+                stacking: 'normal',
+                dataLabels: {
+                    enabled: true,
+                    color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                    style: {
+                        textShadow: '0 0 3px black, 0 0 3px black'
+                    }
+                }
+            }
+        },
+        series: highchart_series_data,
+        credits: {
+            enabled: false
+        }
+    });
+}
+
+/**
+ * get graph line comparison
+ */
+function getGraphLineComparison() {
+    $('#highChartComparisonGraph').highcharts({
+        title: {
+            text: graph_title,
+            x: -20, //center
+            y: 5
+        },
+        xAxis: {
+            categories: highchart_categories_data
+        },
+        yAxis: {
+            plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+        },
+        legend: {
+            align: 'right',
+            x: -70,
+            verticalAlign: 'top',
+            y: 20,
+            floating: true,
+            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+            borderColor: '#CCC',
+            borderWidth: 1,
+            shadow: false
+        },
+        series: highchart_series_data,
+        credits: {
+            enabled: false
+        }
+    });
+}
+
+/**
+ * get pie chart
+ */
+function getGraphPieComparison(chart_data) {
+    $('#comparisonDonut').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false
+        },
+        title: {
+            text: graph_title,
+            style: 'font-size:14px;'
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.y}</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: false,
+                    format: '<b>{point.name}</b>: {y:.1f}',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                },
+                showInLegend: true
+            }
+        },
+        series: [{
+                type: 'pie',
+                name: 'Total',
+                data: chart_data
+            }],
+        legend: {
+            x: 0,
+            y: -10,
+            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+            borderColor: '#CCC',
+            borderWidth: 1,
+            shadow: false
+        },
+        credits: {
+            enabled: false
+        }
+    });
+}
 
 function gatherSelectedOption(name)
 {
