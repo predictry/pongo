@@ -61,7 +61,7 @@ class ItemsController extends \App\Controllers\BaseController
 	public function getEdit($id)
 	{
 		$item		 = \App\Models\Item::find($id);
-		$item_metas	 = \App\Models\Itemmeta::where("item_id", $id)->get();
+		$item_metas	 = \App\Models\ItemMeta::where("item_id", $id)->get();
 
 		if ($item_metas)
 		{

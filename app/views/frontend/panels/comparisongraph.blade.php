@@ -25,10 +25,24 @@
 						var highchart_categories_data = {{ $js_highchart_categories_data }};
 						var highchart_series_data = {{ $js_highchart_series_data }};
 						var graph_title = "{{ $js_graph_title }}";
+						var type = "{{ $type }}";
+						var selected_comparison = "{{ $selected_comparison }}";
+						var type_by = "{{ $type_by }}";
 			</script>
 			<!--<div id="comparisonGraph" style="height: 250px;"></div>-->
 			<div id="highChartComparisonGraph"></div>
-
+		</div>
+	</div>
+	<div class="panel panel-default">
+		<div class="row panel-body">
+			<div class="col-sm-6">
+				<div id="comparisonDonut" style="min-width: 350px; height: 350px; max-width: 350px; margin: 0 auto"></div>
+			</div>
+			<div class="col-sm-6">
+				<h4>{{ ($selected_comparison === 'sales') ? '$ ' : '' }}{{ $total_overall }} Total {{ ucwords($selected_comparison) }}</h4>
+				<h5>{{ ($selected_comparison === 'sales') ? '$ ' : '' }}{{ $total_regular }} Total Regular {{ ucwords($selected_comparison) }}</h5>
+				<h5>{{ ($selected_comparison === 'sales') ? '$ ' : '' }}{{ $total_recommended }} Total Recommended {{ ucwords($selected_comparison) }}</h5>
+			</div>
 		</div>
 	</div>
 </div>

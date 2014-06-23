@@ -10,7 +10,7 @@
 
 namespace App\Models;
 
-class Itemmeta extends \Eloquent
+class ItemMeta extends \Eloquent
 {
 
 	/**

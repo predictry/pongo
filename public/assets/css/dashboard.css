@@ -186,6 +186,9 @@ body {
     color: #FFF;
 }
 
+.btnApplyRange, .btnCancelRange{
+    width: 46%;
+}
 
 /* Graph
 ================================================== */

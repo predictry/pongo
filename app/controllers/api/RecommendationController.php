@@ -191,7 +191,7 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 	function _getRecoItemProperties($item)
 	{
 		$item_properties = array();
-		$item_metas		 = \App\Models\Itemmeta::where("item_id", $item->id)->get();
+		$item_metas		 = \App\Models\ItemMeta::where("item_id", $item->id)->get();
 		if ($item_metas)
 		{
 			foreach ($item_metas as $item_meta)
@@ -238,7 +238,7 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 	function _isAllowedBasedOnPropertiesFilter($item)
 	{
 		$widget_filters	 = \App\Models\WidgetFilter::where("widget_id", $this->widget_id)->get()->first();
-		$item_metas		 = \App\Models\Itemmeta::where("item_id", $item->id)->get()->lists("value", "key");
+		$item_metas		 = \App\Models\ItemMeta::where("item_id", $item->id)->get()->lists("value", "key");
 		$bool			 = true;
 
 		if (!(is_array($item_metas) && count($item_metas) > 0))

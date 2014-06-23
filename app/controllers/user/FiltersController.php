@@ -83,7 +83,7 @@ class FiltersController extends \App\Controllers\BaseController
 		}
 
 		$item_ids	 = \App\Models\Item::where("site_id", $this->active_site_id)->get()->lists("id");
-		$properties	 = \App\Models\Itemmeta::whereIn("item_id", $item_ids)->distinct("key")->lists("key", "key");
+		$properties	 = \App\Models\ItemMeta::whereIn("item_id", $item_ids)->distinct("key")->lists("key", "key");
 
 		$custom_script = "<script type='text/javascript'>";
 		$custom_script .= "var site_url = '" . \URL::to('/') . "';";
@@ -147,7 +147,7 @@ class FiltersController extends \App\Controllers\BaseController
 		$index_item = \Input::get("index");
 
 		$item_ids	 = \App\Models\Item::where("site_id", $this->active_site_id)->get()->lists("id");
-		$properties	 = \App\Models\Itemmeta::whereIn("item_id", $item_ids)->distinct("key")->lists("key", "key");
+		$properties	 = \App\Models\ItemMeta::whereIn("item_id", $item_ids)->distinct("key")->lists("key", "key");
 
 		return \Response::json(
 						array("status"	 => "success",
@@ -196,7 +196,7 @@ class FiltersController extends \App\Controllers\BaseController
 		$index_item	 = \Input::get("index");
 
 		$item_ids	 = \App\Models\Item::where("site_id", $this->active_site_id)->get()->lists("id");
-		$properties	 = \App\Models\Itemmeta::whereIn("item_id", $item_ids)->distinct("key")->lists("key", "key");
+		$properties	 = \App\Models\ItemMeta::whereIn("item_id", $item_ids)->distinct("key")->lists("key", "key");
 
 		$custom_script = "<script type='text/javascript'>";
 		$custom_script .= "var site_url = '" . \URL::to('/') . "';";

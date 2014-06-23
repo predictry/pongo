@@ -3,7 +3,7 @@
 /**
  * Author       : Rifki Yandhi
  * Date Created : Apr 7, 2014 4:58:12 PM
- * File         : app/models/Item.php
+ * File         : app/models/ItemMeta.php
  * Copyright    : rifkiyandhi@gmail.com
  * Function     : 
  */
@@ -30,6 +30,11 @@ class Item extends \Eloquent
 //		"created_at" => "Date Created",
 //		"active"	 => "Activated"
 	);
+
+	public function item_metas()
+	{
+		return $this->hasMany("App\Models\ItemMeta");
+	}
 
 }
 

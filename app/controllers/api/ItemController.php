@@ -45,7 +45,7 @@ class ItemController extends \App\Controllers\ApiBaseController
 
 				$properties_keys = array_keys($properties);
 
-				$item_metas = \App\Models\Itemmeta::where("item_id", $item->id)->get();
+				$item_metas = \App\Models\ItemMeta::where("item_id", $item->id)->get();
 				foreach ($item_metas as $meta)
 				{
 					if (in_array($meta->key, $properties_keys))
@@ -67,7 +67,7 @@ class ItemController extends \App\Controllers\ApiBaseController
 				{//means have new additional properties
 					foreach ($properties_keys as $key)
 					{
-						$item_meta			 = new \App\Models\Itemmeta();
+						$item_meta			 = new \App\Models\ItemMeta();
 						$item_meta->key		 = $key;
 						$item_meta->value	 = $properties[$key];
 						$item_meta->item_id	 = $item->id;

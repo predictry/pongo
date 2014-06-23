@@ -41,17 +41,31 @@ jQuery(document).ready(function() {
 
     if (typeof highchart_pie_data !== 'undefined')
     {
-        getGraphPieComparison(highchart_pie_data);
+        getGraphPie("comparisonDonut", graph_title, highchart_pie_data);
     }
 
-    if (typeof donut_average_recommended_items_data !== 'undefined')
+    if (typeof highchart_ctr_data !== 'undefined')
     {
-        new Morris.Donut({
-            element: 'averageRecommendedItemsDonut',
-            data: donut_average_recommended_items_data,
-            colors: ["#005dff", "#afafaf"]
-        }).select(0);
+        getGraphPieWithText("ctrDonut", "Click Through Rate (CTR) on Recommendations", highchart_ctr_data);
     }
+
+    if (typeof highchart_average_recommended_items_data !== 'undefined')
+    {
+        getGraphPie("averageRecommendedItemsDonut", "Average Cart Items with Recommended Items", highchart_average_recommended_items_data);
+    }
+    if (typeof highchart_average_recommended_sales_data !== 'undefined')
+    {
+        getGraphPie("averageRecommendedSalesDonut", "Average Cart Value with Recommended Items", highchart_average_recommended_sales_data);
+    }
+
+//    if (typeof donut_average_recommended_items_data !== 'undefined')
+//    {
+//        new Morris.Donut({
+//            element: 'averageRecommendedItemsDonut',
+//            data: donut_average_recommended_items_data,
+//            colors: ["#005dff", "#afafaf"]
+//        }).select(0);
+//    }
 
     if (typeof highchart_series_data !== 'undefined')
     {
@@ -287,6 +301,30 @@ jQuery(document).ready(function() {
 
         return;
     });
+
+    $('#reportrange').daterangepicker({
+        ranges: {
+            '31 Days Ago': [moment().subtract('days', 31), moment()],
+            '36 Weeks Ago': [moment().subtract('weeks', 36), moment()],
+            '12 Months Ago': [moment().subtract('months', 12), moment()]
+        },
+        startDate: moment().subtract('days', 31),
+        endDate: moment(),
+        maxDate: moment(),
+        applyClass: 'btnApplyRange btn btn-primary btn-sm',
+        cancelClass: 'btnCancelRange btn btn-default btn-sm pull-right'
+    },
+    function(start, end) {
+        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+    });
+
+    $('#reportrange').on('apply.daterangepicker', function(ev, picker) {
+        console.log(picker.startDate.format('YYYY-MM-DD'));
+        console.log(picker.endDate.format('YYYY-MM-DD'));
+        console.log(site_url + "/home2/" + selected_comparison + "/range/" + type_by + "/" + picker.startDate.format('YYYY-MM-DD') + "/" + picker.endDate.format('YYYY-MM-DD'));
+        window.location = site_url + "/home2/" + selected_comparison + "/range/" + type_by + "/" + picker.startDate.format('YYYY-MM-DD') + "/" + picker.endDate.format('YYYY-MM-DD');
+
+    });
 });
 
 var numOfItems = 1;
@@ -400,15 +438,15 @@ function getGraphLineComparison() {
 /**
  * get pie chart
  */
-function getGraphPieComparison(chart_data) {
-    $('#comparisonDonut').highcharts({
+function getGraphPie(divelem, chart_title, chart_data) {
+    $('#' + divelem).highcharts({
         chart: {
             plotBackgroundColor: null,
             plotBorderWidth: null,
             plotShadow: false
         },
         title: {
-            text: graph_title,
+            text: chart_title,
             style: 'font-size:14px;'
         },
         tooltip: {
@@ -444,6 +482,69 @@ function getGraphPieComparison(chart_data) {
         credits: {
             enabled: false
         }
+    });
+}
+
+/**
+ * get pie chart
+ */
+function getGraphPieWithText(divelem, chart_title, chart_data) {
+    $('#' + divelem).highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false
+        },
+        title: {
+            text: chart_title,
+            style: 'font-size:14px;'
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.y}</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: false,
+                    format: '<b>{point.name}</b>: {y:.1f}',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                },
+                showInLegend: true
+            }
+        },
+        series: [{
+                type: 'pie',
+                name: 'Total',
+                data: chart_data
+            }],
+        legend: {
+            x: 0,
+            y: -10,
+            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+            borderColor: '#CCC',
+            borderWidth: 1,
+            shadow: false
+        },
+        credits: {
+            enabled: false
+        }
+    },
+    function(chart) { // on complete
+        var textX = chart.plotLeft + (chart.plotWidth * 0.5);
+        var textY = chart.plotTop + (chart.plotHeight * 0.5);
+
+        var span = '<span id="pieChartInfoText" style="position:absolute; text-align:center;">';
+        span += '<span style="font-size: 32px; color: #FFF;">' + ctr_of_recommendation + '%</span>';
+        span += '</span>';
+
+        $("#addText").append(span);
+        span = $('#pieChartInfoText');
+        span.css('left', textX + (span.width() * -0.1));
+        span.css('top', textY + (span.height() * -0.5));
     });
 }
 

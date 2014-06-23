@@ -29,6 +29,10 @@ class Widget extends \Eloquent
 		"number_of_rulesets" => "Number of Ruleset(s)"
 	);
 
+	public function widget_instances_and_items()
+	{
+		return $this->hasManyThrough("App\Models\WidgetInstanceItem", "App\Models\WidgetInstance");
+	}
 }
 
 /* End of file Widget.php */

@@ -232,7 +232,7 @@ class RedmartMigrationController extends BaseController
 	{
 		foreach ($metas as $key => $value)
 		{
-			$item_meta			 = new \App\Models\Itemmeta();
+			$item_meta			 = new \App\Models\ItemMeta();
 			$item_meta->key		 = $key;
 			$item_meta->value	 = $value;
 			$item_meta->item_id	 = $item_id;
