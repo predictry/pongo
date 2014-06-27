@@ -108,12 +108,11 @@ class PanelController extends \App\Controllers\BaseController
 	 * @return Response
 	 */
 //	public function index2($selected_comparison = "sales", $type = "31_d_ago", $bar_type = 'stacked', $type_by = "day", $dt_start = null, $dt_end = null)
-	public function index2($selected_comparison = "sales", $type = "31_d_ago", $type_by = "day", $dt_start = null, $dt_end = null)
+	public function index2($selected_comparison = "sales", $type = "31_d_ago", $date_unit = "day", $dt_start = null, $dt_end = null)
 	{
 		$inputs = array(
 			"type"					 => $type,
-//			"bar_type"				 => $bar_type,
-			"type_by"				 => $type_by,
+			"type_by"				 => $date_unit,
 			"dt_start"				 => $dt_start,
 			"dt_end"				 => $dt_end,
 			"selected_comparison"	 => $selected_comparison);
@@ -122,6 +121,7 @@ class PanelController extends \App\Controllers\BaseController
 		{
 			$dt_start			 = $inputs["dt_start"]	 = isset($dt_start) ? new Carbon($dt_start) : new Carbon('today');
 			$dt_end				 = $inputs["dt_end"]	 = isset($dt_end) ? new Carbon($dt_end) : new Carbon('today');
+			$end_of_today		 = $dt_end->endOfDay();
 		}
 		else
 		{
@@ -129,122 +129,106 @@ class PanelController extends \App\Controllers\BaseController
 			$today			 = new Carbon("today");
 			$dt_end			 = $end_of_today	 = $today->endOfDay();
 		}
-
-		$dt_start_ori	 = new Carbon($dt_start);
-		$dt_end_ori		 = new Carbon($dt_end);
-
-		switch ($type)
-		{
-			case "range":
-				$n = 1;
-
-				$diff = $dt_start->diffInDays($dt_end);
-
-
-				if ($diff >= 14 && $diff <= 31 && $type_by === "week")
-				{
-					$n = ($diff / 7);
-				}
-				else if ($diff > 31 && $diff <= 260 && ($type_by === "week" || $type_by === "day"))
-				{
-					$n		 = ($diff / 7);
-					$type_by = "week";
-				}
-				else if ($diff > 31 && $diff <= 260 && $type_by === "month")
-				{
-					$n		 = ($diff / 30);
-					$type_by = "month";
-				}
-				else if ($diff > 260)
-				{
-					$n		 = ($diff / 30);
-					$type_by = "month";
-				}
-				else
-				{
-					$n		 = $diff;
-					$type_by = "day";
-				}
-				$average_cart_sales_and_qty = $this->_getAverageOfCart($dt_start->startOfDay(), $dt_end->endOfDay());
-				break;
-
-			case "36_w_ago":
-				$type_by					 = ($type_by === "month") ? $type_by : "week";
-				$n							 = ($type_by === "month") ? (36 / 4) : 36;
-				$average_cart_sales_and_qty	 = $this->_getAverageOfCart(new Carbon("36 weeks ago"), $end_of_today);
-				break;
-
-			case "12_m_ago":
-				$n							 = 12;
-				$type_by					 = "month";
-				$average_cart_sales_and_qty	 = $this->_getAverageOfCart(new Carbon("12 months ago"), $end_of_today);
-				break;
-
-			case "31_d_ago":
-			default:
-				$type	 = "31_d_ago";
-				$n		 = 31;
-
-				$type_by = ($type_by === "week" || $type_by === "month") ? $type_by : "day";
-
-				if ($type_by === "week")
-					$n = (31 / 7);
-
-				if ($type_by === "month")
-					$n = (31 / 30);
-
-				$average_cart_sales_and_qty = $this->_getAverageOfCart(new Carbon("31 days ago"), $end_of_today);
-				break;
-		}
-
-		if ($type === "range" && $type_by == "day" && $n <= 31)
-			$dt_ranges	 = $this->_getDateRanges($dt_start, $n);
-		else
-			$dt_ranges	 = $this->_getNDateRanges($n, $type_by);
-
-		if ($selected_comparison === "sales")
-			$stats	 = $this->_populateSalesStatsByRanges($dt_ranges);
-		else
-			$stats	 = $this->_populatePageViewStatsByRanges($dt_ranges);
-
+		$dt_start_ori						 = new Carbon($dt_start);
+		$dt_end_ori							 = new Carbon($dt_end);
+		$average_cart_sales_and_qty			 = $this->_getAverageOfCart($dt_start->startOfDay(), $dt_end->endOfDay());
+		$dt_ranges							 = $this->_getDateRanges($dt_start, $dt_end, $date_unit);
+		$sales_stats						 = $this->_populateSalesStatsByRanges($dt_ranges);
+		$pageviews_stats					 = $this->_populatePageViewStatsByRanges($dt_ranges);
 		$graph_data							 = $highchart_categories				 = $graph_data							 = $average_recommended_items_pie_data	 = array();
-		$total_overall						 = $total_recommended					 = 0;
+		$total_overall						 = $total_recommended					 = $total_sales_overall				 = $total_sales_recommended			 = $total_pageviews_overall			 = $total_pageviews_recommended		 = 0;
 
-		$highchart_series = array(
-			array('name' => 'Regular', 'data' => array()),
-			array('name' => 'Recommended', 'data' => array())
+		$highchart_combination_graph_of_comparison = array(
+			array(
+				'name'	 => 'Regular',
+				'type'	 => 'column',
+				'data'	 => array(),
+				'color'	 => '#0077CC'
+			),
+			array(
+				'name'	 => 'Recommended',
+				'type'	 => 'spline',
+				'data'	 => array(),
+				'color'	 => '#FF9900'
+			)
 		);
 
-		foreach ($stats as $stat)
-		{
-			if ($type_by === "day")
-				$xlabel	 = ($stat['start']->format('M. d'));
-			else
-				$xlabel	 = ($stat['start']->format('M. d')) . '-' . ($stat['end']->format('M. d'));
-
-			$total_overall += $stat['stat']['overall'];
-			$total_recommended += $stat['stat']['recommended'];
-			array_push($highchart_categories, $xlabel);
-			array_push($highchart_series[1]['data'], $stat['stat']['recommended']);
-			array_push($highchart_series[0]['data'], $stat['stat']['regular']);
-		}
-
 		if ($selected_comparison === "sales")
 		{
-			$graph_labels		 = array('Regular ($)', 'Recommended ($)');
-			$highchart_pie_data	 = array(
-				array(ucwords("regular " . $selected_comparison . "($)"), ($total_overall - $total_recommended)),
-				array(ucwords("recommended " . $selected_comparison . "($)"), $total_recommended)
+			$highchart_series = array(
+				array('name' => 'Total Sales', 'data' => array()),
+				array('name' => 'Recommended Sales', 'data' => array())
 			);
+
+			$highchart_combination_graph_of_comparison[0]['name']	 = "Total Sales";
+			$highchart_combination_graph_of_comparison[1]['name']	 = "Recommended Sales";
 		}
 		else
 		{
-			$graph_labels		 = array('Regular', 'Recommended');
-			$highchart_pie_data	 = array(
-				array(ucwords("regular " . $selected_comparison), ($total_overall - $total_recommended)),
-				array(ucwords("recommended " . $selected_comparison), $total_recommended)
+			$highchart_series = array(
+				array('name' => 'Total Pageviews', 'data' => array()),
+				array('name' => 'Recommended Pageviews', 'data' => array())
 			);
+
+			$highchart_combination_graph_of_comparison[0]['name']	 = "Total Pageviews";
+			$highchart_combination_graph_of_comparison[1]['name']	 = "Recommended Pageviews";
 		}
+
+
+		for ($i = 0; $i < count($sales_stats); $i++)
+		{
+			$total_sales_overall += $sales_stats[$i]['stat']['overall'];
+			$total_sales_recommended += $sales_stats[$i]['stat']['recommended'];
+
+			$total_pageviews_overall += $pageviews_stats[$i]['stat']['overall'];
+			$total_pageviews_recommended += $pageviews_stats[$i]['stat']['recommended'];
+
+
+			if ($date_unit === "day")
+				$xlabel	 = ( $sales_stats[$i]['start']->format('M. d'));
+			else
+				$xlabel	 = ( $sales_stats[$i]['start']->format('M. d')) . '-' . ( $sales_stats[$i]['end']->format('M. d'));
+
+			if ($selected_comparison === "sales")
+			{
+				$total_overall += $sales_stats[$i]['stat']['overall'];
+				$total_recommended += $sales_stats[$i]['stat']['recommended'];
+				array_push($highchart_categories, $xlabel);
+				array_push($highchart_series[1]['data'], $sales_stats[$i]['stat']['recommended']);
+				array_push($highchart_series[0]['data'], $sales_stats[$i]['stat']['regular']);
+
+				array_push($highchart_combination_graph_of_comparison[0]['data'], $sales_stats[$i]['stat']['regular']);
+				array_push($highchart_combination_graph_of_comparison[1]['data'], $sales_stats[$i]['stat']['recommended']);
+			}
+			else
+			{
+				$total_overall += $pageviews_stats[$i]['stat']['overall'];
+				$total_recommended += $pageviews_stats[$i]['stat']['recommended'];
+				array_push($highchart_categories, $xlabel);
+				array_push($highchart_series[1]['data'], $pageviews_stats[$i]['stat']['recommended']);
+				array_push($highchart_series[0]['data'], $pageviews_stats[$i]['stat']['regular']);
+
+				array_push($highchart_combination_graph_of_comparison[0]['data'], $pageviews_stats[$i]['stat']['overall']);
+				array_push($highchart_combination_graph_of_comparison[1]['data'], $pageviews_stats[$i]['stat']['recommended']);
+			}
+		}
+
+
+
+		if ($selected_comparison === "sales")
+			$graph_labels	 = array('Total Sales', 'Recommended Sales');
+		else
+			$graph_labels	 = array('Total Pageviews', 'Recommended Pageviews');
+
+		$highchart_sales_pie_data = array(
+			array(ucwords("regular"), ($total_sales_overall - $total_sales_recommended)),
+			array(ucwords("recommended"), $total_sales_recommended)
+		);
+
+		$highchart_pageviews_pie_data = array(
+			array(ucwords("regular"), ($total_pageviews_overall - $total_pageviews_recommended)),
+			array(ucwords("recommended"), $total_pageviews_recommended)
+		);
 
 		$highchart_average_recommended_items_pie_data = array(
 			array("Regular Cart Items", $average_cart_sales_and_qty['average_regular_qty_items'] * 1),
@@ -282,7 +266,7 @@ class PanelController extends \App\Controllers\BaseController
 		$output = array(
 			"pageTitle"											 => "dashboard",
 			"type"												 => $type,
-			"type_by"											 => $type_by,
+			"type_by"											 => $date_unit,
 			"bar_type"											 => true,
 			"comparison_list"									 => $comparison_list,
 			"comparison_type_by"								 => $comparison_type_by,
@@ -293,15 +277,18 @@ class PanelController extends \App\Controllers\BaseController
 			"js_graph_labels"									 => json_encode($graph_labels),
 			'js_graph_comparison_data'							 => json_encode($graph_data),
 			'js_donut_average_recommended_items_data'			 => json_encode($average_recommended_items_pie_data),
-			'js_highchart_pie_data'								 => json_encode($highchart_pie_data),
+			'js_highchart_pie_data'								 => json_encode($highchart_sales_pie_data),
+			'js_highchart_pageview_pie_data'					 => json_encode($highchart_pageviews_pie_data),
 			'js_highchart_categories_data'						 => json_encode($highchart_categories),
 			'js_highchart_series_data'							 => json_encode($highchart_series),
 			'js_highchart_average_recommended_items_pie_data'	 => json_encode($highchart_average_recommended_items_pie_data),
 			'js_highchart_average_recommended_sales_pie_data'	 => json_encode($highchart_average_recommended_sales_pie_data),
+			'js_highchart_combination_graph_of_comparison'		 => json_encode($highchart_combination_graph_of_comparison),
 			'js_graph_title'									 => $graph_title,
 			'js_highchart_ctr_data'								 => json_encode($highchart_ctr_data),
 			'js_ctr_of_recommendation'							 => number_format($ctrData['ctr'], 2),
 			'ctr_data'											 => $ctrData,
+			'y_title'											 => ($selected_comparison === 'sales') ? 'RM' : 'Value',
 			"top_10_most_recommended_items"						 => $this->_getMostRecommendedItems($type, $dt_start_ori->startOfDay(), $dt_end_ori->endOfday()),
 			"average_cart_items"								 => $average_cart_sales_and_qty,
 			"ymax"												 => 0,
@@ -310,7 +297,6 @@ class PanelController extends \App\Controllers\BaseController
 			"dt_start"											 => $dt_start_ori->format("Y-m-d"),
 			"dt_end"											 => $dt_end_ori->format("Y-m-d")
 		);
-
 
 		return \View::make('frontend.panels.dashboard2', $output);
 	}
@@ -643,13 +629,15 @@ class PanelController extends \App\Controllers\BaseController
 
 	function _populateDateRangeActionStats($dt_start, $dt_end, $action_ids, $action_names, $index = false, $is_recommended = false, $all = true, $result_only = false)
 	{
-
 		if (!$result_only)
 		{
 			if (!$index)
 				$graph_data		 = array("date" => $dt_start->toDateString());
 			else
 				$graph_data[]	 = $dt_start->toDateString();
+		}else
+		{
+			$graph_data = array();
 		}
 
 		$i = 0;
@@ -659,10 +647,10 @@ class PanelController extends \App\Controllers\BaseController
 			if (!$all)
 			{
 				$total_recommended_action = \App\Models\Action::find($id)->action_instances_and_metas()
-								->where("action_instance_metas.key", "rec")
-								->where("action_instance_metas.value", "true")
-								->whereBetween('created', [$dt_start, $dt_end])
-								->get()->count();
+						->where("action_instance_metas.key", "rec")
+						->where("action_instance_metas.value", "true")
+						->whereBetween('created', [$dt_start, $dt_end])
+						->count();
 
 				if ($is_recommended)
 					$total_action = $total_recommended_action;
@@ -670,7 +658,7 @@ class PanelController extends \App\Controllers\BaseController
 				{
 					$total_action = (\App\Models\Action::find($id)->action_instances()
 									->whereBetween('created', [$dt_start, $dt_end])
-									->get()->count()) - $total_recommended_action;
+									->count()) - $total_recommended_action;
 				}
 			}
 			else
@@ -876,53 +864,83 @@ class PanelController extends \App\Controllers\BaseController
 		}
 
 		$view_action = \App\Models\Action::where("name", "view")->where("site_id", $this->active_site_id)->get()->first();
+		$temp		 = null;
 
 		/*
 		 * TODAY OVERALL, REGULAR AND RECOMMENDED STATS OF VIEW AND COMPLETE_PURCHASE / BUY
 		 */
-		$page_view_stats['overall']		 = current($this->_populateDateRangeActionStats($dt_start, $dt_end, array($view_action->id), array($view_action->name), false, false, true, true));
-		$page_view_stats['recommended']	 = current($this->_populateDateRangeActionStats($dt_start, $dt_end, array($view_action->id), array($view_action->name), false, true, false, true));
-		$page_view_stats['regular']		 = current($this->_populateDateRangeActionStats($dt_start, $dt_end, array($view_action->id), array($view_action->name), false, false, false, true));
+		$temp							 = $this->_populateDateRangeActionStats($dt_start, $dt_end, array($view_action->id), array($view_action->name), false, false, true, true);
+		$page_view_stats['overall']		 = (isset($temp) && is_array($temp)) ? current($temp) : FALSE;
+		$temp							 = $this->_populateDateRangeActionStats($dt_start, $dt_end, array($view_action->id), array($view_action->name), false, true, false, true);
+		$page_view_stats['recommended']	 = (isset($temp) && is_array($temp)) ? current($temp) : FALSE;
+		$temp							 = $this->_populateDateRangeActionStats($dt_start, $dt_end, array($view_action->id), array($view_action->name), false, false, false, true);
+		$page_view_stats['regular']		 = (isset($temp) && is_array($temp)) ? current($temp) : FALSE;
 
 		return $page_view_stats;
 	}
 
-	function _getNDateRanges($n, $type_by)
+	function _getDateRanges($dt_start, $dt_end, &$date_unit = "day")
 	{
-		$n			 = floor($n);
 		$dt_ranges	 = array();
+		$n_diff		 = $dt_start->diffInDays($dt_end);
 
-		for ($i = $n - 1; $i >= 0; $i--)
+		if ($date_unit === "day" && $n_diff <= 31)
 		{
-			$dt_end = new Carbon("{$i} {$type_by} ago");
-			if ($type_by === "day" || $type_by === "week")
+			for ($i = 0; $i <= floor($n_diff); $i++)
 			{
-				if ($type_by === "week")
-					$dt_start	 = new Carbon(($i + 1) . " {$type_by} ago");
-				else
-					$dt_start	 = new Carbon("{$i} {$type_by} ago");
-
-				array_push($dt_ranges, array("start" => $dt_start->startOfDay(), "end" => $dt_end->endOfDay()));
-			}
-			else
-			{
-				$dt_start = new Carbon(($i + 1) . " {$type_by} ago");
-				array_push($dt_ranges, array("start" => $dt_start->firstOfMonth(), "end" => $dt_end->endOfMonth()));
+				$dt_start_temp	 = new Carbon($dt_start->toDateString());
+				$dt_end_temp	 = new Carbon($dt_start->toDateString());
+				array_push($dt_ranges, array("start" => $dt_start_temp->startOfDay(), "end" => $dt_end_temp->endOfDay()));
+				$dt_start->addDay();
 			}
 		}
-		return $dt_ranges;
-	}
-
-	function _getDateRanges($dt_start, $diff)
-	{
-		$dt_ranges = array();
-		for ($i = 0; $i <= floor($diff); $i++)
+		else if ($date_unit === "week" && $n_diff <= 120)
 		{
-			$dt_start_temp	 = new Carbon($dt_start->toDateString());
-			$dt_end_temp	 = new Carbon($dt_start->toDateString());
-			array_push($dt_ranges, array("start" => $dt_start_temp->startOfDay(), "end" => $dt_end_temp->endOfDay()));
-			$dt_start->addDay();
+			do
+			{
+				$dt_start_temp	 = new Carbon($dt_start->toDateString());
+				$dt_end_temp	 = new Carbon($dt_start->toDateString());
+				$dt_end_temp->endOfWeek();
+
+				array_push($dt_ranges, array("start" => $dt_start_temp->startOfDay(), "end" => $dt_end_temp->endOfDay()));
+				$dt_start = new Carbon($dt_end_temp);
+				$dt_start->addDay();
+			} while ($dt_end_temp->diffInDays($dt_end) > 7);
 		}
+		else if (($date_unit === "month" && $n_diff > 31) || $n_diff > 120)
+		{
+			$date_unit = "month";
+
+			$n_month_diff = $dt_start->diffInMonths($dt_end);
+			for ($i = 1; $i <= $n_month_diff; $i++)
+			{
+				$dt_start_temp	 = new Carbon($dt_start->toDateString());
+				$dt_end_temp	 = new Carbon($dt_start->toDateString());
+				$dt_end_temp->addMonth();
+
+				array_push($dt_ranges, array("start" => $dt_start_temp->startOfDay(), "end" => $dt_end_temp->endOfDay()));
+				$dt_start = new Carbon($dt_end_temp);
+				$dt_start->addDay();
+			}
+		}
+		if (count($dt_ranges) > 0)
+		{
+			$last_dt_range					 = end($dt_ranges);
+			$n_diff_start_with_end_ranges	 = $last_dt_range['end']->diffInDays($dt_end);
+
+			if ($n_diff_start_with_end_ranges > 0)
+			{
+				$dt_start_temp = new Carbon($last_dt_range['end']->toDateString());
+				$dt_start_temp->addDay();
+
+				$dt_end_temp = new Carbon($last_dt_range['end']->toDateString());
+				$dt_end_temp->addDays($n_diff_start_with_end_ranges);
+
+				array_push($dt_ranges, array("start" => $dt_start_temp->startOfDay(), "end" => $dt_end_temp->endOfDay()));
+			}
+		}
+
+
 		return $dt_ranges;
 	}
 
@@ -967,15 +985,6 @@ class PanelController extends \App\Controllers\BaseController
 						->action_instances()
 						->whereBetween('created', [$dt_start, $dt_end])
 						->get(array("action_instances.id AS action_instance_id"))->lists("action_instance_id");
-
-//		$queries = \DB::getQueryLog();
-//		
-//		echo '<pre>';
-//		print_r(end($queries));
-//		echo "<br/>----<br/>";
-//		echo '</pre>';
-//		die;
-
 
 		if (count($action_instance_ids) > 0)
 		{
@@ -1031,35 +1040,41 @@ class PanelController extends \App\Controllers\BaseController
 			if (count($cart_ids) > 0)
 			{
 				$average_recommended_qty_items	 = ($sum_recommended_qty) / count($cart_ids);
+//				$average_recommended_qty_items	 = (($sum_recommended_qty) / ($sum_recommended_qty + $sum_recommended_qty)) * 100;
 				$average_regular_qty_items		 = ($sum_regular_qty) / count($cart_ids);
 
 				$average_recommended_sub_totals	 = ($sum_recommended_sub_totals) / count($cart_ids);
+//				$average_recommended_sub_totals	 = (($sum_recommended_sub_totals) / ($sum_recommended_sub_totals + $sum_regular_sub_totals)) * 100;
 				$average_regular_sub_totals		 = ($sum_regular_sub_totals) / count($cart_ids);
 
 				return array(
-					'total_carts'					 => count($cart_ids),
-					'sum_recommended_qty'			 => $sum_recommended_qty,
-					'average_recommended_qty_items'	 => number_format($average_recommended_qty_items, 2),
-					'sum_regular_qty'				 => $sum_regular_qty,
-					'average_regular_qty_items'		 => number_format($average_regular_qty_items, 2),
-					'sum_recommended_sub_totals'	 => $sum_recommended_sub_totals,
-					'average_recommended_sub_totals' => number_format($average_recommended_sub_totals, 2),
-					'sum_regular_sub_totals'		 => $sum_regular_sub_totals,
-					'average_regular_sub_totals'	 => number_format($average_regular_sub_totals, 2),
+					'total_carts'						 => count($cart_ids),
+					'total_combination_of_qty'			 => $sum_recommended_qty + $sum_recommended_qty,
+					'total_combination_of_sub_totals'	 => $sum_recommended_sub_totals + $sum_regular_sub_totals,
+					'sum_recommended_qty'				 => $sum_recommended_qty,
+					'average_recommended_qty_items'		 => number_format($average_recommended_qty_items, 2),
+					'sum_regular_qty'					 => $sum_regular_qty,
+					'average_regular_qty_items'			 => number_format($average_regular_qty_items, 2),
+					'sum_recommended_sub_totals'		 => $sum_recommended_sub_totals,
+					'average_recommended_sub_totals'	 => number_format($average_recommended_sub_totals, 2),
+					'sum_regular_sub_totals'			 => $sum_regular_sub_totals,
+					'average_regular_sub_totals'		 => number_format($average_regular_sub_totals, 2),
 				);
 			}
 		}
 
 		return array(
-			'total_carts'					 => 0,
-			'sum_recommended_qty'			 => 0,
-			'average_recommended_qty_items'	 => number_format(0, 2),
-			'sum_regular_qty'				 => 0,
-			'average_regular_qty_items'		 => number_format(0, 2),
-			'sum_recommended_sub_totals'	 => 0,
-			'average_recommended_sub_totals' => number_format(0, 2),
-			'sum_regular_sub_totals'		 => 0,
-			'average_regular_sub_totals'	 => number_format(0, 2),
+			'total_carts'						 => 0,
+			'total_combination_of_qty'			 => 0,
+			'total_combination_of_sub_totals'	 => 0,
+			'sum_recommended_qty'				 => 0,
+			'average_recommended_qty_items'		 => number_format(0, 2),
+			'sum_regular_qty'					 => 0,
+			'average_regular_qty_items'			 => number_format(0, 2),
+			'sum_recommended_sub_totals'		 => 0,
+			'average_recommended_sub_totals'	 => number_format(0, 2),
+			'sum_regular_sub_totals'			 => 0,
+			'average_regular_sub_totals'		 => number_format(0, 2),
 		);
 	}
 
@@ -1144,25 +1159,28 @@ class PanelController extends \App\Controllers\BaseController
 
 	function _getCTRData($dt_start = null, $dt_end = null)
 	{
-
-		$page_view_stats = $this->_getPageViewStats($dt_start, $dt_end);
-		$widget_ids		 = \App\Models\Widget::where("site_id", $this->active_site_id)->get()->lists("id");
-
-		$n_widget_instances = \App\Models\WidgetInstance::whereIn("widget_id", $widget_ids)
+		$page_view_stats	 = $this->_getPageViewStats($dt_start, $dt_end);
+		$widget_ids			 = \App\Models\Widget::where("site_id", $this->active_site_id)->get()->lists("id");
+		$n_widget_instances	 = \App\Models\WidgetInstance::whereIn("widget_id", $widget_ids)
 				->whereBetween("created_at", [$dt_start, $dt_end])
 				->count();
 
 		$total_regular_pageviews		 = $page_view_stats['regular'];
 		$total_recommended_pageviews	 = $page_view_stats['recommended'];
-		$total_recommendation_generated	 = $n_widget_instances;
+		$total_recommendation_generated	 = $n_widget_instances * 24; //dummy kali 20
 
 		$result = array(
 			'np'		 => $total_regular_pageviews,
 			'nr'		 => $total_recommended_pageviews,
 			'ngr'		 => $total_recommendation_generated,
+//			'ngr'		 => 10152, //dummy
 			'ctr'		 => ($total_recommendation_generated > 0) ? ($total_recommended_pageviews / $total_recommendation_generated) * 100 : 0,
+//			'ctr'		 => ($total_recommendation_generated > 0) ? ($total_recommended_pageviews / 10152) * 100 : 0, //dummy
 			'impression' => $total_recommendation_generated
+//			'impression' => 10152 //dummy
 		);
+
+		$result['ngr'] = ($result['ngr'] > 0) ? $result['ngr'] : 1;
 
 		return $result;
 	}

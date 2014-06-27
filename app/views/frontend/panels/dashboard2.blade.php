@@ -5,7 +5,7 @@
 		<h1>Overview <small>({{$activeSiteName}})</small></h1>
 	</div>
 	<div class="row">
-		@include('frontend.panels.comparisonfilter')	
+		@include('frontend.panels.ajaxcomparisonfilter')	
 		@include('frontend.panels.comparisongraph')	
 		@include('frontend.panels.comparisondonut')	
 	</div>

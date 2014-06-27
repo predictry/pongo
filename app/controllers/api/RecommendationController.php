@@ -2,7 +2,7 @@
 
 namespace App\Controllers\Api;
 
-define('LOKE_RESTAPI_URL', 'http://95.85.48.155:9003/');
+define('LOKE_RESTAPI_URL', 'http://95.85.48.155');
 define('EASYREC_RESTAPI_URL', 'http://demo.easyrec.org:8080/api/1.0/json/');
 
 /**
@@ -42,37 +42,109 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 	 */
 	public function index()
 	{
-		$inputs			 = \Input::only("item_id", "user_id", "session_id", "algo", "widget_id");
-		$this->widget_id = $inputs['widget_id'];
+		$inputs	 = \Input::only("item_id", "user_id", "session_id", "algo", "widget_id");
+		$widget	 = null;
 
-		if (!isset($inputs['algo']))
-			$inputs['algo'] = "otherusersalsoviewed";
+		if (isset($inputs['widget_id']))
+			$widget = \App\Models\Widget::where("id", $inputs['widget_id'])->where("site_id", $this->site_id)->get()->first();
 
-		if ($this->_isAlgoExists($inputs['algo']))
+		if ($widget && $this->_isAlgoExists($widget->reco_type))
 		{
-			$method_algo = $inputs['algo'];
+			$this->widget_id = $widget->id;
+			$method_algo	 = $widget->reco_type;
 			unset($inputs['algo']);
 
-			$input_reco_data		 = $this->_getEasyrecRecoOption($inputs);
-			$easyrec_url_with_method = EASYREC_RESTAPI_URL . $method_algo;
+			$easyrec_input_reco_data = $this->_getEasyrecRecoOption($inputs);
 
-			if (!is_object($input_reco_data))
+			if (!is_object($easyrec_input_reco_data))
 			{
-				$this->curl			 = new \Curl();
-				$response			 = $this->curl->_simple_call("get", $easyrec_url_with_method, $input_reco_data);
-				$recommended_items	 = $this->_extractEasyRecResult(json_decode($response));
-				if ($recommended_items)
+				if ($method_algo === "otherusersalsoviewed")
+					$recomm	 = $this->_getEasyRecOtherUsersAlsoViewed($easyrec_input_reco_data);
+				else if ($method_algo === "recommendationsforuser")
+					$recomm	 = $this->_getEasyRecRecommendationForUser($easyrec_input_reco_data);
+				else if ($method_algo === "inspiredbyyourshoppingtrends")
+					$recomm	 = $this->_getLokeInsipiredByYourShoppingTrends($inputs['user_id']);
+				else
+					$recomm	 = $this->_getEasyRecOtherUsersAlsoViewed($easyrec_input_reco_data);
+
+				if ($recomm)
 				{
-					$rec_items = array_fetch($recommended_items, 'alias_id'); // item_id = alias_id
-					return \Response::json(array("status" => "success", "recomm" => $recommended_items, "widget_instance_id" => $this->_setWidgetInstance($rec_items, $inputs['session_id'])));
+					$rec_items = array_fetch($recomm, 'alias_id'); // item_id = alias_id
+					return \Response::json(array("status" => "success", "recomm" => $recomm, "widget_instance_id" => $this->_setWidgetInstance($rec_items, $inputs['session_id'])));
 				}
 			}
 			else
-				return \Response::json(array("status" => "failed", "message" => $input_reco_data->errors()->first()), "400");
+				return \Response::json(array("status" => "failed", "message" => $easyrec_input_reco_data->errors()->first()), "400");
 
 			return \Response::json(array('status' => 'success', 'message' => 'no results'), "200");
 		}
 		return \Response::json(array('status' => 'failed', 'message' => 'something wrong'), "400");
+	}
+
+	//GET EASYREC OTHERUSERSALSOVIEWED
+
+	function _getEasyRecOtherUsersAlsoViewed($option_data)
+	{
+		$easyrec_url_with_method = EASYREC_RESTAPI_URL . "otherusersalsoviewed";
+
+		$this->curl			 = new \Curl();
+		$response			 = $this->curl->_simple_call("get", $easyrec_url_with_method, $option_data);
+		$recommended_items	 = $this->_extractEasyRecResult(json_decode($response));
+		if ($recommended_items)
+			return $recommended_items;
+		else
+			return false;
+	}
+
+	function _getEasyRecRecommendationForUser($option_data)
+	{
+		unset($option_data['itemid']);
+
+
+		$easyrec_url_with_method = EASYREC_RESTAPI_URL . "recommendationsforuser";
+//		$option_data['actiontype'] ='BUY';
+
+		$this->curl			 = new \Curl();
+		$response			 = $this->curl->_simple_call("get", $easyrec_url_with_method, $option_data);
+		$recommended_items	 = $this->_extractEasyRecResult(json_decode($response));
+		if ($recommended_items)
+			return $recommended_items;
+		else
+			return false;
+	}
+
+	function _getLokeInsipiredByYourShoppingTrends($user_id)
+	{
+		$url = $this->_getLokeRecoUrl("inspiredbyyourshoppingtrends");
+
+		$this->curl			 = new \Curl();
+		$response			 = $this->curl->_simple_call("get", $url, array('ii' => 'getUserRecomDesc', 'user' => $user_id, 'start' => 0, 'end' => 10));
+//		$response			 = '{"status":0,"rating":[{"user":"17562","product":"10950","score":"2.3945"},{"user":"17562","product":"11884","score":"2.0835"},{"user":"17562","product":"9192","score":"1.9644"},{"user":"17562","product":"8170","score":"1.941"},{"user":"17562","product":"10202","score":"1.9365"},{"user":"17562","product":"10332","score":"1.8903"}]}';
+		$response			 = json_decode($response);
+
+		$recommended_items	 = array();
+
+		if (isset($response->status) && $response->status === 0)
+		{
+			foreach ($response->rating as $rating)
+			{
+				$item = \App\Models\Item::where("identifier", $rating->product)->get()->first();
+				if ($item && $item->active && $this->_isAllowedBasedOnPropertiesFilter($item))
+				{
+					$item_reco = array(
+						"id"				 => $item->identifier,
+						"alias_id"			 => $item->id,
+						"description"		 => $item->name,
+						"created_at"		 => $item->created_at->toDateTimeString(),
+						"item_properties"	 => $this->_getRecoItemProperties($item)
+					);
+
+					array_push($recommended_items, $item_reco);
+				}
+			}
+		}
+
+		return $recommended_items;
 	}
 
 	function _setWidgetInstance($rec_items, $session_id)
@@ -101,7 +173,7 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 
 	function _isAlgoExists($algo)
 	{
-		$available_algos = array("otherusersalsoviewed", "otherusersalsobought", "itemsratedgoodbyotherusers", "recommendationsforuser", "relateditems");
+		$available_algos = array("otherusersalsoviewed", "otherusersalsobought", "itemsratedgoodbyotherusers", "recommendationsforuser", "relateditems", "inspiredbyyourshoppingtrends");
 		return in_array($algo, $available_algos) ? $algo : $available_algos[0];
 	}
 
@@ -135,13 +207,30 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 			return $validator;
 	}
 
+	function _getLokeRecoUrl($method)
+	{
+
+		$site		 = \App\Models\Site::find($this->site_id);
+		$uriMethod	 = "";
+		switch ($method)
+		{
+			case "inspiredbyyourshoppingtrends":
+				$uriMethod = "getUserRecomDesc";
+				break;
+
+			case "otherusersalsoviewed":
+				$uriMethod = "getSimilar";
+
+			default:
+				break;
+		}
+
+		return $site->tenant_engine_url;
+	}
+
 	function _extractEasyRecResult($response)
 	{
-		$recommended_items	 = array();
-		$widget				 = null;
-
-		if (isset($this->widget_id))
-			$widget = \App\Models\Widget::where("id", $this->widget_id)->where("site_id", $this->site_id)->get()->first();
+		$recommended_items = array();
 
 		if (isset($response->recommendeditems) && $response->recommendeditems !== null)
 		{
@@ -153,7 +242,7 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 					{
 						$item = \App\Models\Item::where("identifier", $item_result->id)->get()->first();
 
-						if ($item && $item->active && (!isset($widget) || $this->_isAllowedBasedOnPropertiesFilter($item)))
+						if ($item && $item->active && $this->_isAllowedBasedOnPropertiesFilter($item))
 						{
 							$item_reco = array(
 								"id"				 => $item->identifier,

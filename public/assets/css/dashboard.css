@@ -45,6 +45,10 @@ body {
     /*width: 90% !important;*/
 }
 
+.cl-fade{
+    color: #8A7E7E;
+}
+
 #item_rules_container .chosen-container,
 #item_filters_container .chosen-container{
     width: 90% !important;
@@ -65,7 +69,10 @@ body {
     line-height: 24px;
     cursor: help;
 }
-
+#range-type a:hover{
+    text-decoration: none;
+    cursor: pointer;
+}
 /*.chosen-container{
     width: 250px !important;
     height: 31px !important;
@@ -189,7 +196,9 @@ body {
 .btnApplyRange, .btnCancelRange{
     width: 46%;
 }
-
+#top10recommended td{
+    color: #8A7E7E;
+}
 /* Graph
 ================================================== */
 #comparisonDonut, #averageRecommendedItemsDonut
@@ -197,6 +206,45 @@ body {
     height: 300px;
 }
 
+#itemInCartStat:after {
+    background: url('../img/gift.png') no-repeat center #FFF;
+}
+
+#itemSalesInCartStat:after{
+    background: url('../img/cart.png') no-repeat center #FFF;
+
+}
+
+#itemInCartStat:after, #itemSalesInCartStat:after {
+    content : "";
+    display: block;
+    width: 180px;
+    height: 180px;
+    border: 1px solid #C2C2C2;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    opacity : 0.2;
+    border-radius: 50%;
+}
+
+#itemInCartStat span.text-float, #itemSalesInCartStat span.text-float{
+    position: absolute;
+    color: #000;
+    font-size: 42px;
+    text-align: center;
+    top: 34%;
+    left: 36%;
+}
+
+#itemInCartStat span.text-float2, #itemSalesInCartStat span.text-float2{
+    position: absolute;
+    color: #000;
+    font-size: 42px;
+    text-align: center;
+    top: 34%;
+    left: 32%;
+}
 /* Placeholder Dashboard
 ================================================== */
 .placeholders {
