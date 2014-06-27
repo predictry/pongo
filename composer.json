@@ -5,13 +5,13 @@
 	"license": "MIT",
 	"require": {
 		"laravel/framework": "4.1.*",
-		"barryvdh/laravel-ide-helper": "1.*",
                 "unikent/curl": "dev-master",
                 "doctrine/dbal": "2.4.*"
 	},
         "require-dev": {
                  "way/generators": "2.*",
-                 "fzaninotto/faker": "v1.3.0"
+                 "fzaninotto/faker": "v1.3.0",
+		 "barryvdh/laravel-ide-helper": "1.*"
         },
 	"autoload": {
 		"classmap": [
