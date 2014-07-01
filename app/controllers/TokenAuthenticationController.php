@@ -63,7 +63,8 @@ class TokenAuthenticationController extends BaseController
 				return \Redirect::to("home");
 			}else
 			{
-				return \Redirect::to("https://tictail.com/oauth/authorize?response_type={$code}&client_id={$this->tictail_client_id}&redirect_uri=http://dashboard.predictry.dev/tokenauth/");
+				$redirect_url = \Config::get("url") . "/tokenauth/";
+				return \Redirect::to("https://tictail.com/oauth/authorize?response_type={$code}&client_id={$this->tictail_client_id}&redirect_uri={$redirect_url}");
 			}
 		}
 	}
@@ -99,10 +100,10 @@ class TokenAuthenticationController extends BaseController
 			$account->save();
 
 			//SEND VERIFICATION EMAIL
-			$email_data = array("fullname" => ucwords($input['name']));
-			\Mail::send('emails.auth.accountconfirmation', $email_data, function($message) use ($input) {
-				$message->to($input['email'], ucwords($input['name']))->subject('Welcome!');
-			});
+//			$email_data = array("fullname" => ucwords($input['name']));
+//			\Mail::send('emails.auth.accountconfirmation', $email_data, function($message) use ($input) {
+//				$message->to($input['email'], ucwords($input['name']))->subject('Welcome!');
+//			});
 
 			return $account;
 		}
