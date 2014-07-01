@@ -19,6 +19,7 @@ class TokenAuthenticationController extends BaseController
 	private $tictail_auth_url		 = "https://tictail.com/oauth/token";
 	private $access_token			 = "";
 	private $token_expire			 = 0;
+	private $is_new_store			 = false;
 
 	function __construct()
 	{
@@ -59,6 +60,11 @@ class TokenAuthenticationController extends BaseController
 				\Session::set("active_site_name", $site->name);
 				\Session::set("role", "admin");
 				\Session::set("client", "tictail");
+				\Session::set("tictail", $response);
+				\Session::set("is_new_store", $this->is_new_store);
+
+				if ($this->is_new_store)
+					return \Redirect::to("fetch/items");
 
 				return \Redirect::to("home");
 			}else
@@ -129,6 +135,8 @@ class TokenAuthenticationController extends BaseController
 			$site->account_id	 = $account_id;
 			$site->url			 = $url;
 			$site->save();
+
+			$this->is_new_store = true;
 
 			//can be migrate to table
 			$default_actions = array(
