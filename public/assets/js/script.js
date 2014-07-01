@@ -4,13 +4,6 @@ var excludeOptionIDs = new Array();
 var indexes = new Array();
 indexes.push(1);
 
-var filters = {
-    dt_start: dt_start,
-    dt_end: dt_end,
-    comparison_type: 'sales',
-    date_unit: 'day'
-};
-
 /**
  * Add Item Filter
  */
@@ -71,7 +64,7 @@ function getGraphData() {
 
                 $(".percentageOfAverageRecommendationQty").html(percentage_of_qty.toFixed(2));
                 $(".percentageOfAverageRecommendationSales").html(percentage_of_sub_totals.toFixed(2));
-                
+
                 $("#qtySummaryInfo").text(average_cart_sales_and_qty.average_recommended_qty_items + " out of " + average_cart_sales_and_qty.total_combination_of_qty + " items in the carts from recommended items");
                 $("#salesSummaryInfo").text("RM " + average_cart_sales_and_qty.average_recommended_sub_totals + " out of RM " + average_cart_sales_and_qty.total_combination_of_sub_totals + " with recommended items");
 

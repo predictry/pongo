@@ -46,6 +46,12 @@
 								var y_title = "{{ $y_title }}";
 								var dt_start = "{{ $dt_start }}";
 								var dt_end = "{{ $dt_end }}";
+								var filters = {
+								dt_start: dt_start,
+										dt_end: dt_end,
+										comparison_type: 'sales',
+										date_unit: 'day'
+								};
 
 			</script>
 			<!--<div id="comparisonGraph" style="height: 250px;"></div>-->
