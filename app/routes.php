@@ -53,6 +53,8 @@ Route::group(array('domain' => 'dashboard.' . $tld, 'namespace' => 'App\Controll
 	Route::post('reset/submit', 'HomeController@postReset');
 
 	Route::get('datamigration', 'RedmartMigrationController@index');
+
+	Route::get('tokenauth', 'TokenAuthenticationController@index');
 });
 
 /*
