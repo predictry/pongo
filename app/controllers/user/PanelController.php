@@ -1081,24 +1081,28 @@ class PanelController extends \App\Controllers\BaseController
 	function _getMostGenerateRecommendedItems()
 	{
 		$widget_ids	 = \App\Models\Widget::where("site_id", $this->active_site_id)->get()->lists('id');
-		$item_ids	 = array();
-		foreach ($widget_ids as $widget_id)
-		{
-			$item_ids = \App\Models\Widget::find($widget_id)->widget_instances_and_items()
-					->groupBy('widget_instance_items.item_id')
-					->groupBy('widget_instances.widget_id')
-					->having(\DB::raw('COUNT(*)'), '>', 1)
-					->orderBy('total', 'DESC')
-					->limit(10)
-					->get(array('widget_instance_items.item_id', \DB::raw('COUNT(*) AS total')))
-					->lists("item_id");
-		}
+		$items		 = array();
 
-		$items = array();
-
-		foreach ($item_ids as $id)
+		if (count($widget_ids) > 0)
 		{
-			array_push($items, \App\Models\Item::find($id)->item_metas()->get()->toArray());
+			$item_ids = array();
+			foreach ($widget_ids as $widget_id)
+			{
+				$item_ids = \App\Models\Widget::find($widget_id)->widget_instances_and_items()
+						->groupBy('widget_instance_items.item_id')
+						->groupBy('widget_instances.widget_id')
+						->having(\DB::raw('COUNT(*)'), '>', 1)
+						->orderBy('total', 'DESC')
+						->limit(10)
+						->get(array('widget_instance_items.item_id', \DB::raw('COUNT(*) AS total')))
+						->lists("item_id");
+			}
+
+
+			foreach ($item_ids as $id)
+			{
+				array_push($items, \App\Models\Item::find($id)->item_metas()->get()->toArray());
+			}
 		}
 		return $items;
 	}
@@ -1159,28 +1163,41 @@ class PanelController extends \App\Controllers\BaseController
 
 	function _getCTRData($dt_start = null, $dt_end = null)
 	{
-		$page_view_stats	 = $this->_getPageViewStats($dt_start, $dt_end);
-		$widget_ids			 = \App\Models\Widget::where("site_id", $this->active_site_id)->get()->lists("id");
-		$n_widget_instances	 = \App\Models\WidgetInstance::whereIn("widget_id", $widget_ids)
-				->whereBetween("created_at", [$dt_start, $dt_end])
-				->count();
+		$page_view_stats = $this->_getPageViewStats($dt_start, $dt_end);
+		$widget_ids		 = \App\Models\Widget::where("site_id", $this->active_site_id)->get()->lists("id");
+		if (count($widget_ids) > 0)
+		{
+			$n_widget_instances = \App\Models\WidgetInstance::whereIn("widget_id", $widget_ids)
+					->whereBetween("created_at", [$dt_start, $dt_end])
+					->count();
 
-		$total_regular_pageviews		 = $page_view_stats['regular'];
-		$total_recommended_pageviews	 = $page_view_stats['recommended'];
-		$total_recommendation_generated	 = $n_widget_instances * 24; //dummy kali 20
+			$total_regular_pageviews		 = $page_view_stats['regular'];
+			$total_recommended_pageviews	 = $page_view_stats['recommended'];
+			$total_recommendation_generated	 = $n_widget_instances * 24; //dummy kali 20
 
-		$result = array(
-			'np'		 => $total_regular_pageviews,
-			'nr'		 => $total_recommended_pageviews,
-			'ngr'		 => $total_recommendation_generated,
+			$result = array(
+				'np'		 => $total_regular_pageviews,
+				'nr'		 => $total_recommended_pageviews,
+				'ngr'		 => $total_recommendation_generated,
 //			'ngr'		 => 10152, //dummy
-			'ctr'		 => ($total_recommendation_generated > 0) ? ($total_recommended_pageviews / $total_recommendation_generated) * 100 : 0,
+				'ctr'		 => ($total_recommendation_generated > 0) ? ($total_recommended_pageviews / $total_recommendation_generated) * 100 : 0,
 //			'ctr'		 => ($total_recommendation_generated > 0) ? ($total_recommended_pageviews / 10152) * 100 : 0, //dummy
-			'impression' => $total_recommendation_generated
+				'impression' => $total_recommendation_generated
 //			'impression' => 10152 //dummy
-		);
+			);
 
-		$result['ngr'] = ($result['ngr'] > 0) ? $result['ngr'] : 1;
+			$result['ngr'] = ($result['ngr'] > 0) ? $result['ngr'] : 1;
+		}
+		else
+		{
+			$result = array(
+				'np'		 => 0,
+				'nr'		 => 0,
+				'ngr'		 => 0,
+				'ctr'		 => 0,
+				'impression' => 0
+			);
+		}
 
 		return $result;
 	}

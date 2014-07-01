@@ -8,7 +8,11 @@
 				var highchart_ctr_data = {{ $js_highchart_ctr_data }};
 				var ctr_of_recommendation = {{ $js_ctr_of_recommendation }};
 //				var ctr_of_recommendation = "41.5";
+				@if ($ctr_data['ngr'] > 0)
 				var ctr_percentage = "{{ number_format($ctr_data['nr'] / $ctr_data['ngr'], 2) * 100 }}";
+				@else
+				var ctr_percentage = "0";
+				@endif
 	</script>
 	<div class="row">
 		<div class="col-sm-8">	
