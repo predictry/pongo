@@ -197,7 +197,7 @@ class WidgetsController extends \App\Controllers\BaseController
 			{
 				$obj['last_index']	 = count($widget_item_rulesets);
 				$json_obj			 = json_encode($obj);
-				$custom_script .= "editItemwidgetRuleset({$json_obj}, {$index_item_rule});"; //js func to make add itemruleedit
+				$custom_script .= "editItemWidgetRuleset({$json_obj}, {$index_item_rule});"; //js func to make add itemruleedit
 				$index_item_rule+=1;
 			}
 
@@ -206,7 +206,7 @@ class WidgetsController extends \App\Controllers\BaseController
 			{
 				$obj['last_index']	 = count($widget_item_filters);
 				$json_obj			 = json_encode($obj);
-				$custom_script .= "editItemwidgetFilter({$json_obj}, {$index_item_filter});"; //js func to make add itemruleedit
+				$custom_script .= "editItemWidgetFilter({$json_obj}, {$index_item_filter});"; //js func to make add itemruleedit
 				$index_item_filter+=1;
 			}
 			$custom_script.= "</script>";
