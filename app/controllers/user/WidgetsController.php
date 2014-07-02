@@ -262,7 +262,7 @@ class WidgetsController extends \App\Controllers\BaseController
 			$combine_both_new_and_remove = array_merge($result_array_diff, $result_array_diff_round);
 			$result_array_diff_updated	 = array_diff($widget_item_ids, $combine_both_new_and_remove); // possible to update (combine new and remove) then compare to existing
 
-			$result_filter_array_diff_updated	 = $result_filter_array_diff			 = array();
+			$result_filter_array_diff_updated	 = $result_filter_array_diff			 = $result_filter_array_diff_round		 = array();
 
 			if ($edit_widget_filter_ids)
 			{
@@ -278,11 +278,13 @@ class WidgetsController extends \App\Controllers\BaseController
 				$widget_ruleset = \App\Models\WidgetRuleSet::find($value);
 				$widget_ruleset->delete();
 			}
-			foreach ($result_filter_array_diff_round as $value)
-			{
-				$widget_filter = \App\Models\WidgetFilter::find($value);
-				$widget_filter->delete();
-			}
+
+			if (count($result_filter_array_diff_round) > 0)
+				foreach ($result_filter_array_diff_round as $value)
+				{
+					$widget_filter = \App\Models\WidgetFilter::find($value);
+					$widget_filter->delete();
+				}
 
 			//new
 			foreach ($result_array_diff as $i => $value)
