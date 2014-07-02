@@ -262,33 +262,16 @@ class WidgetsController extends \App\Controllers\BaseController
 			$combine_both_new_and_remove = array_merge($result_array_diff, $result_array_diff_round);
 			$result_array_diff_updated	 = array_diff($widget_item_ids, $combine_both_new_and_remove); // possible to update (combine new and remove) then compare to existing
 
-			$widget_filter_ids					 = \App\Models\WidgetFilter::where("widget_id", $id)->get()->lists("id");
-			$result_filter_array_diff			 = array_diff($edit_widget_filter_ids, $widget_filter_ids);
-			$result_filter_array_diff_round		 = array_diff($widget_filter_ids, $edit_widget_filter_ids);
-			$combine_filter_both_new_and_remove	 = array_merge($result_filter_array_diff, $result_filter_array_diff_round);
-			$result_filter_array_diff_updated	 = array_diff($widget_filter_ids, $combine_filter_both_new_and_remove); // possible to update (combine new and remove) then compare to existing
-//			echo '<pre>';
-//			print_r($widget_filter_ids);
-//			echo "<br/>----<br/>";
-//			print_r($result_filter_array_diff);
-//			echo "<br/>----<br/>";
-//			print_r($result_filter_array_diff_round);
-//			echo "<br/>----<br/>";
-//			print_r($combine_filter_both_new_and_remove);
-//			echo "<br/>----<br/>";
-//			print_r($result_filter_array_diff_updated);
-//			echo "<br/>----<br/>";
-//			echo '</pre>';
-//			die;
-//			echo '<pre>';
-//			print_r($widget_item_rules);
-//			print_r($widget_item_ids);
-//			print_r($edit_widget_ruleset_ids);
-//			print_r($result_array_diff);
-//			print_r($result_array_diff_round);
-//			print_r($result_array_diff_updated);
-//			echo '</pre>';
-//			die;
+			$result_filter_array_diff_updated	 = $result_filter_array_diff			 = array();
+
+			if ($edit_widget_filter_ids)
+			{
+				$widget_filter_ids					 = \App\Models\WidgetFilter::where("widget_id", $id)->get()->lists("id");
+				$result_filter_array_diff			 = array_diff($edit_widget_filter_ids, $widget_filter_ids);
+				$result_filter_array_diff_round		 = array_diff($widget_filter_ids, $edit_widget_filter_ids);
+				$combine_filter_both_new_and_remove	 = array_merge($result_filter_array_diff, $result_filter_array_diff_round);
+				$result_filter_array_diff_updated	 = array_diff($widget_filter_ids, $combine_filter_both_new_and_remove); // possible to update (combine new and remove) then compare to existing
+			}
 
 			foreach ($result_array_diff_round as $value)
 			{
@@ -315,17 +298,18 @@ class WidgetsController extends \App\Controllers\BaseController
 			}
 
 			//new
-			foreach ($result_filter_array_diff as $i => $value)
-			{
-				if ($i < count($widget_item_filter_ids))
+			if (count($result_filter_array_diff) > 0)
+				foreach ($result_filter_array_diff as $i => $value)
 				{
-					$widget_filter				 = new \App\Models\WidgetFilter();
-					$widget_filter->filter_id	 = $widget_item_filter_ids[$i];
-					$widget_filter->widget_id	 = $widget->id;
-					$widget_filter->active		 = $filter_actives[$i];
-					$widget_filter->save();
+					if ($i < count($widget_item_filter_ids))
+					{
+						$widget_filter				 = new \App\Models\WidgetFilter();
+						$widget_filter->filter_id	 = $widget_item_filter_ids[$i];
+						$widget_filter->widget_id	 = $widget->id;
+						$widget_filter->active		 = $filter_actives[$i];
+						$widget_filter->save();
+					}
 				}
-			}
 
 			//update
 			foreach ($result_array_diff_updated as $value)
@@ -341,19 +325,21 @@ class WidgetsController extends \App\Controllers\BaseController
 				}
 			}
 
-			//update
-			foreach ($result_filter_array_diff_updated as $value)
-			{
-				$i = array_search($value, $edit_widget_filter_ids);
 
-				if ($i > -1 && ($i <= count($widget_item_filter_ids)))
+			//update
+			if (count($result_filter_array_diff_updated) > 0)
+				foreach ($result_filter_array_diff_updated as $value)
 				{
-					$widget_filter				 = \App\Models\WidgetFilter::find($value);
-					$widget_filter->filter_id	 = $widget_item_filter_ids[$i];
-					$widget_filter->active		 = $filter_actives[$i];
-					$widget_filter->update();
+					$i = array_search($value, $edit_widget_filter_ids);
+
+					if ($i > -1 && ($i <= count($widget_item_filter_ids)))
+					{
+						$widget_filter				 = \App\Models\WidgetFilter::find($value);
+						$widget_filter->filter_id	 = $widget_item_filter_ids[$i];
+						$widget_filter->active		 = $filter_actives[$i];
+						$widget_filter->update();
+					}
 				}
-			}
 		}
 		return \Redirect::route('widgets')->with("flash_message", "Successfully added new rule.");
 	}
