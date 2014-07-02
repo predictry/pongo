@@ -16,8 +16,7 @@ if (elem_predictry !== null)
         item_id: item_id,
         user_id: user_id,
         session_id: getSessionID(),
-        number_of_results: window.PE_numberOfResults,
-        algo: window.PE_recoType
+        widget_id: window.PE_widgetId
     };
 
     var json_result = getRecommendation(reco_data);

@@ -133,8 +133,8 @@ class PanelController extends \App\Controllers\BaseController
 		$dt_end_ori							 = new Carbon($dt_end);
 		$average_cart_sales_and_qty			 = $this->_getAverageOfCart($dt_start->startOfDay(), $dt_end->endOfDay());
 		$dt_ranges							 = $this->_getDateRanges($dt_start, $dt_end, $date_unit);
-		$sales_stats						 = $this->_populateSalesStatsByRanges($dt_ranges);
-		$pageviews_stats					 = $this->_populatePageViewStatsByRanges($dt_ranges);
+		$sales_stats						 = $this->_populateSalesStatsByRangesFromCache($dt_ranges, $date_unit);
+		$pageviews_stats					 = $this->_populatePageViewStatsByRangesFromCache($dt_ranges, $date_unit);
 		$graph_data							 = $highchart_categories				 = $graph_data							 = $average_recommended_items_pie_data	 = array();
 		$total_overall						 = $total_recommended					 = $total_sales_overall				 = $total_sales_recommended			 = $total_pageviews_overall			 = $total_pageviews_recommended		 = 0;
 
@@ -212,8 +212,6 @@ class PanelController extends \App\Controllers\BaseController
 				array_push($highchart_combination_graph_of_comparison[1]['data'], $pageviews_stats[$i]['stat']['recommended']);
 			}
 		}
-
-
 
 		if ($selected_comparison === "sales")
 			$graph_labels	 = array('Total Sales', 'Recommended Sales');
@@ -947,14 +945,63 @@ class PanelController extends \App\Controllers\BaseController
 	function _populateSalesStatsByRanges($dt_ranges)
 	{
 		$stats = array();
+
 		foreach ($dt_ranges as $range)
 		{
 			$start	 = $range['start'];
 			$end	 = $range['end'];
-			array_push($stats, array('start' => $start, 'end' => $end, 'stat' => $this->_getSalesStats($range['start'], $range['end'])));
+			array_push($stats, array('start' => $start, 'end' => $end, 'stat' => $this->_getSalesStats($range['start'], $range['end']), 'str_start' => $start->toDateString(), 'str_end' => $end->toDateString()));
 		}
 
 		return $stats;
+	}
+
+	function _populateSalesStatsByRangesFromCache($dt_ranges, $date_unit)
+	{
+		$stats = array();
+
+		if ($date_unit === "day")
+			$cache_stats = \Cache::get('sales.thirty_days_ago');
+		else if ($date_unit === "week")
+			$cache_stats = \Cache::get('sales.thirty_six_weeks_ago');
+		else if ($date_unit === "month")
+			$cache_stats = \Cache::get('sales.twelve_months_ago');
+		else
+			$cache_stats = array();
+
+		foreach ($dt_ranges as $range)
+		{
+			$start	 = $range['start'];
+			$end	 = $range['end'];
+			$obj	 = ($cache_stats !== null) ? $this->_isAvailableInCache($cache_stats, $start->toDateString(), $end->toDateString()) : false;
+			if (!$obj)
+				array_push($stats, array('start' => $start, 'end' => $end, 'stat' => $this->_getSalesStats($range['start'], $range['end']), 'str_start' => $start->toDateString(), 'str_end' => $end->toDateString()));
+			else
+				array_push($stats, $obj);
+		}
+
+		if (count($stats) > 0)
+		{
+			if ($date_unit === "day")
+				\Cache::add('sales.thirty_days_ago', $stats, 1440);
+			else if ($date_unit === "week")
+				\Cache::add('sales.thirty_six_weeks_ago', $stats, 1440);
+			else if ($date_unit === "month")
+				\Cache::add('sales.twelve_months_ago', $stats, 1440);
+		}
+
+		return $stats;
+	}
+
+	function _isAvailableInCache($cache, $str_start, $str_end)
+	{
+		foreach ($cache as $obj)
+		{
+			if ($obj['str_start'] === $str_start && $obj['str_end'] === $str_end)
+				return $obj;
+		}
+
+		return false;
 	}
 
 	function _populatePageViewStatsByRanges($dt_ranges)
@@ -964,7 +1011,36 @@ class PanelController extends \App\Controllers\BaseController
 		{
 			$start	 = $range['start'];
 			$end	 = $range['end'];
-			array_push($stats, array('start' => $start, 'end' => $end, 'stat' => $this->_getPageViewStats($range['start'], $range['end'])));
+			array_push($stats, array('start' => $start, 'end' => $end, 'stat' => $this->_getPageViewStats($range['start'], $range['end']), 'str_start' => $start->toDateString(), 'str_end' => $end->toDateString()));
+		}
+
+		return $stats;
+	}
+
+	function _populatePageViewStatsByRangesFromCache($dt_ranges, $date_unit)
+	{
+		$stats = array();
+
+		if ($date_unit === "day")
+			$cache_stats = \Cache::get('pageviews.thirty_days_ago');
+		else if ($date_unit === "week")
+			$cache_stats = \Cache::get('pageviews.thirty_six_weeks_ago');
+		else if ($date_unit === "month")
+			$cache_stats = \Cache::get('pageviews.twelve_months_ago');
+		else
+			$cache_stats = array();
+
+		foreach ($dt_ranges as $range)
+		{
+			$start	 = $range['start'];
+			$end	 = $range['end'];
+
+			$obj = ($cache_stats !== null) ? $this->_isAvailableInCache($cache_stats, $start->toDateString(), $end->toDateString()) : false;
+
+			if (!$obj)
+				array_push($stats, array('start' => $start, 'end' => $end, 'stat' => $this->_getPageViewStats($range['start'], $range['end']), 'str_start' => $start->toDateString(), 'str_end' => $end->toDateString()));
+			else
+				array_push($stats, $obj);
 		}
 
 		return $stats;

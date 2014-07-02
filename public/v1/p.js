@@ -1,6 +1,6 @@
 var Predictry = (function() {
 
-    var PREDICTRY_API_URL = "http://dashboard.predictry.dev/api/v1/";
+    var PREDICTRY_API_URL = "http://dashboard.predictry.com/api/v1/";
     var widget_instance_id = null;
     var win = window;
 
@@ -370,8 +370,8 @@ var Predictry = (function() {
         reco_data = eExtend(data, PE_defaults);
         reco_data = eExtend(reco_data, PE_options);
 
-        if (reco_data.algo === undefined)
-            reco_data.algo = "otherusersalsoviewed";
+//        if (reco_data.algo === undefined)
+//            reco_data.algo = "otherusersalsoviewed";
 
         var drawingCallback;
         var params = buildUrl(reco_data);
@@ -647,8 +647,7 @@ var Predictry = (function() {
      * 
      * @returns {returnValue|String}
      */
-    function createSessionID() {
-        var name = "predictry_session";
+    function createSessionID(name) {
         var value = generateSessionID(15);
         String((new Date()).getTime()).replace(/\D/gi, '');
         document.cookie = name + "=" + value + "; path=/";
@@ -656,6 +655,7 @@ var Predictry = (function() {
         createPredictrySession();
         return value;
     }
+
 
     /**
      * Generate Session ID
@@ -691,7 +691,26 @@ var Predictry = (function() {
                 return c.substring(nameEQ.length, c.length);
         }
 
-        return createSessionID();
+        return createSessionID("predictry_session");
+    }
+
+    /**
+     * Get Temporary User ID
+     * 
+     * @returns {String|returnValue}
+     */
+    function getSessionUserID() {
+        var nameEQ = "predictry_userid=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ')
+                c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) == 0)
+                return c.substring(nameEQ.length, c.length);
+        }
+
+        return createSessionID("predictry_userid");
     }
 
     /**
@@ -734,6 +753,7 @@ var Predictry = (function() {
     return {
         init: init,
         getSessionID: getSessionID,
+        getSessionUserID: getSessionUserID,
         sendAction: sendAction,
         sendBulkActions: sendBulkActions,
         getRecommendedItems: getRecommendedItems,

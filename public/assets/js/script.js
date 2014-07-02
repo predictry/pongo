@@ -943,7 +943,7 @@ jQuery(document).ready(function() {
         $('#funelSelector').submit();
     });
 
-    $('div.btn-group .btn').click(function() {
+    $('div#type_options.btn-group .btn').click(function() {
         $(this).find('input:radio').attr('checked', true);
         var type = $(this).find('input[name=options]').val();
 
