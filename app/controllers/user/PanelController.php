@@ -961,11 +961,11 @@ class PanelController extends \App\Controllers\BaseController
 		$stats = array();
 
 		if ($date_unit === "day")
-			$cache_stats = \Cache::get('sales.thirty_days_ago');
+			$cache_stats = \Cache::get("sales_{$this->active_site_id}.thirty_days_ago");
 		else if ($date_unit === "week")
-			$cache_stats = \Cache::get('sales.thirty_six_weeks_ago');
+			$cache_stats = \Cache::get("sales_{$this->active_site_id}.thirty_six_weeks_ago");
 		else if ($date_unit === "month")
-			$cache_stats = \Cache::get('sales.twelve_months_ago');
+			$cache_stats = \Cache::get("sales_{$this->active_site_id}.twelve_months_ago");
 		else
 			$cache_stats = array();
 
@@ -983,11 +983,11 @@ class PanelController extends \App\Controllers\BaseController
 		if (count($stats) > 0)
 		{
 			if ($date_unit === "day")
-				\Cache::add('sales.thirty_days_ago', $stats, 1440);
+				\Cache::add("sales_{$this->active_site_id}.thirty_days_ago", $stats, 1440);
 			else if ($date_unit === "week")
-				\Cache::add('sales.thirty_six_weeks_ago', $stats, 1440);
+				\Cache::add("sales_{$this->active_site_id}.thirty_six_weeks_ago", $stats, 1440);
 			else if ($date_unit === "month")
-				\Cache::add('sales.twelve_months_ago', $stats, 1440);
+				\Cache::add("sales_{$this->active_site_id}.twelve_months_ago", $stats, 1440);
 		}
 
 		return $stats;
@@ -1022,11 +1022,11 @@ class PanelController extends \App\Controllers\BaseController
 		$stats = array();
 
 		if ($date_unit === "day")
-			$cache_stats = \Cache::get('pageviews.thirty_days_ago');
+			$cache_stats = \Cache::get("pageviews__{$this->active_site_id}.thirty_days_ago");
 		else if ($date_unit === "week")
-			$cache_stats = \Cache::get('pageviews.thirty_six_weeks_ago');
+			$cache_stats = \Cache::get("pageviews_{$this->active_site_id}.thirty_six_weeks_ago");
 		else if ($date_unit === "month")
-			$cache_stats = \Cache::get('pageviews.twelve_months_ago');
+			$cache_stats = \Cache::get("pageviews_{$this->active_site_id}.twelve_months_ago");
 		else
 			$cache_stats = array();
 
@@ -1041,6 +1041,17 @@ class PanelController extends \App\Controllers\BaseController
 				array_push($stats, array('start' => $start, 'end' => $end, 'stat' => $this->_getPageViewStats($range['start'], $range['end']), 'str_start' => $start->toDateString(), 'str_end' => $end->toDateString()));
 			else
 				array_push($stats, $obj);
+		}
+
+
+		if (count($stats) > 0)
+		{
+			if ($date_unit === "day")
+				\Cache::add("pageviews_{$this->active_site_id}.thirty_days_ago", $stats, 1440);
+			else if ($date_unit === "week")
+				\Cache::add("pageviews_{$this->active_site_id}.thirty_six_weeks_ago", $stats, 1440);
+			else if ($date_unit === "month")
+				\Cache::add("pageviews_{$this->active_site_id}.twelve_months_ago", $stats, 1440);
 		}
 
 		return $stats;
