@@ -3,7 +3,7 @@
 		<ul class="nav nav-pills nav-justified thumbnail setup-panel">
 			<li class="active"><a href="#step-1">
 					<h4 class="list-group-item-heading">Step 1</h4>
-					<p class="list-group-item-text">Placement Info</p>
+					<p class="list-group-item-text">Widget Info</p>
 				</a></li>
 			<li class="disabled"><a href="#step-2">
 					<h4 class="list-group-item-heading">Step 2</h4>

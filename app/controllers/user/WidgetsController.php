@@ -447,10 +447,11 @@ class WidgetsController extends \App\Controllers\BaseController
 			"pageTitle"					 => "Add New widget",
 			"modalTitle"				 => "Add new ruleset"
 		);
+
 		return \View::make("frontend.panels.widgets.wizardforms", $output);
 	}
 
-	public function postAjaxWizardwidget()
+	public function postAjaxWizardWidget()
 	{
 		$input				 = \Input::only("name", "description");
 		$widget_model		 = new \App\Models\Widget();
@@ -469,7 +470,7 @@ class WidgetsController extends \App\Controllers\BaseController
 		return \Response::json(array("status" => "success"));
 	}
 
-	public function postAjaxWizardCompletewidget()
+	public function postAjaxWizardCompleteWidget()
 	{
 		$input_widget	 = \Session::get("input_widget");
 		$ruleset_ids	 = \Input::get("item_id");

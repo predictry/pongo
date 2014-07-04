@@ -169,7 +169,7 @@ Route::group(array('domain' => 'dashboard.' . $tld, 'before' => 'auth', 'namespa
 		Route::post('widgets/{numeric}/delete', 'WidgetsController@postDelete');
 
 		Route::get('widgets/wizard', array("as" => "widgets.wizard", "uses" => 'WidgetsController@getWizard'));
-		Route::post('widgets/ajaxSubmitWizardwidget', array("as" => "widgets.ajaxSubmitWizardWidget", "uses" => 'WidgetsController@postAjaxWizardWidget'));
+		Route::post('widgets/ajaxSubmitWizardWidget', array("as" => "widgets.ajaxSubmitWizardWidget", "uses" => 'WidgetsController@postAjaxWizardWidget'));
 		Route::post('widgets/ajaxSubmitWizardAddRuleset', array("as" => "widgets.ajaxSubmitWizardAddRuleset", "uses" => 'WidgetsController@postAjaxWizardAddRuleset'));
 		Route::post('widgets/ajaxSubmitCompleteWizard', array("as" => "widgets.ajaxSubmitCompleteWizard", "uses" => 'WidgetsController@postAjaxWizardCompleteWidget'));
 

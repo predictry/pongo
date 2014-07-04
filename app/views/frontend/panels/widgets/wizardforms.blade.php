@@ -6,11 +6,11 @@
 
 	<div class="row setup-content form-horizontal" id="step-1">
 		<div class="col-xs-12">
-			<div class="wizardPlacement">
+			<div class="wizardWidget">
 				@include('frontend.panels.widgets.wizardformwidget')
 			</div>
 			<div class="clearfix"></div>
-			<button type="submit" class="btn btn-primary pull-right" id="btnWizardPlacementInfo">Next</button>
+			<button type="submit" class="btn btn-primary pull-right" id="btnWizardWidgetInfo">Next</button>
 		</div>
 	</div>
 	<div class="row setup-content" id="step-2">
