@@ -69,7 +69,7 @@ Route::group(array('domain' => 'dashboard.' . $tld, 'before' => 'auth', 'namespa
 	$role = Session::get("role");
 
 	Route::get('user', 'UserController@getDashboard');
-//	Route::get('home', array('as' => 'home', 'uses' => 'PanelController@index'));
+	Route::get('home2', array('as' => 'home2', 'uses' => 'PanelController@index'));
 //	Route::get('home2/{selected_comparison?}/{type?}/{bar_type?}/{type_by?}/{dt_start?}/{dt_end?}', array('as' => 'home2', 'uses' => 'PanelController@index2'));
 	Route::get('home/{selected_comparison?}/{type?}/{date_unit?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'PanelController@index2'));
 	Route::get('sites/wizard', array('as' => 'sites', 'uses' => 'SitesController@getSiteWizard'));
