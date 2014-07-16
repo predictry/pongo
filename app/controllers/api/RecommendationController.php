@@ -2,7 +2,7 @@
 
 namespace App\Controllers\Api;
 
-define('LOKE_RESTAPI_URL', 'http://95.85.48.155');
+define('LOKE_RESTAPI_URL', 'http://119.81.72.66');
 define('EASYREC_RESTAPI_URL', 'http://demo.easyrec.org:8080/api/1.0/json/');
 
 /**
@@ -78,7 +78,7 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 
 			return \Response::json(array('status' => 'success', 'message' => 'no results'), "200");
 		}
-		return \Response::json(array('status' => 'failed', 'message' => 'something wrong'), "400");
+		return \Response::json(array('status' => 'failed', 'message' => 'widget not found'), "400");
 	}
 
 	//GET EASYREC OTHERUSERSALSOVIEWED
@@ -117,12 +117,12 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 	{
 		$url = $this->_getLokeRecoUrl("inspiredbyyourshoppingtrends");
 
-		$this->curl			 = new \Curl();
-		$response			 = $this->curl->_simple_call("get", $url, array('ii' => 'getUserRecomDesc', 'user' => $user_id, 'start' => 0, 'end' => 10));
+		$this->curl	 = new \Curl();
+		$response	 = $this->curl->_simple_call("get", $url, array('ii' => 'getUserRecomDesc', 'user' => $user_id, 'start' => 0, 'end' => 10));
 //		$response			 = '{"status":0,"rating":[{"user":"17562","product":"10950","score":"2.3945"},{"user":"17562","product":"11884","score":"2.0835"},{"user":"17562","product":"9192","score":"1.9644"},{"user":"17562","product":"8170","score":"1.941"},{"user":"17562","product":"10202","score":"1.9365"},{"user":"17562","product":"10332","score":"1.8903"}]}';
-		$response			 = json_decode($response);
+		$response	 = json_decode($response);
 
-		$recommended_items	 = array();
+		$recommended_items = array();
 
 		if (isset($response->status) && $response->status === 0)
 		{
@@ -182,7 +182,8 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 		$rules = array(
 			"item_id"	 => "required",
 			"user_id"	 => "required",
-			"session_id" => "required"
+			"session_id" => "required",
+			"widget_id"	 => "required"
 		);
 
 		$api_credential['tenantid']	 = \Request::header("X-Predictry-Server-Tenant-ID");

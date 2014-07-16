@@ -287,8 +287,8 @@ class ActionController extends \App\Controllers\ApiBaseController
 					$index = array_search($meta->key, $properties_keys);
 					unset($properties_keys[$index]);
 				}
-				else
-					$meta->delete();
+//				else
+//					$meta->delete();
 			}
 
 
