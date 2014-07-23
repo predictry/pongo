@@ -89,7 +89,7 @@
 									@else
 									<p style="font-size: 21px; margin-top: 40px;"><span class="percentageOfAverageRecommendationSales">0%</span> of total sales in carts from recommended items.</p>
 									@endif
-									<p class="small cl-fade" id="salesSummaryInfo">RM {{ $average_cart_items['average_recommended_sub_totals'] }} out of RM {{ number_format($average_cart_items['average_regular_sub_totals'], 2) }} with recommended items</p>
+									<p class="small cl-fade" id="salesSummaryInfo">RM {{ $average_cart_items['average_recommended_sub_totals'] }} out of RM {{ $average_cart_items['average_regular_sub_totals'] }} with recommended items</p>
 								</div>
 							</div>
 						</div>
