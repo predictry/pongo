@@ -42,7 +42,7 @@
 									<!--<div id="averageRecommendedItemsDonut" style="min-width: 300px; height: 300px; max-width: 300px; margin: 0 auto"></div>-->
 									<div id="itemInCartStat">
 										<?php
-										$percentage_of_qty		 = number_format($average_cart_items['average_recommended_qty_items'] / $average_cart_items['average_regular_qty_items'], 2) * 100;
+										$percentage_of_qty		 = number_format(($average_cart_items['average_recommended_qty_items'] / $average_cart_items['average_regular_qty_items'] * 100), 2);
 //										$percentage_of_qty		 = number_format($average_cart_items['average_recommended_qty_items'], 2);
 										$whole					 = floor($percentage_of_qty);
 										?>
@@ -71,7 +71,7 @@
 								<div class="col-sm-6">
 									<div id="itemSalesInCartStat">
 										<?php
-										$percentage_of_sub_items = number_format($average_cart_items['average_recommended_sub_totals'] / $average_cart_items['average_regular_sub_totals'], 2) * 100;
+										$percentage_of_sub_items = number_format(($average_cart_items['average_recommended_sub_totals'] / $average_cart_items['average_regular_sub_totals'] * 100), 2);
 //										$percentage_of_sub_items = $average_cart_items['average_recommended_sub_totals'];
 										$whole					 = floor($percentage_of_sub_items);
 										?>
