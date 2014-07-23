@@ -72,7 +72,7 @@
 									<div id="itemSalesInCartStat">
 										<?php
 //										$percentage_of_sub_items = number_format($average_cart_items['average_recommended_sub_totals'] / $average_cart_items['average_regular_sub_totals'], 2) * 100;
-										$percentage_of_sub_items = number_format($average_cart_items['average_recommended_sub_totals'], 2);
+										$percentage_of_sub_items = $average_cart_items['average_recommended_sub_totals'];
 										$whole					 = floor($percentage_of_sub_items);
 										?>
 										@if ($average_cart_items['average_regular_sub_totals'] > 0)
