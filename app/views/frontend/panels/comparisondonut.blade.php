@@ -9,7 +9,8 @@
 				var ctr_of_recommendation = {{ $js_ctr_of_recommendation }};
 //				var ctr_of_recommendation = "41.5";
 				var ctr_ngr = {{ $ctr_data['ngr'] }};
-				if (ctr_ngr > 0)
+				var ctr_nr = {{ $ctr_data['nr'] }};
+				if (ctr_ngr > 0 && ctr_nr > 0)
 				var ctr_percentage = "{{ number_format($ctr_data['nr'] / $ctr_data['ngr'], 2) * 100 }}";
 				else
 				var ctr_percentage = "0";
