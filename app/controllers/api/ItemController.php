@@ -43,38 +43,39 @@ class ItemController extends \App\Controllers\ApiBaseController
 					$item->update();
 				}
 
-				$properties_keys = array_keys($properties);
-
-				$item_metas = \App\Models\ItemMeta::where("item_id", $item->id)->get();
-				foreach ($item_metas as $meta)
+				if (is_array($properties) && count($properties) > 0)
 				{
-					if (in_array($meta->key, $properties_keys))
+					$properties_keys = array_keys($properties);
+					$item_metas		 = \App\Models\ItemMeta::where("item_id", $item->id)->get();
+					foreach ($item_metas as $meta)
 					{
-						if ($meta->value !== trim($properties[$meta->key]))
+						if (in_array($meta->key, $properties_keys))
 						{
-							$meta->value = trim($properties[$meta->key]);
-							$meta->update();
+							if ($meta->value !== trim($properties[$meta->key]))
+							{
+								$meta->value = trim($properties[$meta->key]);
+								$meta->update();
+							}
+							$index = array_search($meta->key, $properties_keys);
+							unset($properties_keys[$index]);
 						}
-						$index = array_search($meta->key, $properties_keys);
-						unset($properties_keys[$index]);
+						else
+							$meta->delete();
 					}
-					else
-						$meta->delete();
-				}
 
-
-				if (count($properties_keys) > 0)
-				{//means have new additional properties
-					foreach ($properties_keys as $key)
-					{
-						$item_meta			 = new \App\Models\ItemMeta();
-						$item_meta->key		 = $key;
-						$item_meta->value	 = $properties[$key];
-						$item_meta->item_id	 = $item->id;
-						$item_meta->save();
+					if (count($properties_keys) > 0)
+					{//means have new additional properties
+						foreach ($properties_keys as $key)
+						{
+							$item_meta			 = new \App\Models\ItemMeta();
+							$item_meta->key		 = $key;
+							$item_meta->value	 = $properties[$key];
+							$item_meta->item_id	 = $item->id;
+							$item_meta->save();
+						}
 					}
 				}
-
+				
 				return \Response::json(array("status" => "success", "message" => "Item successfully updated"), "200");
 			}
 			else

@@ -35,14 +35,13 @@ class CartController extends \App\Controllers\ApiBaseController
 	 */
 	public function store()
 	{
-		$session	 = \Input::get("session");
-		$validator	 = \Validator::make(array('session' => $session), array('session' => 'required'));
+		$session	 = \Input::get("session_id");
+		$validator	 = \Validator::make(array('session_id' => $session), array('session_id' => 'required'));
 		$cart_id	 = -1;
 
 		if ($validator->passes())
 		{
 			$obj_session = \App\Models\Session::where("session", $session)->get()->first();
-
 			if ($obj_session)
 			{
 				$cart = \App\Models\Cart::where("session_id", $obj_session->id)->get()->last();

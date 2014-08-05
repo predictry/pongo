@@ -8,11 +8,11 @@
 				var highchart_ctr_data = {{ $js_highchart_ctr_data }};
 				var ctr_of_recommendation = {{ $js_ctr_of_recommendation }};
 //				var ctr_of_recommendation = "41.5";
-				@if ($ctr_data['ngr'] > 0)
+				var ctr_ngr = {{ $ctr_data['ngr'] }};
+				if (ctr_ngr > 0)
 				var ctr_percentage = "{{ number_format($ctr_data['nr'] / $ctr_data['ngr'], 2) * 100 }}";
-				@ else
+				else
 				var ctr_percentage = "0";
-				@endif
 	</script>
 	<div class="row">
 		<div class="col-sm-8">	
@@ -42,7 +42,7 @@
 									<!--<div id="averageRecommendedItemsDonut" style="min-width: 300px; height: 300px; max-width: 300px; margin: 0 auto"></div>-->
 									<div id="itemInCartStat">
 										<?php
-										$percentage_of_qty		 = number_format(($average_cart_items['average_recommended_qty_items'] / $average_cart_items['average_regular_qty_items'] * 100), 2);
+										$percentage_of_qty		 = ($average_cart_items['average_recommended_qty_items'] > 0) ? number_format(($average_cart_items['average_recommended_qty_items'] / $average_cart_items['average_regular_qty_items'] * 100), 2) : 0;
 //										$percentage_of_qty		 = number_format($average_cart_items['average_recommended_qty_items'], 2);
 										$whole					 = floor($percentage_of_qty);
 										?>
@@ -71,7 +71,7 @@
 								<div class="col-sm-6">
 									<div id="itemSalesInCartStat">
 										<?php
-										$percentage_of_sub_items = number_format(($average_cart_items['average_recommended_sub_totals'] / $average_cart_items['average_regular_sub_totals'] * 100), 2);
+										$percentage_of_sub_items = ($average_cart_items['average_recommended_sub_totals'] > 0) ? number_format(($average_cart_items['average_recommended_sub_totals'] / $average_cart_items['average_regular_sub_totals'] * 100), 2) : 0;
 //										$percentage_of_sub_items = $average_cart_items['average_recommended_sub_totals'];
 										$whole					 = floor($percentage_of_sub_items);
 										?>

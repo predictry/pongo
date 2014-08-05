@@ -20,10 +20,6 @@ App::after(function($request, $response) {
 	//
 });
 
-App::missing(function($exception) {
-	return Response::view('frontend.errors.missing', array('exception' => $exception), 404);
-//	return Redirect::to('home');
-});
 /*
   |--------------------------------------------------------------------------
   | Authentication Filters
@@ -34,16 +30,21 @@ App::missing(function($exception) {
   | integrates HTTP Basic authentication for quick, simple checking.
   |
  */
-
 Route::filter('auth', function() {
 	if (Auth::guest())
 		return Redirect::guest('login');
 });
 
-
 Route::filter('auth.basic', function() {
 	return Auth::basic();
 });
+
+App::missing(function($exception) {
+	return Response::view('frontend.errors.missing', array('exception' => $exception), 404);
+//	return Redirect::to('home');
+});
+
+
 /*
   |--------------------------------------------------------------------------
   | Guest Filter
