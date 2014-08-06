@@ -1,7 +1,7 @@
 var Predictry = (function() {
 
     var PREDICTRY_API_URL = "http://dashboard.predictry.com/api/v1/";
-    var widget_instance_id = null;
+    var widget_instance_id = 0;
     var win = window;
 
     var PE_defaults = {
@@ -20,13 +20,14 @@ var Predictry = (function() {
 
     var response = data = reco_data = {};
     var compulsary_params = optional_params = null;
-    var cart_id = -1;
+    var temp_cart_id = -1;
+    var temp_session_id = null;
 
     function init()
     {
         win = window;
         reco_data = data = {};
-        this.cart_id = getCartID();
+        setSessionCartID();
 
         PE_options.widgetId = win.PE_widgetId;
         PE_options.platformVer = win.PE_platformVer;
@@ -42,7 +43,7 @@ var Predictry = (function() {
 
         var query_params = getQueryParams(document.location.search);
         if (query_params !== undefined && typeof query_params === 'object' && query_params.predictry_src !== undefined) {
-            widget_instance_id = query_params.predictry_src;
+            this.widget_instance_id = query_params.predictry_src;
         }
     }
 
@@ -56,7 +57,7 @@ var Predictry = (function() {
     {
         data = eExtend(data, PE_defaults);
 
-        if (widget_instance_id !== null)
+        if (widget_instance_id !== 0)
         {
             if (data.action_properties !== undefined)
             {
@@ -68,14 +69,14 @@ var Predictry = (function() {
             }
         }
 
-        if (data.action === 'complete_purchase')
+        if (data.action === 'complete_purchase' || data.action === 'buy')
         {
             if (data.action_properties !== undefined)
-                data.action_properties.cart_id = this.cart_id;
+                data.action_properties.cart_id = temp_cart_id;
             else if (data.action_properties === undefined)
-                data.action_properties = {cart_id: this.cart_id};
+                data.action_properties = {cart_id: temp_cart_id};
 
-            this.cart_id = getCartID();
+            temp_cart_id = getCartID();
         }
 
         for (var key in data)
@@ -90,14 +91,15 @@ var Predictry = (function() {
                 }
             }
 
-            if (key === "item_properties") {
+            if (key === "item_properties" && data[key].length > 0) {
+
                 for (var key2 in data[key]) {
                     data['item_properties[' + key2 + ']'] = data[key][key2];
                 }
                 delete data.item_properties;
             }
 
-            if (key === "action_properties") {
+            if (key === "action_properties" && data[key].length > 0) {
                 for (var key2 in data[key]) {
                     data['action_properties[' + key2 + ']'] = data[key][key2];
                 }
@@ -158,7 +160,7 @@ var Predictry = (function() {
             //this is to set cart log, and set cart session
             if (response.status === 'success' && ready_data.action === 'add_to_cart')
             {
-                if (widget_instance_id !== null)
+                if (widget_instance_id !== 0)
                 {
                     if (data.action_properties !== undefined)
                         data.action_properties.rec = true;
@@ -242,7 +244,6 @@ var Predictry = (function() {
     function makeJqueryAjaxCall(method, url, params)
     {
         var result = "";
-
         if (typeof jQuery !== 'undefined') {
             jQuery.ajax({
                 type: method,
@@ -294,7 +295,7 @@ var Predictry = (function() {
                     }
                 }
 
-                if (bulk_action_data.action === 'complete_purchase' && key === 'item_id')
+                if ((bulk_action_data.action === 'complete_purchase' || bulk_action_data.action === 'buy') && key === 'item_id')
                 {
                     var item_id = bulk_action_data.actions[i][key];
                     var cartSession = getCartSession();
@@ -302,9 +303,9 @@ var Predictry = (function() {
                     var action = bulk_action_data.actions[i];
 
                     if (action.action_properties !== undefined)
-                        action.action_properties.cart_id = this.cart_id;
+                        action.action_properties.cart_id = temp_cart_id;
                     else if (action.action_properties === undefined)
-                        action.action_properties = {cart_id: this.cart_id};
+                        action.action_properties = {cart_id: temp_cart_id};
 
                     if (inArray(item_id, cartItemIDs))
                     {
@@ -317,7 +318,7 @@ var Predictry = (function() {
             }
         }
 
-        this.cart_id = getCartID();
+        temp_cart_id = getCartID();
 
         bulk_action_data.session_id = getSessionID();
         bulk_action_data.action_type = 'bulk';
@@ -350,6 +351,7 @@ var Predictry = (function() {
         }
 
         ready_data = setBulkActionData(data);
+
         if (ready_data !== false) {
             return makeJqueryAjaxCall("POST", PREDICTRY_API_URL + "predictry?", ready_data);
         } else {
@@ -469,12 +471,54 @@ var Predictry = (function() {
      * Get Cart ID
      */
     function getCartID() {
-        var result = makeJqueryAjaxCall("POST", PREDICTRY_API_URL + "cart?", {session: getSessionID()});
+        var session = getSessionID();
+
+        if (session === undefined)
+            session = temp_session_id;
+
+
+        var result = makeJqueryAjaxCall("POST", PREDICTRY_API_URL + "cart?", {session: session});
         var cart_id = false;
         if (result.status === 'success')
             cart_id = result.response.cart_id;
 
+        temp_cart_id = cart_id;
+
         return cart_id;
+    }
+
+    function getSessionCartID() {
+        var nameEQ = "predictry=";
+        var ca = document.cookie.split(';');
+        var value = cart_id = null;
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ')
+                c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) == 0) {
+                value = c.substring(nameEQ.length, c.length);
+                break;
+            }
+        }
+
+        if (value !== null)
+        {
+            eval('var obj=' + value);
+            if (obj.ci !== undefined)
+                cart_id = obj.ci;
+            else
+                value = null;
+        }
+
+        if (cart_id === null || cart_id === -1)
+        {
+            if (temp_cart_id !== -1 && temp_cart_id !== undefined)
+                return temp_cart_id;
+
+            return getCartID();
+        }
+        else
+            return cart_id;
     }
 
     /**
@@ -487,7 +531,7 @@ var Predictry = (function() {
      */
     function setCartLog(item_id, qty, event) {
         var data = {
-            cart_id: cart_id,
+            cart_id: temp_cart_id,
             item_id: item_id,
             qty: qty,
             event: event
@@ -504,6 +548,14 @@ var Predictry = (function() {
         if (item_id !== undefined && !inArray(item_id, cartItemIDs)) {
             cartItemIDs.push(item_id);
         }
+
+        return createPredictrySession(cartItemIDs);
+    }
+
+    function setSessionCartID() {
+        var cartSession = getCartSession();
+        cartItemIDs = cartSession.c; //array
+
         return createPredictrySession(cartItemIDs);
     }
 
@@ -536,15 +588,23 @@ var Predictry = (function() {
 
     /**
      * Create Predictry Session
-     * @param {array} cart_value
+     * @param {type} cart_value
+     * @param {type} cart_id
      * @returns {_L1.createPredictrySession.value}
      */
     function createPredictrySession(cart_value) {
+
         var name = "predictry";
-        var value = {c: [], s: getSessionID()};
+        if (temp_cart_id !== -1 && temp_cart_id !== undefined) {
+            var value = {c: [], ci: temp_cart_id};
+        }
+        else
+            var value = {c: [], ci: getSessionCartID()};
 
         if (cart_value !== undefined)
-            value = {c: cart_value, s: getSessionID()};
+            value.c = cart_value;
+
+        temp_cart_id = value.ci;
 
         String((new Date()).getTime()).replace(/\D/gi, '');
         document.cookie = name + "=" + JSON.stringify(value) + "; path=/";
@@ -652,6 +712,7 @@ var Predictry = (function() {
         String((new Date()).getTime()).replace(/\D/gi, '');
         document.cookie = name + "=" + value + "; path=/";
 
+        temp_session_id = value;
         createPredictrySession();
         return value;
     }
@@ -754,7 +815,9 @@ var Predictry = (function() {
         init: init,
         getSessionID: getSessionID,
         getSessionUserID: getSessionUserID,
+        getSessionCartID: getSessionCartID,
         sendAction: sendAction,
+        setActionData: setActionData,
         sendBulkActions: sendBulkActions,
         getRecommendedItems: getRecommendedItems,
         updateItem: setItemMeta,
@@ -768,7 +831,7 @@ var Predictry = (function() {
         drawList: drawTextListRecommendation,
         clone: clone,
         widget_instance_id: widget_instance_id,
-        cart_id: cart_id
+        cart_id: temp_cart_id
     };
 
 }(Predictry || function() {
