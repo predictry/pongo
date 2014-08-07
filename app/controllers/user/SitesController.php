@@ -130,7 +130,7 @@ class SitesController extends \App\Controllers\BaseController
 			if (\Request::ajax())
 			{
 				if ($id)
-					return \Response::json(array("status" => "success", "response" => "/dashboard"));
+					return \Response::json(array("status" => "success", "response" => "/home"));
 				else
 					return \Response::json(
 									array("status"	 => "error",
