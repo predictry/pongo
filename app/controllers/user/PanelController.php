@@ -1219,7 +1219,8 @@ class PanelController extends \App\Controllers\BaseController
 
 		$action_name = ($type === "sales") ? "buy" : "view";
 		$action		 = \App\Models\Action::where("name", $action_name)->where("site_id", $this->active_site_id)->get()->first();
-
+		$item_ids	 = array();
+		
 		if (is_object($action))
 		{
 			$item_ids = \App\Models\Action::find($action->id)
