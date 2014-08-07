@@ -824,28 +824,35 @@ class PanelController extends \App\Controllers\BaseController
 
 		$complete_purchase_action = \App\Models\Action::where("name", "buy")->where("site_id", $this->active_site_id)->get()->first();
 
-		$sales_stats['overall'] = \App\Models\Action::find($complete_purchase_action->id)
-						->action_instances_and_metas()
-						->where("action_instance_metas.key", "sub_total")
-						->whereBetween('created', [$dt_start, $dt_end])
-						->get(array("action_instances.id AS action_instance_id", "action_instance_metas.key", "action_instance_metas.value"))->sum('value');
-
-		$action_instance_ids = \App\Models\Action::find($complete_purchase_action->id)
-						->action_instances_and_metas()
-						->where("action_instance_metas.key", "rec")
-						->where("action_instance_metas.value", "true")
-						->whereBetween('created', [$dt_start, $dt_end])
-						->get(array("action_instances.id AS action_instance_id", "action_instance_metas.key", "action_instance_metas.value"))->lists("action_instance_id");
-
-		if (count($action_instance_ids) > 0)
+		if (is_object($complete_purchase_action))
 		{
-			$sales_stats['recommended'] = \App\Models\ActionInstanceMeta::whereIn("action_instance_id", $action_instance_ids)
-					->where("action_instance_metas.key", "sub_total")
-					->get()
-					->sum('value');
+			$sales_stats['overall'] = \App\Models\Action::find($complete_purchase_action->id)
+							->action_instances_and_metas()
+							->where("action_instance_metas.key", "sub_total")
+							->whereBetween('created', [$dt_start, $dt_end])
+							->get(array("action_instances.id AS action_instance_id", "action_instance_metas.key", "action_instance_metas.value"))->sum('value');
+
+			$action_instance_ids = \App\Models\Action::find($complete_purchase_action->id)
+							->action_instances_and_metas()
+							->where("action_instance_metas.key", "rec")
+							->where("action_instance_metas.value", "true")
+							->whereBetween('created', [$dt_start, $dt_end])
+							->get(array("action_instances.id AS action_instance_id", "action_instance_metas.key", "action_instance_metas.value"))->lists("action_instance_id");
+
+			if (count($action_instance_ids) > 0)
+			{
+				$sales_stats['recommended'] = \App\Models\ActionInstanceMeta::whereIn("action_instance_id", $action_instance_ids)
+						->where("action_instance_metas.key", "sub_total")
+						->get()
+						->sum('value');
+			}
+			else
+				$sales_stats['recommended'] = 0;
 		}
 		else
-			$sales_stats['recommended'] = 0;
+		{
+			$sales_stats['overall']		 = $sales_stats['regular']		 = $sales_stats['recommended']	 = 0;
+		}
 
 		$sales_stats['regular'] = $sales_stats['overall'] - $sales_stats['recommended'];
 
