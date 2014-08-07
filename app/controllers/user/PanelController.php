@@ -1220,18 +1220,21 @@ class PanelController extends \App\Controllers\BaseController
 		$action_name = ($type === "sales") ? "buy" : "view";
 		$action		 = \App\Models\Action::where("name", $action_name)->where("site_id", $this->active_site_id)->get()->first();
 
-		$item_ids = \App\Models\Action::find($action->id)
-				->action_instances_and_metas()
-				->where("action_instance_metas.key", "rec")
-				->where("action_instance_metas.value", "true")
-				->whereBetween('created', [$dt_start, $dt_end])
-				->groupBy('action_instances.item_id')
-				->groupBy('action_instances.action_id')
-				->having(\DB::raw('COUNT(*)'), '>', 1)
-				->orderBy('total', 'DESC')
-				->limit(10)
-				->get(array("action_instances.item_id", \DB::raw('COUNT(*) AS total')))
-				->lists("item_id");
+		if (is_object($action))
+		{
+			$item_ids = \App\Models\Action::find($action->id)
+					->action_instances_and_metas()
+					->where("action_instance_metas.key", "rec")
+					->where("action_instance_metas.value", "true")
+					->whereBetween('created', [$dt_start, $dt_end])
+					->groupBy('action_instances.item_id')
+					->groupBy('action_instances.action_id')
+					->having(\DB::raw('COUNT(*)'), '>', 1)
+					->orderBy('total', 'DESC')
+					->limit(10)
+					->get(array("action_instances.item_id", \DB::raw('COUNT(*) AS total')))
+					->lists("item_id");
+		}
 
 		$items = array();
 
