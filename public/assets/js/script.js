@@ -47,26 +47,35 @@ function getGraphData() {
                     var percentage_of_sub_totals = parseFloat(0);
 
                 var whole = Math.floor(percentage_of_qty);
-                console.log(percentage_of_qty);
-                console.log(whole);
-                console.log(percentage_of_qty - whole);
+
+                highchart_ctr_data = data.response.highchart_ctr_data;
+                if (typeof highchart_ctr_data !== 'undefined')
+                    getGraphPieWithText("ctrDonut", "Click Through Rate (CTR) on Recommendations", highchart_ctr_data);
 
                 if (percentage_of_qty - whole > 0)
-                    $("div#itemInCartStat").html("<span class='text-float2 percentageOfAverageRecommendationQty'>" + percentage_of_qty.toFixed(2) + "</span>");
+                    $("div#itemInCartStat").html("<span class='text-float2 percentageOfAverageRecommendationQty'>" + percentage_of_qty.toFixed(2) + "%</span>");
                 else
-                    $("div#itemInCartStat").html("<span class='text-float percentageOfAverageRecommendationQty'>" + percentage_of_qty + "</span>");
+                    $("div#itemInCartStat").html("<span class='text-float percentageOfAverageRecommendationQty'>" + percentage_of_qty + "%</span>");
 
                 whole = Math.floor(percentage_of_sub_totals);
                 if (percentage_of_sub_totals - whole > 0)
-                    $("div#itemSalesInCartStat").html("<span class='text-float2 percentageOfAverageRecommendationSales'>" + percentage_of_sub_totals.toFixed(2) + "</span>");
+                    $("div#itemSalesInCartStat").html("<span class='text-float2 percentageOfAverageRecommendationSales'>" + percentage_of_sub_totals.toFixed(2) + "%</span>");
                 else
-                    $("div#itemSalesInCartStat").html("<span class='text-float percentageOfAverageRecommendationSales'>" + percentage_of_sub_totals + "</span>");
+                    $("div#itemSalesInCartStat").html("<span class='text-float percentageOfAverageRecommendationSales'>" + percentage_of_sub_totals + "%</span>");
 
-                $(".percentageOfAverageRecommendationQty").html(percentage_of_qty.toFixed(2));
-                $(".percentageOfAverageRecommendationSales").html(percentage_of_sub_totals.toFixed(2));
+                $(".percentageOfAverageRecommendationQty").html(percentage_of_qty.toFixed(2) + "%");
+                $(".percentageOfAverageRecommendationSales").html(percentage_of_sub_totals.toFixed(2) + "%");
 
-                $("#qtySummaryInfo").text(average_cart_sales_and_qty.average_recommended_qty_items + " out of " + average_cart_sales_and_qty.total_combination_of_qty + " items in the carts from recommended items");
-                $("#salesSummaryInfo").text("RM " + average_cart_sales_and_qty.average_recommended_sub_totals + " out of RM " + average_cart_sales_and_qty.total_combination_of_sub_totals + " with recommended items");
+                var spanpercentageOfCTR = '<span id="pieChartInfoText" style="position:absolute; text-align:center;">';
+                spanpercentageOfCTR += '<span style="font-size: 42px; color: #000;">' + data.response.ctr_percentage.toFixed(2) + '%</span>';
+                spanpercentageOfCTR += '</span>';
+
+                $("#addText").html(spanpercentageOfCTR);
+                $(".percentageOfCTRVal").html(data.response.ctr_percentage.toFixed(2) + "%");
+
+                $("#qtySummaryInfo").text(average_cart_sales_and_qty.sum_recommended_qty + " out of " + average_cart_sales_and_qty.total_combination_of_qty + " items in the carts from recommended items");
+                $("#salesSummaryInfo").text("RM " + average_cart_sales_and_qty.sum_recommended_sub_totals + " out of RM " + average_cart_sales_and_qty.total_combination_of_sub_totals + " with recommended items");
+                $("#ctrSummaryInfo").text(data.response.ctr_nr + " recommended items clicked out of " + data.response.ctr_impression + " views");
 
             } else {
                 alert("something wrong");
@@ -734,6 +743,7 @@ jQuery(document).ready(function() {
     }
     if (typeof highchart_ctr_data !== 'undefined')
         getGraphPieWithText("ctrDonut", "Click Through Rate (CTR) on Recommendations", highchart_ctr_data);
+
     if (typeof highchart_average_recommended_items_data !== 'undefined')
         getGraphPie("averageRecommendedItemsDonut", "Average Cart Items with Recommended Items", highchart_average_recommended_items_data);
     if (typeof highchart_average_recommended_sales_data !== 'undefined')

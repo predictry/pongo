@@ -37,12 +37,12 @@ class BaseController extends \Controller
 		View::share($this->siteInfo);
 		View::share($this->manageViewConfig);
 		View::share(array("activeSiteName" => ""));
-		
+
 		if (Auth::check())
 		{
 			//set default active site id
 			$site_exists = false;
-
+			\Log::info("session active_site_id => " . Session::get("active_site_id"));
 			if (Session::get("active_site_id") !== null)
 			{
 				$this->active_site_id	 = Session::get("active_site_id");

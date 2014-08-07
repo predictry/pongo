@@ -88,6 +88,11 @@ body {
     margin-top: 5px;
 }*/
 
+.comparison-filter.affix{
+    z-index: 100;
+    margin-left: 29%;
+    top: 60px;
+}
 /* Sidebar
 ================================================== */
 /* Hide for mobile, show later */
