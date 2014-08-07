@@ -871,15 +871,20 @@ class PanelController extends \App\Controllers\BaseController
 		$view_action = \App\Models\Action::where("name", "view")->where("site_id", $this->active_site_id)->get()->first();
 		$temp		 = null;
 
-		/*
-		 * TODAY OVERALL, REGULAR AND RECOMMENDED STATS OF VIEW AND COMPLETE_PURCHASE / BUY
-		 */
-		$temp							 = $this->_populateDateRangeActionStats($dt_start, $dt_end, array($view_action->id), array($view_action->name), false, false, true, true);
-		$page_view_stats['overall']		 = (isset($temp) && is_array($temp)) ? current($temp) : FALSE;
-		$temp							 = $this->_populateDateRangeActionStats($dt_start, $dt_end, array($view_action->id), array($view_action->name), false, true, false, true);
-		$page_view_stats['recommended']	 = (isset($temp) && is_array($temp)) ? current($temp) : FALSE;
-		$temp							 = $this->_populateDateRangeActionStats($dt_start, $dt_end, array($view_action->id), array($view_action->name), false, false, false, true);
-		$page_view_stats['regular']		 = (isset($temp) && is_array($temp)) ? current($temp) : FALSE;
+		if (is_object($view_action))
+		{
+			/*
+			 * TODAY OVERALL, REGULAR AND RECOMMENDED STATS OF VIEW AND COMPLETE_PURCHASE / BUY
+			 */
+			$temp							 = $this->_populateDateRangeActionStats($dt_start, $dt_end, array($view_action->id), array($view_action->name), false, false, true, true);
+			$page_view_stats['overall']		 = (isset($temp) && is_array($temp)) ? current($temp) : FALSE;
+			$temp							 = $this->_populateDateRangeActionStats($dt_start, $dt_end, array($view_action->id), array($view_action->name), false, true, false, true);
+			$page_view_stats['recommended']	 = (isset($temp) && is_array($temp)) ? current($temp) : FALSE;
+			$temp							 = $this->_populateDateRangeActionStats($dt_start, $dt_end, array($view_action->id), array($view_action->name), false, false, false, true);
+			$page_view_stats['regular']		 = (isset($temp) && is_array($temp)) ? current($temp) : FALSE;
+		}
+		else
+			$page_view_stats['overall']		 = $page_view_stats['recommended']	 = $page_view_stats['regular']		 = 0;
 
 		return $page_view_stats;
 	}
