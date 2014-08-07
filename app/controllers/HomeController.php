@@ -166,10 +166,10 @@ class HomeController extends BaseController
 			$account->save();
 
 			//SEND VERIFICATION EMAIL
-			$email_data = array("fullname" => ucwords($input['name']));
-			\Mail::send('emails.auth.accountconfirmation', $email_data, function($message) use ($input) {
-				$message->to($input['email'], ucwords($input['name']))->subject('Welcome!');
-			});
+//			$email_data = array("fullname" => ucwords($input['name']));
+//			\Mail::send('emails.auth.accountconfirmation', $email_data, function($message) use ($input) {
+//				$message->to($input['email'], ucwords($input['name']))->subject('Welcome!');
+//			});
 
 			return Redirect::to('login')->with('flash_message', "home.success.register");
 		}

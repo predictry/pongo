@@ -36,6 +36,8 @@ class BaseController extends \Controller
 
 		View::share($this->siteInfo);
 		View::share($this->manageViewConfig);
+		View::share(array("activeSiteName" => ""));
+		
 		if (Auth::check())
 		{
 			//set default active site id
