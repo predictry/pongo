@@ -7,7 +7,6 @@
 				var highchart_average_recommended_sales_data = {{ $js_highchart_average_recommended_sales_pie_data }};
 				var highchart_ctr_data = {{ $js_highchart_ctr_data }};
 				var ctr_of_recommendation = {{ $js_ctr_of_recommendation }};
-//				var ctr_of_recommendation = "41.5";
 				var ctr_ngr = {{ $ctr_data['ngr'] }};
 				var ctr_nr = {{ $ctr_data['nr'] }};
 				var ctr_percentage = "0";
@@ -27,9 +26,8 @@
 									<div id="addText" style="position:absolute; left:27%; top:34%;"></div>
 								</div>
 								<div class="col-sm-6">
-									<p style="font-size: 21px; margin-top: 50px;"><span class="percentageOfCTR">{{ $js_ctr_of_recommendation }}% Click Through Rate (CTR) on Recommendations</span></p>
+									<p style="font-size: 21px; margin-top: 50px;"><span class="percentageOfCTR"><span class="percentageOfCTRVal">{{ $js_ctr_of_recommendation }}%</span> Click Through Rate (CTR) on Recommendations</span></p>
 									<p class="small cl-fade" id="ctrSummaryInfo">{{ $ctr_data['nr'] }} recommended items clicked out of {{ $ctr_data['ngr'] }} views</p>
-									<!--<h5>{{ $ctr_data['ngr'] }} recommended products viewed</h5>-->
 								</div>
 							</div>
 						</div>
@@ -39,7 +37,6 @@
 						<div class="panel-body">
 							<div class="row">
 								<div class="col-sm-6">
-									<!--<div id="averageRecommendedItemsDonut" style="min-width: 300px; height: 300px; max-width: 300px; margin: 0 auto"></div>-->
 									<div id="itemInCartStat">
 										<?php
 										$percentage_of_qty		 = ($average_cart_items['average_recommended_qty_items'] > 0) ? number_format(($average_cart_items['average_recommended_qty_items'] / $average_cart_items['average_regular_qty_items'] * 100), 2) : 0;
@@ -57,7 +54,7 @@
 									@if ($average_cart_items['average_regular_qty_items'] > 0)
 									<p style="font-size: 21px; margin-top: 40px;"><span class="percentageOfAverageRecommendationQty">{{ $percentage_of_qty }}</span>% of the cart items are recommended items</p>
 									@else
-									<p style="font-size: 21px; margin-top: 40px;">0% of the item in the carts from recommended items</p>
+									<p style="font-size: 21px; margin-top: 40px;"><span class="percentageOfAverageRecommendationQty">0%</span> of the item in the carts from recommended items</p>
 									@endif
 									<p class="small cl-fade" id="qtySummaryInfo">{{ $average_cart_items['average_recommended_qty_items'] }} out of {{ $average_cart_items['average_regular_qty_items'] }} items in the carts from recommended items</p>
 								</div>
@@ -71,8 +68,8 @@
 								<div class="col-sm-6">
 									<div id="itemSalesInCartStat">
 										<?php
-										$percentage_of_sub_items = ($average_cart_items['average_recommended_sub_totals'] > 0) ? number_format(($average_cart_items['average_recommended_sub_totals'] / $average_cart_items['average_regular_sub_totals'] * 100), 2) : 0;
-//										$percentage_of_sub_items = $average_cart_items['average_recommended_sub_totals'];
+//										$percentage_of_sub_items = ($average_cart_items['average_recommended_sub_totals'] > 0) ? number_format(($average_cart_items['average_recommended_sub_totals'] / $average_cart_items['average_regular_sub_totals'] * 100), 2) : 0;
+										$percentage_of_sub_items = $average_cart_items['average_recommended_sub_totals'];
 										$whole					 = floor($percentage_of_sub_items);
 										?>
 										@if ($average_cart_items['average_regular_sub_totals'] > 0)
@@ -81,7 +78,6 @@
 										<span class="text-float percentageOfAverageRecommendationSales">0%</span>
 										@endif
 									</div>
-									<!--<div id="averageRecommendedSalesDonut" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>-->
 								</div>
 								<div class="col-sm-6">
 									@if ($average_cart_items['average_regular_sub_totals'] > 0)
@@ -89,7 +85,7 @@
 									@else
 									<p style="font-size: 21px; margin-top: 40px;"><span class="percentageOfAverageRecommendationSales">0%</span> of total sales in carts from recommended items.</p>
 									@endif
-									<p class="small cl-fade" id="salesSummaryInfo">RM {{ $average_cart_items['average_recommended_sub_totals'] }} out of RM {{ $average_cart_items['average_regular_sub_totals'] }} with recommended items</p>
+									<p class="small cl-fade" id="salesSummaryInfo">RM {{ $average_cart_items['sum_recommended_sub_totals'] }} out of RM {{ $average_cart_items['total_combination_of_sub_totals'] }} with recommended items</p>
 								</div>
 							</div>
 						</div>

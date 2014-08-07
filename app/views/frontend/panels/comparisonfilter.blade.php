@@ -1,4 +1,4 @@
-<div class="form-inline">
+<div class="form-inline affix-top">
 	<!--	<div class="col-sm-3">
 			<div class="form-group">
 				<div class="form-group text-left">

@@ -1068,88 +1068,90 @@ class PanelController extends \App\Controllers\BaseController
 
 		$complete_purchase_action = \App\Models\Action::where("name", "buy")->where("site_id", $this->active_site_id)->get()->first();
 
-		$action_instance_ids = \App\Models\Action::find($complete_purchase_action->id)
-						->action_instances()
-						->whereBetween('created', [$dt_start, $dt_end])
-						->get(array("action_instances.id AS action_instance_id"))->lists("action_instance_id");
-
-		if (count($action_instance_ids) > 0)
+		if (is_object($complete_purchase_action))
 		{
-
-			$cart_ids = array_unique(\App\Models\ActionInstanceMeta::whereIn("action_instance_id", $action_instance_ids)
-							->where("action_instance_metas.key", "cart_id")
-							->get(array("action_instance_metas.value AS value"))->lists("value"));
-
-			$recommended_action_instance_metas = \App\Models\Action::find($complete_purchase_action->id)
-							->action_instances_and_metas()
-							->where("action_instance_metas.key", "rec")
-							->where("action_instance_metas.value", "true")
+			$action_instance_ids = \App\Models\Action::find($complete_purchase_action->id)
+							->action_instances()
 							->whereBetween('created', [$dt_start, $dt_end])
-							->get(array("action_instances.id AS action_instance_id", "action_instance_metas.key", "action_instance_metas.value"))->lists("action_instance_id");
+							->get(array("action_instances.id AS action_instance_id"))->lists("action_instance_id");
 
-
-			$regular_action_instance_metas = array_diff($action_instance_ids, $recommended_action_instance_metas);
-
-			if (count($recommended_action_instance_metas) > 0)
+			if (count($action_instance_ids) > 0)
 			{
-				$sum_recommended_qty = \App\Models\ActionInstanceMeta::whereIn("action_instance_id", $recommended_action_instance_metas)
-						->where("action_instance_metas.key", "qty")
-						->get()
-						->sum('value');
 
-				$sum_recommended_sub_totals = \App\Models\ActionInstanceMeta::whereIn("action_instance_id", $recommended_action_instance_metas)
-						->where("action_instance_metas.key", "sub_total")
-						->get()
-						->sum('value');
-			}
-			else
-			{
-				$sum_recommended_qty		 = $sum_recommended_sub_totals	 = 0;
-			}
+				$cart_ids = array_unique(\App\Models\ActionInstanceMeta::whereIn("action_instance_id", $action_instance_ids)
+								->where("action_instance_metas.key", "cart_id")
+								->get(array("action_instance_metas.value AS value"))->lists("value"));
 
-			if (count($regular_action_instance_metas) > 0)
-			{
-				$sum_regular_qty = \App\Models\ActionInstanceMeta::whereIn("action_instance_id", $regular_action_instance_metas)
-						->where("action_instance_metas.key", "qty")
-						->get()
-						->sum('value');
+				$recommended_action_instance_metas = \App\Models\Action::find($complete_purchase_action->id)
+								->action_instances_and_metas()
+								->where("action_instance_metas.key", "rec")
+								->where("action_instance_metas.value", "true")
+								->whereBetween('created', [$dt_start, $dt_end])
+								->get(array("action_instances.id AS action_instance_id", "action_instance_metas.key", "action_instance_metas.value"))->lists("action_instance_id");
 
-				$sum_regular_sub_totals = \App\Models\ActionInstanceMeta::whereIn("action_instance_id", $regular_action_instance_metas)
-						->where("action_instance_metas.key", "sub_total")
-						->get()
-						->sum('value');
-			}
-			else
-			{
-				$sum_regular_qty		 = $sum_regular_sub_totals	 = 0;
-			}
 
-			if (count($cart_ids) > 0)
-			{
-				$average_recommended_qty_items	 = ($sum_recommended_qty) / count($cart_ids);
+				$regular_action_instance_metas = array_diff($action_instance_ids, $recommended_action_instance_metas);
+
+				if (count($recommended_action_instance_metas) > 0)
+				{
+					$sum_recommended_qty = \App\Models\ActionInstanceMeta::whereIn("action_instance_id", $recommended_action_instance_metas)
+							->where("action_instance_metas.key", "qty")
+							->get()
+							->sum('value');
+
+					$sum_recommended_sub_totals = \App\Models\ActionInstanceMeta::whereIn("action_instance_id", $recommended_action_instance_metas)
+							->where("action_instance_metas.key", "sub_total")
+							->get()
+							->sum('value');
+				}
+				else
+				{
+					$sum_recommended_qty		 = $sum_recommended_sub_totals	 = 0;
+				}
+
+				if (count($regular_action_instance_metas) > 0)
+				{
+					$sum_regular_qty = \App\Models\ActionInstanceMeta::whereIn("action_instance_id", $regular_action_instance_metas)
+							->where("action_instance_metas.key", "qty")
+							->get()
+							->sum('value');
+
+					$sum_regular_sub_totals = \App\Models\ActionInstanceMeta::whereIn("action_instance_id", $regular_action_instance_metas)
+							->where("action_instance_metas.key", "sub_total")
+							->get()
+							->sum('value');
+				}
+				else
+				{
+					$sum_regular_qty		 = $sum_regular_sub_totals	 = 0;
+				}
+
+				if (count($cart_ids) > 0)
+				{
+					$average_recommended_qty_items	 = ($sum_recommended_qty) / count($cart_ids);
 //				$average_recommended_qty_items	 = (($sum_recommended_qty) / ($sum_recommended_qty + $sum_recommended_qty)) * 100;
-				$average_regular_qty_items		 = ($sum_regular_qty) / count($cart_ids);
+					$average_regular_qty_items		 = ($sum_regular_qty) / count($cart_ids);
 
-				$average_recommended_sub_totals	 = ($sum_recommended_sub_totals) / count($cart_ids);
+					$average_recommended_sub_totals	 = ($sum_recommended_sub_totals) / count($cart_ids);
 //				$average_recommended_sub_totals	 = (($sum_recommended_sub_totals) / ($sum_recommended_sub_totals + $sum_regular_sub_totals)) * 100;
-				$average_regular_sub_totals		 = ($sum_regular_sub_totals) / count($cart_ids);
+					$average_regular_sub_totals		 = ($sum_regular_sub_totals) / count($cart_ids);
 
-				return array(
-					'total_carts'						 => count($cart_ids),
-					'total_combination_of_qty'			 => $sum_recommended_qty + $sum_recommended_qty,
-					'total_combination_of_sub_totals'	 => $sum_recommended_sub_totals + $sum_regular_sub_totals,
-					'sum_recommended_qty'				 => $sum_recommended_qty,
-					'average_recommended_qty_items'		 => number_format($average_recommended_qty_items, 2),
-					'sum_regular_qty'					 => $sum_regular_qty,
-					'average_regular_qty_items'			 => number_format($average_regular_qty_items, 2),
-					'sum_recommended_sub_totals'		 => $sum_recommended_sub_totals,
-					'average_recommended_sub_totals'	 => number_format($average_recommended_sub_totals, 2),
-					'sum_regular_sub_totals'			 => $sum_regular_sub_totals,
-					'average_regular_sub_totals'		 => number_format($average_regular_sub_totals, 2),
-				);
+					return array(
+						'total_carts'						 => count($cart_ids),
+						'total_combination_of_qty'			 => $sum_recommended_qty + $sum_recommended_qty,
+						'total_combination_of_sub_totals'	 => $sum_recommended_sub_totals + $sum_regular_sub_totals,
+						'sum_recommended_qty'				 => $sum_recommended_qty,
+						'average_recommended_qty_items'		 => number_format($average_recommended_qty_items, 2),
+						'sum_regular_qty'					 => $sum_regular_qty,
+						'average_regular_qty_items'			 => number_format($average_regular_qty_items, 2),
+						'sum_recommended_sub_totals'		 => $sum_recommended_sub_totals,
+						'average_recommended_sub_totals'	 => number_format($average_recommended_sub_totals, 2),
+						'sum_regular_sub_totals'			 => $sum_regular_sub_totals,
+						'average_regular_sub_totals'		 => number_format($average_regular_sub_totals, 2),
+					);
+				}
 			}
 		}
-
 		return array(
 			'total_carts'						 => 0,
 			'total_combination_of_qty'			 => 0,

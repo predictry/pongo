@@ -101,6 +101,18 @@ class AjaxPanelController extends \App\Controllers\BaseController
 			array("Recommended Cart Items", $average_cart_sales_and_qty['average_recommended_sub_totals'] * 1)
 		);
 
+
+		//CTR
+		if ($inputs['comparison_type'] === 'sales')
+			$ctrData = $this->_getCTRData($other_stats, $dt_start_ori, $dt_end_ori);
+		else
+			$ctrData = $this->_getCTRData($stats, $dt_start_ori, $dt_end_ori);
+
+		$highchart_ctr_data = array(
+			array("Impression of Recommended Items", $ctrData['ngr']),
+			array("Recommended Items Clicked", $ctrData['nr'])
+		);
+
 		$response = array(
 			'highchart_categories'							 => $highchart_categories,
 			'highchart_options_series'						 => $highchart_options_series,
@@ -111,6 +123,12 @@ class AjaxPanelController extends \App\Controllers\BaseController
 			'highchart_average_recommended_items_pie_data'	 => $highchart_average_recommended_items_pie_data,
 			'highchart_average_recommended_sales_pie_data'	 => $highchart_average_recommended_sales_pie_data,
 			'average_cart_sales_and_qty'					 => $average_cart_sales_and_qty,
+			'highchart_ctr_data'							 => $highchart_ctr_data,
+			'ctr_percentage'								 => $ctrData['ctr'],
+			'ctr_ngr'										 => $ctrData['ngr'],
+			'ctr_nr'										 => $ctrData['nr'],
+			'ctr_np'										 => $ctrData['np'],
+			'ctr_impression'								 => $ctrData['impression'],
 			'y_title'										 => ($inputs['comparison_type'] === 'sales') ? 'RM' : 'Value'
 		);
 
@@ -524,6 +542,46 @@ class AjaxPanelController extends \App\Controllers\BaseController
 		}
 
 		return $stats;
+	}
+
+	function _getCTRData($page_view_stats, $dt_start = null, $dt_end = null)
+	{
+		$widget_ids = \App\Models\Widget::where("site_id", $this->active_site_id)->get()->lists("id");
+		if (count($widget_ids) > 0)
+		{
+			$n_widget_instances = \App\Models\WidgetInstance::whereIn("widget_id", $widget_ids)
+					->whereBetween("created_at", [$dt_start, $dt_end])
+					->count();
+
+			$total_regular_pageviews		 = $page_view_stats['regular'];
+			$total_recommended_pageviews	 = $page_view_stats['recommended'];
+			$total_recommendation_generated	 = $n_widget_instances * 24; //dummy kali 20
+
+			$result = array(
+				'np'		 => $total_regular_pageviews,
+				'nr'		 => $total_recommended_pageviews,
+				'ngr'		 => $total_recommendation_generated,
+//				'ngr'		 => 10152, //dummy
+				'ctr'		 => ($total_recommendation_generated > 0) ? ($total_recommended_pageviews / $total_recommendation_generated) * 100 : 0,
+//				'ctr'		 => ($total_recommendation_generated > 0) ? ($total_recommended_pageviews / 10152) * 100 : 0, //dummy
+				'impression' => $total_recommendation_generated
+//				'impression' => 10152 //dummy
+			);
+
+			$result['ngr'] = ($result['ngr'] > 0) ? $result['ngr'] : 1;
+		}
+		else
+		{
+			$result = array(
+				'np'		 => 0,
+				'nr'		 => 0,
+				'ngr'		 => 0,
+				'ctr'		 => 0,
+				'impression' => 0
+			);
+		}
+
+		return $result;
 	}
 
 }
