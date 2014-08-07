@@ -101,19 +101,18 @@ class AjaxPanelController extends \App\Controllers\BaseController
 			array("Recommended Cart Items", $average_cart_sales_and_qty['average_recommended_sub_totals'] * 1)
 		);
 
-
 		//CTR
 		if ($inputs['comparison_type'] === 'sales')
-			$ctrData = $this->_getCTRData($other_stats, $dt_start_ori, $dt_end_ori);
+			$ctrData			 = $this->_getCTRData($other_stats_summary, $dt_start_ori, $dt_end_ori);
 		else
-			$ctrData = $this->_getCTRData($stats, $dt_start_ori, $dt_end_ori);
-
-		$highchart_ctr_data = array(
+			$ctrData			 = $this->_getCTRData($stats_summary, $dt_start_ori, $dt_end_ori);
+//
+		$highchart_ctr_data	 = array(
 			array("Impression of Recommended Items", $ctrData['ngr']),
 			array("Recommended Items Clicked", $ctrData['nr'])
 		);
-
-		$response = array(
+//
+		$response			 = array(
 			'highchart_categories'							 => $highchart_categories,
 			'highchart_options_series'						 => $highchart_options_series,
 			'comparison_summaries'							 => $stats_summary,
