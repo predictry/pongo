@@ -42,7 +42,6 @@ class BaseController extends \Controller
 		{
 			//set default active site id
 			$site_exists = false;
-			\Log::info("session active_site_id => " . Session::get("active_site_id"));
 			if (Session::get("active_site_id") !== null)
 			{
 				$this->active_site_id	 = Session::get("active_site_id");

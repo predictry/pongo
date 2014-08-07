@@ -19,11 +19,6 @@ class PanelController extends \App\Controllers\BaseController
 	{
 		parent::__construct();
 
-		if (!$this->active_site_id)
-		{
-			return \Redirect::to('sites/wizard');
-		}
-
 		$custom_script = "<script type='text/javascript'>";
 		$custom_script .= "var site_url = '" . \URL::to('/') . "';";
 		$custom_script .= "</script>";
@@ -110,6 +105,9 @@ class PanelController extends \App\Controllers\BaseController
 //	public function index2($selected_comparison = "sales", $type = "31_d_ago", $bar_type = 'stacked', $type_by = "day", $dt_start = null, $dt_end = null)
 	public function index2($selected_comparison = "sales", $type = "31_d_ago", $date_unit = "day", $dt_start = null, $dt_end = null)
 	{
+		if (!$this->active_site_id)
+			return \Redirect::to('sites/wizard');
+
 		$inputs = array(
 			"type"					 => $type,
 			"type_by"				 => $date_unit,
@@ -1220,7 +1218,7 @@ class PanelController extends \App\Controllers\BaseController
 		$action_name = ($type === "sales") ? "buy" : "view";
 		$action		 = \App\Models\Action::where("name", $action_name)->where("site_id", $this->active_site_id)->get()->first();
 		$item_ids	 = array();
-		
+
 		if (is_object($action))
 		{
 			$item_ids = \App\Models\Action::find($action->id)
