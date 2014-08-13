@@ -4,10 +4,10 @@
 CWD=$(pwd)
 
 #installing git if it does not exist
- type git  >/dev/null 2>&1 || {
-         sudo apt-get install -y git
-         echo "git installed successfully"
-    }
+# type git  >/dev/null 2>&1 || {
+#         sudo apt-get install -y git
+#         echo "git installed successfully"
+#    }
 
 
 #installing composer if it does not exist
