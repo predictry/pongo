@@ -1,5 +1,6 @@
 #! /bin/bash
 
+CWD=$(pwd)
 
 #installing git if it does not exist
 # type git  >/dev/null 2>&1 || {
@@ -52,11 +53,11 @@ fi
 
 #replacing the nginx default file
 
-cp default /usr/share/nginx/html/
+cp $CWD/default /etc/nginx/sites-available/
 
 #replacing php.ini with the default one 
  
-cp php.ini /etc/php5/fpm/php.ini
+cp $CWD/php.ini /etc/php5/fpm/php.ini
 
 
 # reloading nginx and php
