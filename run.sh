@@ -17,6 +17,7 @@
 #installing postgresql if it does not exist
  type psql  >/dev/null 2>&1 || {
 	 sudo apt-get install -y postgresql-client
+         sudo apt-get install php5-pgsql
          echo "postgresql-client installed successfully"
     }
 
