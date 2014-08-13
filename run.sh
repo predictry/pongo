@@ -1,5 +1,6 @@
 #! /bin/bash
 
+CWD=$(pwd)
 
 #installing git if it does not exist
 # type git  >/dev/null 2>&1 || {
@@ -7,6 +8,11 @@
 #         echo "git installed successfully"
 #    }
 
+#installing php-fpm and php-curl-extension curl if it does not exist
+ type php  >/dev/null 2>&1 || {
+        sudo  apt-get install -y php5-fpm && apt-get install php5-cli && sudo apt-get install -y curl php5-curl
+         echo "php installed successfully"
+    }
 
 #installing composer if it does not exist
  type composer  >/dev/null 2>&1 || {
@@ -29,32 +35,30 @@
          echo "nginx installed successfully and its running"
     }
 
-#installing php-fpm and php-curl-extension curl if it does not exist
- type php  >/dev/null 2>&1 || {
-        sudo  apt-get install -y php5-fpm && sudo apt-get install -y curl php5-curl
-         echo "php installed successfully"
-    }
 
 #instaling mcrypt for php 
 if [[ -z $(php -m | grep mcrypt) ]]; then
- sudo apt-get install -y  php5-mcrypt && -y  php5enmod mcrypt
-
+ sudo apt-get install -y  php5-mcrypt 
+ sudo ln -s /etc/php5/conf.d/mcrypt.ini /etc/php5/mods-available/mcrypt.ini
+ sudo php5enmod mcrypt
+ sudo service php5-fpm restart
 fi
 
 
 #creating a folder in /usr/share/nginx/html and cloning predictry from github
 
 if [ ! -e "/usr/share/nginx/html/www" ] ; then
-    cd /usr/share/nginx/html && mkdir "www" &&  sudo git clone https://github.com/perfectsen/predictry-pongo . 	
+    cd /usr/share/nginx/html && mkdir "www" && cd www  && sudo git clone https://github.com/perfectsen/predictry-pongo .
+
 fi
 
 #replacing the nginx default file
 
-cp default /usr/share/nginx/html/
+cp $CWD/default /etc/nginx/sites-available/
 
 #replacing php.ini with the default one 
  
-cp php.ini /etc/php5/fpm/php.ini
+cp $CWD/php.ini /etc/php5/fpm/php.ini
 
 
 # reloading nginx and php
