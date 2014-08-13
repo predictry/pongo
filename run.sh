@@ -21,10 +21,11 @@
     }
 
 
-#installing nginx if it does not exist
+#installing nginx if it does not exist, and start nginx
  type nginx  >/dev/null 2>&1 || {
 	sudo apt-get install -y nginx
-         echo "nginx installed successfully"
+	sudo service nginx start
+         echo "nginx installed successfully and its running"
     }
 
 #installing php-fpm and php-curl-extension curl if it does not exist
