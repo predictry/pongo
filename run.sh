@@ -1,8 +1,6 @@
 #! /bin/bash
 
 
-CWD=$(pwd)
-
 #installing git if it does not exist
 # type git  >/dev/null 2>&1 || {
 #         sudo apt-get install -y git
