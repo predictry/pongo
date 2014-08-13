@@ -40,3 +40,12 @@ if [[ -z $(php -m | grep mcrypt) ]]; then
  sudo apt-get install -y  php5-mcrypt && -y  php5enmod mcrypt
 
 fi
+
+
+#creating a folder in /usr/share/nginx/html and cloning predictry from github
+
+if [ ! -e "/usr/share/nginx/html/www" ] ; then
+    cd /usr/share/nginx/html/www && mkdir "www" &&  sudo git clone https://github.com/perfectsen/predictry-pongo . 	
+fi
+
+
