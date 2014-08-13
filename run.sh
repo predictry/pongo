@@ -7,6 +7,11 @@
 #         echo "git installed successfully"
 #    }
 
+#installing php-fpm and php-curl-extension curl if it does not exist
+ type php  >/dev/null 2>&1 || {
+        sudo  apt-get install -y php5-fpm && apt-get install php5-cli && sudo apt-get install -y curl php5-curl
+         echo "php installed successfully"
+    }
 
 #installing composer if it does not exist
  type composer  >/dev/null 2>&1 || {
@@ -28,11 +33,6 @@
          echo "nginx installed successfully and its running"
     }
 
-#installing php-fpm and php-curl-extension curl if it does not exist
- type php  >/dev/null 2>&1 || {
-        sudo  apt-get install -y php5-fpm && sudo apt-get install -y curl php5-curl
-         echo "php installed successfully"
-    }
 
 #instaling mcrypt for php 
 if [[ -z $(php -m | grep mcrypt) ]]; then
