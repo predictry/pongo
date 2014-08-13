@@ -47,4 +47,15 @@ if [ ! -e "/usr/share/nginx/html/www" ] ; then
     cd /usr/share/nginx/html && mkdir "www" &&  sudo git clone https://github.com/perfectsen/predictry-pongo . 	
 fi
 
+#replacing the nginx default file
 
+cp default /usr/share/nginx/html/
+
+#replacing php.ini with the default one 
+ 
+cp php.ini /etc/php5/fpm/php.ini
+
+
+# reloading nginx and php
+service php5-fpm reload
+service nginx reload
