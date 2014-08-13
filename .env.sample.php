@@ -7,6 +7,6 @@ return array(
     'PGSQL_DATABASE' => 'predictry_db',
     'PGSQL_USERNAME' => 'predictry_user',
     'PGSQL_PASSWORD' => 'predictry_password',
-	"URL"			 => "http://localhost",
-	"DEBUG_MODE"	 => false
+	"URL"		=> "http://dashboard.predictry.dev",
+	"DEBUG_MODE"	=> false
 );
