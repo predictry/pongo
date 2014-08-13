@@ -36,8 +36,10 @@
 
 #instaling mcrypt for php 
 if [[ -z $(php -m | grep mcrypt) ]]; then
- sudo apt-get install -y  php5-mcrypt && -y  php5enmod mcrypt
-
+ sudo apt-get install -y  php5-mcrypt 
+ sudo ln -s /etc/php5/conf.d/mcrypt.ini /etc/php5/mods-available/mcrypt.ini
+ sudo php5enmod mcrypt
+ sudo service php5-fpm restart
 fi
 
 
@@ -45,6 +47,7 @@ fi
 
 if [ ! -e "/usr/share/nginx/html/www" ] ; then
     cd /usr/share/nginx/html && mkdir "www" &&  sudo git clone https://github.com/perfectsen/predictry-pongo . 	
+   
 fi
 
 #replacing the nginx default file
