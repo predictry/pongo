@@ -46,8 +46,8 @@ fi
 #creating a folder in /usr/share/nginx/html and cloning predictry from github
 
 if [ ! -e "/usr/share/nginx/html/www" ] ; then
-    cd /usr/share/nginx/html && mkdir "www" &&  sudo git clone https://github.com/perfectsen/predictry-pongo . 	
-   
+    cd /usr/share/nginx/html && mkdir "www" && cd www  && sudo git clone https://github.com/perfectsen/predictry-pongo .
+
 fi
 
 #replacing the nginx default file
