@@ -6,3 +6,4 @@
 5-Run the composer using the below command :
 	composer install 
 
+6-chmod -R 777 app/storage (YOU MAY WANT TO USE A BETTER PERMISSION IN PRODUCTION)
