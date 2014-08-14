@@ -1,0 +1,10 @@
+<div data-user-id="{$USER_ID}" data-item-id="{$ITEM_ID}" class="PREDICTRY"></div>
+<script type="text/javascript">
+    (function() {
+        var u = (("https:" === document.location.protocol) ? "https://" : "http://") + "api.predictry.dev/v2/";
+        _predictry.push(['setWidgetId', "{$WIDGET_ID}"]);
+        var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+        g.type = 'text/javascript', g.defer = true, g.async = true, g.src = u + 'r.min.js';
+        s.parentNode.insertBefore(g, s);
+    })();
+</script>
