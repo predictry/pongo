@@ -232,4 +232,3 @@ Route::group(array('prefix' => 'api/v1', 'namespace' => 'App\Controllers\Api'), 
 	Route::resource('cartlog', 'CartLogController', array("only" => array("store")));
 	Route::resource('widget', 'WidgetInstanceController', array("only" => array("store")));
 });
-

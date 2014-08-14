@@ -13,3 +13,11 @@
 	</dd>
 	@endforeach
 </dl>
+<div class="clearfix"></div>
+
+<pre>
+	<?php
+	foreach ($properties as $p)
+		echo $p->key . ":" . $p->value . "\n";
+	?>
+</pre>
