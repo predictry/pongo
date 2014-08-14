@@ -57,6 +57,9 @@ class ActionController extends \App\Controllers\ApiBaseController
 				if ($validator->passes())
 				{
 					$response = $this->_proceedAction($action_name, $user_identifier_id, $session_id, $action_data);
+
+					if (is_object($response))
+						return Response::json($response, $response->status);
 				}
 				else
 				{
@@ -71,8 +74,11 @@ class ActionController extends \App\Controllers\ApiBaseController
 
 				foreach ($actions as $act)
 				{
-					$action_data['item_id']				 = $act['item_id'];
-					$action_data['description']			 = $act['description'];
+					$action_data['item_id'] = $act['item_id'];
+
+					if (key_exists("description", $act))
+						$action_data['description'] = $act['description'];
+
 					$action_data['action_properties']	 = isset($act['action_properties']) ? $act['action_properties'] : array();
 					$action_data['item_properties']		 = isset($act['item_properties']) ? $act['item_properties'] : array();
 					$validator							 = $this->_validateProceedAction($action_name, $user_identifier_id, $session_id, $action_data);
@@ -113,7 +119,7 @@ class ActionController extends \App\Controllers\ApiBaseController
 	{
 		$item_identifier_id	 = $action_data['item_id'];
 		$session			 = $session_id;
-		$item_name			 = $action_data['description'];
+		$item_name			 = isset($action_data['description']) ? $action_data['description'] : '';
 		$action_properties	 = $action_data['action_properties'];
 		$item_properties	 = $action_data['item_properties'];
 
@@ -214,7 +220,7 @@ class ActionController extends \App\Controllers\ApiBaseController
 		}
 	}
 
-	function _getVisitorID($identifier)
+	function _getVisitorID($identifier, &$is_new = false)
 	{
 		$visitor_id = 0;
 
@@ -267,7 +273,7 @@ class ActionController extends \App\Controllers\ApiBaseController
 
 		if ($item)
 		{
-			if (isset($item_data['name']) && ($item->name !== $item_data['name']))
+			if (isset($item_data['name']) && $item_data['name'] !== "" && ($item->name !== $item_data['name']))
 			{
 				$item->name = $item_data['name'];
 				$item->update();
