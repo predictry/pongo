@@ -10,8 +10,11 @@
 
 namespace App\Controllers;
 
-use Request,
-	App\Models;
+define('LOKE_RESTAPI_URL', 'http://119.81.72.66');
+define('EASYREC_RESTAPI_URL', 'http://demo.easyrec.org:8080/api/1.0/json/');
+define('GUI_RESTAPI_URL', 'http://103.18.244.119/predictry/api/v1/');
+define("GUI_HTTP_USERNAME", "pongo");
+define("GUI_HTTP_PASSWORD", "vventures");
 
 class ApiBaseController extends \Controller
 {
@@ -19,6 +22,7 @@ class ApiBaseController extends \Controller
 	public $predictry_server_api_key = null;
 	public $site					 = null;
 	public $site_id					 = null;
+	public $http_status				 = 200;
 	private $message				 = "";
 
 	public function __construct()
@@ -80,9 +84,52 @@ class ApiBaseController extends \Controller
 		return false;
 	}
 
-	public function getTesting()
+	public function getErrorResponse($error_key, $http_status, $resources = "", $msg = "", $c_msg = "")
 	{
-		return \Response::json($_SERVER);
+		$response = array(
+			'error'			 => true, //true / false
+			'message'		 => '',
+			'client_message' => '',
+			'status'		 => ''
+		);
+
+		$client_message	 = $message		 = "";
+		switch ($error_key)
+		{
+			case "credentialMissing":
+				$message = "credential hasn't assigned or wrong";
+				break;
+
+			case "notFound":
+				$message		 = "Resources of {$resources} doesn't exists";
+				$client_message	 = "The {$resources} doesn't exists. Please try again.";
+				break;
+
+			case "inputUnknown":
+				$message		 = "Input of {$resources} unknown";
+				$client_message	 = "Your request cannot be proceed, due to unknown input. Please contact your site administrator.";
+				break;
+
+			case "errorValidator":
+				$message		 = $msg;
+				$client_message	 = $c_msg;
+				break;
+
+			case "noResults":
+				$message		 = "No recommendation results available.";
+				$client_message	 = "No recommendation results available in the moment. Please try again later.";
+				break;
+
+			default:
+				break;
+		}
+
+		$response['message']		 = $message;
+		$response['client_message']	 = $client_message;
+		$response['status']			 = $http_status;
+		$this->http_status			 = $http_status;
+
+		return $response;
 	}
 
 }

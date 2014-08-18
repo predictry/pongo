@@ -26,7 +26,6 @@ var bulk_action = {
         }
     ]
 };
-
 var action_data = {
     action: 'view',
     item_id: 105,
@@ -39,7 +38,6 @@ var action_data = {
         price: 250
     }
 };
-
 //_predictry.push(['trackView', USER_ID, ITEM_ID, DESCRIPTION, ITEM_PROPERTIES, ACTION_PROPERTIES ]);
 //_predictry.push(['trackView', action_data.user_id, action_data.item_id, action_data.description, action_data.item_properties, {} ]);
 //_predictry.push(['trackAddToCart', action_data.user_id, action_data.item_id, action_data.description, action_data.item_properties, {} ]);
@@ -65,7 +63,6 @@ var bulk_action_data_2 = {
         }
     ]
 };
-
 var actions = [
     {
         item_id: 105,
@@ -83,7 +80,6 @@ var actions = [
         }
     }
 ];
-
 //_predictry.push(['trackBuy', 200, actions]);
 
 
@@ -91,7 +87,6 @@ var str_recommendation_data = "";
 predict.getRecommendedItems(18, 35851, 9154, function() {
     str_recommendation_data = predict.getRecentRecommendedItems();
 });
-
 //_predictry.push(['getRecommendedItems', WIDGET_ID, USER_ID, ITEM_ID, CALLBACK]);
 
 var recommendation_data;
@@ -105,3 +100,70 @@ _predictry.push(['getRecommendedItems', 18, 35851, 9154, function() {
         }
     }
 ]);
+var view_item_data = {
+    // If user is not logged in, this object is not required
+    user: {
+        user_id: "100", //alphanumeric (unique)
+        email: "user@email.com",
+        //OPTIONALS - Provide if available so that recommendations would be better
+        name: "John Doe",
+        country: "Australia"
+
+    },
+    item: {
+        item_id: "105", //alphanumeric (unique)
+        name: "Item name",
+        price: 250.12,
+        currency: "MYR", //currency code based on http://www.xe.com/iso4217.php
+        img_url: "http://www.predictry.com/123.png",
+        item_url: "http://www.predictry.com/123", //without trailing slash
+
+
+        //OPTIONALS - Provide if available so that recommendations would be better
+        discount: "23%", //the discount that is being offered. If the discount is in amount 23.10 without the percentage and quotes
+        description: "Description of the item",
+        inventory_qty: 100, //how many items left
+        category: "Electronics",
+        sub_category: "Phone",
+        tags: ["iphone", "5s", "gold"], //this is an array. If there's only one item also enclosed in array ["iphone"] 
+        brand: "apple",
+        locations: ["kuala lumpur", "jakarta"], //cities that this is sold if applicable
+        start_date: 1407921883, //unix timestamp - when is the first that this will be sold? If applicable, if not, ignore.
+        end_date: 1417921883, //unix timestamp - when is the last day that it will be sold? If applicable, if not, ignore.  
+
+    }
+};
+_predictry.push(['trackView', view_item_data]);
+
+
+var buy_data = {
+    user: {
+        user_id: "100", //alphanumeric (unique)
+        email: "user@email.com",
+        //OPTIONALS - Provide if available so that recommendations would be better
+        name: "John Doe",
+        country: "Australia"
+    },
+    buy: {
+        items: [
+            {
+                item_id: "105", //alphanumeric (unique)
+                qty: 12,
+                sub_total: 380
+            },
+            {
+                item_id: "106",
+                qty: 20,
+                sub_total: 1350.5
+            }
+        ],
+        total: 1730.5,
+        currency: "MYR", //currency code based on http://www.xe.com/iso4217.php
+
+        //OPTIONALS
+        promo_code: "ABC123", //alphanumeric
+        promo_code_discount: "23%" //the discount that is being offered by the promo code. If the discount is in amount 23.10 without the percentage and quotes
+    }
+};
+
+_predictry.push(['trackBuy', buy_data]);

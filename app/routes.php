@@ -233,3 +233,8 @@ Route::group(array('prefix' => 'api/v1', 'namespace' => 'App\Controllers\Api'), 
 	Route::resource('widget', 'WidgetInstanceController', array("only" => array("store")));
 });
 
+Route::group(array('prefix' => 'api/v2', 'namespace' => 'App\Controllers\Api'), function() {
+	Route::resource('actions', 'Action2Controller', array("only" => array("index", "store", "show", "destroy")));
+	Route::resource('carts', 'CartController', array("only" => array("store")));
+});
+

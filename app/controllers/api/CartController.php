@@ -35,7 +35,7 @@ class CartController extends \App\Controllers\ApiBaseController
 	 */
 	public function store()
 	{
-		$session	 = \Input::get("session_id");
+		$session	 = trim(\Input::get("session_id"));
 		$validator	 = \Validator::make(array('session_id' => $session), array('session_id' => 'required'));
 		$cart_id	 = -1;
 

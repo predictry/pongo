@@ -8,8 +8,6 @@ use Input,
 	Request,
 	Validator;
 
-define('EASYREC_RESTAPI_URL', 'http://demo.easyrec.org:8080/api/1.0/json/');
-
 class ActionController extends \App\Controllers\ApiBaseController
 {
 

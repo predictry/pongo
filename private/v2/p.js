@@ -342,9 +342,11 @@ if (typeof Predictry !== 'object') {
                     config_default_request_method = "POST",
                     config_request_method = config_default_request_method,
                     config_default_request_content_type = "application/x-www-form-urlencoded; charset=UTF-8",
-                    config_api_url = "http://dashboard.predictry.dev/api/v1/",
-                    config_api_resources = ["predictry", "recommendation", "cart", "cartlog"],
+                    config_request_content_type = config_default_request_content_type,
+                    config_api_url = "http://dashboard.predictry.dev/api/v2/",
+                    config_api_resources = ["actions", "users", "items", "carts", "cartlogs", "recommendation"],
                     config_session_cookie_timeout = 63072000000, // 2 years
+                    config_tracking_session_cookie_timeout = 72000000, //20 minutes
                     config_default_action = "view",
                     config_do_not_track = false,
                     recent_xhr = null;
@@ -462,7 +464,7 @@ if (typeof Predictry !== 'object') {
              * @returns {string}
              */
             function setSessionCookieId(unique_id) {
-                setCookie(getCookieName("session"), unique_id, config_session_cookie_timeout, config_cookie_path);
+                setCookie(getCookieName("session"), unique_id, config_tracking_session_cookie_timeout, config_cookie_path);
                 return unique_id;
             }
 
@@ -470,22 +472,45 @@ if (typeof Predictry !== 'object') {
              * Set Session User ID
              * 
              * @param {string} unique_id
-             * @returns {String}
+             * @returns {void}
              */
             function setUserSessionCookieId(unique_id) {
-                setCookie(getCookieName("user"), unique_id, config_session_cookie_timeout, config_cookie_path);
+                setCookie(getCookieName("user"), unique_id, config_tracking_session_cookie_timeout, config_cookie_path);
+                return unique_id;
+
+            }
+
+            /**
+             * Set Browser Session Cookie ID
+             * @param {string} unique_id
+             * @returns {string}
+             */
+            function setBrowserSessionCookieId(unique_id) {
+                setCookie(getCookieName("browser"), unique_id, config_session_cookie_timeout, config_cookie_path);
+                return unique_id;
+
             }
 
             /**
              * Set Cart Session
+             * @param {object} c_obj
              * @returns {object}
              */
-            function setCartSessionCookie() {
+            function setCartSessionCookie(c_obj) {
                 var cart_id = getCartID();
-                var c_obj = {c: [], cart_id: cart_id};
+                if (!isDefined(c_obj))
+                    c_obj = {c: [], cart_id: cart_id};
+
                 var value = JSON.stringify(c_obj);
-                setCookie(getCookieName("cart"), value, config_session_cookie_timeout, config_cookie_path);
+                setCookie(getCookieName("cart"), value, config_tracking_session_cookie_timeout, config_cookie_path);
                 return c_obj;
+            }
+
+            function setViewSessionCookie() {
+                var v_obj = {v: []};
+                var value = JSON.stringify(v_obj);
+                setCookie(getCookieName("view"), value, config_tracking_session_cookie_timeout, config_cookie_path);
+                return v_obj;
             }
 
             /**
@@ -665,6 +690,17 @@ if (typeof Predictry !== 'object') {
             }
 
 
+            function setViewSession(item_id) {
+                var viewSession = eval("(" + getCookie(getCookieName("view")) + ")");
+                var viewItemIDs = viewSession.v;
+                if (isDefined(viewItemIDs) && (item_id !== undefined && !inArray(item_id, viewItemIDs))) {
+                    viewSession.v.push(item_id);
+                }
+                var value = JSON.stringify(viewSession);
+                setCookie(getCookieName("view"), value, config_session_cookie_timeout, config_cookie_path);
+            }
+
+
             /**
              * Get Session ID
              * 
@@ -682,6 +718,14 @@ if (typeof Predictry !== 'object') {
             function getSessionUserID() {
                 var val = getCookie(getCookieName("user"));
                 return (val) ? val : setUserSessionCookieId(generateSessionID(15));
+            }
+
+            /**
+             * Set Browser ID
+             */
+            function getSessionBrowserID() {
+                var val = getCookie(getCookieName("browser"));
+                return (val) ? val : setBrowserSessionCookieId(generateSessionID(15));
             }
 
             /**
@@ -705,12 +749,14 @@ if (typeof Predictry !== 'object') {
                 if (session === undefined)
                     session = setSessionCookieId();
 
-                if (isDefined(cartSession) && isObject(cartSession) && isDefined(cartSession.cart_id)) {
+                if (isDefined(cartSession) && isObject(cartSession) && isDefined(cartSession.cart_id) && cartSession.cart_id !== -1) {
+                    console.log("get from existing cookie");
                     return cartSession.cart_id;
                 }
 
                 //Retrieve cart_id from API by passing session data
-                call_url = config_api_url + config_api_resources[2];
+                call_url = config_api_url + config_api_resources[3];
+                config_request_content_type = config_default_request_content_type;
                 var response = sendRequest(call_url, buildUrl({session_id: session}), false);
                 if (isObject(response) && response.status === 'success')
                 {
@@ -885,7 +931,7 @@ if (typeof Predictry !== 'object') {
                 var http = new XMLHttpRequest();
                 http.overrideMimeType("application/json");
                 http.open(config_request_method, url, async);
-                http.setRequestHeader("Content-Type", config_default_request_content_type);
+                http.setRequestHeader("Content-Type", config_request_content_type);
                 http.setRequestHeader("X-Predictry-Server-Tenant-ID", tenant_id);
                 http.setRequestHeader("X-Predictry-Server-Api-Key", api_key);
 
@@ -920,6 +966,20 @@ if (typeof Predictry !== 'object') {
                 }
             }
 
+            function appendPredictryData(data) {
+                data.session_id = getSessionID();
+                data.user_id = getSessionUserID();
+                data.browser_id = getSessionBrowserID();
+
+                //check if the viewed item is from reco or not
+                if (widget_instance_id !== 0 && isDefined(data.action))
+                    data.action.rec = true;
+                else if (widget_instance_id !== 0 && !isDefined(data.action))
+                    data.action = {rec: true};
+
+                return data;
+            }
+
             function getWidgetInstanceID(uri) {
                 if (isDefined(uri) && isDefined(getParameter(uri, "predictry_src")))
                     widget_instance_id = getParameter(uri, "predictry_src");
@@ -927,6 +987,152 @@ if (typeof Predictry !== 'object') {
                     widget_instance_id = -1;
                 return widget_instance_id;
             }
+
+            function trackView(view_item_data) {
+                if (!isDefined(view_item_data) || !isObject(view_item_data))
+                    return;
+
+                view_item_data.action_name = "view"; //append action name
+                view_item_data.action_type = "single";
+                view_item_data = appendPredictryData(view_item_data);
+
+                //if data.action.rec is true store it into cookie
+                if (isDefined(data.action) && isDefined(data.action.rec))
+                    setViewSession(view_item_data.item.item_id);
+
+                config_request_content_type = "application/json; charset=utf-8";
+                return sendRequest(config_api_url + config_api_resources[0], JSON.stringify(view_item_data), true);
+            }
+
+            function trackBuy(buy_data) {
+                if (!isDefined(buy_data) || !isObject(buy_data))
+                    return;
+
+                buy_data.action_name = "buy";
+                buy_data.action_type = "bulk";
+                buy_data = appendPredictryData(buy_data);
+
+                if (isDefined(data.action))
+                    buy_data.action.cart_id = getCartID();
+                else if (!isDefined(data.action))
+                    buy_data.action = {cart_id: getCartID()};
+
+
+                var cartSession = eval("(" + getCookie(getCookieName("cart")) + ")");
+                var cartItemIDs = cartSession.c;
+
+                var viewSession = eval("(" + getCookie(getCookieName("view")) + ")");
+                var viewItemIDs = viewSession.v;
+
+                for (var i = 0; i < buy_data.buy.items.length; i++)
+                {
+                    for (var key in buy_data.buy.items[i])
+                    {
+                        var item_id = buy_data.buy.items[i][key];
+                        if (key === "item_id") {
+                            console.log("item_id: " + item_id);
+                            console.log(viewItemIDs);
+                            console.log(inArray(item_id, viewItemIDs));
+                        }
+
+                        if (key === "item_id" && inArray(item_id, cartItemIDs))
+                            buy_data.buy.items[i].rec = true;
+                        else if (key === "item_id" && inArray(item_id, viewItemIDs))
+                            buy_data.buy.items[i].rec = true;
+                    }
+                }
+
+                setCookie(getCookieName('session'), '', -86400, config_cookie_path);
+                setCookie(getCookieName('cart'), '', -86400, config_cookie_path);
+                setCookie(getCookieName('view'), '', -86400, config_cookie_path);
+
+                config_request_content_type = "application/json; charset=utf-8";
+                return sendRequest(config_api_url + config_api_resources[0], JSON.stringify(buy_data), true);
+            }
+
+
+
+            /**
+             * 
+             * Deprecated
+             * 
+             * Send Track View
+             * 
+             * @param {type} user_id
+             * @param {type} email
+             * @param {type} item_id
+             * @param {type} description
+             * @param {type} item_properties
+             * @param {type} action_properties
+             * @returns {undefined}
+             */
+//            function trackView(user_id, email, item_id, description, item_properties, action_properties) {
+//                var action_data = {
+//                    action: 'view',
+//                    user_id: user_id || null,
+//                    email: email || null,
+//                    item_id: item_id || null,
+//                    session_id: getSessionID(),
+//                    description: description || null,
+//                    item_properties: item_properties || {},
+//                    action_properties: action_properties || {}
+//                };
+//
+//                sendAction(action_data);
+//            }
+
+//            function trackAddToCart(user_id, email, item_id, description, item_properties, action_properties) {
+//                var action_data = {
+//                    action: 'add_to_cart',
+//                    user_id: user_id,
+//                    email: email || null,
+//                    item_id: item_id,
+//                    session_id: getSessionID(),
+//                    description: description || "",
+//                    item_properties: item_properties || {},
+//                    action_properties: action_properties || {}
+//                };
+//
+//                sendAction(action_data);
+//            }
+
+//            function trackBuy(user_id, email, actions) {
+//                var bulk_action_data = {
+//                    action: 'buy',
+//                    user_id: user_id,
+//                    email: email || null,
+//                    session_id: getSessionID(),
+//                    actions: actions
+//                };
+//
+//                sendBulkActions(bulk_action_data);
+//            }
+
+//            function trackStartedCheckout(user_id, email, actions) {
+//                var bulk_action_data = {
+//                    action: 'started_checkout',
+//                    user_id: user_id,
+//                    email: email || null,
+//                    session_id: getSessionID(),
+//                    actions: actions
+//                };
+//
+//                sendBulkActions(bulk_action_data);
+//            }
+
+//            function trackStartedPayment(user_id, email, actions) {
+//                var bulk_action_data = {
+//                    action: 'started_payment',
+//                    user_id: user_id,
+//                    email: email || null,
+//                    session_id: getSessionID(),
+//                    actions: actions
+//                };
+//
+//                sendBulkActions(bulk_action_data);
+//            }
+
+
 
             /************************************************************
              * Constructor
@@ -948,8 +1154,10 @@ if (typeof Predictry !== 'object') {
                 },
                 setSessionID: function(session_id) {
                     var val = getCookie(getCookieName("session"));
-                    if (val)
+                    if (val) {
+                        setSessionCookieId(val); //extend lifetime
                         return;
+                    }
                     else {
                         session_id = isDefined(session_id) ? session_id : generateSessionID(15);
                         setSessionCookieId(session_id);
@@ -957,17 +1165,37 @@ if (typeof Predictry !== 'object') {
                 },
                 setSessionUserID: function(session_user_id) {
                     var val = getCookie(getCookieName("user"));
-                    if (val)
+                    if (val) {
+                        setSessionCookieId(val); //extend lifetime
                         return;
+                    }
                     else {
                         session_user_id = isDefined(session_user_id) ? session_user_id : generateSessionID(15);
                         setUserSessionCookieId(session_user_id);
                     }
                 },
+                setSessionBrowserID: function(session_browser_id) {
+                    var val = getCookie(getCookieName("browser"));
+                    if (val)
+                        return;
+                    else {
+                        session_browser_id = isDefined(session_browser_id) ? session_browser_id : generateSessionID(15);
+                        setBrowserSessionCookieId(session_browser_id);
+                    }
+                },
                 setSessionCart: function() {
                     var val = getCookie(getCookieName("cart"));
+                    if (val) {
+                        var cartSession = eval("(" + getCookie(getCookieName("cart")) + ")");
+                        setCartSessionCookie(cartSession);
+                    }
                     return (val) ? val : setCartSessionCookie();
                 },
+                setSessionView: function() {
+                    var val = getCookie(getCookieName("view"));
+                    return (val) ? val : setViewSessionCookie();
+                },
+                setViewSession: setViewSession,
                 setCartLog: setCartLog,
                 setDoNotTrack: function(enable) {
                     config_do_not_track = (enable);
@@ -991,62 +1219,11 @@ if (typeof Predictry !== 'object') {
                 },
                 sendAction: sendAction,
                 sendBulkActions: sendBulkActions,
-                trackView: function(user_id, item_id, description, item_properties, action_properties) {
-                    var action_data = {
-                        action: 'view',
-                        user_id: user_id || null,
-                        item_id: item_id || null,
-                        session_id: getSessionID(),
-                        description: description || null,
-                        item_properties: item_properties || {},
-                        action_properties: action_properties || {}
-                    };
-
-                    sendAction(action_data);
-                },
-                trackAddToCart: function(user_id, item_id, description, item_properties, action_properties) {
-                    var action_data = {
-                        action: 'add_to_cart',
-                        user_id: user_id,
-                        item_id: item_id,
-                        session_id: getSessionID(),
-                        description: description || "",
-                        item_properties: item_properties || {},
-                        action_properties: action_properties || {}
-                    };
-
-                    sendAction(action_data);
-                },
-                trackBuy: function(user_id, actions) {
-                    var bulk_action_data = {
-                        action: 'buy',
-                        user_id: user_id,
-                        session_id: getSessionID(),
-                        actions: actions
-                    };
-
-                    sendBulkActions(bulk_action_data);
-                },
-                trackStartedCheckout: function(user_id, actions) {
-                    var bulk_action_data = {
-                        action: 'started_checkout',
-                        user_id: user_id,
-                        session_id: getSessionID(),
-                        actions: actions
-                    };
-
-                    sendBulkActions(bulk_action_data);
-                },
-                trackStartedPayment: function(user_id, actions) {
-                    var bulk_action_data = {
-                        action: 'started_payment',
-                        user_id: user_id,
-                        session_id: getSessionID(),
-                        actions: actions
-                    };
-
-                    sendBulkActions(bulk_action_data);
-                },
+                trackView: trackView,
+//                trackAddToCart: trackAddToCart,
+                trackBuy: trackBuy,
+//                trackStartedCheckout: trackStartedCheckout,
+//                trackStartedPayment: trackStartedPayment,
                 drawList: drawTextListRecommendation,
                 cart_id: temp_cart_id,
                 widget_id: widget_id,
@@ -1060,12 +1237,16 @@ if (typeof Predictry !== 'object') {
             };
         }
 
+        //INIT CALLS
+        _predictry.push(['setSessionID']);
+        _predictry.push(['setSessionBrowserID']);
         _predictry.push(['setSessionUserID']);
         _predictry.push(['setSessionCart']);
+        _predictry.push(['setSessionView']);
         _predictry.push(['getWidgetInstanceID', document.location.search]);
 
         async_executor = new Executor(window_alias.PE_tenantId, window_alias.PE_apiKey);
-        var execute_first = {setTenantId: 1, setApiKey: 1, setSessionID: 1, setSessionUserID: 1, setSessionCart: 1, getWidgetInstanceID: 1};
+        var execute_first = {setTenantId: 1, setApiKey: 1, setSessionID: 1, setSessionBrowserID: 1, setSessionUserID: 1, setSessionCart: 1, getWidgetInstanceID: 1};
         var method_name;
 
         for (iterator = 0; iterator < _predictry.length; iterator++) {

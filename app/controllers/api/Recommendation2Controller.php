@@ -1,14 +1,16 @@
 <?php
 
-namespace App\Controllers\Api;
-
 /**
  * Author       : Rifki Yandhi
- * Date Created : Mar 19, 2014 12:31:53 PM
- * File         : api\RecommendationController.php
+ * Date Created : Aug 14, 2014 5:47:40 PM
+ * File         : app/controllers/Recommendation2Controller.php
+ * Copyright    : rifkiyandhi@gmail.com
  * Function     : 
  */
-class RecommendationController extends \App\Controllers\ApiBaseController
+
+namespace App\Controllers\Api;
+
+class Recommendation2Controller extends \App\Controllers\ApiBaseController
 {
 
 	private $curl				 = null;
@@ -43,7 +45,9 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 		$widget	 = null;
 
 		if (isset($inputs['widget_id']))
-			$widget = \App\Models\Widget::where("id", $inputs['widget_id'])->where("site_id", $this->site_id)->get()->first();
+			$widget		 = \App\Models\Widget::where("id", $inputs['widget_id'])->where("site_id", $this->site_id)->get()->first();
+		else
+			$response	 = $this->getErrorResponse("inputUnknown", 400, "widget_id");
 
 		if ($widget && $this->_isAlgoExists($widget->reco_type))
 		{
@@ -61,25 +65,40 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 					$recomm	 = $this->_getEasyRecRecommendationForUser($easyrec_input_reco_data);
 				else if ($method_algo === "inspiredbyyourshoppingtrends")
 					$recomm	 = $this->_getLokeInsipiredByYourShoppingTrends($inputs['user_id']);
+				//gui algorithm
+				else if ($method_algo === "otherusersalsoviewed2")
+					;
+				else if ($method_algo === "otheritemsviewedtogether")
+					;
+				else if ($method_algo === "otheritemspurchased")
+					;
+				else if ($method_algo === "otheritemspurchasedtogether")
+					;
 				else
 					$recomm	 = $this->_getEasyRecOtherUsersAlsoViewed($easyrec_input_reco_data);
 
 				if ($recomm)
 				{
 					$rec_items = array_fetch($recomm, 'alias_id'); // item_id = alias_id
-					return \Response::json(array("status" => "success", "recomm" => $recomm, "widget_instance_id" => $this->_setWidgetInstance($rec_items, $inputs['session_id'])));
+					return \Response::json(array(
+								"status" => 200,
+								"data"	 => array(
+									"recomm"			 => $recomm,
+									"widget_instance_id" => $this->_setWidgetInstance($rec_items, $inputs['session_id'])
+								))
+					);
 				}
+				else
+					$response = $this->getErrorResponse("inputUnknown", 400, "widget_id");
 			}
 			else
-				return \Response::json(array("status" => "failed", "message" => $easyrec_input_reco_data->errors()->first()), "400");
-
-			return \Response::json(array('status' => 'success', 'message' => 'no results'), "200");
+				$response = $this->getErrorResponse("errorValidator", 400, "", $easyrec_input_reco_data->errors()->first());
 		}
-		return \Response::json(array('status' => 'failed', 'message' => 'widget not found'), "400");
+
+		return \Response::json($response, $this->http_status);
 	}
 
 	//GET EASYREC OTHERUSERSALSOVIEWED
-
 	function _getEasyRecOtherUsersAlsoViewed($option_data)
 	{
 		$easyrec_url_with_method = EASYREC_RESTAPI_URL . "otherusersalsoviewed";
@@ -143,6 +162,16 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 
 		return $recommended_items;
 	}
+	
+	
+	//GET GUI RECOMMENDATION
+	
+	function _getGuiOtherItemsViewed($option_data)
+	{
+		
+	}
+	
+	
 
 	function _setWidgetInstance($rec_items, $session_id)
 	{
@@ -384,3 +413,6 @@ class RecommendationController extends \App\Controllers\ApiBaseController
 	}
 
 }
+
+/* End of file Recommendation2Controller.php */
+/* Location: ./application/controllers/Recommendation2Controller.php */
