@@ -516,11 +516,16 @@ class Action2Controller extends \App\Controllers\ApiBaseController
 					$item_meta			 = new \App\Models\ItemMeta();
 					$item_meta->item_id	 = $item->id;
 					$item_meta->key		 = $key;
-					$item_meta->value	 = $value;
+
+					if (is_array($value))
+						$value = json_encode($value);
+
+					$item_meta->value = $value;
 					$item_meta->save();
 				}
 
-				$is_new = true;
+				$this->is_new_item	 = true;
+				$this->item_id		 = $item->id;
 				return $item->id;
 			}
 			else
