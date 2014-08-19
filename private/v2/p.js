@@ -1053,20 +1053,22 @@ if (typeof Predictry !== 'object') {
 
                 var viewSession = eval("(" + getCookie(getCookieName("view")) + ")");
                 var viewItemIDs = viewSession.v;
-
+                
                 for (var i = 0; i < data.items.length; i++)
                 {
                     for (var key in data.items[i])
                     {
                         var item_id = data.items[i][key];
-                        if (key === "item_id" && inArray(item_id, cartItemIDs))
-                            data.items[i].rec = true;
-                        else if (key === "item_id" && inArray(item_id, viewItemIDs))
-                            data.items[i].rec = true;
+                        if (key === "item_id" && (cartItemIDs.length > 0)) {
+                            if (inArray(item_id, cartItemIDs))
+                                data.items[i].rec = true;
+                        }
+                        else if (key === "item_id" && (viewItemIDs.length > 0)) {
+                            if (inArray(item_id, viewItemIDs))
+                                data.items[i].rec = true;
+                        }
                     }
                 }
-
-                deleteCookies();
 
                 config_request_content_type = "application/json; charset=utf-8";
                 return sendRequest(config_api_url + config_api_resources[0], JSON.stringify(data), true);
@@ -1181,8 +1183,8 @@ if (typeof Predictry !== 'object') {
         _predictry.push(['setSessionBrowserID']);
         _predictry.push(['setSessionUserID']);
         _predictry.push(['setSessionCart']);
-//        _predictry.push(['setSessionView']);
-//        _predictry.push(['getWidgetInstanceID', document.location.search]);
+        _predictry.push(['setSessionView']);
+        _predictry.push(['getWidgetInstanceID', document.location.search]);
 
         async_executor = new Executor(window_alias.PE_tenantId, window_alias.PE_apiKey);
         var execute_first = {setTenantId: 1, setApiKey: 1, setSessionID: 1, setSessionBrowserID: 1, setSessionUserID: 1, setSessionCart: 1, getWidgetInstanceID: 1};
