@@ -133,40 +133,4 @@ class ApiBaseController extends \Controller
 
 		return $response;
 	}
-
-	public function getErrorResponse($error_key, $http_status, $resources)
-	{
-		$response = array(
-			'error'			 => '', //true / false
-			'message'		 => '',
-			'client_message' => '',
-			'status'		 => ''
-		);
-
-		$client_message	 = $message		 = "";
-		switch ($error_key)
-		{
-			case "credentialMissing":
-				$message = "credential hasn't assigned or wrong";
-				break;
-
-			case "notFound":
-				$message		 = "Resources of {$resources} doesn't exists";
-				$client_message	 = "The {$resources} doesn't exists. Please try again.";
-				break;
-
-			case "inputUnknown":
-				$message		 = "Input of {$resources} unknown";
-				$client_message	 = "Your request cannot be proceed, due to unknown input. Please contact your site administrator";
-				break;
-			default:
-				break;
-		}
-
-		$response['message']		 = $message;
-		$response['client_message']	 = $client_message;
-		$response['status']			 = $http_status;
-		return $response;
-	}
-
 }
