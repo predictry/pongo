@@ -19,11 +19,13 @@ define("GUI_HTTP_PASSWORD", "vventures");
 class ApiBaseController extends \Controller
 {
 
-	public $predictry_server_api_key = null;
-	public $site					 = null;
-	public $site_id					 = null;
-	public $http_status				 = 200;
-	private $message				 = "";
+	public $predictry_server_api_key	 = null;
+	public $predictry_server_tenant_id	 = null;
+	public $site						 = null;
+	public $site_id						 = null;
+	public $http_status					 = 200;
+	private $message					 = "";
+	public $gui_domain_auth				 = array();
 
 	public function __construct()
 	{

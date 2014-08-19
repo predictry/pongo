@@ -13,227 +13,114 @@ Documentation of how to implement Predictry JS SDK on the site.
 ##Version 
 ###2.0.0
 
-###JS Embed Code
+###*STEP 1*: GETTING STARTED (EMBED JS)
+To start tracking with the Predictry JavaScript library, just paste the following code into the page you want to track just before the `</head>` tags. Make sure to change ***‘YOUR_API_KEY’*** and ***‘YOUR_TENANT_ID’*** accordingly that have been provided to you. 
+
+This snippet of code will load our library asynchronously on your page which doesn’t slow down the loading time of you page
+
+We create a variable called _predictry that will be available on any pages. You will use it to send any data to us.
+
+Note: You need to include this on every page of your website.
+
 ```js
 <script type="text/javascript">
 	var _predictry = _predictry || [];
 	(function() {
-		var u = (("https:" === document.location.protocol) ? "https://" : "http://") + "api.predictry.dev/v2/";
-		_predictry.push(['setTenantId', "{$TENANT_ID}"], ['setApiKey', "{$API_KEY}"], ['setSessionID']);
+		var u = (("https:" === document.location.protocol) ? "https://" : "http://") + "dpv9g3v1sio9.cloudfront.net/v2/";
+		_predictry.push(['setTenantId', "YOUR_TENANT_ID"], ['setApiKey', "YOUR_API_KEY"]);
 		var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
 		g.type = 'text/javascript';
 		g.defer = true;
 		g.async = true;
-		g.src = u + 'p.js';
+		g.src = u + 'p.min.js';
 		s.parentNode.insertBefore(g, s);
 	})();
 </script>
 
 ```
-###JS Embed Code (Minified)
-
+If you prefer you can opt for a minified version
 ```js
-var _predictry=_predictry||[];(function(){var a=(("https:"===document.location.protocol)?"https://":"http://")+"api.predictry.dev/v2/";_predictry.push(["setTenantId","{$TENANT_ID}"],["setApiKey","{$API_KEY}"],["setSessionID"]);var e=document,c=e.createElement("script"),b=e.getElementsByTagName("script")[0];c.type="text/javascript";c.defer=true;c.async=true;c.src=a+"p.js";b.parentNode.insertBefore(c,b)})();
+var _predictry=_predictry||[];(function(){var a=(("https:"===document.location.protocol)?"https://":"http://")+"dpv9g3v1sio9.cloudfront.net/v2/";_predictry.push(["setTenantId","YOUR_TENANT_ID"],["setApiKey","YOUR_API_KEY"]);var e=document,c=e.createElement("script"),b=e.getElementsByTagName("script")[0];c.type="text/javascript";c.defer=true;c.async=true;c.src=a+"p.min.js";b.parentNode.insertBefore(c,b)})();
 ```
 
-###Send View Action
+
+###*STEP 2*: TRACK VIEW 
+On every product/item page that you would like to track, include this also.
 
 ```js
-var data = {
-    action: 'view',
-    item_id: 105,
-    user_id: 100,
-    description: "Page title",
-    item_properties: {
-        img_url: "http://www.predictry.com/123.png",
-        item_url: "http://www.predictry.com/123/",
-        price: 250,
-        inventory_qty: 100,
-        category: "product",
-        sub_category: "gadget",
-        tags: "iphone, 5s, gold",
-        brand: "apple",
-        location: "malaysia",
-        currency: "RM",
-        start_date: 1407921883, //unix timestamp
-        end_date: 1413763200 //unix timestamp
+var view_item_data = {
+    // If user is not logged in, this object is not required
+    action: {
+        name: "view"
     },
-    action_properties: {
-        agent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36',
-        ip_address: '175.143.39.120',
-        email: 'user@website.com',
-        rec: true //flag if the visitor viewed the item from recommendation, if not remove key (rec)
-    }
+    user: {
+        user_id: "100", //alphanumeric (unique)
+        email: "user@email.com"
+    },
+    items: [
+        {
+            item_id: "105", //alphanumeric (unique)
+            name: "Item name",
+            price: 250.12,
+            img_url: "http://www.predictry.com/123.png",
+            item_url: "http://www.predictry.com/123", //without trailing slash
+
+            //OPTIONALS - Provide if available so that recommendations would be better
+            discount: "23%", //the discount that is being offered. If the discount is in amount 23.10 without the percentage
+            description: "Description of the item",
+            inventory_qty: 100, //how many items left
+            category: "Electronics",
+            sub_category: "Phone",
+            tags: ["iphone", "5s", "gold"], //this is an array. If there's only one item also enclosed in array ["iphone"] 
+            brand: "apple",
+            locations: ["kuala lumpur", "jakarta"], //cities that this is sold if applicable
+            start_date: 1407921883, //unix timestamp - when is the first that this will be sold? If applicable, if not, ignore.
+            end_date: 1417921883 //unix timestamp - when is the last day that it will be sold? If applicable, if not, ignore.	
+        }
+    ]
 };
 
-_predictry.push(['trackView', data.user_id, data.item_id, data.description, data.item_properties, data.action_properties ]);
+_predictry.push(['track', view_item_data]);
 ```
 
-###Send Add To Cart Action
+
+###*STEP 3*: TRACK BUY 
+To track successful purchases, you can include this on the thank you page or on any page after a purchase is completed.
 ```js
-var data = {
-    action: 'view',
-    item_id: 105,
-    user_id: 100,
-    description: "Page title",
-    item_properties: {
-        img_url: "http://www.predictry.com/123.png",
-        item_url: "http://www.predictry.com/123/",
-        price: 250,
-        inventory_qty: 100,
-        category: "product",
-        sub_category: "gadget",
-        tags: "iphone, 5s, gold",
-        brand: "apple",
-        location: "malaysia"
+var buy_data = {
+    action: {
+        name: "buy",
+        total: 1730.5
     },
-    action_properties: {
-        agent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36',
-        ip_address: '175.143.39.120',
-        qty: 5
-    }
+    user: {
+        user_id: "100", //alphanumeric (unique)
+        email: "user@email.com"
+    },
+    items: [
+        {
+            item_id: "105", //alphanumeric (unique)
+            qty: 12,
+            sub_total: 380
+        },
+        {
+            item_id: "106",
+            qty: 20,
+            sub_total: 1350.5
+        }
+    ]
 };
 
-_predictry.push(['trackAddToCart', data.user_id, data.item_id, data.description, data.item_properties, data.action_properties ]);
-```
-####Methods and Params (Tracking)
-With the exception of fields that are surrounded by `[]`, all fields specified are required for each request.
-
-| Method | Params |
-|---|---|
-| trackView | user_id:{string}, item_id:{string}, description:{string}, [item_properties:{object}], [action_properties:{object}] | 
-| trackAddToCart | user_id:{string}, item_id:{string}, description:{string}, [item_properties:{object}], [action_properties:{object}] | 
-| trackStartedCheckout | user_id:{string}, [items:{object}] | 
-| trackStartedPayment | user_id:{string}, [items:{object}] | 
-| trackBuy | user_id:{string}, [items:{object}] | 
-| sendAction | action_data:{object} | 
-| sendBulkActions | action_data:{object} | 
-
-###Send Buy Action
-```js
-var user_id = 200;
-var items = [
-    {
-        item_id: 105,
-        action_properties: {
-            qty: 10,
-            sub_total: 500,
-            rec: true //flag if the product's coming from recommendation
-        }
-    },
-    {
-        item_id: 106,
-        action_properties: {
-            qty: 1,
-            sub_total: 200
-        }
-    }
-];
-
-_predictry.push(['trackBuy', user_id, items]);
-```
-####Methods and Params (Tracking)
-
-| Method | Params |
-|---|---|
-| getRecommendedItems | widget_id:{string}, user_id:{string}, item_id:{string}, callback:{function} | 
-| setWidgetId | widget_id:{string} | 
-
-###Pull Recommendation (Manual)
-```js
-var data = {
-    widget_id: 18, //generated from the dashboard, contain (widget detail, algorithm, filters) 
-    user_id: 100,
-    item_id: 105
-};
-
-var recommendation_data;
-_predictry.push(['getRecommendedItems', data.widget_id, data.user_id, data.item_id, function() {
-        recommendation_data = predict.getRecentRecommendedItems();
-        if (recommendation_data !== undefined) {
-            //@todo add your line here to extract the recommendation as anything you want
-        }
-    }
-]);
+_predictry.push(['track', buy_data]);
 ```
 
-Sample Response (Object)
-```json
-{
-   "status":"success",
-   "recomm":[
-      {
-         "id":"9153",
-         "alias_id":2396,
-         "description":"Take One Original Baby Bites",
-         "created_at":"2014-05-08 07:32:36",
-         "item_properties":{
-            "item_url":"predictry.com\/product\/take-one-original-baby-bites",
-            "img_url":"\/\/s3-ap-southeast-1.amazonaws.com\/media.predictry.com\/newmedia\/460x\/i\/m\/IMG_7468.JPG",
-            "price":"2.65"
-            ....
-         }
-      },
-      {
-         "id":"6205",
-         "alias_id":754,
-         "description":"Heinz Teething Rusks ",
-         "created_at":"2014-05-08 07:32:21",
-         "item_properties":{
-            "item_url":"alpha.predictry.com\/product\/heinz-teething-rusks",
-            "price":"4.95"
-            ...
-         }
-      },
-      {
-         "id":"8095",
-         "alias_id":1808,
-         "description":"Merries Diapers - L",
-         "created_at":"2014-05-08 07:32:31",
-         "item_properties":{
-            "item_url":"predictry.com\/product\/merries-diapers-l",
-            "img_url":"\/\/s3-ap-southeast-1.amazonaws.com\/media.predictry.com\/newmedia\/460x\/i\/m\/IMG_4177.JPG",
-            "price":"24.25"
-            ...
-         }
-      },
-      {
-         "id":"11653",
-         "alias_id":4158,
-         "description":"Pampers Baby Dry Diapers L Size 4",
-         "created_at":"2014-05-08 07:32:56",
-         "item_properties":{
-            "item_url":"predictry.com\/product\/pampers-baby-dry-diapers-l-size-4",
-            "img_url":"\/\/s3-ap-southeast-1.amazonaws.com\/media.predictry.com\/newmedia\/460x\/i\/m\/RM_0415F_11653.JPG",
-            "price":"22"
-            ...
-         }
-      }
-   ],
-   "widget_instance_id":501
-}
-```
-####Pull Recommendation (Automatic)
-Place the code below on any part of the site that you want the recommendation to be appear. The code below will generate simple list elements that will be append on DOM.
-```js
-<div data-user-id="{$USER_ID}" data-item-id="{$ITEM_ID}" class="PREDICTRY"></div>
-<script type="text/javascript">
-    (function() {
-        var u = (("https:" === document.location.protocol) ? "https://" : "http://") + "api.predictry.dev/v2/";
-        _predictry.push(['setWidgetId', "{$WIDGET_ID}"]);
-        var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
-        g.type = 'text/javascript', g.defer = true, g.async = true, g.src = u + 'r.min.js';
-        s.parentNode.insertBefore(g, s);
-    })();
-</script>
-```
+
 
 ##Changelog
-- 2.0.
+- 0.2.1
     - Revamp the class
     - Asynchronous
     - Added single function for single action
-- 1.0.0
+- 0.1.0
     - Initial
     - Alpha Release
 

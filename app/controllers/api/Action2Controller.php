@@ -19,12 +19,32 @@ use Input,
 class Action2Controller extends \App\Controllers\ApiBaseController
 {
 
-	private $curl = null;
+	protected $response		 = array();
+	protected $curl			 = null;
+	protected $is_new_item, $is_new_visitor, $is_new_action, $is_new_session, $is_new_browser;
+	protected $action_id, $item_id, $visitor_id, $action_instance_id, $session_id, $browser_id;
+	protected $action_type	 = "single";
+	protected $action_data	 = array();
 
 	public function __construct()
 	{
 		parent::__construct();
-		$this->predictry_server_api_key = Request::header("X-Predictry-Server-Api-Key");
+		$this->is_new_item					 = $this->is_new_visitor				 = $this->is_new_action				 = $this->is_new_session				 = $this->is_new_browser				 = false;
+		$this->action_id					 = $this->item_id						 = $this->visitor_id					 = $this->action_instance_id			 = $this->session_id					 = $this->browser_id					 = 0;
+		$this->predictry_server_api_key		 = Request::header("X-Predictry-Server-Api-Key");
+		$this->predictry_server_tenant_id	 = \Request::header("X-Predictry-Server-Tenant-ID");
+
+		$this->response = array(
+			"error"			 => false,
+			"status"		 => 200,
+			"message"		 => "",
+			"client_message" => ""
+		);
+
+		$this->gui_domain_auth = array(
+			'appid'	 => $this->predictry_server_api_key,
+			'domain' => $this->predictry_server_tenant_id
+		);
 	}
 
 	public function index()
@@ -45,9 +65,7 @@ class Action2Controller extends \App\Controllers\ApiBaseController
 	 */
 	public function store()
 	{
-
-		$action_validator = \Validator::make(Input::only("action_type", "action_name"), array("action_type" => "required", "action_name" => "required"));
-
+		$action_validator = \Validator::make(Input::only("action"), array("action" => "required"));
 		if ($action_validator->passes())
 		{
 			$browser_cookie_inputs	 = Input::only("session_id", "browser_id", "user_id");
@@ -57,32 +75,55 @@ class Action2Controller extends \App\Controllers\ApiBaseController
 				"user_id"	 => ""
 			);
 
-			$action_type = \Input::get("action_type");
-			$action_name = \Input::get("action_name");
+			$rules			 = array_merge($browser_rules, array('items' => 'required|array'));
+			$inputs			 = array_merge($browser_cookie_inputs, Input::only("action", "user", "items"));
+			$input_validator = \Validator::make($inputs, $rules);
+			if ($input_validator->passes())
+			{
+				//validating user data
+				$user_property_rules = array(
+					"user_id"	 => "required|alpha_num",
+					"email"		 => (isset($inputs['user']['email']) && $inputs['user']['email'] !== "") ? "required|email" : ""
+				);
 
-			if ($action_type === "single" && $action_name === "view")
-			{
-				$view_rules		 = array_merge($browser_rules, array('item' => 'required'));
-				$view_inputs	 = array_merge($browser_cookie_inputs, Input::only("action_type", "action_name", "user", "item", "action"));
-				$view_validator	 = \Validator::make($view_inputs, $view_rules);
-				if ($view_validator->passes())
-					$response		 = $this->_proceedSingleAction($action_name, $view_inputs);
-			}
-			else if ($action_type === "bulk" && $action_name === "buy")
-			{
-				$buy_rules		 = array_merge($browser_rules, array('buy' => 'required'));
-				$buy_inputs		 = array_merge($browser_cookie_inputs, Input::only("action_type", "action_name", "user", "buy", "action"));
-				$buy_validator	 = \Validator::make($buy_inputs, $buy_rules);
-				if ($buy_validator->passes())
-					$response		 = $this->_proceedBuyAction($action_name, $buy_inputs);
+				$user_validator = \Validator::make($inputs['user'], $user_property_rules);
+				if ($user_validator->passes())
+				{
+					$this->browser_id	 = $this->_getBrowserID($inputs['browser_id'], $this->is_new_browser); //get browser_id
+					$this->visitor_id	 = $this->_getVisitorID($inputs['user'], $this->is_new_visitor);
+					$this->session_id	 = $this->_getSessionID($inputs['session_id'], $this->visitor_id, $this->is_new_session); //get session_id
+					$this->_setBrowseSession($this->browser_id, $this->session_id); //set browser session
+
+					if ($inputs['action']['name'] === 'view')
+					{
+						$items = $inputs['items'];
+						foreach ($items as $item)
+						{
+							$inputs['item'] = $item;
+							$this->_proceedSingleAction($inputs['action']['name'], $inputs);
+							//@todo send to gui, since we know if the item, user new or not
+							//@todo send action to gui
+						}
+						$response = $this->response;
+					}
+					else if ($inputs['action']['name'] === 'buy')
+					{
+						if ($this->_proceedBuyAction($inputs['action']['name'], $inputs))
+							$this->http_status = 200;
+
+						$response = $this->response;
+					}
+				}
+				else
+					$response = $this->getErrorResponse("errorValidator", "200", "", $user_validator->errors()->first());
 			}
 			else
-				$response = $this->getErrorResponse("errorValidator", "200", "", $view_validator->errors()->first());
+				$response = $this->getErrorResponse("errorValidator", "200", "", $input_validator->errors()->first());
 		}
 		else
-			$response = $this->getErrorResponse("errorValidator", "200", "", $view_validator->errors()->first());
+			$response = $this->getErrorResponse("errorValidator", "200", "", $action_validator->errors()->first());
 
-		return Response::json($response, 200);
+		return Response::json($response, $this->http_status);
 	}
 
 	function _validateProceedAction($action_type, $action_name, $user_identifier_id, $email, $session_id, $action_data)
@@ -111,155 +152,89 @@ class Action2Controller extends \App\Controllers\ApiBaseController
 
 	function _proceedSingleAction($action_name, $action_data)
 	{
-		$item_data		 = $action_data['item'];
-		$user_data		 = $action_data['user'];
-		$is_new_item	 = false;
-		$is_new_visitor	 = false;
-		$is_new_action	 = false;
-		$is_new_session	 = false;
-		$is_new_browser	 = false;
+		$items_data = $action_data['item'];
 
 		$item_property_rules = array(
 			"item_id"	 => "required|alpha_num",
 			"name"		 => "required",
 			"price"		 => "required|numeric",
-			"currency"	 => "required|max:3",
 			"img_url"	 => "required|url",
 			"item_url"	 => "required|url"
 		);
 
-		$response = array(
-			"status"	 => 200,
-			"message"	 => ""
-		);
-
-		$item_validator = \Validator::make($item_data, $item_property_rules);
+		$item_validator = \Validator::make($items_data, $item_property_rules);
 
 		//validating the item first is important since 
 		if ($item_validator->passes())
-			$item_id	 = $this->_getItemID($item_data, $is_new_item);
+			$this->item_id	 = $this->_getItemID($items_data, $this->is_new_item);
 		else
-			$response	 = $this->getErrorResponse("errorValidator", "200", "", $item_validator->errors()->first());
+			$this->response	 = $this->getErrorResponse("errorValidator", "200", "", $item_validator->errors()->first());
 
-		//validating user data
-		$user_property_rules = array(
-			"user_id"	 => "required|alpha_num",
-			"email"		 => (isset($user_data['email']) && $user_data['email'] !== "") ? "required|email" : ""
-		);
-
-		$user_validator = \Validator::make($user_data, $user_property_rules);
-		if ($user_validator->passes())
+		if ($this->item_id)
 		{
-			$browser_id	 = $this->_getBrowserID($action_data['browser_id'], $is_new_browser); //get browser_id
-			$visitor_id	 = $this->_getVisitorID($user_data, $is_new_visitor);
-			$session_id	 = $this->_getSessionID($action_data['session_id'], $visitor_id, $is_new_session); //get session_id
-			$this->_setBrowseSession($browser_id, $session_id); //set browser session
-		}
-		else
-			$response = $this->getErrorResponse("errorValidator", "200", "", $item_validator->errors()->first());
-
-
-		if ($item_id)
-		{
-			$action_id		 = $this->_getActionID(array("name" => $action_name), $is_new_action);
+			$this->action_id = $this->_getActionID(array("name" => $action_name), $this->is_new_action);
 			$action_instance = new \App\Models\ActionInstance();
 
 			//process action instance
-			$action_instance->action_id	 = $action_id;
-			$action_instance->item_id	 = $item_id;
-			$action_instance->session_id = $session_id;
+			$action_instance->action_id	 = $this->action_id;
+			$action_instance->item_id	 = $this->item_id;
+			$action_instance->session_id = $this->session_id;
 			$action_instance->created	 = new Carbon("now");
 			$action_instance->save();
 
+			$this->action_instance_id = $action_instance->id;
 			$this->_setActionMeta($action_instance->id, $action_data['action']);
 		}
 
+		if ($this->response['error'])
+			return false;
+
+
+		$this->action_data = $action_data;
 		return true;
 	}
 
 	function _proceedBuyAction($action_name, $action_data)
 	{
-		$user_data		 = $action_data['user'];
-		$buy_items		 = $action_data['buy'];
-		$is_new_visitor	 = false;
-		$is_new_action	 = false;
-		$is_new_session	 = false;
-		$is_new_browser	 = false;
+		$items			 = $action_data['items'];
+		$this->action_id = $this->_getActionID(array("name" => $action_name), $this->is_new_action);
 
-		$response = array(
-			"status"	 => 200,
-			"message"	 => ""
-		);
+		$action_properties_without_name = $action_data['action'];
+		unset($action_properties_without_name['name']);
 
-		//validating user data
-		$user_property_rules = array(
-			"user_id"	 => "required|alpha_num",
-			"email"		 => (isset($user_data['email']) && $user_data['email'] !== "") ? "required|email" : ""
-		);
-
-		$user_validator = \Validator::make($user_data, $user_property_rules);
-		if ($user_validator->passes())
+		$i = 0;
+		foreach ($items as $item)
 		{
-			$browser_id	 = $this->_getBrowserID($action_data['browser_id'], $is_new_browser); //get browser_id
-			$visitor_id	 = $this->_getVisitorID($user_data, $is_new_visitor);
-			$session_id	 = $this->_getSessionID($action_data['session_id'], $visitor_id, $is_new_session); //get session_id
-			$this->_setBrowseSession($browser_id, $session_id); //set browser session
+			$action_properties = array_merge($action_properties_without_name, $item);
+			unset($action_properties['item_id']);
 
-			$action_id = $this->_getActionID(array("name" => $action_name), $is_new_action);
-
-			$buy_property_rules = array(
-				"items"		 => "required|array",
-				"total"		 => "required|numeric",
-				"currency"	 => "required|alpha_num"
-			);
-
-			$buy_validator = \Validator::make($buy_items, $buy_property_rules);
-			if ($buy_validator->passes())
+			$item_model = \App\Models\Item::where("identifier", $item['item_id'])->where("site_id", $this->site_id)->get()->first();
+			if ($item_model)
 			{
-				$items = $buy_items['items'];
+				$action_instance = new \App\Models\ActionInstance();
 
-				$i = 0;
-				foreach ($items as $item)
-				{
-					$action_properties = array_merge($action_data['action'], $item);
-					unset($action_properties['item_id']);
+				//process action instance
+				$action_instance->action_id	 = $this->action_id;
+				$action_instance->item_id	 = $item['item_id'];
+				$action_instance->session_id = $this->session_id;
+				$action_instance->created	 = new Carbon("now");
+				$action_instance->save();
 
-					$item_model = \App\Models\Item::where("identifier", $item['item_id'])->where("site_id", $this->site_id)->get()->first();
-					if ($item_model)
-					{
-						$action_instance = new \App\Models\ActionInstance();
-
-						//process action instance
-						$action_instance->action_id	 = $action_id;
-						$action_instance->item_id	 = $item['item_id'];
-						$action_instance->session_id = $session_id;
-						$action_instance->created	 = new Carbon("now");
-						$action_instance->save();
-
-						if ($i === 0)
-						{
-							$action_properties = array_merge($action_properties, $buy_items);
-							unset($action_properties['items']);
-						}
-						$this->_setActionMeta($action_instance->id, $action_properties);
-					}
-					else
-					{
-						$response = $this->getErrorResponse("errorValidator", "200", "", "Item not found.");
-						break;
-					}
-
-					$i++;
-				}
+				$this->_setActionMeta($action_instance->id, $action_properties);
 			}
 			else
-				$response = $this->getErrorResponse("errorValidator", "200", "", $buy_validator->errors()->first());
+			{
+				$this->response = $this->getErrorResponse("errorValidator", "200", "", "Item not found.");
+				break;
+			}
+
+			$i++;
 		}
-		else
-			$response = $this->getErrorResponse("errorValidator", "200", "", $user_validator->errors()->first());
 
+		if ($this->response['error'])
+			return false;
 
-		return $response;
+		return true;
 	}
 
 	function _proceedAction($action_name, $user_identifier_id, $email, $session_id, $action_data)
@@ -437,7 +412,6 @@ class Action2Controller extends \App\Controllers\ApiBaseController
 
 	function _getVisitorID($user_data, &$is_new = false)
 	{
-
 		if (isset($user_data['email']) && $user_data['email'] !== "")
 		{
 			$visitor = \App\Models\Visitor::where("email", $user_data['email'])->get()->toArray();
@@ -693,12 +667,10 @@ class Action2Controller extends \App\Controllers\ApiBaseController
 				array_push($gui_item_data, array(\Str::camel($key) => $val));
 		}
 
-		array_push($gui_item_data, array("name" => $item_data['description']));
-
 		$item_resources_uri					 = GUI_RESTAPI_URL . "items/";
-		$item_resources_uri_with_credential	 = $item_resources_uri . '?' . http_build_query($gui_credential_access);
-
-		$response = $this->curl->_simple_call("post", $item_resources_uri_with_credential, $item_data);
+		$item_resources_uri_with_credential	 = $item_resources_uri . '?' . http_build_query($this->gui_domain_auth);
+		$response							 = $this->curl->_simple_call("post", $item_resources_uri_with_credential, $item_data);
+		return $response;
 	}
 
 }

@@ -317,8 +317,6 @@ if (typeof Predictry !== 'object') {
                     reco_data = {};
 
             var
-//                    compulsary_params = null,
-//                    optional_params = null;
                     compulsary_params = new Array("user_id", "action", "item_id", "session_id", "description"),
                     optional_params = new Array("item_properties", "action_properties");
 
@@ -346,7 +344,7 @@ if (typeof Predictry !== 'object') {
                     config_api_url = "http://dashboard.predictry.dev/api/v2/",
                     config_api_resources = ["actions", "users", "items", "carts", "cartlogs", "recommendation"],
                     config_session_cookie_timeout = 63072000000, // 2 years
-                    config_tracking_session_cookie_timeout = 72000000, //20 minutes
+                    config_tracking_session_cookie_timeout = 1200000, //20 minutes
                     config_default_action = "view",
                     config_do_not_track = false,
                     recent_xhr = null;
@@ -434,6 +432,12 @@ if (typeof Predictry !== 'object') {
                 return obj_response;
             }
 
+            function deleteCookies() {
+                setCookie(getCookieName('session'), '', -86400, config_cookie_path);
+                setCookie(getCookieName('cart'), '', -86400, config_cookie_path);
+                setCookie(getCookieName('view'), '', -86400, config_cookie_path);
+            }
+
             /*
              * Set cookie value
              */
@@ -498,16 +502,19 @@ if (typeof Predictry !== 'object') {
              */
             function setCartSessionCookie(c_obj) {
                 var cart_id = getCartID();
-                if (!isDefined(c_obj))
+                if (!isDefined(c_obj) || !isObject(c_obj))
                     c_obj = {c: [], cart_id: cart_id};
+                else
+                    c_obj.cart_id = cart_id;
 
                 var value = JSON.stringify(c_obj);
                 setCookie(getCookieName("cart"), value, config_tracking_session_cookie_timeout, config_cookie_path);
                 return c_obj;
             }
 
-            function setViewSessionCookie() {
-                var v_obj = {v: []};
+            function setViewSessionCookie(v_obj) {
+                if (!isDefined(v_obj) || !isObject(v_obj))
+                    var v_obj = {v: []};
                 var value = JSON.stringify(v_obj);
                 setCookie(getCookieName("view"), value, config_tracking_session_cookie_timeout, config_cookie_path);
                 return v_obj;
@@ -679,7 +686,7 @@ if (typeof Predictry !== 'object') {
             /**
              * Update Cart Item Session
              */
-            function setCartSession(item_id) {
+            function setItemIntoCartSession(item_id) {
                 var cartSession = eval("(" + getCookie(getCookieName("cart")) + ")");
                 var cartItemIDs = cartSession.c; //array
                 if (isDefined(cartItemIDs) && (item_id !== undefined && !inArray(item_id, cartItemIDs))) {
@@ -690,14 +697,20 @@ if (typeof Predictry !== 'object') {
             }
 
 
-            function setViewSession(item_id) {
+            function setItemIntoViewSession(item_id) {
                 var viewSession = eval("(" + getCookie(getCookieName("view")) + ")");
-                var viewItemIDs = viewSession.v;
+                if (isDefined(viewSession) && isObject(viewSession))
+                    var viewItemIDs = viewSession.v;
+                else {
+                    setViewSessionCookie();
+                    viewSession = eval("(" + getCookie(getCookieName("view")) + ")");
+                }
+
                 if (isDefined(viewItemIDs) && (item_id !== undefined && !inArray(item_id, viewItemIDs))) {
                     viewSession.v.push(item_id);
                 }
                 var value = JSON.stringify(viewSession);
-                setCookie(getCookieName("view"), value, config_session_cookie_timeout, config_cookie_path);
+                setCookie(getCookieName("view"), value, config_tracking_session_cookie_timeout, config_cookie_path);
             }
 
 
@@ -750,7 +763,6 @@ if (typeof Predictry !== 'object') {
                     session = setSessionCookieId();
 
                 if (isDefined(cartSession) && isObject(cartSession) && isDefined(cartSession.cart_id) && cartSession.cart_id !== -1) {
-                    console.log("get from existing cookie");
                     return cartSession.cart_id;
                 }
 
@@ -778,7 +790,7 @@ if (typeof Predictry !== 'object') {
                     session_id: getSessionID()
                 };
                 config_request_method = "GET";
-                var url = config_api_url + config_api_resources[1] + "?" + buildUrl(data);
+                var url = config_api_url + config_api_resources[5] + "?" + buildUrl(data);
                 sendRequest(url, buildUrl(data), true, callback);
                 config_request_method = config_default_request_method;
                 return response;
@@ -850,7 +862,7 @@ if (typeof Predictry !== 'object') {
                                 else
                                     data.action_properties = {rec: true, widget_instance_id: widget_instance_id};
 
-                                setCartSession(data.item_id);
+                                setItemIntoCartSession(data.item_id);
                             }
 
                             if (isDefined(data.action_properties)) {
@@ -970,13 +982,6 @@ if (typeof Predictry !== 'object') {
                 data.session_id = getSessionID();
                 data.user_id = getSessionUserID();
                 data.browser_id = getSessionBrowserID();
-
-                //check if the viewed item is from reco or not
-                if (widget_instance_id !== 0 && isDefined(data.action))
-                    data.action.rec = true;
-                else if (widget_instance_id !== 0 && !isDefined(data.action))
-                    data.action = {rec: true};
-
                 return data;
             }
 
@@ -988,35 +993,60 @@ if (typeof Predictry !== 'object') {
                 return widget_instance_id;
             }
 
-            function trackView(view_item_data) {
-                if (!isDefined(view_item_data) || !isObject(view_item_data))
+            function track(data) {
+                if (!isDefined(data) || !isObject(data))
                     return;
 
-                view_item_data.action_name = "view"; //append action name
-                view_item_data.action_type = "single";
-                view_item_data = appendPredictryData(view_item_data);
+                if (!isDefined(data.action) || !isDefined(data.items))
+                    return;
+
+                data = appendPredictryData(data);
+
+                if (isDefined(data.action.name) && (data.action.name === "view")) {
+                    //check if the viewed item is from reco or not
+                    if (widget_instance_id !== 0 && isDefined(data.action))
+                        data.action.rec = true;
+                    else if (widget_instance_id !== 0 && !isDefined(data.action))
+                        data.action = {rec: true};
+
+                    trackView(data);
+                } else if (isDefined(data.action.name) && data.action.name === "buy") {
+                    trackBuy(data);
+                } else {
+                    config_request_content_type = "application/json; charset=utf-8";
+                    return sendRequest(config_api_url + config_api_resources[0], JSON.stringify(data), true);
+                }
+            }
+
+            function trackView(data) {
+                if (!isDefined(data) || !isObject(data))
+                    return;
+
+                if (isDefined(data.action)) {
+                    data.action.name = "view"; //append action name
+                }
+
+                data = appendPredictryData(data);
 
                 //if data.action.rec is true store it into cookie
                 if (isDefined(data.action) && isDefined(data.action.rec))
-                    setViewSession(view_item_data.item.item_id);
+                    setItemIntoViewSession(data.items[0].item_id);
 
                 config_request_content_type = "application/json; charset=utf-8";
-                return sendRequest(config_api_url + config_api_resources[0], JSON.stringify(view_item_data), true);
+                return sendRequest(config_api_url + config_api_resources[0], JSON.stringify(data), true);
             }
 
-            function trackBuy(buy_data) {
-                if (!isDefined(buy_data) || !isObject(buy_data))
+            function trackBuy(data) {
+                if (!isDefined(data) || !isObject(data))
                     return;
 
-                buy_data.action_name = "buy";
-                buy_data.action_type = "bulk";
-                buy_data = appendPredictryData(buy_data);
+                data = appendPredictryData(data);
+
 
                 if (isDefined(data.action))
-                    buy_data.action.cart_id = getCartID();
+                    data.action.cart_id = getCartID();
                 else if (!isDefined(data.action))
-                    buy_data.action = {cart_id: getCartID()};
-
+                    data.action = {cart_id: getCartID()};
 
                 var cartSession = eval("(" + getCookie(getCookieName("cart")) + ")");
                 var cartItemIDs = cartSession.c;
@@ -1024,115 +1054,23 @@ if (typeof Predictry !== 'object') {
                 var viewSession = eval("(" + getCookie(getCookieName("view")) + ")");
                 var viewItemIDs = viewSession.v;
 
-                for (var i = 0; i < buy_data.buy.items.length; i++)
+                for (var i = 0; i < data.items.length; i++)
                 {
-                    for (var key in buy_data.buy.items[i])
+                    for (var key in data.items[i])
                     {
-                        var item_id = buy_data.buy.items[i][key];
-                        if (key === "item_id") {
-                            console.log("item_id: " + item_id);
-                            console.log(viewItemIDs);
-                            console.log(inArray(item_id, viewItemIDs));
-                        }
-
+                        var item_id = data.items[i][key];
                         if (key === "item_id" && inArray(item_id, cartItemIDs))
-                            buy_data.buy.items[i].rec = true;
+                            data.items[i].rec = true;
                         else if (key === "item_id" && inArray(item_id, viewItemIDs))
-                            buy_data.buy.items[i].rec = true;
+                            data.items[i].rec = true;
                     }
                 }
 
-                setCookie(getCookieName('session'), '', -86400, config_cookie_path);
-                setCookie(getCookieName('cart'), '', -86400, config_cookie_path);
-                setCookie(getCookieName('view'), '', -86400, config_cookie_path);
+                deleteCookies();
 
                 config_request_content_type = "application/json; charset=utf-8";
-                return sendRequest(config_api_url + config_api_resources[0], JSON.stringify(buy_data), true);
+                return sendRequest(config_api_url + config_api_resources[0], JSON.stringify(data), true);
             }
-
-
-
-            /**
-             * 
-             * Deprecated
-             * 
-             * Send Track View
-             * 
-             * @param {type} user_id
-             * @param {type} email
-             * @param {type} item_id
-             * @param {type} description
-             * @param {type} item_properties
-             * @param {type} action_properties
-             * @returns {undefined}
-             */
-//            function trackView(user_id, email, item_id, description, item_properties, action_properties) {
-//                var action_data = {
-//                    action: 'view',
-//                    user_id: user_id || null,
-//                    email: email || null,
-//                    item_id: item_id || null,
-//                    session_id: getSessionID(),
-//                    description: description || null,
-//                    item_properties: item_properties || {},
-//                    action_properties: action_properties || {}
-//                };
-//
-//                sendAction(action_data);
-//            }
-
-//            function trackAddToCart(user_id, email, item_id, description, item_properties, action_properties) {
-//                var action_data = {
-//                    action: 'add_to_cart',
-//                    user_id: user_id,
-//                    email: email || null,
-//                    item_id: item_id,
-//                    session_id: getSessionID(),
-//                    description: description || "",
-//                    item_properties: item_properties || {},
-//                    action_properties: action_properties || {}
-//                };
-//
-//                sendAction(action_data);
-//            }
-
-//            function trackBuy(user_id, email, actions) {
-//                var bulk_action_data = {
-//                    action: 'buy',
-//                    user_id: user_id,
-//                    email: email || null,
-//                    session_id: getSessionID(),
-//                    actions: actions
-//                };
-//
-//                sendBulkActions(bulk_action_data);
-//            }
-
-//            function trackStartedCheckout(user_id, email, actions) {
-//                var bulk_action_data = {
-//                    action: 'started_checkout',
-//                    user_id: user_id,
-//                    email: email || null,
-//                    session_id: getSessionID(),
-//                    actions: actions
-//                };
-//
-//                sendBulkActions(bulk_action_data);
-//            }
-
-//            function trackStartedPayment(user_id, email, actions) {
-//                var bulk_action_data = {
-//                    action: 'started_payment',
-//                    user_id: user_id,
-//                    email: email || null,
-//                    session_id: getSessionID(),
-//                    actions: actions
-//                };
-//
-//                sendBulkActions(bulk_action_data);
-//            }
-
-
 
             /************************************************************
              * Constructor
@@ -1166,7 +1104,7 @@ if (typeof Predictry !== 'object') {
                 setSessionUserID: function(session_user_id) {
                     var val = getCookie(getCookieName("user"));
                     if (val) {
-                        setSessionCookieId(val); //extend lifetime
+                        setUserSessionCookieId(val); //extend lifetime
                         return;
                     }
                     else {
@@ -1193,9 +1131,14 @@ if (typeof Predictry !== 'object') {
                 },
                 setSessionView: function() {
                     var val = getCookie(getCookieName("view"));
+                    if (val) {
+                        var viewSession = eval("(" + getCookie(getCookieName("view")) + ")");
+                        setViewSessionCookie(viewSession);
+                    }
                     return (val) ? val : setViewSessionCookie();
                 },
-                setViewSession: setViewSession,
+                setItemIntoCartSession: setItemIntoCartSession,
+                setItemIntoViewSession: setItemIntoViewSession,
                 setCartLog: setCartLog,
                 setDoNotTrack: function(enable) {
                     config_do_not_track = (enable);
@@ -1217,13 +1160,9 @@ if (typeof Predictry !== 'object') {
                     }
                     return (recent_response !== null && isDefined(recent_response)) ? recent_response : undefined;
                 },
-                sendAction: sendAction,
-                sendBulkActions: sendBulkActions,
-                trackView: trackView,
-//                trackAddToCart: trackAddToCart,
-                trackBuy: trackBuy,
-//                trackStartedCheckout: trackStartedCheckout,
-//                trackStartedPayment: trackStartedPayment,
+//                sendAction: sendAction,
+//                sendBulkActions: sendBulkActions,
+                track: track,
                 drawList: drawTextListRecommendation,
                 cart_id: temp_cart_id,
                 widget_id: widget_id,
@@ -1242,8 +1181,8 @@ if (typeof Predictry !== 'object') {
         _predictry.push(['setSessionBrowserID']);
         _predictry.push(['setSessionUserID']);
         _predictry.push(['setSessionCart']);
-        _predictry.push(['setSessionView']);
-        _predictry.push(['getWidgetInstanceID', document.location.search]);
+//        _predictry.push(['setSessionView']);
+//        _predictry.push(['getWidgetInstanceID', document.location.search]);
 
         async_executor = new Executor(window_alias.PE_tenantId, window_alias.PE_apiKey);
         var execute_first = {setTenantId: 1, setApiKey: 1, setSessionID: 1, setSessionBrowserID: 1, setSessionUserID: 1, setSessionCart: 1, getWidgetInstanceID: 1};
