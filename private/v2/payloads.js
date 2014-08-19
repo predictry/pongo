@@ -167,3 +167,68 @@ var buy_data = {
 };
 
 _predictry.push(['trackBuy', buy_data]);
+
+
+/**
+ * NEW PAYLOADS
+ */
+
+var view_item_data = {
+    // If user is not logged in, this object is not required
+    action: {
+        name: "view"
+    },
+    user: {
+        user_id: "100", //alphanumeric (unique)
+        email: "user@email.com"
+    },
+    items: [
+        {
+            item_id: "105", //alphanumeric (unique)
+            name: "Item name",
+            price: 250.12,
+            img_url: "http://www.predictry.com/123.png",
+            item_url: "http://www.predictry.com/123", //without trailing slash
+
+            //OPTIONALS - Provide if available so that recommendations would be better
+            discount: "23%", //the discount that is being offered. If the discount is in amount 23.10 without the percentage
+            description: "Description of the item",
+            inventory_qty: 100, //how many items left
+            category: "Electronics",
+            sub_category: "Phone",
+            tags: ["iphone", "5s", "gold"], //this is an array. If there's only one item also enclosed in array ["iphone"] 
+            brand: "apple",
+            locations: ["kuala lumpur", "jakarta"], //cities that this is sold if applicable
+            start_date: 1407921883, //unix timestamp - when is the first that this will be sold? If applicable, if not, ignore.
+            end_date: 1417921883 //unix timestamp - when is the last day that it will be sold? If applicable, if not, ignore.	
+        }
+    ]
+};
+
+_predictry.push(['track', view_item_data]);
+
+
+var buy_data = {
+    action: {
+        name: "buy",
+        total: 1730.5
+    },
+    user: {
+        user_id: "100", //alphanumeric (unique)
+        email: "user@email.com"
+    },
+    items: [
+        {
+            item_id: "105", //alphanumeric (unique)
+            qty: 12,
+            sub_total: 380
+        },
+        {
+            item_id: "106",
+            qty: 20,
+            sub_total: 1350.5
+        }
+    ]
+};
+
+_predictry.push(['track', buy_data]);
