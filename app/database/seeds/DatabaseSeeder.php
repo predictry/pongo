@@ -19,7 +19,8 @@ class DatabaseSeeder extends Seeder
 		$this->call('SitesTableSeeder');
 		$this->call('ActionsSeeder');
 		$this->call('CombinationTableSeeder');
-//		$this->call('ItemTableSeeder');
+		$this->call('ItemTableSeeder');
+//		$this->call('ActionDataSeeder');
 	}
 
 }
@@ -201,6 +202,51 @@ class CombinationTableSeeder extends Seeder
 					'description'	 => 'Default'
 				)
 		);
+	}
+
+}
+
+class ActionDataSeeder extends Seeder
+{
+
+	public function run()
+	{
+		$item_ids	 = \App\Models\Item::all()->lists("id");
+		$visitor_ids = \App\Models\Session::all()->lists("id");
+
+		for ($i = 31; $i >= 0; $i--)
+		{
+			if ($i === 0)
+				$dt_created	 = new Carbon\Carbon('today');
+			else
+				$dt_created	 = new Carbon\Carbon($i . " days ago");
+
+			$n_action = rand(1, 200);
+			for ($j = 0; $j < 50; $j++)
+			{
+//				$is_recommended	 = rand(0, 1);
+				$item_index		 = rand(0, count($item_ids) - 1);
+				$visitor_index	 = rand(0, count($visitor_ids) - 1);
+
+
+				//process action instance
+				$action_instance			 = new \App\Models\ActionInstance();
+				$action_instance->action_id	 = 21;
+				$action_instance->item_id	 = $item_ids[$item_index];
+				$action_instance->session_id = $visitor_ids[$visitor_index];
+				$action_instance->created	 = $dt_created;
+				$action_instance->save();
+
+//				if (true)
+//				{
+//					$action_instance_meta						 = new \App\Models\ActionInstanceMeta();
+//					$action_instance_meta->key					 = 'rec';
+//					$action_instance_meta->value				 = 'true';
+//					$action_instance_meta->action_instance_id	 = $action_instance->id;
+//					$action_instance_meta->save();
+//				}
+			}
+		}
 	}
 
 }

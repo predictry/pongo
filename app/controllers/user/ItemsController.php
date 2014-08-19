@@ -70,7 +70,7 @@ class ItemsController extends \App\Controllers\BaseController
 				$item->{$obj->key} = $obj->value;
 			}
 		}
-		
+
 		$activated = ($item->active) ? true : false;
 		return View::make("frontend.panels.items.form", array("item" => $item, "type" => "edit", 'pageTitle' => "Edit Item", "activated" => $activated));
 	}
@@ -100,9 +100,12 @@ class ItemsController extends \App\Controllers\BaseController
 
 	public function getView($id)
 	{
-		$item		 = \App\Models\Item::find($id);
-		$activated	 = ($item->activte) ? true : false;
-		return View::make("frontend.panels.items.viewmodalcontent", array("item" => $item, "type" => "view", 'pageTitle' => "View Item", "columns" => $item->manage_table_header, "activated" => $activated));
+		$item			 = \App\Models\Item::find($id);
+		if (is_object($item))
+			$item_properties = \App\Models\ItemMeta::where("item_id", $item->id)->orderBy('created_at', 'ASC')->get();
+
+		$activated = ($item->activte) ? true : false;
+		return View::make("frontend.panels.items.viewmodalcontent", array("item" => $item, "properties" => $item_properties, "type" => "view", 'pageTitle' => "View Item", "columns" => $item->manage_table_header, "activated" => $activated));
 	}
 
 	public function postDelete($id)
