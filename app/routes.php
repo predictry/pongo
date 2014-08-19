@@ -26,9 +26,9 @@ Route::pattern('dt_start', '^([0-9]{4})-([0-9]{2})-([0-9]{2})$');
 Route::pattern('dt_end', '^([0-9]{4})-([0-9]{2})-([0-9]{2})$');
 Route::pattern('numeric', '[0-9]+');
 
-$dashboard_domain	 = str_replace("http://", "", Config::get('app.url'));
-$domains			 = explode(".", $dashboard_domain);
-$tld				 = $domains[1] . "." . $domains[2];
+//$dashboard_domain	 = str_replace("http://", "", Config::get('app.url'));
+//$domains			 = explode(".", $dashboard_domain);
+//$tld				 = $domains[1] . "." . $domains[2];
 
 /*
   |--------------------------------------------------------------------------
@@ -36,7 +36,7 @@ $tld				 = $domains[1] . "." . $domains[2];
   |--------------------------------------------------------------------------
  */
 //Route::group(array('domain' => 'dashboard.{domain}', 'namespace' => 'App\Controllers'), function() {
-Route::group(array('domain' => 'dashboard.' . $tld, 'namespace' => 'App\Controllers'), function() {
+Route::group(array('namespace' => 'App\Controllers'), function() {
 	Route::get('/', 'HomeController@getLogin');
 	Route::get('/home/{numeric}/{token}', 'HomeController@getHome');
 
@@ -63,7 +63,7 @@ Route::group(array('domain' => 'dashboard.' . $tld, 'namespace' => 'App\Controll
   |--------------------------------------------------------------------------
  */
 //Route::group(array('domain' => 'dashboard.{domain}', 'before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
-Route::group(array('domain' => 'dashboard.' . $tld, 'before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
+Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
 
 	#Dashboard
 	$role = Session::get("role");
@@ -192,7 +192,7 @@ Route::group(array('domain' => 'dashboard.' . $tld, 'before' => 'auth', 'namespa
   | API Routing
   |--------------------------------------------------------------------------
  */
-Route::group(array('domain' => 'api.' . $tld, 'prefix' => 'v1', 'namespace' => 'App\Controllers\Api'), function() {
+Route::group(array('prefix' => 'v1', 'namespace' => 'App\Controllers\Api'), function() {
 	//	 Allow from any origin
 	if (isset($_SERVER['HTTP_ORIGIN']))
 	{
