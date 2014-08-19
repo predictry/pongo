@@ -21,7 +21,7 @@
 	<div class="col-sm-3">
 		<div class="the-box no-border bg-success">
 			<div class="tiles-inner text-center">
-				<p class="tiles-title">Today Sales</p>
+				<p class="tiles-title">Today Items Sold</p>
 				<h1 class="bolded">{{ $overviews['today_total_buy_action'] }}</h1>
 				<p class="tiles-sub-title">(taken from buy action)</p>
 			</div>
