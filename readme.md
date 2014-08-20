@@ -4,14 +4,13 @@ Trivial: *Pongo* is the scientific name of orangutans.
 
 ## Documentation
 
+## Predictry JS SDK Implementation
 
-#Predictry JS SDK
----
-##Usage
+## Usage
 Documentation of how to implement Predictry JS SDK on the site.
 
 ##Version 
-###2.0.0
+###0.2.1
 
 ###*STEP 1*: GETTING STARTED (EMBED JS)
 To start tracking with the Predictry JavaScript library, just paste the following code into the page you want to track just before the `</head>` tags. Make sure to change ***‘YOUR_API_KEY’*** and ***‘YOUR_TENANT_ID’*** accordingly that have been provided to you. 
