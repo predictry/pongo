@@ -21,7 +21,7 @@ class Action2Controller extends \App\Controllers\ApiBaseController
 
 	protected $response		 = array();
 	protected $curl			 = null;
-	protected $is_new_item, $is_new_visitor, $is_new_action, $is_new_session, $is_new_browser;
+	protected $is_new_item, $is_new_visitor, $is_new_action, $is_new_session, $is_new_browser, $is_anonymous;
 	protected $action_id, $item_id, $visitor_id, $action_instance_id, $session_id, $browser_id;
 	protected $action_type	 = "single";
 	protected $action_data	 = array();
@@ -29,8 +29,10 @@ class Action2Controller extends \App\Controllers\ApiBaseController
 	public function __construct()
 	{
 		parent::__construct();
-		$this->is_new_item					 = $this->is_new_visitor				 = $this->is_new_action				 = $this->is_new_session				 = $this->is_new_browser				 = false;
-		$this->action_id					 = $this->item_id						 = $this->visitor_id					 = $this->action_instance_id			 = $this->session_id					 = $this->browser_id					 = 0;
+		$this->is_new_item					 = $this->is_new_visitor				 = $this->is_new_action				 = false;
+		$this->is_new_session				 = $this->is_new_browser				 = $this->is_anonymous					 = false;
+		$this->action_id					 = $this->item_id						 = $this->visitor_id					 = 0;
+		$this->action_instance_id			 = $this->session_id					 = $this->browser_id					 = 0;
 		$this->predictry_server_api_key		 = Request::header("X-Predictry-Server-Api-Key");
 		$this->predictry_server_tenant_id	 = \Request::header("X-Predictry-Server-Tenant-ID");
 
@@ -45,6 +47,9 @@ class Action2Controller extends \App\Controllers\ApiBaseController
 			'appid'	 => $this->predictry_server_api_key,
 			'domain' => $this->predictry_server_tenant_id
 		);
+
+		\Gui::setCredential(GUI_HTTP_USERNAME, GUI_HTTP_PASSWORD);
+		\Gui::setDomainAuth($this->gui_domain_auth['appid'], $this->gui_domain_auth['domain']);
 	}
 
 	public function index()
@@ -82,17 +87,31 @@ class Action2Controller extends \App\Controllers\ApiBaseController
 			{
 				//validating user data
 				$user_property_rules = array(
-					"user_id"	 => "required|alpha_num",
-					"email"		 => (isset($inputs['user']['email']) && $inputs['user']['email'] !== "") ? "required|email" : ""
+					"email" => (isset($inputs['user']['email']) && $inputs['user']['email'] !== "") ? "required|email" : ""
 				);
+
+				//if client didn't set the user object values, then replace it using generated uid
+				if (!isset($inputs['user']))
+				{
+					$inputs['user']['user_id']	 = $inputs['user_id'];
+					$inputs['user']['email']	 = "";
+
+					$this->is_anonymous = true;
+				}
 
 				$user_validator = \Validator::make($inputs['user'], $user_property_rules);
 				if ($user_validator->passes())
 				{
-					$this->browser_id	 = $this->_getBrowserID($inputs['browser_id'], $this->is_new_browser); //get browser_id
-					$this->visitor_id	 = $this->_getVisitorID($inputs['user'], $this->is_new_visitor);
-					$this->session_id	 = $this->_getSessionID($inputs['session_id'], $this->visitor_id, $this->is_new_session); //get session_id
-					$this->_setBrowseSession($this->browser_id, $this->session_id); //set browser session
+					$this->browser_id = $this->_getBrowserID($inputs['browser_id']); //get browser_id
+					//if user is anonymous, don't create visitor info (only for identified user)
+					if (!$this->is_anonymous)
+					{
+						$this->visitor_id	 = $this->_getVisitorID($inputs['user'], $inputs['session_id']);
+						$this->session_id	 = $this->_getSessionID($inputs['session_id'], $this->visitor_id); //get session_id
+					}
+					else
+					//send null for visitor_id
+						$this->session_id = $this->_getSessionID($inputs['session_id']); //get session_id
 
 					if ($inputs['action']['name'] === 'view')
 					{
@@ -103,14 +122,33 @@ class Action2Controller extends \App\Controllers\ApiBaseController
 							$this->_proceedSingleAction($inputs['action']['name'], $inputs);
 							//@todo send to gui, since we know if the item, user new or not
 							//@todo send action to gui
+
+							$this->_proceedToGui($item, $inputs['user'], $inputs['action']);
+							$response = $this->response;
 						}
+
 						$response = $this->response;
 					}
-					else if ($inputs['action']['name'] === 'buy')
+					else if ($inputs['action']['name'] === 'buy' || $inputs['action']['name'] === "started_checkout" || $inputs['action']['name'] === "started_payment")
 					{
-						if ($this->_proceedBuyAction($inputs['action']['name'], $inputs))
+						if ($this->_proceedBulkAction($inputs['action']['name'], $inputs))
 							$this->http_status = 200;
 
+						$response = $this->response;
+					}
+					else
+					{
+						$items = $inputs['items'];
+						foreach ($items as $item)
+						{
+							$inputs['item'] = $item;
+							$this->_proceedSingleAction($inputs['action']['name'], $inputs);
+							//@todo send to gui, since we know if the item, user new or not
+							//@todo send action to gui
+
+							$this->_proceedToGui($item, $inputs['user'], $inputs['action']);
+							$response = $this->response;
+						}
 						$response = $this->response;
 					}
 				}
@@ -194,7 +232,7 @@ class Action2Controller extends \App\Controllers\ApiBaseController
 		return true;
 	}
 
-	function _proceedBuyAction($action_name, $action_data)
+	function _proceedBulkAction($action_name, $action_data)
 	{
 		$items			 = $action_data['items'];
 		$this->action_id = $this->_getActionID(array("name" => $action_name), $this->is_new_action);
@@ -228,6 +266,7 @@ class Action2Controller extends \App\Controllers\ApiBaseController
 				break;
 			}
 
+			$this->_proceedToGui($item, $action_data['user'], $action_data['action']);
 			$i++;
 		}
 
@@ -389,7 +428,8 @@ class Action2Controller extends \App\Controllers\ApiBaseController
 	function _setBrowseSession($browser_id, $session_id)
 	{
 		$browser_session = \App\Models\BrowserSession::where("browser_id", $browser_id)->where("session_id", $session_id)->get()->first();
-		if ($browser_session)
+
+		if (!$browser_session)
 		{
 			$browser_session			 = new \App\Models\BrowserSession();
 			$browser_session->browser_id = $browser_id;
@@ -407,52 +447,63 @@ class Action2Controller extends \App\Controllers\ApiBaseController
 		$visitor->email		 = $visitor_data['email'];
 		$visitor->save();
 
+		$this->is_new_visitor	 = true;
+		$this->visitor_id		 = $visitor->id;
 		return $visitor->id;
 	}
 
-	function _getVisitorID($user_data, &$is_new = false)
+	function _getVisitorID($user_data, $session)
 	{
-		if (isset($user_data['email']) && $user_data['email'] !== "")
-		{
-			$visitor = \App\Models\Visitor::where("email", $user_data['email'])->get()->toArray();
-			if (!$visitor)
-			{
-				$is_new = true;
-				return $this->_setVisitor($user_data);
-			}
-			else
-			{
-				if (count($visitor) > 0)
-				{
-					//check if the email of visitor match one of the session from spesific site
-					//if not means the email is unique for different site
-					$temp_visitor_id = 0;
-					foreach ($visitor as $v)
-					{
-						$session = \App\Models\Session::where("site_id", $this->site_id)->where("visitor_id", $v['id'])->get()->first();
-						if ($session)
-						{
-							$temp_visitor_id = $v['id'];
-							break;
-						}
-					}
+		$visitor_id	 = false;
+		$session	 = \App\Models\Session::where("session", $session)->get()->first();
 
-					$is_new = (!$temp_visitor_id) ? true : false;
-					return (!$temp_visitor_id) ? $this->_setVisitor($user_data) : $temp_visitor_id;
+		if ($session)
+		{ // if session exists, update visitor data
+			$visitor_id = ($session->visitor_id !== null) ? $session->visitor_id : false;
+			if ($visitor_id)
+			{
+				$visitor			 = \App\Models\Visitor::find($visitor_id);
+				$visitor->identifier = $user_data['user_id'];
+				$visitor->email		 = $user_data['email'];
+				$visitor->update();
+			}
+		}
+
+		//get the visitors list that have the same email
+		if (!$visitor_id && isset($user_data['email']) && $user_data['email'] !== "")
+		{
+			$visitors = \App\Models\Visitor::where("email", $user_data['email'])->get()->toArray();
+			//check if one of the visitor used by one of the session from the specific site.
+			foreach ($visitors as $v)
+			{
+				$session = \App\Models\Session::where("site_id", $this->site_id)->where("visitor_id", $v['id'])->get()->first();
+				if ($session)
+				{
+					$visitor_id = $v['id'];
+					break;
 				}
 			}
-			return $visitor->id;
 		}
-		else
+
+		//if one of the session use the visitor_id. Then we need to update that visitor info
+		//possibility, user logged in after browsing as an anonymous.
+		if ($visitor_id && $visitor_id !== null)
 		{
-			$visitor = \App\Models\Visitor::where("identifier", $user_data['user_id'])->get()->first();
-			if (!$visitor)
-				return $this->_setVisitor($user_data);
-			return $visitor->id;
+			$visitor			 = \App\Models\Visitor::find($visitor_id);
+			$visitor->identifier = $user_data['user_id'];
+			$visitor->email		 = $user_data['email'];
+			$visitor->update();
 		}
+
+		//none of the session that use any of the visitor_id then create new for that
+		//possibility, user anonymous and session expired.
+		if (!$visitor_id)
+			$visitor_id = $this->_setVisitor($user_data);
+
+		return $visitor_id;
 	}
 
-	function _getItemID($item_data, &$is_new = false)
+	function _getItemID($item_data)
 	{
 		$identifier	 = $item_data['item_id'];
 		$item		 = \App\Models\Item::where("identifier", $identifier)->where("site_id", $this->site_id)->first();
@@ -526,6 +577,8 @@ class Action2Controller extends \App\Controllers\ApiBaseController
 
 				$this->is_new_item	 = true;
 				$this->item_id		 = $item->id;
+
+				$this->is_new_item = true;
 				return $item->id;
 			}
 			else
@@ -533,7 +586,7 @@ class Action2Controller extends \App\Controllers\ApiBaseController
 		}
 	}
 
-	function _getSessionID($session, $visitor_id = null, &$is_new = false)
+	function _getSessionID($session, $visitor_id = null)
 	{
 		$session_visitor_id	 = 0;
 		//start processing visitor
@@ -546,17 +599,26 @@ class Action2Controller extends \App\Controllers\ApiBaseController
 			$visitor_session->site_id	 = $this->site_id;
 			$visitor_session->session	 = $session;
 			$visitor_session->save();
-			$is_new						 = true;
+
+			$this->is_new_session	 = true;
+			$this->session_id		 = $session_visitor_id		 = $visitor_session->id;
+			$this->_setBrowseSession($this->browser_id, $visitor_session->id); //set browser session
+		}
+		else
+		{
+			if ($visitor_id !== null)
+			{
+				$visitor_session->visitor_id = $visitor_id;
+				$visitor_session->update();
+			}
 
 			$session_visitor_id = $visitor_session->id;
 		}
-		else
-			$session_visitor_id = $visitor_session->id;
 
 		return $session_visitor_id;
 	}
 
-	function _getBrowserID($browser_id, &$is_new = false)
+	function _getBrowserID($browser_id)
 	{
 		$browser = \App\Models\Browser::where("identifier", $browser_id)->get()->first();
 		if ($browser)
@@ -566,6 +628,8 @@ class Action2Controller extends \App\Controllers\ApiBaseController
 			$browser			 = new \App\Models\Browser();
 			$browser->identifier = $browser_id;
 			$browser->save();
+
+			$this->is_new_browser = true;
 			return $browser->id;
 		}
 	}
@@ -655,30 +719,43 @@ class Action2Controller extends \App\Controllers\ApiBaseController
 		return $response;
 	}
 
-	//@todo POST ITEM TO GUI, WITH ALL PROPERTIES THAT ALREADY DEFINED
-	function _postItemToGui($item_data)
+	private function _proceedToGui($item_data, $user_data, $action_data)
 	{
-		$this->curl->http_login(GUI_HTTP_USERNAME, GUI_HTTP_PASSWORD);
-		$gui_item_params = array(
-			"name", "brand", "model", "description", "tags", "price", "category",
-			"subCategory", "dateAdded", "itemURL", "imageURL", "startDate", "endDate", "locations"
-		);
+		if ($this->is_new_item)
+			$this->_postItemToGui($item_data);
 
-		$gui_item_data = array();
+		if ($this->is_new_visitor)
+			$this->_postUserToGui($user_data);
 
-		foreach ($item_data as $key => $val)
-		{
-			if (in_array(\Str::camel($key), $gui_item_params))
-				array_push($gui_item_data, array(\Str::camel($key) => $val));
-		}
+		$this->_postAction($action_data);
+	}
 
-		$item_resources_uri					 = GUI_RESTAPI_URL . "items/";
-		$item_resources_uri_with_credential	 = $item_resources_uri . '?' . http_build_query($this->gui_domain_auth);
-		$response							 = $this->curl->_simple_call("post", $item_resources_uri_with_credential, $item_data);
-		return $response;
+	private function _postItemToGui($item_data)
+	{
+		$result				 = \Gui::postItem($this->item_id, $item_data);
+		$this->is_new_item	 = false;
+
+		return ($result) ? $result : false;
+	}
+
+	private function _postUserToGui($user_data)
+	{
+		$result					 = \Gui::postUser($this->visitor_id, $user_data);
+		$this->is_new_visitor	 = false;
+
+		return ($result) ? $result : false;
+	}
+
+	private function _postAction($action_data)
+	{
+		$result				 = \Gui::postAction($this->action_instance_id, $action_data);
+		$this->is_new_action = false;
+
+		return ($result) ? $result : false;
 	}
 
 }
 
 /* End of file Action2Controller.php */
-/* Location: ./application/controllers/Action2Controller.php */
+	/* Location: ./application/controllers/Action2Controller.php */
+	

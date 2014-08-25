@@ -1001,20 +1001,27 @@ if (typeof Predictry !== 'object') {
                     return;
 
                 data = appendPredictryData(data);
+                
+                if (isDefined(data.action.name))
+                {
+                    if (data.action.name === "view" && data.items.length === 1) {
+                        //check if the viewed item is from reco or not
+                        if (widget_instance_id !== 0 && isDefined(data.action))
+                            data.action.rec = true;
+                        else if (widget_instance_id !== 0 && !isDefined(data.action))
+                            data.action = {rec: true};
 
-                if (isDefined(data.action.name) && (data.action.name === "view")) {
-                    //check if the viewed item is from reco or not
-                    if (widget_instance_id !== 0 && isDefined(data.action))
-                        data.action.rec = true;
-                    else if (widget_instance_id !== 0 && !isDefined(data.action))
-                        data.action = {rec: true};
-
-                    trackView(data);
-                } else if (isDefined(data.action.name) && data.action.name === "buy") {
-                    trackBuy(data);
-                } else {
-                    config_request_content_type = "application/json; charset=utf-8";
-                    return sendRequest(config_api_url + config_api_resources[0], JSON.stringify(data), true);
+                        trackView(data);
+                    } else if (data.action.name === "buy" && data.items.length >= 1) {
+                        trackBuy(data);
+                        deleteCookies();
+                    } else if (data.action.name === "started_checkout" || data.action.name === "started_payment") {
+                        trackBulk(data);
+                    }
+                    else {
+                        config_request_content_type = "application/json; charset=utf-8";
+                        return sendRequest(config_api_url + config_api_resources[0], JSON.stringify(data), true);
+                    }
                 }
             }
 
@@ -1053,7 +1060,7 @@ if (typeof Predictry !== 'object') {
 
                 var viewSession = eval("(" + getCookie(getCookieName("view")) + ")");
                 var viewItemIDs = viewSession.v;
-                
+
                 for (var i = 0; i < data.items.length; i++)
                 {
                     for (var key in data.items[i])
@@ -1067,6 +1074,35 @@ if (typeof Predictry !== 'object') {
                             if (inArray(item_id, viewItemIDs))
                                 data.items[i].rec = true;
                         }
+                    }
+                }
+
+                config_request_content_type = "application/json; charset=utf-8";
+                return sendRequest(config_api_url + config_api_resources[0], JSON.stringify(data), true);
+            }
+
+            function trackBulk(data) {
+                if (!isDefined(data) || !isObject(data))
+                    return;
+
+                data = appendPredictryData(data);
+
+
+                if (isDefined(data.action))
+                    data.action.cart_id = getCartID();
+                else if (!isDefined(data.action))
+                    data.action = {cart_id: getCartID()};
+
+                var cartSession = eval("(" + getCookie(getCookieName("cart")) + ")");
+                var cartItemIDs = cartSession.c;
+
+                for (var i = 0; i < data.items.length; i++)
+                {
+                    for (var key in data.items[i])
+                    {
+                        var item_id = data.items[i][key];
+                        if (key === "item_id" && (cartItemIDs.length > 0) && inArray(item_id, cartItemIDs))
+                            data.items[i].rec = true;
                     }
                 }
 

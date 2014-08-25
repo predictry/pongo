@@ -45,55 +45,16 @@ class Recommendation2Controller extends \App\Controllers\ApiBaseController
 		$widget	 = null;
 
 		if (isset($inputs['widget_id']))
-			$widget		 = \App\Models\Widget::where("id", $inputs['widget_id'])->where("site_id", $this->site_id)->get()->first();
-		else
-			$response	 = $this->getErrorResponse("inputUnknown", 400, "widget_id");
-
-		if ($widget && $this->_isAlgoExists($widget->reco_type))
 		{
-			$this->widget_id = $widget->id;
-			$method_algo	 = $widget->reco_type;
-			unset($inputs['algo']);
-
-			$easyrec_input_reco_data = $this->_getEasyrecRecoOption($inputs);
-
-			if (!is_object($easyrec_input_reco_data))
+			$widget = \App\Models\Widget::where("id", $inputs['widget_id'])->where("site_id", $this->site_id)->get()->first();
+			if ($widget && $this->_isAlgoExists($widget->reco_type))
 			{
-				if ($method_algo === "otherusersalsoviewed")
-					$recomm	 = $this->_getEasyRecOtherUsersAlsoViewed($easyrec_input_reco_data);
-				else if ($method_algo === "recommendationsforuser")
-					$recomm	 = $this->_getEasyRecRecommendationForUser($easyrec_input_reco_data);
-				else if ($method_algo === "inspiredbyyourshoppingtrends")
-					$recomm	 = $this->_getLokeInsipiredByYourShoppingTrends($inputs['user_id']);
-				//gui algorithm
-				else if ($method_algo === "otherusersalsoviewed2")
-					;
-				else if ($method_algo === "otheritemsviewedtogether")
-					;
-				else if ($method_algo === "otheritemspurchased")
-					;
-				else if ($method_algo === "otheritemspurchasedtogether")
-					;
-				else
-					$recomm	 = $this->_getEasyRecOtherUsersAlsoViewed($easyrec_input_reco_data);
-
-				if ($recomm)
-				{
-					$rec_items = array_fetch($recomm, 'alias_id'); // item_id = alias_id
-					return \Response::json(array(
-								"status" => 200,
-								"data"	 => array(
-									"recomm"			 => $recomm,
-									"widget_instance_id" => $this->_setWidgetInstance($rec_items, $inputs['session_id'])
-								))
-					);
-				}
-				else
-					$response = $this->getErrorResponse("inputUnknown", 400, "widget_id");
+				
 			}
-			else
-				$response = $this->getErrorResponse("errorValidator", 400, "", $easyrec_input_reco_data->errors()->first());
 		}
+		else
+			$response = $this->getErrorResponse("inputUnknown", 400, "widget_id");
+
 
 		return \Response::json($response, $this->http_status);
 	}
@@ -162,16 +123,13 @@ class Recommendation2Controller extends \App\Controllers\ApiBaseController
 
 		return $recommended_items;
 	}
-	
-	
+
 	//GET GUI RECOMMENDATION
-	
+
 	function _getGuiOtherItemsViewed($option_data)
 	{
 		
 	}
-	
-	
 
 	function _setWidgetInstance($rec_items, $session_id)
 	{
@@ -199,7 +157,10 @@ class Recommendation2Controller extends \App\Controllers\ApiBaseController
 
 	function _isAlgoExists($algo)
 	{
-		$available_algos = array("otherusersalsoviewed", "otherusersalsobought", "itemsratedgoodbyotherusers", "recommendationsforuser", "relateditems", "inspiredbyyourshoppingtrends");
+		$available_algos = array(
+			"otherusersalsoviewed", "otherusersalsobought", "itemsratedgoodbyotherusers", "recommendationsforuser", "relateditems", "inspiredbyyourshoppingtrends", //easyrec
+			"otherusersalsoviewed2", "otherusersalsoviewedtogether", "otherusersalsobought2", "otherusersalsoboughttogether" //gui
+		);
 		return in_array($algo, $available_algos) ? $algo : $available_algos[0];
 	}
 
