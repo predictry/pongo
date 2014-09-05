@@ -13,7 +13,8 @@ namespace App\Models;
 class Browser extends \Eloquent
 {
 
-	protected $table = 'browsers';
+    protected $guarded = array("id");
+    protected $table   = 'browsers';
 
 }
 

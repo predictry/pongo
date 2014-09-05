@@ -13,7 +13,8 @@ namespace App\Models;
 class BrowserSession extends \Eloquent
 {
 
-	protected $table = 'browsers_session';
+    protected $guarded = array("id");
+    protected $table   = 'browsers_session';
 
 }
 
