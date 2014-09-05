@@ -3,8 +3,8 @@
  * Date Created : Aug 11, 2014 9:10:30 AM
  * Email        : rifkiyandhi@gmail.com 
  * Function     : Predictry JS SDK
- * Version      : 2.0.0
- * Revision     : 0
+ * Version      : 0.2.0
+ * Revision     : 2
  */
 
 if (typeof _predictry !== 'object') {
@@ -222,9 +222,9 @@ if (typeof Predictry !== 'object') {
         /**
          * Build URL params
          * 
-         * @param {type} parameters
-         * @param {type} bulk
-         * @returns {String|buildUrl.qs}
+         * @param {object} obj
+         * @param {string} prefix
+         * @returns {String}
          */
         function buildUrl(obj, prefix) {
             var str = [];
@@ -329,6 +329,11 @@ if (typeof Predictry !== 'object') {
 
             var call_url = null;
 
+            var
+                    predictry_nodes = {},
+                    widgets = [],
+                    is_lookup_widget = false;
+
 
             /**
              * Config values
@@ -391,16 +396,17 @@ if (typeof Predictry !== 'object') {
             /**
              * Drawing recommendation as LIST
              * 
-             * @param {type} obj
-             * @returns {undefined}
+             * @param {DOM} elem
+             * @param {object} obj
+             * @returns {void}
              */
             function drawTextListRecommendation(elem, obj)
             {
                 if (obj !== null) { // if no error show recommendations
 
                     try {
-                        var items = obj.recomm;
-                        widget_instance_id = obj.widget_instance_id;
+                        var items = obj.data.items;
+                        widget_instance_id = obj.data.widget_instance_id;
                     } catch (e) {
                         return;
                     }
@@ -417,8 +423,8 @@ if (typeof Predictry !== 'object') {
 
                         for (var x = 0; x < items.length; x++) {
                             listString +=
-                                    "<li><a href=\"" + items[x].item_properties.item_url + "?predictr_src=" + widget_instance_id + "\">"
-                                    + items[x].description +
+                                    "<li><a href=\"" + items[x].item_url + "?predictr_src=" + widget_instance_id + "\">"
+                                    + items[x].name +
                                     "</a>" +
                                     "</li>";
                         }
@@ -512,6 +518,12 @@ if (typeof Predictry !== 'object') {
                 return c_obj;
             }
 
+            /**
+             * Set view session cookie
+             * 
+             * @param {object} v_obj
+             * @returns {_L15.Executor.setViewSessionCookie.v_obj}
+             */
             function setViewSessionCookie(v_obj) {
                 if (!isDefined(v_obj) || !isObject(v_obj))
                     var v_obj = {v: []};
@@ -685,6 +697,9 @@ if (typeof Predictry !== 'object') {
 
             /**
              * Update Cart Item Session
+             * 
+             * @param {string} item_id
+             * @returns {void}
              */
             function setItemIntoCartSession(item_id) {
                 var cartSession = eval("(" + getCookie(getCookieName("cart")) + ")");
@@ -696,7 +711,12 @@ if (typeof Predictry !== 'object') {
                 setCookie(getCookieName("cart"), value, config_session_cookie_timeout, config_cookie_path);
             }
 
-
+            /**
+             * Update View Item Session
+             * 
+             * @param {string} item_id
+             * @returns {void}
+             */
             function setItemIntoViewSession(item_id) {
                 var viewSession = eval("(" + getCookie(getCookieName("view")) + ")");
                 if (isDefined(viewSession) && isObject(viewSession))
@@ -712,7 +732,6 @@ if (typeof Predictry !== 'object') {
                 var value = JSON.stringify(viewSession);
                 setCookie(getCookieName("view"), value, config_tracking_session_cookie_timeout, config_cookie_path);
             }
-
 
             /**
              * Get Session ID
@@ -782,13 +801,31 @@ if (typeof Predictry !== 'object') {
                 return cart_id;
             }
 
-            function getRecommendedItems(widget_id, user_id, item_id, callback) {
+//            function getRecommendedItems(widget_id, user_id, item_id, callback) {
+            function getRecommendedItems(reco_data, callback) {
+                var widget_id, item_id, user_id;
+
+                if (isDefined(reco_data) && isDefined(reco_data.widget_id))
+                    widget_id = reco_data.widget_id;
+
+                if (isDefined(reco_data) && isDefined(reco_data.item_id) && reco_data.item_id !== "")
+                    item_id = reco_data.item_id;
+                else
+                    item_id = 0;
+
+                if (isDefined(reco_data) && isDefined(reco_data.user_id) && reco_data.user_id !== "")
+                    user_id = reco_data.user_id;
+                else
+                    user_id = 0;
+//                    user_id = getSessionUserID();
+
                 var data = {
                     widget_id: widget_id,
                     user_id: user_id,
                     item_id: item_id,
                     session_id: getSessionID()
                 };
+
                 config_request_method = "GET";
                 var url = config_api_url + config_api_resources[5] + "?" + buildUrl(data);
                 sendRequest(url, buildUrl(data), true, callback);
@@ -828,6 +865,11 @@ if (typeof Predictry !== 'object') {
                 };
                 image.src = config_api_url + resource + (config_api_url.indexOf('?') < 0 ? '?' : '&') + queries;
             }
+
+            function getPredictryNodes() {
+
+            }
+
 
             /**
              * Send Action
@@ -928,8 +970,9 @@ if (typeof Predictry !== 'object') {
              * Make A Call
              * 
              * @param {string} url
-             * @param {string} data
+             * @param {object} data
              * @param {boolean} async
+             * @param {function} callback
              * @returns {void}
              */
             function sendXmlHttpRequest(url, data, async, callback) {
@@ -948,15 +991,24 @@ if (typeof Predictry !== 'object') {
                 http.setRequestHeader("X-Predictry-Server-Api-Key", api_key);
 
                 recent_xhr = http;
-                if (!isDefined(callback))
-                    http.onreadystatechange = function() {//Call a function when the state changes.
-                        if (http.readyState === 4 && http.status === 200) {
+                http.onreadystatechange = function() {//Call a function when the state changes.
+                    if (http.readyState === 4 && http.status === 200) {
+                        if (isDefined(callback)) {
+                            if (isFunction(callback))
+                                callback(http.responseText);
+                            else if (isString(callback)) {
+                                var func = eval(callback);
+                                if (isFunction(func)) {
+                                    func(http.responseText);
+                                }
+                            }
+                        } else {
                             recent_response = JSON.parse(http.responseText);
                             return;
                         }
-                    };
-                else
-                    http.onreadystatechange = callback;
+                    }
+                };
+
 
                 http.send(data);
             }
@@ -1001,7 +1053,7 @@ if (typeof Predictry !== 'object') {
                     return;
 
                 data = appendPredictryData(data);
-                
+
                 if (isDefined(data.action.name))
                 {
                     if (data.action.name === "view" && data.items.length === 1) {
@@ -1086,7 +1138,6 @@ if (typeof Predictry !== 'object') {
                     return;
 
                 data = appendPredictryData(data);
-
 
                 if (isDefined(data.action))
                     data.action.cart_id = getCartID();
@@ -1189,22 +1240,43 @@ if (typeof Predictry !== 'object') {
                 getWidgetID: function() {
                     return widget_id;
                 },
-                getRecommendedItems: getRecommendedItems,
-                getRecentRecommendedItems: function() {
-                    if (isDefined(recent_xhr) && isObject(recent_xhr) && recent_xhr !== null) {
-                        if (recent_xhr.readyState === 4 && recent_xhr.status === 200) {
-                            recent_response = JSON.parse(recent_xhr.responseText);
-                        }
+                getWidget: function() {
+                    if (!is_lookup_widget) {
+                        predictry_nodes = document.querySelectorAll(".predictry");
+                        [].forEach.call(predictry_nodes, function(elem) {
+                            var i = 0, ds = elem.dataset;
+                            if (ds.predictryWidgetId === undefined || ds.predictryWidgetId === "")
+                                return;
+
+                            var data = {item_id: ds.predictryItemId, user_id: ds.predictryUserId, widget_id: ds.predictryWidgetId};
+                            if (ds.predictryCallback === undefined) {
+                                _predictry.push(['getRecommendedItems', data, function(response) {
+                                        if (response !== undefined && i === 0) {
+                                            var obj = JSON.parse(response);
+                                            if (typeof obj === 'object') {
+                                                widgets.push({widget_id: ds.predictryWidgetId, response: obj.data.items});
+                                                _predictry.push(['drawList', elem, obj]);
+                                            }
+                                            i++;
+                                        }
+                                    }
+                                ]);
+                            }
+                            else
+                                _predictry.push(['getRecommendedItems', data, ds.predictryCallback]);
+                        });
+                        is_lookup_widget = true;
                     }
-                    return (recent_response !== null && isDefined(recent_response)) ? recent_response : undefined;
                 },
-//                sendAction: sendAction,
-//                sendBulkActions: sendBulkActions,
+                getRecommendedItems: getRecommendedItems,
                 track: track,
                 drawList: drawTextListRecommendation,
                 cart_id: temp_cart_id,
                 widget_id: widget_id,
-                widget_instance_id: widget_instance_id
+                widget_instance_id: widget_instance_id,
+                is_lookup_widget: is_lookup_widget,
+                predictry_nodes: predictry_nodes,
+                widgets: widgets
             };
         }
 

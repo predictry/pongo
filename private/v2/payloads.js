@@ -1,3 +1,14 @@
+var _predictry = _predictry || [];
+(function() {
+    _predictry.push(['setTenantId', "YOUR_TENANT_ID"], ['setApiKey', "YOUR_API_KEY"]);
+    var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+    g.type = 'text/javascript';
+    g.defer = true;
+    g.async = true;
+    g.src = '//d2gq0qsnoi5tbv.cloudfront.net/v2/p.min.js';
+    s.parentNode.insertBefore(g, s);
+})();
+
 var bulk_action = {
     action: 'buy',
     user_id: 100,
