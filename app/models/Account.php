@@ -10,65 +10,79 @@
 
 namespace App\Models;
 
-use Illuminate\Auth\UserInterface;
+use Eloquent;
 use Illuminate\Auth\Reminders\RemindableInterface;
+use Illuminate\Auth\UserInterface;
+use Illuminate\Support\Facades\Hash;
 
-class Account extends \Eloquent implements UserInterface, RemindableInterface
+class Account extends Eloquent implements UserInterface, RemindableInterface
 {
 
-	/**
-	 * The database table used by the model.
-	 *
-	 * @var string
-	 */
-	protected $table = 'accounts';
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    protected $table = 'accounts';
 
-	/**
-	 * The attributes excluded from the model's JSON form.
-	 *
-	 * @var array
-	 */
-	protected $hidden = array('password');
+    /**
+     * The attributes excluded from the model's JSON form.
+     *
+     * @var array
+     */
+    protected $hidden  = array('password');
+    protected $guarded = array('id');
+    static $rules      = array(
+        'name'                  => 'required',
+        'password'              => 'required|min:8|confirmed',
+        'password_confirmation' => 'required|min:8',
+        'email'                 => 'required|email|unique:accounts'
+    );
 
-	/**
-	 * Get the unique identifier for the user.
-	 *
-	 * @return mixed
-	 */
-	public function getAuthIdentifier()
-	{
-		return $this->getKey();
-	}
+    public function setPasswordAttribute($password)
+    {
+        $this->attributes['password'] = Hash::make($password);
+    }
 
-	/**
-	 * Get the password for the user.
-	 *
-	 * @return string
-	 */
-	public function getAuthPassword()
-	{
-		return $this->password;
-	}
+    /**
+     * Get the unique identifier for the user.
+     *
+     * @return mixed
+     */
+    public function getAuthIdentifier()
+    {
+        return $this->getKey();
+    }
 
-	public function getRememberToken()
-	{
-		return $this->remember_token;
-	}
+    /**
+     * Get the password for the user.
+     *
+     * @return string
+     */
+    public function getAuthPassword()
+    {
+        return $this->password;
+    }
 
-	public function getRememberTokenName()
-	{
-		return 'remember_token';
-	}
+    public function getRememberToken()
+    {
+        return $this->remember_token;
+    }
 
-	public function getReminderEmail()
-	{
-		return $this->email;
-	}
+    public function getRememberTokenName()
+    {
+        return 'remember_token';
+    }
 
-	public function setRememberToken($value)
-	{
-		$this->remember_token = $value;
-	}
+    public function getReminderEmail()
+    {
+        return $this->email;
+    }
+
+    public function setRememberToken($value)
+    {
+        $this->remember_token = $value;
+    }
 
 }
 

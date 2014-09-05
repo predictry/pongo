@@ -13,7 +13,8 @@ namespace App\Models;
 class WidgetInstance extends \Eloquent
 {
 
-	protected $table = 'widget_instances';
+    protected $guarded = array("id");
+    protected $table   = "widget_instances";
 
 }
 

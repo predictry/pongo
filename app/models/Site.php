@@ -26,7 +26,7 @@ class Site extends \Eloquent
 		"api_secret" => "API Secret Key"
 	);
 	public $rules				 = array(
-		"name"	 => "required|max:32",
+		"name"	 => "required|regex:/^[a-zA-Z]{1}/|alpha_num|max:32",
 		"url"	 => "required|active_url",
 	);
 

@@ -78,7 +78,7 @@ class SitesController extends \App\Controllers\BaseController
 		$input['account_id'] = Auth::user()->id;
 
 		$site		 = new \App\Models\Site();
-		$validator	 = Validator::make($input, $site->rules);
+		$validator	 = Validator::make($input, $site->rules,array("regex" => "The name format should start with character. Ex. ABC123"));
 
 		if ($validator->passes())
 		{

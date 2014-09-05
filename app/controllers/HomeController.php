@@ -11,278 +11,231 @@
 namespace App\Controllers;
 
 use View,
-	Auth,
-	Input,
-	Validator,
-	Redirect,
-	Hash,
-	Config,
-	Password,
-	App;
+    Auth,
+    Input,
+    Validator,
+    Redirect,
+    Hash,
+    Config,
+    Password,
+    App;
 
 class HomeController extends BaseController
 {
 
-	protected $layout = 'frontend.layouts.basic';
+    protected $layout = 'frontend.layouts.basic';
+    protected $account_repository;
 
-	/**
-	 * Display home view.
-	 * 
-	 * @return Response
-	 */
-	public function getHome($id, $str)
-	{
-		echo '<pre>';
-		echo "id=>";
-		print_r($id);
-		echo "<br/>----<br/>";
-		echo "str=>";
-		print_r($str);
-		echo '</pre>';
-		die;
+    public function __construct(App\Pongo\Repository\AccountRepository $account_repository)
+    {
+        parent::__construct();
+        $this->account_repository = $account_repository;
+    }
 
-		return View::make('hello');
-	}
+    /**
+     * Display home view.
+     * 
+     * @return Response
+     */
+    public function getHome($id, $str)
+    {
+        return View::make('hello');
+    }
 
-	/**
-	 * Display login view.
-	 * 
-	 * @return Response
-	 */
-	public function getLogin()
-	{
-		$user = Auth::user();
-		if (!empty($user->id))
-		{
-			return Redirect::to('home');
-		}
+    /**
+     * Display login view.
+     * 
+     * @return Response
+     */
+    public function getLogin()
+    {
+        $user = Auth::user();
+        if (!empty($user->id)) {
+            return Redirect::to('home');
+        }
 
-		return View::make('frontend.common.login', array("pageTitle" => "Login"));
-	}
+        return View::make('frontend.common.login', array("pageTitle" => "Login"));
+    }
 
-	/**
-	 * Handle a POST request to logged in.
-	 * 
-	 * @return Response
-	 */
-	public function postLogin()
-	{
-		$input = array(
-			'email'		 => Input::get('email'),
-			'username'	 => Input::get('email'),
-			'password'	 => Input::get('password'),
-			'remember'	 => Input::get('remember')
-		);
+    /**
+     * Handle a POST request to logged in.
+     * 
+     * @return Response
+     */
+    public function postLogin()
+    {
+        $rules = array(
+            'email'    => 'required|email',
+            'password' => 'required|min:8'
+        );
 
-		$rules = array(
-			'email'		 => 'required|email',
-			'password'	 => 'required|min:8'
-		);
+        $input       = Input::only("email", "username", "password", "remember");
+        $validator   = $this->account_repository->validate($input, $rules);
+        $flash_error = '';
 
-		$validator	 = Validator::make($input, $rules);
-		$flash_error = '';
-		if ($validator->passes())
-		{
-			$account_id = \App\Models\Account::where("email", $input['email'])->get(array('id'))->first();
+        if ($validator->passes()) {
+            $account = \App\Models\Account::where("email", $input['email'])->get()->first();
 
-			if (isset($account_id))
-			{
-				if (Auth::attempt(array('email' => $input['email'], 'password' => $input['password']), ($input['remember'])))
-				{
-					//validate if member or not
-					$member = App\Models\Member::where("account_id", Auth::user()->id)->get()->first();
-					if ($member)
-					{
-						$site_member = App\Models\SiteMember::where("member_id", $member->id)->get()->first();
-						$site		 = \App\Models\Site::find($site_member->site_id);
-						\Session::set("active_site_id", $site_member->site_id);
-						\Session::set("active_site_name", $site->name);
-						\Session::set("role", "member");
-					}
-					else
-						\Session::set("role", "admin");
+            if ($account) {
+                if (Auth::attempt(array('email' => $input['email'], 'password' => $input['password']), ($input['remember']))) {
+                    //validate if member or not
+                    $is_member = $this->account_repository->isMember();
+                    if (!$is_member)
+                        \Session::set("role", "admin");
 
-					return Redirect::to('home');
-				}
+                    return Redirect::to('home');
+                }
 
-				$flash_error = 'error.login.failed';
-			}
-			else
-			{
-				$flash_error = "error.email.doesnt.exists";
-			}
-			return Redirect::to('login')->with('flash_error', $flash_error)->withInput();
-		}
-		else
-		{
-			return Redirect::to('login')->withInput()->withErrors($validator);
-		}
-	}
+                $flash_error = 'error.login.failed';
+            }
+            else
+                $flash_error = "error.email.doesnt.exists";
 
-	/**
-	 * Display register view.
-	 * 
-	 * @return Response
-	 */
-	public function getRegister()
-	{
-		$this->siteInfo['pageTitle'] = "signup.now";
-		return View::make('frontend.common.register');
-	}
+            return Redirect::to('login')->with('flash_error', $flash_error)->withInput();
+        }
+        else
+            return Redirect::to('login')->withInput()->withErrors($validator);
+    }
 
-	/**
-	 * Handle a POST request to register new account
-	 * 
-	 * @return Response
-	 */
-	public function postRegister()
-	{
-		$input = array(
-			'name'					 => Input::get('name'),
-			'email'					 => Input::get('email'),
-			'password'				 => Input::get('password'),
-			'password_confirmation'	 => Input::get('password_confirmation')
-		);
+    /**
+     * Display register view.
+     * 
+     * @return Response
+     */
+    public function getRegister()
+    {
+        $this->siteInfo['pageTitle'] = "signup.now";
+        return View::make('frontend.common.register');
+    }
 
-		$rules = array(
-			'name'					 => 'required',
-			'password'				 => 'required|min:8|confirmed',
-			'password_confirmation'	 => 'required|min:8',
-			'email'					 => 'required|email|unique:accounts'
-		);
+    /**
+     * Handle a POST request to register new account
+     * 
+     * @return Response
+     */
+    public function postRegister()
+    {
+        $input     = Input::only("name", "email", "password", "password_confirmation");
+        $validator = $this->account_repository->validate($input);
 
-		$validator = Validator::make($input, $rules);
-		if ($validator->passes())
-		{
-			$account = new App\Models\Account;
+        if ($validator->passes()) {
+            // add necessary info for new account
+            $input = array_add($input, 'plan_id', 1);
+            $input = array_add($input, "confirmed", 1);
+            $input = array_add($input, "confirmation_code", md5(microtime() . Config::get('app.key')));
+            unset($input['password_confirmation']);   //we don't need password confirmation on account attributes
 
-			$account->name				 = $input['name'];
-			$account->email				 = $input['email'];
-			$account->password			 = Hash::make($input['password']);
-			$account->plan_id			 = 1;
-			$account->confirmed			 = 1;
-			$account->confirmation_code	 = md5(microtime() . Config::get('app.key'));
+            $account = $this->account_repository->newInstance($input); //create new instance
+            if ($this->account_repository->saveAccount($account))
+                \Event::fire("account.registration_confirmed", $account);  //send verification email (skip to confirmation)
+            else
+                return Redirect::to('register')->withInput()->withErrors("We are unable to process the data. Please try again.");
 
-			$account->save();
+            return Redirect::to('login')->with('flash_message', "home.success.register");
+        }
+        else {
+            return Redirect::to('register')->withInput()->withErrors($validator);
+        }
+    }
 
-			//SEND VERIFICATION EMAIL
-//			$email_data = array("fullname" => ucwords($input['name']));
-//			\Mail::send('emails.auth.accountconfirmation', $email_data, function($message) use ($input) {
-//				$message->to($input['email'], ucwords($input['name']))->subject('Welcome!');
-//			});
+    /**
+     * Display forgot password view.
+     * 
+     * @return Response
+     */
+    public function getForgotPassword()
+    {
+        return View::make("frontend.common.forgot");
+    }
 
-			return Redirect::to('login')->with('flash_message', "home.success.register");
-		}
-		else
-		{
-			return Redirect::to('register')->withInput()->withErrors($validator);
-		}
-	}
+    /**
+     * Hanle a POST request to send forgot password email confirmation.
+     * 
+     * @return Response
+     */
+    public function postForgotPassword()
+    {
+        $input = array(
+            'email' => Input::get('email')
+        );
 
-	/**
-	 * Display forgot password view.
-	 * 
-	 * @return Response
-	 */
-	public function getForgotPassword()
-	{
-		return View::make("frontend.common.forgot");
-	}
+        $rules = array(
+            'email' => 'required|email'
+        );
 
-	/**
-	 * Hanle a POST request to send forgot password email confirmation.
-	 * 
-	 * @return Response
-	 */
-	public function postForgotPassword()
-	{
-		$input = array(
-			'email' => Input::get('email')
-		);
+        $validator = Validator::make($input, $rules);
+        if ($validator->passes()) {
+            $user_id = \App\Models\Account::where("email", $input['email'])->get(array('id'))->first();
+            if (!$user_id)
+                return Redirect::to('forgot')->with('flash_error', "error.email.doesnt.exists");
+            else {
+                $response = Password::remind(Input::only('email'), function($message) {
+                            $message->subject = "subject.password.reminder";
+                        });
+                switch ($response) {
+                    case Password::INVALID_USER:
+                        return Redirect::back()->with('flash_message', \Lang::get($response));
 
-		$rules = array(
-			'email' => 'required|email'
-		);
+                    case Password::REMINDER_SENT:
+                        return Redirect::back()->with('flash_message', \Lang::get($response));
+                }
+            }
+        }
+        else {
+            return Redirect::back()->withInput()->withErrors($validator);
+        }
+    }
 
-		$validator = Validator::make($input, $rules);
-		if ($validator->passes())
-		{
-			$user_id = \App\Models\Account::where("email", $input['email'])->get(array('id'))->first();
-			if (!$user_id)
-				return Redirect::to('forgot')->with('flash_error', "error.email.doesnt.exists");
-			else
-			{
-				$response = Password::remind(Input::only('email'), function($message) {
-							$message->subject = "subject.password.reminder";
-						});
-				switch ($response)
-				{
-					case Password::INVALID_USER:
-						return Redirect::back()->with('flash_message', \Lang::get($response));
+    /**
+     * Display the password reset view for the given token.
+     *
+     * @param  string  $token
+     * @return Response
+     */
+    public function getReset($token = null)
+    {
+        if (is_null($token))
+            App::abort(404);
 
-					case Password::REMINDER_SENT:
-						return Redirect::back()->with('flash_message', \Lang::get($response));
-				}
-			}
-		}
-		else
-		{
-			return Redirect::back()->withInput()->withErrors($validator);
-		}
-	}
+        return View::make('frontend.common.reset')->with('token', $token);
+    }
 
-	/**
-	 * Display the password reset view for the given token.
-	 *
-	 * @param  string  $token
-	 * @return Response
-	 */
-	public function getReset($token = null)
-	{
-		if (is_null($token))
-			App::abort(404);
+    /**
+     * Handle a POST request to reset a user's password.
+     *
+     * @return Response
+     */
+    public function postReset()
+    {
+        $credentials = Input::only('email', 'password', 'password_confirmation', 'token');
 
-		return View::make('frontend.common.reset')->with('token', $token);
-	}
+        $rules = array(
+            'email'                 => 'required|email',
+            'password'              => 'required|min:8|confirmed',
+            'password_confirmation' => 'required',
+            'token'                 => 'required'
+        );
 
-	/**
-	 * Handle a POST request to reset a user's password.
-	 *
-	 * @return Response
-	 */
-	public function postReset()
-	{
-		$credentials = Input::only('email', 'password', 'password_confirmation', 'token');
+        $validator = Validator::make($credentials, $rules);
 
-		$rules = array(
-			'email'					 => 'required|email',
-			'password'				 => 'required|min:8|confirmed',
-			'password_confirmation'	 => 'required',
-			'token'					 => 'required'
-		);
+        if ($validator->passes()) {
+            $response = Password::reset($credentials, function($user, $password) {
+                        $user->password = Hash::make($password);
+                        $user->save();
+                    });
 
-		$validator = Validator::make($credentials, $rules);
+            switch ($response) {
+                case Password::INVALID_PASSWORD:
+                case Password::INVALID_TOKEN:
+                case Password::INVALID_USER:
+                    return Redirect::back()->with('flash_error', Lang::get($response));
+                case Password::PASSWORD_RESET:
+                    return Redirect::to('login')->with('flash_message', "success.password.changed");
+            }
+        }
 
-		if ($validator->passes())
-		{
-			$response = Password::reset($credentials, function($user, $password) {
-						$user->password = Hash::make($password);
-						$user->save();
-					});
-
-			switch ($response)
-			{
-				case Password::INVALID_PASSWORD:
-				case Password::INVALID_TOKEN:
-				case Password::INVALID_USER:
-					return Redirect::back()->with('flash_error', Lang::get($response));
-				case Password::PASSWORD_RESET:
-					return Redirect::to('login')->with('flash_message', "success.password.changed");
-			}
-		}
-
-		$token = Input::get('token');
-		return Redirect::to('reset/' . $token)->withInput()->withErrors($validator);
-	}
+        $token = Input::get('token');
+        return Redirect::to('reset/' . $token)->withInput()->withErrors($validator);
+    }
 
 }
