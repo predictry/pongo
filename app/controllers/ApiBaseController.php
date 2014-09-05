@@ -12,7 +12,7 @@ namespace App\Controllers;
 
 define('LOKE_RESTAPI_URL', 'http://119.81.72.66');
 define('EASYREC_RESTAPI_URL', 'http://demo.easyrec.org:8080/api/1.0/json/');
-define('GUI_RESTAPI_URL', 'http://ec2-54-254-163-85.ap-southeast-1.compute.amazonaws.com/predictry/api/v1/');
+define('GUI_RESTAPI_URL', 'http://ec2-54-169-9-168.ap-southeast-1.compute.amazonaws.com/predictry/api/v1/');
 define("GUI_HTTP_USERNAME", "pongo");
 define("GUI_HTTP_PASSWORD", "vventures");
 
