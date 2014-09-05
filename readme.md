@@ -5,7 +5,7 @@ Trivial: *Pongo* is the scientific name of orangutans.
 ## Documentation
 
 
-#Predictry JS SDK
+#Predictry JS SDK (v.0.2.2)
 ---
 ##Usage
 Documentation of how to implement Predictry JS SDK on the site.
