@@ -10,7 +10,7 @@ CWD=$(pwd)
 
 #installing php-fpm and php-curl-extension curl if it does not exist
  type php  >/dev/null 2>&1 || {
-        sudo  apt-get install -y php5-fpm && apt-get install -y php5-cli && sudo apt-get install -y curl php5-curl
+        sudo  apt-get install -y php5-fpm && sudo apt-get install -y php5-cli && sudo apt-get install -y curl php5-curl
          echo "php installed successfully"
     }
 
