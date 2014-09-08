@@ -16,7 +16,7 @@ CWD=$(pwd)
 
 #installing composer if it does not exist
  type composer  >/dev/null 2>&1 || {
-       sudo curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin && sudo mv /usr/local/bin/composer.phar /usr/local/bin/composer
+       sudo curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin && sudo mv /usr/local/bin/composer.phar /usr/local/bin/composer
          echo "composer installed successfully"
     }
 
@@ -48,7 +48,7 @@ fi
 #creating a folder in /usr/share/nginx/html and cloning predictry from github
 
 if [ ! -e "/usr/share/nginx/html/www" ] ; then
-    cd /usr/share/nginx/html && mkdir "www" && cd www  && sudo git clone https://github.com/perfectsen/predictry-pongo .
+    cd /usr/share/nginx/html && sudo  mkdir "www" && cd www  && sudo git clone https://github.com/perfectsen/predictry-pongo .
 
 fi
 
