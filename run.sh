@@ -3,14 +3,14 @@
 CWD=$(pwd)
 
 #installing git if it does not exist
-# type git  >/dev/null 2>&1 || {
-#         sudo apt-get install -y git
-#         echo "git installed successfully"
-#    }
+ type git  >/dev/null 2>&1 || {
+         sudo apt-get install -y git
+         echo "git installed successfully"
+    }
 
 #installing php-fpm and php-curl-extension curl if it does not exist
  type php  >/dev/null 2>&1 || {
-        sudo  apt-get install -y php5-fpm && apt-get install php5-cli && sudo apt-get install -y curl php5-curl
+        sudo  apt-get install -y php5-fpm && apt-get install -y php5-cli && sudo apt-get install -y curl php5-curl
          echo "php installed successfully"
     }
 
@@ -23,7 +23,7 @@ CWD=$(pwd)
 #installing postgresql if it does not exist
  type psql  >/dev/null 2>&1 || {
 	 sudo apt-get install -y postgresql-client
-         sudo apt-get install php5-pgsql
+         sudo apt-get install -y php5-pgsql
          echo "postgresql-client installed successfully"
     }
 
