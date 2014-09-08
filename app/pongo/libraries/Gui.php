@@ -1,5 +1,7 @@
 <?php
 
+use Carbon\Carbon;
+
 /**
  * Author       : Rifki Yandhi
  * Date Created : Aug 21, 2014 3:01:11 PM
@@ -133,9 +135,11 @@ class Gui
             $ch = curl_init($resources_uri);
             curl_setopt($ch, CURLOPT_POST, TRUE);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+            Log::info("send resources_uri: " . $resources_uri);
         }
         else {
             $ch = curl_init($resources_uri . ($data ? '&' . http_build_query($data, NULL, '&') : ''));
+            Log::info("send resources_uri: " . $resources_uri . ($data ? '&' . http_build_query($data, NULL, '&') : ''));
         }
 
         curl_setopt($ch, CURLOPT_USERPWD, self::$username . ':' . self::$password);
@@ -152,7 +156,6 @@ class Gui
         curl_setopt($ch, CURLOPT_HEADER, false);
 
         $response = curl_exec($ch);
-        Log::info("send resources_uri: " . $resources_uri);
         Log::debug($response);
         //\Log::info(curl_getinfo($ch));
         Log::notice("---------------");
@@ -241,20 +244,73 @@ class Gui
             "not_contain"        => "ncti"
         );
 
-        $divider   = "$";
-        $query_str = '';
+        $divider     = "$";
+        $query_str   = $filter_type = '';
 
         foreach ($filters as $filter) {
-            $query_str .= "{$divider}{$filter['property']}"
+            $is_list      = false;
+            $filter_value = '';
+
+            if ($filter['type'] === "date") {
+                if (DateTime::createFromFormat('Y-m-d G:i:s', $filter['value']) !== FALSE) {
+                    $dt           = new Carbon($filter['value']);
+                    $filter_value = $dt->timestamp;
+                    $filter_type  = "date";
+                }
+            }
+            else if ($filter['type'] === "list") {
+                $list = explode(',', $filter['value']);
+                if (count($list) > 0) {
+                    //get the first item on the list to determine the data type
+                    foreach ($list as $val) {
+                        if (gettype($val) === "string")
+                            $filter_type = "str";
+                        else if (gettype($val) === "integer")
+                            $filter_type = "num";
+                        break;
+                    }
+                    $is_list = true;
+                }
+            }
+
+//            switch (gettype($filter['value'])) {
+//                case "string":
+//                    if (DateTime::createFromFormat('Y-m-d G:i:s', $filter['value']) !== FALSE) {
+//                        $dt           = new Carbon($filter['value']);
+//                        $filter_value = $dt->timestamp;
+//                        $filter_type  = "date";
+//                    }
+//                    break;
+//                case "integer":
+//                    $filter_type = "num";
+//                    break;
+//                case "array":
+//                    $filter_type = "list";
+//                    break;
+//                default:
+//                    $filter_type = $filter['type'];
+//                    break;
+//            }
+            $filter_value = ($filter_value !== "") ? $filter_value : $filter['value'];
+            $filter_type  = ($filter_type !== "") ? $filter_type : $filter['type'];
+
+
+            $query_str .= "{$filter['property']}"
                     . "{$divider}{$operator_string_alias[$filter['operator']]}"
-                    . "{$divider}{$filter['value']}"
-                    . "{$divider}{$filter['type']}"
-                    . "|";
+                    . "{$divider}{$filter_value}"
+                    . "{$divider}{$filter_type}";
+
+            if ($is_list)
+                $query_str .= "{$divider}ls";
+
+            $query_str .= "|";
         }
 
         return substr($query_str, 0, strlen($query_str) - 1);
         //sample result 
-//        $price$gt$int$100|$category$ct$string$masak
+        //$price$gt$100$num
+        //$category$ct$masak$str
+        //$tags$ct$electronics,sports$str$ls
     }
 
 }

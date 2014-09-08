@@ -59,15 +59,14 @@ class Recommendation2Controller extends ApiBaseController
         Gui::setDomainAuth($this->gui_domain_auth['appid'], $this->gui_domain_auth['domain']);
     }
 
-    /*     * xx
+    /**
      * Display a listing of the resource.
      *
      * @return Response
      */
-
     public function index()
     {
-        $input     = Input::only("item_id", "user_id", "session_id", "algo", "widget_id");
+        $input     = Input::only("item_id", "user_id", "session_id", "widget_id");
         $response  = $reco_data = array();
 
         if (isset($input['widget_id'])) {
@@ -77,7 +76,8 @@ class Recommendation2Controller extends ApiBaseController
             if (!isset($reco_data['error'])) {
 
                 //get recommendation
-                $response = $this->repository->getRecommendation($reco_data['algo'], $reco_data);
+                $reco_data['item_id'] = 5124;
+                $response             = $this->repository->getRecommendation($reco_data);
 
                 if ($response && isset($response->error)) {
                     $this->http_status = $response->status;
@@ -87,22 +87,22 @@ class Recommendation2Controller extends ApiBaseController
                     if ($response->data->items && count($response->data->items) > 0) {
 
                         $item_ids = $response->data->item_ids;
-                        unset($response->data->item_ids);
 
                         //no error found, then we have to create new widget instance
                         $widget_instance_id = $this->repository->createWidgetInstance($input['widget_id'], $input['session_id']);
                         //when the widget instance ready, then we record the result
-                        if ($widget_instance_id) {
+                        if ($widget_instance_id && count($item_ids) > 0) {
                             Event::fire("recommendation.response_received", array($item_ids, $widget_instance_id));
                         }
 
                         $response->data->widget_instance_id = $widget_instance_id;
                     }
+
+                    unset($response->data->item_ids);
                 }
             }
-            else {
+            else
                 $response = $this->getErrorResponse($reco_data['data'][0], $reco_data['data'][1], $reco_data['data'][2]);
-            }
         }
         else
             $response = $this->getErrorResponse("inputUnknown", 400, "widget_id");
