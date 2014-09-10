@@ -10,15 +10,18 @@
 
 namespace App\Controllers;
 
-use View,
+use App,
     Auth,
-    Input,
-    Validator,
-    Redirect,
-    Hash,
+    Carbon\Carbon,
     Config,
+    DateTime,
+    Event,
+    Hash,
+    Input,
     Password,
-    App;
+    Redirect,
+    Validator,
+    View;
 
 class HomeController extends BaseController
 {
@@ -39,6 +42,20 @@ class HomeController extends BaseController
      */
     public function getHome($id, $str)
     {
+
+        if (gettype("2014-04-26 07:59:10") === "string") {
+            if (DateTime::createFromFormat('Y-m-d G:i:s', "2014-04-26 07:59:10") !== FALSE) {
+                $dt = new Carbon("2014-04-26 07:59:10");
+                var_dump($dt->timestamp);
+
+//                echo "it's a date";
+            }
+            else {
+                echo "it's not a date";
+            }
+        }
+        die;
+
         return View::make('hello');
     }
 
@@ -127,7 +144,7 @@ class HomeController extends BaseController
 
             $account = $this->account_repository->newInstance($input); //create new instance
             if ($this->account_repository->saveAccount($account))
-                \Event::fire("account.registration_confirmed", $account);  //send verification email (skip to confirmation)
+                Event::fire("account.registration_confirmed", $account);  //send verification email (skip to confirmation)
             else
                 return Redirect::to('register')->withInput()->withErrors("We are unable to process the data. Please try again.");
 

@@ -12,7 +12,7 @@ namespace App\Controllers\User;
 
 use App\Controllers\BaseController,
     App\Models\Filter,
-    App\Models\Filtermeta,
+    App\Models\FilterMeta,
     App\Models\Item,
     App\Models\ItemMeta,
     App\Models\WidgetFilter,
@@ -32,16 +32,18 @@ class FiltersController extends BaseController
     function __construct()
     {
         parent::__construct();
+        $this->model = new Filter();
+
         $this->operator_types = array(
             'contain'            => 'Contains',
             'equal'              => 'Equals',
             'not_equal'          => 'Not Equals',
-//			'is_set'			 => 'Is Set',
-//			'is_not_set'		 => 'Is Not Set',
             'greater_than'       => 'Greater Than',
             'greater_than_equal' => 'Greater Than or Equal',
             'less_than'          => 'Less Than',
-            'less_than_equal'    => 'Less Than or Equal'
+            'less_than_equal'    => 'Less Than or Equal',
+//            'is_set'             => 'Is Set',
+//            'is_not_set'         => 'Is Not Set',
         );
 
         View::share(array("ca" => get_class(), "moduleName" => "Filter", "view" => false, 'operator_types' => $this->operator_types));
@@ -49,8 +51,7 @@ class FiltersController extends BaseController
 
     public function index()
     {
-        $this->model = new Filter();
-        $page        = Input::get('page', 1);
+        $page = Input::get('page', 1);
 
         $data    = $this->getByPage($page, $this->manageViewConfig['limit_per_page'], "site_id", $this->active_site_id, 'id', 'ASC');
         $message = '';
@@ -62,7 +63,7 @@ class FiltersController extends BaseController
         else {
             $items = $data->items;
             foreach ($items as $obj) {
-                $filter_properties     = Filtermeta::where("filter_id", $obj->id)->get()->lists("property");
+                $filter_properties     = FilterMeta::where("filter_id", $obj->id)->get()->lists("property");
                 for ($i = 0; $i < count($filter_properties); $i++)
                     $filter_properties[$i] = '<span class="label label-primary">' . $filter_properties[$i] . '</span>';
                 $obj->properties       = implode(" ", $filter_properties);
@@ -94,7 +95,7 @@ class FiltersController extends BaseController
 
         $item_ids   = Item::where("site_id", $this->active_site_id)->get()->lists("id");
         $properties = ItemMeta::whereIn("item_id", $item_ids)->distinct("key")->lists("key", "key");
-        $types      = array("numeric", "text", "date", "locations");
+        $types      = $this->model->filter_data_type;
 
         $custom_script = "<script type='text/javascript'>";
         $custom_script .= "var site_url = '" . URL::to('/') . "';";
@@ -135,10 +136,11 @@ class FiltersController extends BaseController
 
             if ($filter->id) {
                 for ($i = 0; $i < count($inputs['property']); $i++) {
-                    $filter_meta            = new Filtermeta();
+                    $filter_meta            = new FilterMeta();
                     $filter_meta->filter_id = $filter->id;
                     $filter_meta->property  = $inputs['property'][$i];
                     $filter_meta->operator  = $inputs['operator_key'][$i];
+                    $filter_meta->type      = $inputs['type'][$i];
                     $filter_meta->value     = $inputs['value'][$i];
                     $filter_meta->save();
                 }
@@ -157,7 +159,7 @@ class FiltersController extends BaseController
 
         $item_ids   = Item::where("site_id", $this->active_site_id)->get()->lists("id");
         $properties = ItemMeta::whereIn("item_id", $item_ids)->distinct("key")->lists("key", "key");
-        $types      = array("numeric", "text", "date", "locations");
+        $types      = $this->model->filter_data_type;
 
         return Response::json(
                         array("status"   => "success",
@@ -174,7 +176,7 @@ class FiltersController extends BaseController
         $filter = Filter::where("id", $id)->where("site_id", $this->active_site_id)->get()->first();
 
         if ($filter) {
-            $filter_metas = Filtermeta::where("filter_id", $filter->id)->get()->toArray();
+            $filter_metas = FilterMeta::where("filter_id", $filter->id)->get()->toArray();
         }
 
         $custom_script   = "<script type='text/javascript'>var site_url = '" . URL::to('/') . "';";
@@ -211,11 +213,14 @@ class FiltersController extends BaseController
         $custom_script .= "var site_url = '" . URL::to('/') . "';";
         $custom_script .= "</script>";
 
+        $types = $this->model->filter_data_type;
+
         $output = array(
             "type"          => "create",
             "custom_script" => $custom_script,
             "properties"    => $properties,
             "obj"           => $obj,
+            "types"         => $types,
             "index_item"    => $index_item,
         );
 
@@ -251,7 +256,7 @@ class FiltersController extends BaseController
 
                 for ($i = 0; $i < count($inputs['filter_meta_id']); $i++) {
                     if ($inputs['filter_meta_id'][$i] > 0) {
-                        $filter_meta = Filtermeta::find($inputs['filter_meta_id'][$i]);
+                        $filter_meta = FilterMeta::find($inputs['filter_meta_id'][$i]);
                         if ($filter_meta) {
                             $filter_meta->property = $inputs['property'][$i];
                             $filter_meta->operator = $inputs['operator_key'][$i];
@@ -261,7 +266,7 @@ class FiltersController extends BaseController
                         }
                     }
                     else if ($inputs['filter_meta_id'][$i] == -1) {
-                        $filter_meta            = new Filtermeta();
+                        $filter_meta            = new FilterMeta();
                         $filter_meta->filter_id = $filter->id;
                         $filter_meta->property  = $inputs['property'][$i];
                         $filter_meta->operator  = $inputs['operator_key'][$i];
@@ -272,7 +277,7 @@ class FiltersController extends BaseController
                             $filter_meta_ids[] = $filter_meta->id;
                     }
                 }
-                Filtermeta::whereNotIn("id", $filter_meta_ids)->where("filter_id", $filter->id)->delete();
+                FilterMeta::whereNotIn("id", $filter_meta_ids)->where("filter_id", $filter->id)->delete();
             }
 
             return Redirect::route('filters')->with("flash_message", "Successfully update filter.");
@@ -293,7 +298,7 @@ class FiltersController extends BaseController
             if ($number_of_widget_contain_this_filter > 0)
                 return Redirect::route('filters')->with("flash_error", "This filter cannot be removed. There is a widget that still associated with this filter.");
 
-            Filtermeta::where("filter_id", $filter->id)->delete();
+            FilterMeta::where("filter_id", $filter->id)->delete();
             $filter->delete();
         }
         return Redirect::route('filters')->with("flash_message", "Filter has been successfully removed.");

@@ -346,7 +346,7 @@ if (typeof Predictry !== 'object') {
                     config_request_method = config_default_request_method,
                     config_default_request_content_type = "application/x-www-form-urlencoded; charset=UTF-8",
                     config_request_content_type = config_default_request_content_type,
-                    config_api_url = "http://dashboard.predictry.dev/api/v2/",
+                    config_api_url = "http://api-aws.predictry.com/api/v2/",
                     config_api_resources = ["actions", "users", "items", "carts", "cartlogs", "recommendation"],
                     config_session_cookie_timeout = 63072000000, // 2 years
                     config_tracking_session_cookie_timeout = 1200000, //20 minutes
@@ -865,11 +865,6 @@ if (typeof Predictry !== 'object') {
                 };
                 image.src = config_api_url + resource + (config_api_url.indexOf('?') < 0 ? '?' : '&') + queries;
             }
-
-            function getPredictryNodes() {
-
-            }
-
 
             /**
              * Send Action
