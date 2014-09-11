@@ -23,10 +23,10 @@ class RecommendationRepository
 
     protected $error_response = null;
 
-    public function createWidgetInstance($widget_id, $session_id)
+    public function createWidgetInstance($widget_id, $session)
     {
-        $session    = Session::where("session", $session_id)->get()->first();
-        $session_id = ($session) ? $session->id : 1;
+        $visitor_session = Session::where("session", $session)->get()->first();
+        $session_id      = ($visitor_session) ? $visitor_session->id : 1;
 
         $widget_instance = WidgetInstance::create(["widget_id" => $widget_id, "session_id" => $session_id]);
         if ($widget_instance) {
@@ -48,7 +48,7 @@ class RecommendationRepository
         if (!is_null($widget)) {
 
             $gui_reco_data = array_add($gui_reco_data, 'widget_id', $widget->id);
-            $gui_reco_data = array_add($gui_reco_data, 'algo', $widget->reco_type);
+            $gui_reco_data = array_add($gui_reco_data, 'type', $widget->reco_type);
 
             if (isset($input['user_id']) && $input['user_id'] > 0) {
                 $visitor = Visitor::where("identifier", $input['user_id'])->get()->first();
@@ -83,27 +83,7 @@ class RecommendationRepository
         return false;
     }
 
-    public function validateAlgo($algo)
-    {
-        $available_algos = array(
-            "otheritemsviewed", "oiv",
-            "otheritemsviewedtogether", "oivt",
-            "otheritemspurchased", "oip",
-            "otheritemspurchasedtogether", "oipt",
-            "topitemsviewed", "trv",
-            "topitemspurchasedrecently", "trp",
-            "toprecentadditionstocart", "trac"
-        );
-
-        $index = array_search($algo, $available_algos);
-        if ($index !== false) {
-            return $available_algos[$index + 1];
-        }
-        else
-            return false;
-    }
-
-    public function getRecommendation($algo, $reco_data)
+    public function getRecommendation($reco_data)
     {
         $fields   = []; //fields that requested in the moment are all
         $response = [];
@@ -111,36 +91,19 @@ class RecommendationRepository
         //get filters
         $widget_filter       = WidgetFilter::where("widget_id", $reco_data['widget_id'])->get()->first();
         $widget_filter_metas = ($widget_filter) ? Filter::find($widget_filter->filter_id)->metas()->get()->toArray() : [];
+        unset($reco_data['widget_id']);
 
-        //simplify the algo
-        $algo = $this->validateAlgo($algo);
-
-
-        switch ($algo) {
+        switch ($reco_data['type']) {
 
             //since we only gui engine, we group the case
-            case "otheritemsviewed":
-            case "oiv":
-
-            case "otheritemsviewedtogether":
-            case "oivt":
-
-            case "otheritemspurchased":
-            case "oip":
-
-            case "otheritemspurchasedtogether":
-            case "oipt":
-
-            case "topitemsviewed":
-            case "trv":
-
-            case "topitemspurchasedrecently":
-            case "trp":
-
-            case "toprecentadditionstocart":
-            case "trac":
-
-                $response = json_decode(Gui::getRecommended($algo, $reco_data, $widget_filter_metas, $fields));
+            case "oiv": //otheritemsviewed
+            case "oivt": //otheritemsviewedtogether
+            case "oip": //otheritemspurchased
+            case "oipt": //otheritemspurchasedtogether
+            case "trv": //topitemsviewed
+            case "trp": //topitemspurchasedrecently
+            case "trac": //toprecentadditionstocart
+                $response = json_decode(Gui::getRecommended($reco_data['type'], $reco_data, $widget_filter_metas, $fields));
 
                 //@todo PLEASE REMOVE AFTER TESTING, THIS ONLY DUMMY RECO RESULTS
 //                $response = (object) ['data' => (object) ['items' => []]];
@@ -165,7 +128,8 @@ class RecommendationRepository
                 break;
         }
 
-        if (is_object($response) && !isset($response->error)) {
+        //process of getting the details
+        if (!is_null($response) && is_object($response) && !isset($response->error)) {
             if ($response->data->items && count($response->data->items) > 0) {
                 $item_ids                 = [];
                 $items_with_details       = $this->getRecoItemDetails($response->data->items, $item_ids);
@@ -183,6 +147,7 @@ class RecommendationRepository
         foreach ($items as $obj) {
 
             $item = Item::find($obj->id); // lookup from items using id
+//            $item = Item::where("identifier", $obj->id)->where("site_id", 13)->get()->first(); // lookup from items using id
 
             if ($item) {
                 $detail = [

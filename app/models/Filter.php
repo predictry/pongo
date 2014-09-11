@@ -23,7 +23,14 @@ class Filter extends \Eloquent
         "name"       => "Filter Name",
         "properties" => "Selected Properties"
     );
-    
+    public $filter_data_type    = [
+        'str'      => 'text',
+        'num'      => 'numeric',
+        'date'     => 'date',
+        'list'     => 'list',
+        'location' => 'location'
+    ];
+
     public function metas()
     {
         return $this->hasMany("App\Models\FilterMeta");
