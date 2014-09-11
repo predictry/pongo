@@ -23,10 +23,10 @@ class RecommendationRepository
 
     protected $error_response = null;
 
-    public function createWidgetInstance($widget_id, $session_id)
+    public function createWidgetInstance($widget_id, $session)
     {
-        $session    = Session::where("session", $session_id)->get()->first();
-        $session_id = ($session) ? $session->id : 1;
+        $visitor_session = Session::where("session", $session)->get()->first();
+        $session_id      = ($visitor_session) ? $visitor_session->id : 1;
 
         $widget_instance = WidgetInstance::create(["widget_id" => $widget_id, "session_id" => $session_id]);
         if ($widget_instance) {
@@ -129,7 +129,7 @@ class RecommendationRepository
         }
 
         //process of getting the details
-        if (is_object($response) && !isset($response->error)) {
+        if (!is_null($response) && is_object($response) && !isset($response->error)) {
             if ($response->data->items && count($response->data->items) > 0) {
                 $item_ids                 = [];
                 $items_with_details       = $this->getRecoItemDetails($response->data->items, $item_ids);

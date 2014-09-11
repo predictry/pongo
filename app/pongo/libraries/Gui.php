@@ -15,9 +15,9 @@ class Gui
 
     function __construct()
     {
-        self::$username = null;
-        self::$password = null;
-        self::$uri = null;
+        self::$username  = null;
+        self::$password  = null;
+        self::$uri       = null;
         self::$uriDomain = null;
     }
 
@@ -29,7 +29,7 @@ class Gui
 
     public static function setDomainAuth($appid, $domain)
     {
-        self::$appid = $appid;
+        self::$appid  = $appid;
         self::$domain = $domain;
     }
 
@@ -47,7 +47,7 @@ class Gui
         );
 
         $item_resources_uri_with_credential = $item_resources_uri . '/?' . http_build_query($domain_auth);
-        self::$uriDomain = $item_resources_uri_with_credential;
+        self::$uriDomain                    = $item_resources_uri_with_credential;
     }
 
     public static function setAccess($uri, $credential, $domain_auth)
@@ -80,7 +80,7 @@ class Gui
         $gui_item_data = array_add($gui_item_data, "id", $id); //item id from items table
 
         self::setResourcesUri("items");
-        Log::info("postItem gui_item_data: " . json_encode($gui_item_data));
+//        Log::info("postItem gui_item_data: " . json_encode($gui_item_data));
         $response = self::send("post", self::$uriDomain, $gui_item_data);
 
         return $response;
@@ -95,7 +95,7 @@ class Gui
         $gui_user_data = array_add($gui_user_data, "id", $id); //item id from items table
 
         self::setResourcesUri("users");
-        Log::info("postUser gui_user_data: " . json_encode($gui_user_data));
+//        Log::info("postUser gui_user_data: " . json_encode($gui_user_data));
         $response = self::send("post", self::$uriDomain, $gui_user_data);
         return $response;
     }
@@ -113,7 +113,7 @@ class Gui
         $gui_action_data = array_add($gui_action_data, "type", $action_data['name']); //type is action name
 
         self::setResourcesUri("actions");
-        Log::info("postAction gui_action_data: " . json_encode($gui_action_data));
+//        Log::info("postAction gui_action_data: " . json_encode($gui_action_data));
         $response = self::send("post", self::$uriDomain, $gui_action_data);
         return $response;
     }
@@ -135,11 +135,11 @@ class Gui
             $ch = curl_init($resources_uri);
             curl_setopt($ch, CURLOPT_POST, TRUE);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-            Log::info("send resources_uri: " . $resources_uri);
+//            Log::info("send resources_uri: " . $resources_uri);
         }
         else {
             $ch = curl_init($resources_uri . ($data ? '&' . http_build_query($data, NULL, '&') : ''));
-            Log::info("send resources_uri: " . $resources_uri . ($data ? '&' . http_build_query($data, NULL, '&') : ''));
+//            Log::info("send resources_uri: " . $resources_uri . ($data ? '&' . http_build_query($data, NULL, '&') : ''));
         }
 
         curl_setopt($ch, CURLOPT_USERPWD, self::$username . ':' . self::$password);
@@ -156,11 +156,11 @@ class Gui
         curl_setopt($ch, CURLOPT_HEADER, false);
 
         $response = curl_exec($ch);
-        Log::debug($response);
+//        Log::debug($response);
         //\Log::info(curl_getinfo($ch));
-        Log::notice("---------------");
-        Log::notice("---------------");
-//
+//        Log::notice("---------------");
+//        Log::notice("---------------");
+
         return $response;
     }
 
@@ -179,7 +179,7 @@ class Gui
     {
         $reco_data = array_merge(array(), $identifiers); //apply identifiers
 
-        $str_filter_query = (count($filters) > 0) ? self::buildQuery($filters) : "";
+        $str_filter_query = (count($filters) > 0) ? self::buildQuery($filters) : ""; //apply filters
 
         if ($str_filter_query !== "")
             $reco_data = array_add($reco_data, "q", $str_filter_query); //apply queries
@@ -192,47 +192,18 @@ class Gui
             $reco_data = array_add($reco_data, "limit", $limit);
 
         $reco_data = array_add($reco_data, "type", $type); //apply type
+//        Log::info("getRecommended reco_data: " . json_encode($reco_data));
 
         self::setAccess($uri, $credential, $domain_auth);
         self::setResourcesUri("recommend");
-        Log::info("getRecommended reco_data: " . json_encode($reco_data));
         return self::send("get", self::$uriDomain, $reco_data);
     }
 
-    //@todo Build standard query language for filtering purpose to get recommended items or any possible request that requires it.
     public static function buildQuery($filters)
     {
         // Sample Data
         // Operators such as e,gt,gte,lt,lte,ct,nct is optional for type number, string, date, list
         // Equal operator wouldn't work for list type [1,2] eq [2,1]
-        // 
-//                $filters = array(
-//            array(
-//                "property" => "price",
-//                "operator" => "greater_than",
-//                "type"     => "num",
-//                "value"    => 100
-//            ),
-//            array(
-//                "property" => "category",
-//                "operator" => "contain",
-//                "type"     => "str",
-//                "value"    => "masak"
-//            ),
-//            array(
-//                "property" => "end_date",
-//                "operator" => "lte",
-//                "type"     => "date",
-//                "value"    => 123123131212
-//            ),
-//            array(
-//                "property" => "end_date",
-//                "operator" => "cti",
-//                "type"     => "list",
-//                "value"    => [100, 200, 300] | ["est", "test", "bla"]
-//            )
-//        );
-
         $operator_string_alias = array(
             "greater_than"       => "gt",
             "less_than"          => "lt",
@@ -244,11 +215,12 @@ class Gui
             "not_contain"        => "ncti"
         );
 
-        $divider     = "$";
-        $query_str   = $filter_type = '';
+        $divider   = "$";
+        $query_str = '';
 
         foreach ($filters as $filter) {
             $is_list      = false;
+            $filter_type  = '';
             $filter_value = '';
 
             if ($filter['type'] === "date") {
@@ -272,28 +244,19 @@ class Gui
                     $is_list = true;
                 }
             }
+            else if ($filter['type'] === "location") {
+                $arr                = explode(".", $filter['value']);
+                $filter['property'] = isset($arr[0]) ? $filter['type'] . "_" . $arr[0] : "";
+                $filter_value       = isset($arr[1]) ? $arr[1] : "";
 
-//            switch (gettype($filter['value'])) {
-//                case "string":
-//                    if (DateTime::createFromFormat('Y-m-d G:i:s', $filter['value']) !== FALSE) {
-//                        $dt           = new Carbon($filter['value']);
-//                        $filter_value = $dt->timestamp;
-//                        $filter_type  = "date";
-//                    }
-//                    break;
-//                case "integer":
-//                    $filter_type = "num";
-//                    break;
-//                case "array":
-//                    $filter_type = "list";
-//                    break;
-//                default:
-//                    $filter_type = $filter['type'];
-//                    break;
-//            }
+                if (gettype($filter_value) === "string")
+                    $filter_type = "str";
+                else if (gettype($filter_value) === "integer")
+                    $filter_type = "num";
+            }
+
             $filter_value = ($filter_value !== "") ? $filter_value : $filter['value'];
             $filter_type  = ($filter_type !== "") ? $filter_type : $filter['type'];
-
 
             $query_str .= "{$filter['property']}"
                     . "{$divider}{$operator_string_alias[$filter['operator']]}"

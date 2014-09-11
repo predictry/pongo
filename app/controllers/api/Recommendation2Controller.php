@@ -60,9 +60,9 @@ class Recommendation2Controller extends ApiBaseController
     }
 
     /**
-     * Display a listing of the resource.
+     * Get Recommendation
      *
-     * @return Response
+     * @return {json} 
      */
     public function index()
     {
@@ -71,34 +71,39 @@ class Recommendation2Controller extends ApiBaseController
 
         if (isset($input['widget_id'])) {
 
-            $reco_data = $this->repository->populateRecoData($this->site_id, $input, 5);
+            $reco_data = $this->repository->populateRecoData($this->site_id, $input);
 
             if (!isset($reco_data['error'])) {
 
                 //get recommendation
-                $reco_data['item_id'] = 5124;
-                $response             = $this->repository->getRecommendation($reco_data);
+                $response = $this->repository->getRecommendation($reco_data);
 
-                if ($response && isset($response->error)) {
-                    $this->http_status = $response->status;
-                }
-                else {
+                if (!is_null($response)) {
+                    if ($response && isset($response->error)) {
+                        $this->http_status = $response->status;
+                    }
+                    else {
 
-                    if ($response->data->items && count($response->data->items) > 0) {
+                        if ($response->data->items && count($response->data->items) > 0) {
 
-                        $item_ids = $response->data->item_ids;
+                            $item_ids = $response->data->item_ids;
 
-                        //no error found, then we have to create new widget instance
-                        $widget_instance_id = $this->repository->createWidgetInstance($input['widget_id'], $input['session_id']);
-                        //when the widget instance ready, then we record the result
-                        if ($widget_instance_id && count($item_ids) > 0) {
-                            Event::fire("recommendation.response_received", array($item_ids, $widget_instance_id));
+                            //no error found, then we have to create new widget instance
+                            $widget_instance_id = $this->repository->createWidgetInstance($input['widget_id'], $input['session_id']);
+                            //when the widget instance ready, then we record the result
+                            if ($widget_instance_id && count($item_ids) > 0) {
+                                Event::fire("recommendation.response_received", array($item_ids, $widget_instance_id));
+                            }
+
+                            $response->data->widget_instance_id = $widget_instance_id;
                         }
 
-                        $response->data->widget_instance_id = $widget_instance_id;
+                        unset($response->data->item_ids);
                     }
-
-                    unset($response->data->item_ids);
+                }
+                else {
+                    $response                  = $this->getErrorResponse("noResults", 200);
+                    $response['data']['items'] = [];
                 }
             }
             else
