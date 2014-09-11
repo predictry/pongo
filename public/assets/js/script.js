@@ -283,47 +283,67 @@ function getGraphPieWithText(divelem, chart_title, chart_data) {
     });
 }
 
-function gatherSelectedOption(name)
-{
-    var values = [];
-    $("select[name='" + name + "[]'] option:selected").each(function() {
-        values.push(this.value);
-    });
-    return values;
-}
+function getFilterType(id, val) {
+    var dd = $("#type" + id);
+    var input = $("#value" + id);
+    var inputDiv = input.parent();
+    var value = (val !== undefined) ? val : "";
 
-function validateSelectedItem(selected, name)
-{
-    excludeOptionIDs = gatherSelectedOption(name);
-    console.log(excludeOptionIDs);
-    if (excludeOptionIDs.length > 1) {
-        var counter = 0;
-        for (var i = 0; i < excludeOptionIDs.length; i++) {
-            if (excludeOptionIDs[i] === selected)
-                counter += 1;
-
-            if (counter === 2)
-            {
-                alert("This option already selected");
-                return false;
-            }
-        }
-
+    //when adding date input, it seems that the parent has changed. So need to go to parent parent
+    if ($("#inputDate" + id).val() !== undefined) {
+        inputDiv = $("#inputDate" + id).parent();
     }
-    return true;
+
+    console.log(dd.val());
+    console.log(value);
+
+
+    switch (dd.val()) {
+        case "date":
+            var inputDate = "<div class='input-group date' id='inputDate" + id + "' data-date-format='YYYY-MM-DD hh:mm A'>"
+                    + "<input name='value[]' id='value" + id + "' type='text' class='form-control disabled' readonly='' value='" + value + "'/>"
+                    + "<span class='input-group-addon'><span class='glyphicon glyphicon-calendar'></span>"
+                    + "</span></div>";
+
+//            var inputDate = "<input class='form-control date' id='value" + id + "' name='value[]' type='text' data-date-format='YYYY-MM-DD hh:mm:ss A'/>";
+            inputDiv.html(inputDate);
+            input = $("#inputDate" + id);
+            input.datetimepicker();
+            break;
+
+        case "str":
+        case "list":
+        case "location":
+
+            var propertyName = $("#action" + id).val();
+            $.ajax({
+                url: site_url + "/items/key/" + propertyName + "/metas",
+                type: 'GET',
+                dataType: 'json',
+                success: function(data)
+                {
+                    console.log(data);
+                    if (data.status === "success") {
+                    }
+                },
+                error: function() {
+                    alert('error!');
+                }
+            });
+
+
+            var inputStr = "<input class='form-control' id='value" + id + "' name='value[]' type='text' value='" + value + "'/>";
+            inputDiv.html(inputStr);
+            break;
+
+        case "num":
+            var inputNum = "<input class='form-control' onkeydown='javascript:maskInputToNumeric()' value='" + value + "' id='value" + id + "' name='value[]' type='number'/>";
+            inputDiv.html(inputNum);
+            break;
+    }
 }
 
-function removeItem(id, name)
-{
-    $("#" + name + id).remove();
-    var index = indexes.indexOf(id);
-
-    if (index > -1)
-        indexes.splice(index, 1);
-}
-
-function addItemRule(is_modal, container)
-{
+function addItemRule(is_modal, container) {
     var bool_is_modal = false;
     var div_container = "item_rules_container";
     var item_identifier = "#item";
@@ -383,34 +403,36 @@ function addItemRule(is_modal, container)
     });
 }
 
-function editItemRule(obj, index) {
+function addItemFunel() {
+    var btn = $("a.btnAddItem");
+    btn.removeClass("btnAddItem btn-default").addClass("btnRemoveItem btn-danger").html("Remove");
+    btn.attr("onClick", "removeItem(" + indexOfItem + ", 'item_funel');");
+    indexOfItem += 1;
+
     var form_data = {
-        obj: obj,
-        index: index,
+        index: indexOfItem,
         is_ajax: 1
     };
 
     $.ajax({
-        url: site_url + "/rules/itemEdit",
+        url: site_url + "/panel/itemFunel",
         type: 'GET',
         data: form_data,
         dataType: 'json',
         success: function(data)
         {
             if (data.status === "success") {
-                $("#item_rules_container").append(data.response);
-                $(".chosen-select").chosen();
-                $("#item" + index).chosen();
-                $("#type" + index).chosen();
-                $("#item" + index).val(obj.item_id).trigger('chosen:updated');
+                $("#item_funel_action_container").append(data.response);
+                numOfItems += 1;
 
-                $("#item" + index).on('change', function(evt, params) {
-                    if (!validateSelectedItem(params.selected, "item_id")) {
-                        $("#item" + index).val("").trigger('chosen:updated');
+                $(".chosen-select").chosen();
+                $("#action" + indexOfItem).chosen();
+
+                $("#item_funel" + indexOfItem).on('change', function(evt, params) {
+                    if (!validateSelectedItem(params.selected, "action_id")) {
+                        $("#action" + indexOfItem).val("").trigger('chosen:updated');
                     }
                 });
-
-                indexOfItem = index;
             }
         },
         error: function() {
@@ -419,8 +441,37 @@ function editItemRule(obj, index) {
     });
 }
 
-function addItemWidgetRuleset()
-{
+function addItemFilter() {
+    var btn = $('a.btnAddItem');
+    btn.removeClass("btnAddItem btn-default").addClass("btnRemoveItem btn-danger").html("Remove");
+    btn.attr("onClick", "removeItem(" + indexOfItem + ", 'item_funel');");
+    indexOfItem += 1;
+
+    var form_data = {
+        index: indexOfItem,
+        is_ajax: 1
+    };
+
+    $.ajax({
+        url: site_url + "/filters/item",
+        type: 'GET',
+        data: form_data,
+        dataType: 'json',
+        success: function(data)
+        {
+            if (data.status === "success") {
+                $("#filter_item_container").append(data.response);
+                numOfItems += 1;
+                $(".chosen-select").chosen();
+            }
+        },
+        error: function() {
+            alert('error!');
+        }
+    });
+}
+
+function addItemWidgetRuleset() {
     var btn = $("a.btnAddItemWidgetRuleset");
     btn.removeClass("btnAddItemWidgetRuleset btn-default").addClass("btnRemoveItemWidgetRuleset btn-danger").html("Remove");
     btn.attr("onClick", "removeItem(" + indexOfItem + ", 'item_rule');");
@@ -459,8 +510,43 @@ function addItemWidgetRuleset()
 
 }
 
-function editItemWidgetRuleset(obj, index)
-{
+function editItemRule(obj, index) {
+    var form_data = {
+        obj: obj,
+        index: index,
+        is_ajax: 1
+    };
+
+    $.ajax({
+        url: site_url + "/rules/itemEdit",
+        type: 'GET',
+        data: form_data,
+        dataType: 'json',
+        success: function(data)
+        {
+            if (data.status === "success") {
+                $("#item_rules_container").append(data.response);
+                $(".chosen-select").chosen();
+                $("#item" + index).chosen();
+                $("#type" + index).chosen();
+                $("#item" + index).val(obj.item_id).trigger('chosen:updated');
+
+                $("#item" + index).on('change', function(evt, params) {
+                    if (!validateSelectedItem(params.selected, "item_id")) {
+                        $("#item" + index).val("").trigger('chosen:updated');
+                    }
+                });
+
+                indexOfItem = index;
+            }
+        },
+        error: function() {
+            alert('error!');
+        }
+    });
+}
+
+function editItemWidgetRuleset(obj, index) {
     var form_data = {
         obj: obj,
         index: index,
@@ -496,8 +582,7 @@ function editItemWidgetRuleset(obj, index)
     });
 }
 
-function editItemWidgetFilter(obj, index)
-{
+function editItemWidgetFilter(obj, index) {
     var form_data = {
         obj: obj,
         index: index,
@@ -533,91 +618,7 @@ function editItemWidgetFilter(obj, index)
     });
 }
 
-function addItemFunel()
-{
-    var btn = $("a.btnAddItem");
-    btn.removeClass("btnAddItem btn-default").addClass("btnRemoveItem btn-danger").html("Remove");
-    btn.attr("onClick", "removeItem(" + indexOfItem + ", 'item_funel');");
-    indexOfItem += 1;
-
-    var form_data = {
-        index: indexOfItem,
-        is_ajax: 1
-    };
-
-    $.ajax({
-        url: site_url + "/panel/itemFunel",
-        type: 'GET',
-        data: form_data,
-        dataType: 'json',
-        success: function(data)
-        {
-            if (data.status === "success") {
-                $("#item_funel_action_container").append(data.response);
-                numOfItems += 1;
-
-                $(".chosen-select").chosen();
-                $("#action" + indexOfItem).chosen();
-
-                $("#item_funel" + indexOfItem).on('change', function(evt, params) {
-                    if (!validateSelectedItem(params.selected, "action_id")) {
-                        $("#action" + indexOfItem).val("").trigger('chosen:updated');
-                    }
-                });
-            }
-        },
-        error: function() {
-            alert('error!');
-        }
-    });
-}
-
-/**
- * Add Item Filter
- */
-function addItemFilter() {
-    var btn = $('a.btnAddItem');
-    btn.removeClass("btnAddItem btn-default").addClass("btnRemoveItem btn-danger").html("Remove");
-    btn.attr("onClick", "removeItem(" + indexOfItem + ", 'item_funel');");
-    indexOfItem += 1;
-
-    var form_data = {
-        index: indexOfItem,
-        is_ajax: 1
-    };
-
-    $.ajax({
-        url: site_url + "/filters/item",
-        type: 'GET',
-        data: form_data,
-        dataType: 'json',
-        success: function(data)
-        {
-            if (data.status === "success") {
-                $("#filter_item_container").append(data.response);
-                numOfItems += 1;
-
-                $(".chosen-select").chosen();
-                $("#action" + indexOfItem).chosen();
-
-                $("#item_funel" + indexOfItem).on('change', function(evt, params) {
-                    if (!validateSelectedItem(params.selected, "action_id")) {
-                        $("#action" + indexOfItem).val("").trigger('chosen:updated');
-                    }
-                });
-            }
-        },
-        error: function() {
-            alert('error!');
-        }
-    });
-}
-
-/**
- * Edit Item Filter
- */
-function editItemFilter(obj, index)
-{
+function editItemFilter(obj, index) {
     var form_data = {
         obj: obj,
         index: index,
@@ -636,15 +637,13 @@ function editItemFilter(obj, index)
                 $(".chosen-select").chosen();
                 $("#action" + index).chosen();
                 $("#type" + index).chosen();
-                $("#item" + index).val(obj.ruleset_id).trigger('chosen:updated');
 
-                $("#item_funel" + index).on('change', function(evt, params) {
-                    if (!validateSelectedItem(params.selected, "action_id")) {
-                        $("#action" + index).val("").trigger('chosen:updated');
-                    }
-                });
+                var input = $("#value" + index);
+                getFilterType(index, input.val());
+                if (index >= indexOfItem)
+                    indexOfItem = index;
 
-                indexOfItem = index;
+                console.log(indexOfItem);
             }
         },
         error: function() {
@@ -662,6 +661,62 @@ function setDefaultComparisonType(comparison_type) {
     filters.comparison_type = comparison_type;
     getGraphData();
     return;
+}
+
+function gatherSelectedOption(name) {
+    var values = [];
+    $("select[name='" + name + "[]'] option:selected").each(function() {
+        values.push(this.value);
+    });
+    return values;
+}
+
+function validateSelectedItem(selected, name) {
+    excludeOptionIDs = gatherSelectedOption(name);
+    console.log(excludeOptionIDs);
+    if (excludeOptionIDs.length > 1) {
+        var counter = 0;
+        for (var i = 0; i < excludeOptionIDs.length; i++) {
+            if (excludeOptionIDs[i] === selected)
+                counter += 1;
+
+            if (counter === 2)
+            {
+                alert("This option already selected");
+                return false;
+            }
+        }
+
+    }
+    return true;
+}
+
+function removeItem(id, name) {
+    $("#" + name + id).remove();
+    var index = indexes.indexOf(id);
+
+    if (index > -1)
+        indexes.splice(index, 1);
+}
+
+function maskInputToNumeric(e) {
+    var event = e || window.event
+
+    var key_code = event.keyCode;
+    var oElement = e ? e.target : window.event.srcElement;
+    if (!event.shiftKey && !event.ctrlKey && !event.altKey) {
+        if ((key_code > 47 && key_code < 58) ||
+                (key_code > 95 && key_code < 106)) {
+
+            if (key_code > 95)
+                key_code -= (95 - 47);
+            oElement.value = oElement.value;
+        } else if (key_code == 8) {
+            oElement.value = oElement.value;
+        } else if (key_code != 9) {
+            event.returnValue = false;
+        }
+    }
 }
 
 var loadBar;
@@ -685,6 +740,7 @@ loadBar = loadBar || (function() {
 })();
 
 jQuery(document).ready(function() {
+
     $(".alert").alert();
     $('.dropdown-toggle').dropdown();
     $('.tt').tooltip();
@@ -711,30 +767,6 @@ jQuery(document).ready(function() {
             xLabels: "day"
         });
     }
-
-//    if (typeof graph_comparison_data !== 'undefined')
-//    {
-//        new Morris.Bar({
-//            element: 'comparisonGraph',
-//            data: graph_comparison_data,
-//            xkey: comparison_graph_x_keys,
-//            ykeys: comparison_graph_y_keys,
-//            stacked: bar_type,
-//            ymax: y_max,
-//            labels: comparison_labels,
-//            hideHover: true
-//        });
-//    }
-
-//    if (typeof donut_average_recommended_items_data !== 'undefined')
-//    {
-//        new Morris.Donut({
-//            element: 'averageRecommendedItemsDonut',
-//            data: donut_average_recommended_items_data,
-//            colors: ["#005dff", "#afafaf"]
-//        }).select(0);
-//    }
-
 
     //HIGHCHART GRAPH
     if (typeof highchart_pie_data !== 'undefined') {
@@ -853,8 +885,7 @@ jQuery(document).ready(function() {
 
     allWells.hide();
 
-    navListItems.click(function(e)
-    {
+    navListItems.click(function(e) {
         e.preventDefault();
         var $target = $($(this).attr('href')),
                 $item = $(this).closest('li');
@@ -980,6 +1011,9 @@ jQuery(document).ready(function() {
         return;
     });
 
+    /**
+     * Report Ranges
+     */
     $('#reportrange').daterangepicker({
         ranges: {
             '31 Days Ago': [moment().subtract('days', 31), moment()],
@@ -991,8 +1025,7 @@ jQuery(document).ready(function() {
         maxDate: moment(),
         applyClass: 'btnApplyRange btn btn-primary btn-sm',
         cancelClass: 'btnCancelRange btn btn-default btn-sm pull-right'
-    },
-    function(start, end) {
+    }, function(start, end) {
         $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
     });
     $('#reportrange').on('apply.daterangepicker', function(ev, picker) {
@@ -1002,7 +1035,6 @@ jQuery(document).ready(function() {
 //        window.location = site_url + "/home2/" + selected_comparison + "/range/" + type_by + "/" + picker.startDate.format('YYYY-MM-DD') + "/" + picker.endDate.format('YYYY-MM-DD');
 
     });
-
     $('#reportrange2').daterangepicker({
         ranges: {
             '31 Days Ago': [moment().subtract('days', 31), moment()],
@@ -1014,8 +1046,7 @@ jQuery(document).ready(function() {
         maxDate: moment(),
         applyClass: 'btnApplyRange btn btn-primary btn-sm',
         cancelClass: 'btnCancelRange btn btn-default btn-sm pull-right'
-    },
-    function(start, end) {
+    }, function(start, end) {
         filters.dt_start = start.format('YYYY-MM-DD');
         filters.dt_end = end.format('YYYY-MM-DD');
         $('#reportrange2 span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
@@ -1027,7 +1058,6 @@ jQuery(document).ready(function() {
 //        console.log(picker.startDate.format('YYYY-MM-DD'));
 //        console.log(picker.endDate.format('YYYY-MM-DD'));
     });
-
     $("#date_unit").bind('change', function(e) {
         var valueSelected = this.value;
         filters.date_unit = valueSelected;
