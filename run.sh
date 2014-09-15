@@ -9,12 +9,12 @@
 
 #cloning required files from git to the image, files such as the nginx configurations, php-fpm and etc... .
 
-sudo git clone https://a0731e397121fcfcd8446931d0dc092da97e0669@github.com/mohammadhamzehloui/aws.git /home/ubuntu/aws
+git clone https://a0731e397121fcfcd8446931d0dc092da97e0669@github.com/mohammadhamzehloui/aws.git /home/ubuntu/aws
 
 #adding ssh keys to ~/.ssh folder
-sudo cp /home/ubuntu/aws/id_rsa ~/.ssh
-sudo chmod 400 /home/ubuntu/aws/id_rsa
-sudo cp /home/ubuntu/aws/config ~/.ssh
+cp /home/ubuntu/aws/id_rsa ~/.ssh
+chmod 400 /home/ubuntu/aws/id_rsa
+cp /home/ubuntu/aws/config ~/.ssh
 
 #installing php-fpm and php-curl-extension curl if it does not exist
  type php  >/dev/null 2>&1 || {
@@ -30,7 +30,7 @@ sudo cp /home/ubuntu/aws/config ~/.ssh
 
 #installing postgresql if it does not exist
  type psql  >/dev/null 2>&1 || {
-	 sudo apt-get install -y postgresql-client
+	# sudo apt-get install -y postgresql-client
          sudo apt-get install -y php5-pgsql
          echo "postgresql-client installed successfully"
     }
@@ -55,14 +55,15 @@ fi
 
 #creating a folder in /usr/share/nginx/html and cloning predictry from github
 
+mkdir /home/ubuntu/pongo
+git clone -b production  git@github.com:predictry/pongo.git /home/ubuntu/pongo
+rm /home/ubuntu/pongo/.env.sample.php
+cp /home/ubuntu/aws/.env.php /home/ubuntu/pongo/
+
 if [ ! -e "/usr/share/nginx/html/www" ] ; then
-    cd /usr/share/nginx/html && sudo mkdir -p "www/pongo" && cd www/pongo  && sudo git clone -b production  git@github.com:predictry/pongo.git .
+    cd /usr/share/nginx/html && sudo mkdir -p "www/pongo" && cd www/pongo  && sudo mv $(ls -a /home/ubuntu/pongo/) .
 
 fi
-
-#removing the .env.sample.php file from pongo and replacing the one from github 
-sudo rm /usr/share/nginx/html/www/pongo/.env.sample.php 
-sudo cp /home/ubuntu/aws/.env.php /usr/share/nginx/html/www/pongo/
 
 
 #removing the configuration files for nginx php php-fpm  and replacing with the ones from github
