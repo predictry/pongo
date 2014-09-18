@@ -21,17 +21,18 @@ class RecommendationEventHandler
     /**
      * Record recommendation results.
      * 
-     * @param array $reco_ids
+     * @param array $data_ids
      * @param int $widget_instance_id
      */
-    public function saveRecoResult($reco_ids, $widget_instance_id)
+    public function saveRecoResult($data_ids, $widget_instance_id)
     {
         //Added widget Instance Metas
         $new_records = array();
-        foreach ($reco_ids as $id) {
+        foreach ($data_ids as $data) {
             $record = array(
                 "widget_instance_id" => $widget_instance_id,
-                "item_id"            => $id
+                "item_id"            => $data['id'],
+                "identifier"         => $data['identifier']
             );
 
             array_push($new_records, $record);
