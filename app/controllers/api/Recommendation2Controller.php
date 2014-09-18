@@ -85,6 +85,7 @@ class Recommendation2Controller extends ApiBaseController
                             $widget_instance_id = $this->repository->createWidgetInstance($input['widget_id'], $input['session_id']); //no error found, then we have to create new widget instance
                             if ($widget_instance_id && count($response->data->item_ids) > 0) { //when the widget instance ready, then we record the result
                                 $response->data->widget_instance_id = $widget_instance_id; //widget_instance_id
+                                $response->data->items              = $this->repository->appendWidgetInstanceId($response->data->items, $widget_instance_id); //need to append predictry_src=widget_instance_id   
                                 Event::fire("recommendation.response_received", array($response->data->item_ids, $widget_instance_id));
                             }
                         }

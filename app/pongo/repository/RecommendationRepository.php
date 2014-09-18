@@ -146,6 +146,17 @@ class RecommendationRepository
         return $complete_items;
     }
 
+    public function appendWidgetInstanceId($items, $widget_instance_id)
+    {
+        foreach ($items as $item) {
+            if (isset($item->item_url)) {
+                $item->item_url = (parse_url($item->item_url, PHP_URL_QUERY)) ? ($item->item_url . '&predictry_src=' . $widget_instance_id) : ($item->item_url . '?predictry_src=' . $widget_instance_id);
+            }
+        }
+
+        return $items;
+    }
+
 }
 
 /* End of file RecommendationRepository.php */
