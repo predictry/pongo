@@ -6,15 +6,23 @@
          sudo apt-get install -y git
          echo "git installed successfully"
     }
+type aws  >/dev/null 2>&1 || {
+	sudo apt-get update
+	sudo apt-get install -y python-pip
+	sudo pip install awscli
+    }
 
 #cloning required files from git to the image, files such as the nginx configurations, php-fpm and etc... .
 
 git clone https://a0731e397121fcfcd8446931d0dc092da97e0669@github.com/mohammadhamzehloui/aws.git /home/ubuntu/aws
 
 #adding ssh keys to ~/.ssh folder
-cp /home/ubuntu/aws/id_rsa ~/.ssh
+echo "Downloading keys~~~~~~~!!!!!!!!!!"
+aws s3 cp s3://git-env-keys-personal/id_rsa /home/ubuntu/aws/
 chmod 400 /home/ubuntu/aws/id_rsa
+cp /home/ubuntu/aws/id_rsa ~/.ssh
 cp /home/ubuntu/aws/config ~/.ssh
+
 
 #installing php-fpm and php-curl-extension curl if it does not exist
  type php  >/dev/null 2>&1 || {
@@ -58,10 +66,10 @@ fi
 mkdir /home/ubuntu/pongo
 git clone -b production  git@github.com:predictry/pongo.git /home/ubuntu/pongo
 rm /home/ubuntu/pongo/.env.sample.php
-cp /home/ubuntu/aws/.env.php /home/ubuntu/pongo/
+aws s3 cp s3://git-env-keys-personal/.env.php /home/ubuntu/pongo/
 
 if [ ! -e "/usr/share/nginx/html/www" ] ; then
-    cd /usr/share/nginx/html && sudo mkdir -p "www/pongo" && cd www/pongo  && sudo mv $(ls -a /home/ubuntu/pongo/) .
+    cd /usr/share/nginx/html && sudo mkdir -p "www/pongo" && cd www/pongo  && sudo mv  /home/ubuntu/pongo/* . && sudo mv  /home/ubuntu/pongo/.* .
 
 fi
 
@@ -76,7 +84,7 @@ sudo cp /home/ubuntu/aws/www.conf /etc/php5/fpm/pool.d
 sudo rm -R /home/ubuntu/aws
 
 #running composer 
-cd /usr/share/nginx/html/www/pongo/ && sudo composer install && sudo php artisan migrate && sudo composer dumpautoload
+cd /usr/share/nginx/html/www/pongo/ && sudo composer install --prefer-source && sudo php artisan migrate && sudo composer dumpautoload
 cd /usr/share/nginx/html/www/pongo/ && sudo composer install && sudo composer dumpautoload
 
 #changing permission for app/storage
