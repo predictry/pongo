@@ -1,0 +1,100 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Parameters": {
+        "Instanceid": {
+            "Type": "String"
+        }
+    },
+    "Resources": {
+        "asgtestautoscalinggroup": {
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "Properties": {
+                "AvailabilityZones": [
+                    "ap-southeast-1b"
+                ],
+                "LoadBalancerNames": [
+                    "lbtest"
+                ],
+                "Cooldown": "300",
+                "DesiredCapacity": "1",
+                "MaxSize": "3",
+                "MinSize": "1",
+                "HealthCheckGracePeriod": "300",
+                "HealthCheckType": "EC2",
+                "VPCZoneIdentifier": [
+                    "subnet-81c53fe4"
+                ],
+                "LaunchConfigurationName": {
+                    "Ref": "lcmytestlc"
+                }
+            },
+  "UpdatePolicy": {
+        "AutoScalingRollingUpdate": {
+            "MaxBatchSize": "2",
+            "MinInstancesInService": "2",
+            "PauseTime": "PT0S"
+        }
+    }
+
+  },
+        "lcmytestlc": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "Properties": {
+                "ImageId": {
+                    "Ref": "Instanceid"
+                },
+                "InstanceType": "t2.micro",
+                "InstanceMonitoring": "true"
+            }
+        },
+        "sgtesting": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "testing",
+                "VpcId": "vpc-1bed037e",
+                "SecurityGroupIngress": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "22",
+                        "ToPort": "22",
+                        "CidrIp": "0.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "80",
+                        "ToPort": "80",
+                        "CidrIp": "0.0.0.0/0"
+                    }
+                ],
+                "SecurityGroupEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "CidrIp": "0.0.0.0/0"
+                    }
+                ]
+            }
+        },
+        "scalingdown": {
+            "Type": "AWS::AutoScaling::ScalingPolicy",
+            "Properties": {
+                "AdjustmentType": "ChangeInCapacity",
+                "ScalingAdjustment": "-1",
+                "AutoScalingGroupName": {
+                    "Ref": "asgtestautoscalinggroup"
+                }
+            }
+        },
+        "scalingup": {
+            "Type": "AWS::AutoScaling::ScalingPolicy",
+            "Properties": {
+                "AdjustmentType": "ChangeInCapacity",
+                "ScalingAdjustment": "1",
+                "AutoScalingGroupName": {
+                    "Ref": "asgtestautoscalinggroup"
+                }
+            }
+        }
+    },
+    "Description": ""
+
+}
