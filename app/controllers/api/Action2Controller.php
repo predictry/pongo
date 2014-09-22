@@ -86,19 +86,19 @@ class Action2Controller extends ApiBaseController
      */
     public function store()
     {
-        $action_validator = \Validator::make(Input::only("action"), array("action" => "required"));
+        $action_validator = Validator::make(Input::only("action"), array("action" => "required"));
 
         if ($action_validator->passes()) {
-            $browser_cookie_inputs = Input::only("session_id", "browser_id", "user_id");
-            $browser_rules         = array(
+            $browser_inputs = Input::only("session_id", "browser_id", "user_id");
+            $browser_rules  = array(
                 "session_id" => "required",
                 "browser_id" => "",
                 "user_id"    => ""
             );
 
-            $rules           = array_merge($browser_rules, array('items' => 'required|array'));
-            $inputs          = array_merge($browser_cookie_inputs, Input::only("action", "user", "items"));
-            $input_validator = \Validator::make($inputs, $rules);
+            $rules           = array_merge($browser_rules, array('items' => 'array'));
+            $inputs          = array_merge($browser_inputs, Input::only("action", "user", "items"));
+            $input_validator = Validator::make($inputs, $rules);
 
             if ($input_validator->passes()) {
                 //validating user data
@@ -108,12 +108,12 @@ class Action2Controller extends ApiBaseController
 
                 //if client didn't set the user object values, then replace it using generated uid
                 if (!isset($inputs['user'])) {
-                    $inputs['user'] = array_add($inputs['user'], "user_id", $inputs['user_id']);
-
+                    $inputs['user']     = array_add($inputs['user'], "user_id", $inputs['user_id']);
                     $this->is_anonymous = true;
                 }
 
-                $user_validator = \Validator::make($inputs['user'], $user_property_rules);
+                $user_validator = Validator::make($inputs['user'], $user_property_rules);
+
                 if ($user_validator->passes()) {
                     $this->browser_id = $this->_getBrowserID($inputs['browser_id']); //get browser_id
                     //if user is anonymous, don't create visitor info (only for identified user)
@@ -122,7 +122,6 @@ class Action2Controller extends ApiBaseController
                         $this->session_id = $this->_getSessionID($inputs['session_id'], $this->visitor_id); //get session_id
                     }
                     else
-                    //send null for visitor_id
                         $this->session_id = $this->_getSessionID($inputs['session_id']); //get session_id
 
                     if ($inputs['action']['name'] === 'view') {
@@ -146,14 +145,21 @@ class Action2Controller extends ApiBaseController
                     }
                     else {
                         $items = $inputs['items'];
-                        foreach ($items as $item) {
-                            $inputs['item'] = $item;
-
-                            if ($this->_proceedSingleAction($inputs['action']['name'], $inputs)) {
-                                $this->_proceedToGui($item, $inputs['user'], $inputs['action']);
+                        if (count($items) > 0) {
+                            foreach ($items as $item) {
+                                $inputs['item'] = $item;
+                                if ($this->_proceedSingleAction($inputs['action']['name'], $inputs)) {
+                                    $this->_proceedToGui($item, $inputs['user'], $inputs['action']);
+                                }
+                                else
+                                    break;
                             }
-                            else
-                                break;
+                        }
+                        else {
+                            //chances if the actions only tracking
+                            if ($this->_proceedSingleAction($inputs['action']['name'], $inputs)) {
+                                $this->_proceedToGui([], $inputs['user'], $inputs['action']);
+                            }
                         }
 
                         $response = $this->response;
@@ -197,7 +203,7 @@ class Action2Controller extends ApiBaseController
 
     function _proceedSingleAction($action_name, $action_data)
     {
-        $items_data = $action_data['item'];
+        $items_data = (isset($action_data['item'])) ? $action_data['item'] : [];
 
         $item_property_rules = array(
             "item_id"  => "required|alpha_num",
@@ -207,28 +213,25 @@ class Action2Controller extends ApiBaseController
             "item_url" => "required|url"
         );
 
-        $item_validator = \Validator::make($items_data, $item_property_rules);
+        $item_validator = Validator::make($items_data, $item_property_rules);
 
         //validating the item first is important since, item will always associated with the action
+        //item will no longer compulsary
         if ($item_validator->passes())
-            $this->item_id  = $this->_getItemID($items_data, $this->is_new_item);
-        else
-            $this->response = $this->getErrorResponse("errorValidator", "200", "", $item_validator->errors()->first());
+            $this->item_id = $this->_getItemID($items_data, $this->is_new_item);
 
-        if ($this->item_id) {
-            $this->action_id = $this->_getActionID(array("name" => $action_name), $this->is_new_action);
-            $action_instance = new ActionInstance();
+        $this->action_id = $this->_getActionID(array("name" => $action_name), $this->is_new_action);
+        $action_instance = new ActionInstance();
 
-            //process action instance
-            $action_instance->action_id  = $this->action_id;
-            $action_instance->item_id    = $this->item_id;
-            $action_instance->session_id = $this->session_id;
-            $action_instance->created    = new Carbon("now");
-            $action_instance->save();
+        //process action instance
+        $action_instance->action_id  = $this->action_id;
+        $action_instance->item_id    = ($this->item_id !== 0) ? $this->item_id : null;
+        $action_instance->session_id = $this->session_id;
+        $action_instance->created    = new Carbon("now");
+        $action_instance->save();
 
-            $this->action_instance_id = $action_instance->id;
-            $this->_setActionMeta($action_instance->id, $action_data['action']);
-        }
+        $this->action_instance_id = $action_instance->id;
+        $this->_setActionMeta($action_instance->id, $action_data['action']);
 
         if ($this->response['error'])
             return false;
@@ -254,8 +257,6 @@ class Action2Controller extends ApiBaseController
             $item_model = Item::where("identifier", $item['item_id'])->where("site_id", $this->site_id)->get()->first();
 
             if ($item_model) {
-
-
                 $action_instance = new ActionInstance();
 
                 //process action instance
@@ -287,7 +288,6 @@ class Action2Controller extends ApiBaseController
 
     private function _proceedToGui($item_data, $user_data, $action_data)
     {
-        //@todo need to be activated later. This is only for testing, because all items are not new.
         if ($this->is_new_item)
             $this->_postItemToGui($item_data);
 
@@ -319,7 +319,7 @@ class Action2Controller extends ApiBaseController
     {
         $action              = new Action();
         $action->name        = $action_data['name'];
-        $action->description = $action_data['description'];
+        $action->description = (isset($action_data['description'])) ? $action_data['description'] : '';
         $action->site_id     = $this->site_id;
         $action->save();
 
