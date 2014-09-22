@@ -10,13 +10,14 @@
 
 namespace App\Controllers\User;
 
-use View,
+use App\Controllers\BaseController,
+    View,
     Input,
     Redirect,
     Validator,
     Paginator;
 
-class ActionsController extends \App\Controllers\BaseController
+class ActionsController extends BaseController
 {
 
     public $default_action_view_id = null;
@@ -48,8 +49,9 @@ class ActionsController extends \App\Controllers\BaseController
         $this->model = new \App\Models\ActionInstance();
         $page        = Input::get('page', 1);
 
-        $action_type_dropdown        = \App\Models\Action::where("site_id", $this->active_site_id)->lists("name", "id");
-        $available_site_actions      = \App\Models\Action::where("site_id", $this->active_site_id)->get()->toArray();
+        $action_type_dropdown   = \App\Models\Action::where("site_id", $this->active_site_id)->lists("name", "id");
+        $available_site_actions = \App\Models\Action::where("site_id", $this->active_site_id)->get()->toArray();
+
         $available_site_action_ids   = array_fetch($available_site_actions, "id");
         $available_site_action_names = array_fetch($available_site_actions, "name");
 
@@ -74,11 +76,10 @@ class ActionsController extends \App\Controllers\BaseController
             foreach ($data->items as $item) {
                 $item->name      = $action_name;
                 $visitor_session = \App\Models\Session::find($item->session_id)->visitor;
+                $obj_item        = \App\Models\Item::find($item->item_id);
 
-                $obj_item = \App\Models\Item::find($item->item_id);
-
-                $item->user_id            = $visitor_session->identifier;
-                $item->item_identifier_id = $obj_item->identifier;
+                $item->user_id            = (isset($visitor_session->identifier)) ? $visitor_session->identifier : '-';
+                $item->item_identifier_id = (isset($obj_item->identifier)) ? $obj_item->identifier : '-';
             }
             $paginator = Paginator::make($data->items, $data->totalItems, $data->limit);
         }

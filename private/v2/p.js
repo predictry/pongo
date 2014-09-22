@@ -1043,7 +1043,7 @@ if (typeof Predictry !== 'object') {
                 if (!isDefined(data) || !isObject(data))
                     return;
 
-                if (!isDefined(data.action) || !isDefined(data.items))
+                if (!isDefined(data.action))
                     return;
 
                 data = appendPredictryData(data);
