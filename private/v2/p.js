@@ -12,7 +12,7 @@ if (typeof _predictry !== 'object') {
 }
 
 if (typeof Predictry !== 'object') {
-    Predictry = (function() {
+    Predictry = (function () {
         'use strict';
 
         /************************************************************
@@ -117,7 +117,7 @@ if (typeof Predictry !== 'object') {
             script.src = src;
 
             if (script.readyState) {
-                script.onreadystatechange = function() {
+                script.onreadystatechange = function () {
                     var state = this.readyState;
 
                     if (state === 'loaded' || state === 'complete') {
@@ -403,7 +403,6 @@ if (typeof Predictry !== 'object') {
             function drawTextListRecommendation(elem, obj)
             {
                 if (obj !== null) { // if no error show recommendations
-
                     try {
                         var items = obj.data.items;
                         widget_instance_id = obj.data.widget_instance_id;
@@ -419,14 +418,14 @@ if (typeof Predictry !== 'object') {
                     var listString = "";
                     // display recommendations in the DIV layer 'recommendation'
                     if (items.length > 0) {
-                        listString = "<ul>";
+                        listString = "<ul style='width: 100%;'>";
 
                         for (var x = 0; x < items.length; x++) {
                             listString +=
-                                    "<li><a href=\"" + items[x].item_url + "?predictr_src=" + widget_instance_id + "\">"
-                                    + items[x].name +
-                                    "</a>" +
-                                    "</li>";
+                                    "<li style='list-style: none; float: left; padding-left: 10px; padding-right: 10px; width: 160px; '>"
+                                    + "<img src=\"" + items[x].img_url + "\" style='clear: both; display: block; margin-right: auto; margin-left: auto; width: 150px;'>"
+                                    + "<a href=\"" + items[x].item_url + "\">" + items[x].name + "</a>"
+                                    + "</li>";
                         }
                         elem.innerHTML += listString + "</ul>";
                     }
@@ -860,7 +859,7 @@ if (typeof Predictry !== 'object') {
              */
             function getImage(resource, queries) {
                 var image = new Image(1, 1);
-                image.onload = function() {
+                image.onload = function () {
                     iterator = 0; // To avoid JSLint warning of empty block 
                 };
                 image.src = config_api_url + resource + (config_api_url.indexOf('?') < 0 ? '?' : '&') + queries;
@@ -986,7 +985,7 @@ if (typeof Predictry !== 'object') {
                 http.setRequestHeader("X-Predictry-Server-Api-Key", api_key);
 
                 recent_xhr = http;
-                http.onreadystatechange = function() {//Call a function when the state changes.
+                http.onreadystatechange = function () {//Call a function when the state changes.
                     if (http.readyState === 4 && http.status === 200) {
                         if (isDefined(callback)) {
                             if (isFunction(callback))
@@ -1165,16 +1164,16 @@ if (typeof Predictry !== 'object') {
              ************************************************************/
 
             return {
-                setTenantId: function(id) {
+                setTenantId: function (id) {
                     tenant_id = id;
                 },
-                setApiKey: function(key) {
+                setApiKey: function (key) {
                     api_key = key;
                 },
-                setWidgetId: function(id) {
+                setWidgetId: function (id) {
                     widget_id = id;
                 },
-                setSessionID: function(session_id) {
+                setSessionID: function (session_id) {
                     var val = getCookie(getCookieName("session"));
                     if (val) {
                         setSessionCookieId(val); //extend lifetime
@@ -1185,7 +1184,7 @@ if (typeof Predictry !== 'object') {
                         setSessionCookieId(session_id);
                     }
                 },
-                setSessionUserID: function(session_user_id) {
+                setSessionUserID: function (session_user_id) {
                     var val = getCookie(getCookieName("user"));
                     if (val) {
                         setUserSessionCookieId(val); //extend lifetime
@@ -1196,7 +1195,7 @@ if (typeof Predictry !== 'object') {
                         setUserSessionCookieId(session_user_id);
                     }
                 },
-                setSessionBrowserID: function(session_browser_id) {
+                setSessionBrowserID: function (session_browser_id) {
                     var val = getCookie(getCookieName("browser"));
                     if (val)
                         return;
@@ -1205,7 +1204,7 @@ if (typeof Predictry !== 'object') {
                         setBrowserSessionCookieId(session_browser_id);
                     }
                 },
-                setSessionCart: function() {
+                setSessionCart: function () {
                     var val = getCookie(getCookieName("cart"));
                     if (val) {
                         var cartSession = eval("(" + getCookie(getCookieName("cart")) + ")");
@@ -1213,7 +1212,7 @@ if (typeof Predictry !== 'object') {
                     }
                     return (val) ? val : setCartSessionCookie();
                 },
-                setSessionView: function() {
+                setSessionView: function () {
                     var val = getCookie(getCookieName("view"));
                     if (val) {
                         var viewSession = eval("(" + getCookie(getCookieName("view")) + ")");
@@ -1224,7 +1223,7 @@ if (typeof Predictry !== 'object') {
                 setItemIntoCartSession: setItemIntoCartSession,
                 setItemIntoViewSession: setItemIntoViewSession,
                 setCartLog: setCartLog,
-                setDoNotTrack: function(enable) {
+                setDoNotTrack: function (enable) {
                     config_do_not_track = (enable);
                 },
                 getSessionID: getSessionID,
@@ -1232,20 +1231,20 @@ if (typeof Predictry !== 'object') {
                 getSessionCart: getSessionCart,
                 getCartID: getCartID,
                 getWidgetInstanceID: getWidgetInstanceID,
-                getWidgetID: function() {
+                getWidgetID: function () {
                     return widget_id;
                 },
-                getWidget: function() {
+                getWidget: function () {
                     if (!is_lookup_widget) {
                         predictry_nodes = document.querySelectorAll(".predictry");
-                        [].forEach.call(predictry_nodes, function(elem) {
+                        [].forEach.call(predictry_nodes, function (elem) {
                             var i = 0, ds = elem.dataset;
                             if (ds.predictryWidgetId === undefined || ds.predictryWidgetId === "")
                                 return;
 
                             var data = {item_id: ds.predictryItemId, user_id: ds.predictryUserId, widget_id: ds.predictryWidgetId};
                             if (ds.predictryCallback === undefined) {
-                                _predictry.push(['getRecommendedItems', data, function(response) {
+                                _predictry.push(['getRecommendedItems', data, function (response) {
                                         if (response !== undefined && i === 0) {
                                             var obj = JSON.parse(response);
                                             if (typeof obj === 'object') {
@@ -1323,16 +1322,16 @@ if (typeof Predictry !== 'object') {
          * Public data and methods
          ************************************************************/
         Predictry = {
-            getAsyncExecutor: function() {
+            getAsyncExecutor: function () {
                 return async_executor;
             },
-            getExecutor: function(tenant_id, api_key) {
+            getExecutor: function (tenant_id, api_key) {
                 return new Executor(tenant_id, api_key);
             }
         };
 
         if (typeof define === 'function' && define.amd) {
-            define('predictry', [], function() {
+            define('predictry', [], function () {
                 return Predictry;
             });
         }

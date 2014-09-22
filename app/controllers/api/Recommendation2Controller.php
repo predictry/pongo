@@ -70,34 +70,25 @@ class Recommendation2Controller extends ApiBaseController
         $response  = $reco_data = array();
 
         if (isset($input['widget_id'])) {
-
             $reco_data = $this->repository->populateRecoData($this->site_id, $input);
 
             if (!isset($reco_data['error'])) {
-
                 //get recommendation
                 $response = $this->repository->getRecommendation($reco_data);
 
-                if (!is_null($response)) {
+                if (!is_null($response) && count($response) > 0) {
                     if ($response && isset($response->error)) {
                         $this->http_status = $response->status;
                     }
                     else {
-
                         if ($response->data->items && count($response->data->items) > 0) {
-
-                            $item_ids = $response->data->item_ids;
-
-                            //no error found, then we have to create new widget instance
-                            $widget_instance_id = $this->repository->createWidgetInstance($input['widget_id'], $input['session_id']);
-                            //when the widget instance ready, then we record the result
-                            if ($widget_instance_id && count($item_ids) > 0) {
-                                Event::fire("recommendation.response_received", array($item_ids, $widget_instance_id));
+                            $widget_instance_id = $this->repository->createWidgetInstance($input['widget_id'], $input['session_id']); //no error found, then we have to create new widget instance
+                            if ($widget_instance_id && count($response->data->item_ids) > 0) { //when the widget instance ready, then we record the result
+                                $response->data->widget_instance_id = $widget_instance_id; //widget_instance_id
+                                $response->data->items              = $this->repository->appendWidgetInstanceId($response->data->items, $widget_instance_id); //need to append predictry_src=widget_instance_id   
+                                Event::fire("recommendation.response_received", array($response->data->item_ids, $widget_instance_id));
                             }
-
-                            $response->data->widget_instance_id = $widget_instance_id;
                         }
-
                         unset($response->data->item_ids);
                     }
                 }

@@ -2,6 +2,7 @@ var numOfItems = 1;
 var indexOfItem = 1;
 var excludeOptionIDs = new Array();
 var indexes = new Array();
+var propertyMetas = new Array();
 indexes.push(1);
 
 /**
@@ -17,7 +18,7 @@ function getGraphData() {
         success: function(data)
         {
             if (data.status === "success") {
-                console.log(data);
+//                console.log(data);
 
                 highchart_categories_data = data.response.highchart_categories;
                 highchart_combination_graph_of_comparison = data.response.highchart_options_series;
@@ -283,6 +284,49 @@ function getGraphPieWithText(divelem, chart_title, chart_data) {
     });
 }
 
+function viewMetaDetail(id, propertyName, arrSelectedValue) {
+    var selectedPropertyKey = $("#propertyKey" + id).val();
+    var selectedType = $("#type" + id).val();
+
+    var metas = null;
+
+    if (propertyMetas[propertyName] !== undefined) {
+        var divWrapper = $("#" + propertyName + "Wrapper" + id);
+        metas = propertyMetas[propertyName][selectedPropertyKey];
+        selectMetas = "<select class='form-control chosen-select' id='value" + id + "' name='value[]'>";
+
+        var strOptions = "";
+        for (var i = 0; i < metas.length; i++) {
+
+            //@todo values must be like locations.kuala_lumpur
+            var option_value = propertyName + "." + selectedType + "." + selectedPropertyKey + "." + metas[i].toLowerCase().replace(" ", "_");
+            strOptions += "<option value='" + option_value + "'";
+
+            if (arrSelectedValue !== undefined) {
+                if (option_value === arrSelectedValue)
+                    strOptions += "selected='selected'";
+            }
+            else {
+                if (i === 0)
+                    strOptions += "selected='selected'";
+            }
+
+            strOptions += ">" + metas[i] + "</option>";
+        }
+        selectMetas += strOptions + "</select>";
+
+        var propertyMetaWrapper = $("#propertyMetaWrapper" + id);
+        if (propertyMetaWrapper.html() === undefined) {
+            selectMetas = "<div class='col-sm-6' id='propertyMetaWrapper" + id + "'>" + selectMetas + "</div>";
+            divWrapper.append(selectMetas);
+        } else {
+            propertyMetaWrapper.html(selectMetas);
+        }
+
+        $(".chosen-select").chosen();
+    }
+}
+
 function getFilterType(id, val) {
     var dd = $("#type" + id);
     var input = $("#value" + id);
@@ -294,9 +338,9 @@ function getFilterType(id, val) {
         inputDiv = $("#inputDate" + id).parent();
     }
 
-    console.log(dd.val());
-    console.log(value);
-
+    if ($("#propertyKeyWrapper" + id).val() !== undefined) {
+        inputDiv = $("#propertyKeyWrapper" + id).parent().parent();
+    }
 
     switch (dd.val()) {
         case "date":
@@ -313,17 +357,35 @@ function getFilterType(id, val) {
 
         case "str":
         case "list":
+            var inputStr = "<input class='form-control' id='value" + id + "' name='value[]' type='text' value='" + value + "'/>";
+            inputDiv.html(inputStr);
+            break;
+
         case "location":
 
             var propertyName = $("#action" + id).val();
             $.ajax({
                 url: site_url + "/items/key/" + propertyName + "/metas",
                 type: 'GET',
+                data: {
+                    isDropDown: true,
+                    isView: true,
+                    id: id,
+                    val: value
+                },
                 dataType: 'json',
-                success: function(data)
+                success: function(response)
                 {
-                    console.log(data);
-                    if (data.status === "success") {
+                    if (response.status === "success") {
+                        data = response.data;
+//                        var wrapperDiv = "<div class='row ' id='" + propertyName + "Wrapper" + id + "'><div class='col-sm-6' id='propertyKeyWrapper" + id + "'>";
+                        var wrapperDiv = "<div class='row ' id='" + propertyName + "Wrapper" + id + "'><div class='col-sm-12' id='propertyKeyWrapper" + id + "'>";
+                        wrapperDiv += response.view + "</div></div>";
+                        inputDiv.html(wrapperDiv);
+
+                        propertyMetas[propertyName] = response.data;
+//                        viewMetaDetail(id, propertyName, value);
+                        $(".chosen-select").chosen();
                     }
                 },
                 error: function() {
@@ -331,9 +393,6 @@ function getFilterType(id, val) {
                 }
             });
 
-
-            var inputStr = "<input class='form-control' id='value" + id + "' name='value[]' type='text' value='" + value + "'/>";
-            inputDiv.html(inputStr);
             break;
 
         case "num":
@@ -642,8 +701,6 @@ function editItemFilter(obj, index) {
                 getFilterType(index, input.val());
                 if (index >= indexOfItem)
                     indexOfItem = index;
-
-                console.log(indexOfItem);
             }
         },
         error: function() {
@@ -673,7 +730,6 @@ function gatherSelectedOption(name) {
 
 function validateSelectedItem(selected, name) {
     excludeOptionIDs = gatherSelectedOption(name);
-    console.log(excludeOptionIDs);
     if (excludeOptionIDs.length > 1) {
         var counter = 0;
         for (var i = 0; i < excludeOptionIDs.length; i++) {
@@ -1029,8 +1085,8 @@ jQuery(document).ready(function() {
         $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
     });
     $('#reportrange').on('apply.daterangepicker', function(ev, picker) {
-        console.log(picker.startDate.format('YYYY-MM-DD'));
-        console.log(picker.endDate.format('YYYY-MM-DD'));
+//        console.log(picker.startDate.format('YYYY-MM-DD'));
+//        console.log(picker.endDate.format('YYYY-MM-DD'));
 //        console.log(site_url + "/home2/" + selected_comparison + "/range/" + type_by + "/" + picker.startDate.format('YYYY-MM-DD') + "/" + picker.endDate.format('YYYY-MM-DD'));
 //        window.location = site_url + "/home2/" + selected_comparison + "/range/" + type_by + "/" + picker.startDate.format('YYYY-MM-DD') + "/" + picker.endDate.format('YYYY-MM-DD');
 

@@ -104,24 +104,7 @@ class RecommendationRepository
             case "trp": //topitemspurchasedrecently
             case "trac": //toprecentadditionstocart
                 $response = json_decode(Gui::getRecommended($reco_data['type'], $reco_data, $widget_filter_metas, $fields));
-
-                //@todo PLEASE REMOVE AFTER TESTING, THIS ONLY DUMMY RECO RESULTS
-//                $response = (object) ['data' => (object) ['items' => []]];
-//                if (is_object($response) && !isset($response->error)) {
-//                    if ($response->data && count($response->data->items) == 0) {
-//                        $dummy_reco_items = [
-//                            (object) array('id' => '668'),
-//                            (object) array('id' => '598'),
-//                            (object) array('id' => '407'),
-//                            (object) array('id' => '3459'),
-//                            (object) array('id' => '487'),
-//                            (object) array('id' => '467')
-//                        ];
-//
-//                        $response->data->items = $dummy_reco_items;
-//                    }
-//                }
-
+//                $response             = json_decode('{"status": 200, "data": {"items": [{"matches": 80, "id": 4491}, {"matches": 41, "id": 360}, {"matches": 40, "id": 4492}, {"matches": 40, "id": 356}, {"matches": 40, "id": 61}, {"matches": 40, "id": 63}, {"matches": 40, "id": 54}]}}');
                 break;
 
             default:
@@ -145,10 +128,7 @@ class RecommendationRepository
     {
         $complete_items = [];
         foreach ($items as $obj) {
-
             $item = Item::find($obj->id); // lookup from items using id
-//            $item = Item::where("identifier", $obj->id)->where("site_id", 13)->get()->first(); // lookup from items using id
-
             if ($item) {
                 $detail = [
                     'id'   => $item->identifier, //this is client item identifier
@@ -159,11 +139,22 @@ class RecommendationRepository
                 $reco_item = array_merge($detail, $metas);
 
                 array_push($complete_items, (object) $reco_item);
-                array_push($item_ids, $obj->id); // need this information to store recommendation results
+                array_push($item_ids, array('id' => $obj->id, 'identifier' => $item->identifier)); // need this information to store recommendation results
             }
         }
 
         return $complete_items;
+    }
+
+    public function appendWidgetInstanceId($items, $widget_instance_id)
+    {
+        foreach ($items as $item) {
+            if (isset($item->item_url)) {
+                $item->item_url = (parse_url($item->item_url, PHP_URL_QUERY)) ? ($item->item_url . '&predictry_src=' . $widget_instance_id) : ($item->item_url . '?predictry_src=' . $widget_instance_id);
+            }
+        }
+
+        return $items;
     }
 
 }
