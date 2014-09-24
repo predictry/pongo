@@ -11,7 +11,8 @@
     "source_ami": "ami-12356d40",
     "instance_type": "t2.micro",
     "ssh_username": "ubuntu",
-    "ami_name": "test_2_fix_run_bash {{timestamp}}"
+    "ami_name": "Pongo-Image {{timestamp}}",
+    "iam_instance_profile":"ec2-s3"
   }],
  "provisioners": [{
     "type": "shell",
