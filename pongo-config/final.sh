@@ -3,7 +3,7 @@
 
 packer build EC2_MAIN_SERVER.json  >image_id.txt
 ami=$(tail -n 1 image_id.txt | grep -E -o 'ami-.{8}')
-sudo rm image_id.txt
+rm image_id.txt
 
 
 if [ ! -z "$ami" ]; then
