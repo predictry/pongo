@@ -1,10 +1,10 @@
 #! /bin/bash
 
-packer build EC2_PERSOAN_ACCOUNT  >image_id.txt
+
+packer build EC2_MAIN_SERVER.json  >image_id.txt
 ami=$(tail -n 1 image_id.txt | grep -E -o 'ami-.{8}')
 sudo rm image_id.txt
 
-ami=ami-06183c54
 
 if [ ! -z "$ami" ]; then
 
