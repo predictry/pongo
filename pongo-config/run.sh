@@ -1,27 +1,10 @@
 #! /bin/bash
 
-
-#installing git if it does not exist
- type git  >/dev/null 2>&1 || {
-         sudo apt-get install -y git
-         echo "git installed successfully"
-    }
 type aws  >/dev/null 2>&1 || {
 	sudo apt-get update
 	sudo apt-get install -y python-pip
 	sudo pip install awscli
     }
-
-#cloning required files from git to the image, files such as the nginx configurations, php-fpm and etc... .
-
-git clone https://a0731e397121fcfcd8446931d0dc092da97e0669@github.com/mohammadhamzehloui/aws.git /home/ubuntu/aws
-
-#adding ssh keys to ~/.ssh folder
-echo "Downloading keys~~~~~~~!!!!!!!!!!"
-aws s3 cp s3://predictry-key-and-environment-file/id_rsa /home/ubuntu/aws/
-chmod 400 /home/ubuntu/aws/id_rsa
-cp /home/ubuntu/aws/id_rsa ~/.ssh
-cp /home/ubuntu/aws/config ~/.ssh
 
 
 #installing php-fpm and php-curl-extension curl if it does not exist
@@ -38,7 +21,6 @@ cp /home/ubuntu/aws/config ~/.ssh
 
 #installing postgresql if it does not exist
  type psql  >/dev/null 2>&1 || {
-	# sudo apt-get install -y postgresql-client
          sudo apt-get install -y php5-pgsql
          echo "postgresql-client installed successfully"
     }
@@ -55,18 +37,11 @@ cp /home/ubuntu/aws/config ~/.ssh
 #instaling mcrypt for php 
 if [[ -z $(php -m | grep mcrypt) ]]; then
  sudo apt-get install -y  php5-mcrypt 
- sudo ln -s /etc/php5/conf.d/mcrypt.ini /etc/php5/mods-available/mcrypt.ini
- sudo php5enmod mcrypt
  sudo service php5-fpm restart
 fi
 
 
 #creating a folder in /usr/share/nginx/html and cloning predictry from github
-
-mkdir /home/ubuntu/pongo
-git clone -b production  git@github.com:predictry/pongo.git /home/ubuntu/pongo
-rm /home/ubuntu/pongo/.env.sample.php
-aws s3 cp s3://predictry-key-and-environment-file/.env.php /home/ubuntu/pongo/
 
 if [ ! -e "/usr/share/nginx/html/www" ] ; then
     cd /usr/share/nginx/html && sudo mkdir -p "www/pongo" && cd www/pongo  && sudo mv  /home/ubuntu/pongo/* . && sudo mv  /home/ubuntu/pongo/.* .
@@ -75,13 +50,13 @@ fi
 
 
 #removing the configuration files for nginx php php-fpm  and replacing with the ones from github
-sudo cp /home/ubuntu/aws/default /etc/nginx/sites-available/
-sudo cp /home/ubuntu/aws/nginx.conf /etc/nginx/
-sudo cp /home/ubuntu/aws/php.ini /etc/php5/fpm/
-sudo cp /home/ubuntu/aws/www.conf /etc/php5/fpm/pool.d
+sudo cp /home/ubuntu/pongo/default /etc/nginx/sites-available/
+sudo cp /home/ubuntu/pongo/nginx.conf /etc/nginx/
+sudo cp /home/ubuntu/pongo/php.ini /etc/php5/fpm/
+sudo cp /home/ubuntu/pongo/www.conf /etc/php5/fpm/pool.d
 
 #removing the aws folder sudo rm -R /home/ubuntu/aws
-sudo rm -R /home/ubuntu/aws
+sudo rm -R /home/ubuntu/pongo/
 
 #running composer 
 cd /usr/share/nginx/html/www/pongo/ && sudo composer install --prefer-source && sudo php artisan migrate && sudo composer dumpautoload
