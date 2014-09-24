@@ -18,7 +18,7 @@ git clone https://a0731e397121fcfcd8446931d0dc092da97e0669@github.com/mohammadha
 
 #adding ssh keys to ~/.ssh folder
 echo "Downloading keys~~~~~~~!!!!!!!!!!"
-aws s3 cp s3://git-env-keys-personal/id_rsa /home/ubuntu/aws/
+aws s3 cp s3://predictry-key-and-environment-file/id_rsa /home/ubuntu/aws/
 chmod 400 /home/ubuntu/aws/id_rsa
 cp /home/ubuntu/aws/id_rsa ~/.ssh
 cp /home/ubuntu/aws/config ~/.ssh
@@ -66,7 +66,7 @@ fi
 mkdir /home/ubuntu/pongo
 git clone -b production  git@github.com:predictry/pongo.git /home/ubuntu/pongo
 rm /home/ubuntu/pongo/.env.sample.php
-aws s3 cp s3://git-env-keys-personal/.env.php /home/ubuntu/pongo/
+aws s3 cp s3://predictry-key-and-environment-file/.env.php /home/ubuntu/pongo/
 
 if [ ! -e "/usr/share/nginx/html/www" ] ; then
     cd /usr/share/nginx/html && sudo mkdir -p "www/pongo" && cd www/pongo  && sudo mv  /home/ubuntu/pongo/* . && sudo mv  /home/ubuntu/pongo/.* .
