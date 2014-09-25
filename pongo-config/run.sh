@@ -44,10 +44,12 @@ type aws  >/dev/null 2>&1 || {
 
 
 #instaling mcrypt for php 
-if [[ -z $(php -m | grep mcrypt) ]]; then
- sudo apt-get install -y  php5-mcrypt 
- sudo service php5-fpm restart
-fi
+ if [[ -z $(php -m | grep mcrypt) ]]; then
+	sudo apt-get install -y  php5-mcrypt 
+	sudo ln -s /etc/php5/conf.d/mcrypt.ini /etc/php5/mods-available/mcrypt.ini
+	sudo php5enmod mcrypt
+  	sudo service php5-fpm restart
+ fi
 
 
 #removing the configuration files for nginx php php-fpm  and replacing with the ones from github
