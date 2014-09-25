@@ -25,7 +25,7 @@
         },
         {
             "type": "file",
-            "source": "{{user `WORKSPACE`}}",
+            "source": "{{user `WORKSPACE`}}/",
             "destination": "/home/ubuntu/pongo"
         },
         {
