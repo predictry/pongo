@@ -3,7 +3,7 @@
 
 packer build  -var $aws_access_key -var $aws_secret_key EC2_MAIN_SERVER.json  >image_id.txt
 ami=$(tail -n 1 image_id.txt | grep -E -o 'ami-.{8}')
-rm image_id.txt
+rm $WORKSPACE/pongo-config/image_id.txt
 
 
 if [ ! -z "$ami" ]; then
