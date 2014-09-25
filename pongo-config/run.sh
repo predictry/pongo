@@ -50,10 +50,10 @@ fi
 
 
 #removing the configuration files for nginx php php-fpm  and replacing with the ones from github
-sudo cp /home/ubuntu/pongo/default /etc/nginx/sites-available/
-sudo cp /home/ubuntu/pongo/nginx.conf /etc/nginx/
-sudo cp /home/ubuntu/pongo/php.ini /etc/php5/fpm/
-sudo cp /home/ubuntu/pongo/www.conf /etc/php5/fpm/pool.d
+sudo cp /home/ubuntu/pongo/pongo-config/default /etc/nginx/sites-available/
+sudo cp /home/ubuntu/pongo/pongo-config/nginx.conf /etc/nginx/
+sudo cp /home/ubuntu/pongo/pongo-config/php.ini /etc/php5/fpm/
+sudo cp /home/ubuntu/pongo/pongo-config/www.conf /etc/php5/fpm/pool.d
 
 #removing the aws folder sudo rm -R /home/ubuntu/aws
 sudo rm -R /home/ubuntu/pongo/
