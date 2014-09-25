@@ -1,7 +1,8 @@
 {
     "variables": {
         "aws_access_key": "",
-        "aws_secret_key": ""
+        "aws_secret_key": "",
+	"workspace":"{{env `WORKSPACE`}}"
     },
     "builders": [
         {
@@ -23,7 +24,7 @@
         },
         {
             "type": "file",
-            "source": "/var/lib/jenkins/jobs/update-pongo/workspace/",
+            "source": "{{user `workspace`}}/",
             "destination": "/home/ubuntu/pongo"
         },
         {
