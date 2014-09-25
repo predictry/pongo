@@ -1,5 +1,14 @@
 #! /bin/bash
 
+#installing git 
+
+#installing git if it does not exist
+type git  >/dev/null 2>&1 || {
+         sudo apt-get install -y git
+         echo "git installed successfully"
+    }
+
+
 type aws  >/dev/null 2>&1 || {
 	sudo apt-get update
 	sudo apt-get install -y python-pip
@@ -41,6 +50,12 @@ if [[ -z $(php -m | grep mcrypt) ]]; then
 fi
 
 
+#removing the configuration files for nginx php php-fpm  and replacing with the ones from github
+sudo cp /home/ubuntu/pongo/pongo-config/default /etc/nginx/sites-available/
+sudo cp /home/ubuntu/pongo/pongo-config/nginx.conf /etc/nginx/
+sudo cp /home/ubuntu/pongo/pongo-config/php.ini /etc/php5/fpm/
+sudo cp /home/ubuntu/pongo/pongo-config/www.conf /etc/php5/fpm/pool.d
+
 #creating a folder in /usr/share/nginx/html and cloning predictry from github
 
 if [ ! -e "/usr/share/nginx/html/www" ] ; then
@@ -48,12 +63,6 @@ if [ ! -e "/usr/share/nginx/html/www" ] ; then
 
 fi
 
-
-#removing the configuration files for nginx php php-fpm  and replacing with the ones from github
-sudo cp /home/ubuntu/pongo/pongo-config/default /etc/nginx/sites-available/
-sudo cp /home/ubuntu/pongo/pongo-config/nginx.conf /etc/nginx/
-sudo cp /home/ubuntu/pongo/pongo-config/php.ini /etc/php5/fpm/
-sudo cp /home/ubuntu/pongo/pongo-config/www.conf /etc/php5/fpm/pool.d
 
 #removing the aws folder sudo rm -R /home/ubuntu/aws
 sudo rm -R /home/ubuntu/pongo/
