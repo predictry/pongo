@@ -2,7 +2,7 @@
     "variables": {
         "aws_access_key": "",
         "aws_secret_key": "",
-	"WORKSPACE":""
+	"WORKSPACE":"{{env `WORKSPACE`}}"
     },
     "builders": [
         {
@@ -24,7 +24,7 @@
         },
         {
             "type": "file",
-            "source": "{{env `WORKSPACE`}}/",
+            "source": "{{user `WORKSPACE`}}/",
             "destination": "/home/ubuntu/pongo"
         },
         {
