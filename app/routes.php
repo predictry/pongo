@@ -184,7 +184,7 @@ Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), f
 
 /*
   |--------------------------------------------------------------------------
-  | API Routing
+  | API Routinglocal
   |--------------------------------------------------------------------------
  */
 Route::group(array('prefix' => 'v1', 'namespace' => 'App\Controllers\Api'), function() {
@@ -233,5 +233,12 @@ Route::group(array('prefix' => 'api/v2', 'namespace' => 'App\Controllers\Api'), 
     Route::resource('carts', 'CartController', array("only" => array("store")));
     Route::resource('cartlog', 'CartLogController', array("only" => array("store")));
     Route::resource('widget', 'WidgetInstanceController', array("only" => array("store")));
+
+    //@TODO - Create route to fetch recent actions by site
+    /**
+     * api/v2/tenant/{tenant_id}/actions
+     */
+    Route::resource('tenant', 'TenantController');
+    Route::resource('tenant.actions', 'TenantActionController', array("only" => array("index")));
 });
 
