@@ -38,9 +38,7 @@ class TenantActionController extends ApiBaseController
         if ($validator->passes()) {
 
             $actions          = Site::find($this->site_id)->actions();
-            $action_instances = ActionInstance::whereIn("action_id", $actions->get(['id'])->lists("id"))->orderBy('id', 'DESC')->limit(1)->get(['id', 'action_id', 'item_id']);
-
-            //@TODO Get Action Information
+            $action_instances = ActionInstance::whereIn("action_id", $actions->get(['id'])->lists("id"))->orderBy('id', 'DESC')->limit(10)->get(['id', 'action_id', 'item_id']);
 
             $action_instance_metas = [];
 
