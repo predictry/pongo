@@ -38,25 +38,24 @@ class TenantActionController extends ApiBaseController
         if ($validator->passes()) {
 
             $actions          = Site::find($this->site_id)->actions();
-            $action_instances = ActionInstance::whereIn("action_id", $actions->get(['id'])->lists("id"))->orderBy('id', 'DESC')->limit(10)->get(['id', 'action_id', 'item_id']);
+            $action_instances = ActionInstance::whereIn("action_id", $actions->get(['id'])->lists("id"))->orderBy('id', 'DESC')->limit(10)->get(['id', 'action_id', 'item_id', 'created']);
 
             $action_instance_metas = [];
 
             foreach ($action_instances as $action_instance) {
 
-
-                $action = $action_instance->action()->first();
-
+                $action               = $action_instance->action()->first();
                 $action_instance_meta = $action_instance->action_instance_metas();
                 $item                 = Item::find($action_instance->item_id);
 
                 array_push($action_instance_metas, [
-                    'action'            => trim($action->name),
-                    'action_properties' => $action_instance_meta->get(['key', 'value'])->toArray(),
+                    'action'            => ($action) ? trim($action->name) : '',
+                    'action_properties' => ($action_instance_meta) ? $action_instance_meta->get(['key', 'value'])->toArray() : [],
                     'action_item'       => ($item) ? [
-                        'name'       => $item->name,
-                        'created_at' => $item->created_at
-                            ] : []
+                        'name'  => $item->name,
+                        'metas' => $item->item_metas()->get(['key', 'value'])->toArray()
+                            ] : [],
+                    'dt_created'        => ($action_instance) ? $action_instance->created : ''
                 ]);
             }
 
