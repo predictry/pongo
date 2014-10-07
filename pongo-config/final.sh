@@ -3,17 +3,15 @@
 
 packer build  -var $aws_access_key -var $aws_secret_key EC2_MAIN_SERVER.json  >image_id.txt
 ami=$(tail -n 1 image_id.txt | grep -E -o 'ami-.{8}')
--rm $WORKSPACE/pongo-config/image_id.txt
+rm $WORKSPACE/pongo-config/image_id.txt
 
 if [ ! -z "$ami" ]; then
 	
-	#The below command will return  the name of the most updated launch-configuration
-	current_launch_configuration=$(aws cloudformation describe-stack-resources --stack-name "update-pongo" | grep -E -o 'update-pongo-PongoLaunchConfiguration-.+"' | grep -E -o '.+[^\"]')
+current_launch_configuration=$(aws cloudformation describe-stack-resources --stack-name "update-pongo" | grep -E -o 'update-pongo-PongoLaunchConfiguration-.+"' | grep -E -o '.+[^\"]')
 
 
-	#The below command will return the id of the most resent pongo-image
-	old_ami_id=$(aws autoscaling describe-launch-configurations --launch-configuration-names $current_launch_configuration | grep -E -o 'ami-.+[^\"]' | grep -E -$
-
+#The below command will return the id of the most resent pongo-image
+old_ami_id=$(aws autoscaling describe-launch-configurations --launch-configuration-names $current_launch_configuration | grep -E -o 'ami-.+[^\"]' | grep -E -o '.+[^\, | ^\"]')
 
 
 	#updating the template
