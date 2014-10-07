@@ -28,18 +28,22 @@ old_ami_id=$(aws autoscaling describe-launch-configurations --launch-configurati
 
 			#The below command will delete  the old image after the updating process finished
 			aws ec2 deregister-image --image-id $old_ami_id
-
-
+				
+			echo $old_ami_id
+				
 			#The below command will get the ID of the snapshop from the old image
 			snapshot_id=$(aws ec2 describe-snapshots | grep -E -o -A 10 "$old_ami_id.*" | grep -E -o 'snap-\S{8}')
+				
+			echo $snapshot_id
 
 			#The bellow command will delete the the old snapshop
 			aws ec2 delete-snapshot --snapshot-id $snapshot_id
 
+			
 
 	break
 					else
-						echo 'Not Updates Yet'
+						echo 'Updating is in process'
 
 					 	counter=$(($counter + 1))
 						echo $counter
@@ -54,9 +58,6 @@ old_ami_id=$(aws autoscaling describe-launch-configurations --launch-configurati
 	done
 
 
-unset $current_launch_configuration
-unset $old_ami_id
-unset $snapshot_id
 
 
 else
