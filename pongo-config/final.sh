@@ -15,7 +15,7 @@ old_ami_id=$(aws autoscaling describe-launch-configurations --launch-configurati
 
 
 	#updating the template
-	 aws cloudformation update-stack --stack-name update-pongo --template-body file://cloud.json --parameters  ParameterKey=Instanceid,ParameterValue=$ami;then
+	 aws cloudformation update-stack --stack-name update-pongo --template-body file://cloud.json --parameters  ParameterKey=Instanceid,ParameterValue=$ami
 			
 
 	counter=1
