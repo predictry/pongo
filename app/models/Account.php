@@ -34,9 +34,10 @@ class Account extends Eloquent implements UserInterface, RemindableInterface
     protected $guarded = array('id');
     static $rules      = array(
         'name'                  => 'required',
+        'email'                 => 'required|email|unique:accounts',
         'password'              => 'required|min:8|confirmed',
         'password_confirmation' => 'required|min:8',
-        'email'                 => 'required|email|unique:accounts'
+        'plan_id'               => 'required|exists:plans,id'
     );
 
     public function setPasswordAttribute($password)

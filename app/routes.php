@@ -227,6 +227,9 @@ Route::group(array('prefix' => 'api/v1', 'namespace' => 'App\Controllers\Api'), 
 });
 
 Route::group(array('prefix' => 'api/v2', 'namespace' => 'App\Controllers\Api'), function() {
+    /**
+     * Predictry Data End Points
+     */
     Route::resource('actions', 'Action2Controller', array("only" => array("index", "store", "show", "destroy")));
     Route::resource('recommendation', 'Recommendation2Controller', array("only" => array("index")));
     Route::resource('item', 'ItemController', array("only" => array("store")));
@@ -234,11 +237,37 @@ Route::group(array('prefix' => 'api/v2', 'namespace' => 'App\Controllers\Api'), 
     Route::resource('cartlog', 'CartLogController', array("only" => array("store")));
     Route::resource('widget', 'WidgetInstanceController', array("only" => array("store")));
 
-    //@TODO - Create route to fetch recent actions by site
     /**
      * api/v2/tenant/{tenant_id}/actions
      */
     Route::resource('tenant', 'TenantController');
     Route::resource('tenant.actions', 'TenantActionController', array("only" => array("index")));
-});
 
+    /**
+     * POST - api/v2/user (create new user)
+     * POST - api/v2/user/{email} {get information of the user}
+     */
+    Route::resource('account', 'AccountController', array("only" => array("store", "show")));
+
+    /**
+     * POST - {prefix}/auth (store)
+     */
+    Route::resource('auth', 'AuthController', ['only' => ['index', 'store']]);
+
+    /**
+     * UNUSED
+     * AUTH FLOW : CLIENT CREDENTIALS
+     * POST - api/v2/auth
+     * @param string $email
+     * @param string password
+     */
+    Route::post('auth', 'AuthController@postAuth');
+
+    Route::group(array('before' => ''), function() {
+        Route::post('oauth/access_token', 'OAuthController@postAuthAccessToken');
+    });
+
+    Route::group(array('before' => 'check-authorization-params|auth'), function() {
+        Route::post('oauth/authorize', 'OAuthController@postAuthorize');
+    });
+});
