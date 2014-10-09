@@ -32,7 +32,7 @@ old_ami_id=$(aws autoscaling describe-launch-configurations --launch-configurati
 			echo $old_ami_id
 				
 			#The below command will get the ID of the snapshop from the old image
-			snapshot_id=$(aws ec2 describe-snapshots | grep -E -o -A 10 "$old_ami_id.*" | grep -E -o 'snap-\S{8}')
+			snapshot_id=$(aws ec2 describe-snapshots | grep -E -A 10 "$old_ami_id.*" | grep -E -o 'snap-\S{8}')
 				
 			echo $snapshot_id
 
