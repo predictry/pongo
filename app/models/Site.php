@@ -35,6 +35,11 @@ class Site extends \Eloquent
         return $this->hasMany("App\Models\Action");
     }
 
+    public function members()
+    {
+        return $this->hasMany("Member");
+    }
+
 }
 
 /* End of file Site.php */
