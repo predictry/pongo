@@ -8,4 +8,4 @@
 ?>
 @include('frontend.partials.header',  array('styles' => array(HTML::style('assets/css/layout.css'))))
 @yield('content')
-@include('frontend.partials.footer')
+@include('frontend.partials.lightfooter')
