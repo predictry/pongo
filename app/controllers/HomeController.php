@@ -11,15 +11,22 @@
 namespace App\Controllers;
 
 use App,
+    App\Models\Account,
+    App\Models\Site,
     Auth,
     Carbon\Carbon,
-    Config,
     DateTime,
+    DB,
     Event,
     Hash,
     Input,
+    Lang,
+    Log,
     Password,
     Redirect,
+    Response,
+    Session,
+    Str,
     Validator,
     View;
 
@@ -98,10 +105,14 @@ class HomeController extends BaseController
                     //validate if member or not
                     $is_member = $this->account_repository->isMember();
                     if (!$is_member)
-                        \Session::set("role", "admin");
+                        Session::set("role", "admin");
 
                     return Redirect::to('home');
                 }
+
+                $queries = DB::getQueryLog();
+                Log::info(json_encode(end($queries)));
+
 
                 $flash_error = 'error.login.failed';
             }
@@ -122,7 +133,17 @@ class HomeController extends BaseController
     public function getRegister()
     {
         $this->siteInfo['pageTitle'] = "signup.now";
-        return View::make('frontend.common.register');
+
+        $site_categories = \App\Models\SiteCategory::orderBy('id', 'ASC')->get()->lists("name", "id");
+        $plans           = \App\Models\Plan::orderBy('id', 'ASC')->get()->lists("name", "id");
+
+        $output = [
+            'site_categories'           => $site_categories,
+            'plans'                     => $plans,
+            'selected_site_category_id' => 1,
+            'selected_plan_id'          => 4
+        ];
+        return View::make('frontend.common.register', $output);
     }
 
     /**
@@ -132,19 +153,34 @@ class HomeController extends BaseController
      */
     public function postRegister()
     {
-        $input     = Input::only("name", "email", "password", "password_confirmation");
-        $validator = $this->account_repository->validate($input);
+        $rules = array_add(Account::$rules, 'site_url', 'required|unique:sites,url');
+
+        $validator = $this->account_repository->validate(Input::all(), $rules);
 
         if ($validator->passes()) {
-            // add necessary info for new account
-            $input = array_add($input, 'plan_id', 1);
-            $input = array_add($input, "confirmed", 1);
-            $input = array_add($input, "confirmation_code", md5(microtime() . Config::get('app.key')));
-            unset($input['password_confirmation']);   //we don't need password confirmation on account attributes
+            $input   = Input::all();
+            $account = new Account();
 
-            $account = $this->account_repository->newInstance($input); //create new instance
-            if ($this->account_repository->saveAccount($account))
+            $account->name     = $input['name'];
+            $account->email    = $input['email'];
+            $account->password = $input['password'];
+            $account->plan_id  = $input['plan_id'];
+            $this->account_repository->assignConfirmation($account);
+
+            if ($this->account_repository->saveAccount($account)) {
                 Event::fire("account.registration_confirmed", $account);  //send verification email (skip to confirmation)
+
+                $site             = new Site();
+                $site->name       = Str::random(6);
+                $site->api_key    = md5($input['site_url']);
+                $site->api_secret = md5($input['site_url'] . uniqid(mt_rand(), true));
+                $site->account_id = $account->id;
+                $site->url        = $input['site_url'];
+                $site->save();
+
+                Event::fire("site.set_default_actions", [$site]);
+                Event::fire("site.set_default_funnel_preferences", [$site]);
+            }
             else
                 return Redirect::to('register')->withInput()->withErrors("We are unable to process the data. Please try again.");
 
@@ -191,10 +227,10 @@ class HomeController extends BaseController
                         });
                 switch ($response) {
                     case Password::INVALID_USER:
-                        return Redirect::back()->with('flash_message', \Lang::get($response));
+                        return Redirect::back()->with('flash_message', Lang::get($response));
 
                     case Password::REMINDER_SENT:
-                        return Redirect::back()->with('flash_message', \Lang::get($response));
+                        return Redirect::back()->with('flash_message', Lang::get($response));
                 }
             }
         }
@@ -238,12 +274,14 @@ class HomeController extends BaseController
         if ($validator->passes()) {
             $response = Password::reset($credentials, function($user, $password) {
                         $user->password = Hash::make($password);
-                        $user->save();
+                        $user->update();
                     });
 
             switch ($response) {
                 case Password::INVALID_PASSWORD:
+                    return Redirect::to('forgot')->with('flash_error', "Invalid Password");
                 case Password::INVALID_TOKEN:
+                    return Redirect::to('forgot')->with('flash_error', "Invalid Token");
                 case Password::INVALID_USER:
                     return Redirect::back()->with('flash_error', Lang::get($response));
                 case Password::PASSWORD_RESET:
