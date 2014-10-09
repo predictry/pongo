@@ -30,7 +30,7 @@
                 "Tags": [
                     {
                         "Key": "Name",
-                        "Value": "tapirus-autoscaling-g0",
+                        "Value": "Pongo-Autoscaling-instance",
                         "PropagateAtLaunch": true
                     }
                 ]
