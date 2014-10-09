@@ -26,6 +26,13 @@
                 },
                 "LoadBalancerNames": [
                     "sg-load-balancer"
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "tapirus-autoscaling-g0",
+                        "PropagateAtLaunch": true
+                    }
                 ]
             },
             "UpdatePolicy": {
