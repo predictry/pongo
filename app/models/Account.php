@@ -85,6 +85,11 @@ class Account extends Eloquent implements UserInterface, RemindableInterface
         $this->remember_token = $value;
     }
 
+    public function metas()
+    {
+        return $this->hasMany("App\Models\AccountMeta");
+    }
+
 }
 
 /* End of file Account.php */
