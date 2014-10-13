@@ -13,18 +13,18 @@ namespace App\Models;
 class ActionMeta extends \Eloquent
 {
 
-	/**
-	 * The database table used by the model.
-	 *
-	 * @var string
-	 */
-	public $timestamps	 = false;
-	protected $table	 = 'action_metas';
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    public $timestamps = false;
+    protected $table   = 'action_metas';
 
-	public function action()
-	{
-		return $this->hasMany("App\Models\Action", "action_id");
-	}
+    public function action()
+    {
+        return $this->hasMany("App\Models\Action", "action_id");
+    }
 
 }
 

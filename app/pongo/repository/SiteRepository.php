@@ -19,15 +19,14 @@ use App\Models\Account,
 class SiteRepository
 {
 
-    public function createNewSite($site_name, $site_url)
+    public function createNewSite($account_id, $site_name, $site_url)
     {
-        return \App\Models\Site::firstOrCreate([
-                    'account_id', \Auth::user()->id,
-                    'name'       => $site_name,
-                    'url'        => $site_url,
-                    'api_key'    => $site_url,
-                    'api_secret' => $site_url
-        ]);
+        $site             = new \App\Models\Site();
+        $site->name       = $site_name;
+        $site->url        = $site->api_key    = $site->api_secret = $site_url;
+        $site->account_id = $account_id;
+        $site->save();
+        return $site;
     }
 
     public function createDefaultActions($site_id)
