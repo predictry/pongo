@@ -10,22 +10,21 @@
 
 namespace App\Controllers;
 
-use App,
-    App\Models\Account,
-    App\Models\Site,
+use App\Models\Account,
+    App\Models\Plan,
+    App\Models\SiteCategory,
+    App\Pongo\Repository\AccountRepository,
+    App\Pongo\Repository\SiteRepository,
     Auth,
     Carbon\Carbon,
     DateTime,
-    DB,
     Event,
-    Hash,
     Input,
     Lang,
     Log,
     Password,
     Redirect,
     Response,
-    Session,
     Str,
     Validator,
     View;
@@ -36,7 +35,7 @@ class HomeController extends BaseController
     protected $layout = 'frontend.layouts.basic';
     protected $account_repository;
 
-    public function __construct(App\Pongo\Repository\AccountRepository $account_repository)
+    public function __construct(AccountRepository $account_repository)
     {
         parent::__construct();
         $this->account_repository = $account_repository;
@@ -98,21 +97,24 @@ class HomeController extends BaseController
         $flash_error = '';
 
         if ($validator->passes()) {
-            $account = \App\Models\Account::where("email", $input['email'])->get()->first();
+
+            $account = Account::where("email", $input['email'])->get()->first();
 
             if ($account) {
+
                 if (Auth::attempt(array('email' => $input['email'], 'password' => $input['password']), ($input['remember']))) {
 
                     if (!$account->confirmed) {
+                        Auth::logout();
                         $flash_error = 'error.account.have.not.confirmed';
-                        \Auth::logout();
                         return Redirect::to('login')->with('flash_error', $flash_error)->withInput();
                     }
 
-                    //validate if member or not
+                    \Session::set('is_new_account', ($this->account_repository->isNewAccount()) ? true : false);
+
                     $is_member = $this->account_repository->isMember();
-                    if (!$is_member)
-                        Session::set("role", "admin");
+                    if (!$is_member) //validate if member or not
+                        \Session::set("role", "admin");
 
                     return Redirect::to('home');
                 }
@@ -137,8 +139,8 @@ class HomeController extends BaseController
     {
         $this->siteInfo['pageTitle'] = "signup.now";
 
-        $site_categories = \App\Models\SiteCategory::orderBy('id', 'ASC')->get()->lists("name", "id");
-        $plans           = \App\Models\Plan::orderBy('id', 'ASC')->get()->lists("name", "id");
+        $site_categories = SiteCategory::orderBy('id', 'ASC')->get()->lists("name", "id");
+        $plans           = Plan::orderBy('id', 'ASC')->get()->lists("name", "id");
 
         $output = [
             'site_categories'           => $site_categories,
@@ -157,7 +159,7 @@ class HomeController extends BaseController
     public function postRegister()
     {
         $rules           = array_add(Account::$rules, 'site_url', 'required|unique:sites,url');
-        $site_repository = new \App\Pongo\Repository\SiteRepository();
+        $site_repository = new SiteRepository();
         $validator       = $this->account_repository->validate(Input::all(), $rules);
 
         if ($validator->passes()) {
@@ -174,7 +176,6 @@ class HomeController extends BaseController
 
                 $site_name = Str::random(6); //tenant_id
                 $site      = $site_repository->createNewSite($account->id, $site_name, $input['site_url']);
-                \Log::info($site_name);
                 Event::fire("account.registered", $account);  //send verification email
                 Event::fire("site.set_default_actions", [$site]);
                 Event::fire("site.set_default_funnel_preferences", [$site]);
@@ -216,7 +217,7 @@ class HomeController extends BaseController
 
         $validator = Validator::make($input, $rules);
         if ($validator->passes()) {
-            $user_id = \App\Models\Account::where("email", $input['email'])->get(array('id'))->first();
+            $user_id = Account::where("email", $input['email'])->get(array('id'))->first();
             if (!$user_id)
                 return Redirect::to('forgot')->with('flash_error', "error.email.doesnt.exists");
             else {
@@ -271,7 +272,7 @@ class HomeController extends BaseController
 
         if ($validator->passes()) {
             $response = Password::reset($credentials, function($user, $password) {
-                        $user->password = Hash::make($password);
+                        $user->password = $password;
                         $user->update();
                     });
 
