@@ -1,6 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Log,
+use App\Models\AccountMeta,
+    Illuminate\Support\Facades\Log,
     Illuminate\Support\Facades\Mail;
 
 /**
@@ -33,8 +34,18 @@ class AccountEventHandler
         Log::info('account.registration_confirmed fired');
         $email_data = array("fullname" => ucwords($account->name));
         Mail::send('emails.auth.accountconfirmation', $email_data, function($message) use ($account) {
+
             $message->to($account->email, ucwords($account->name))->subject('Welcome on board!');
+
+            //Create is_new_account meta
+            AccountMeta::firstOrCreate([
+                'account_id' => $account->id,
+                'key'        => 'is_new_account',
+                'value'      => true
+            ]);
         });
+
+        $this->testFunction();
     }
 
 }

@@ -3,6 +3,7 @@
 namespace App\Pongo\Repository;
 
 use App\Models\Account,
+    App\Models\AccountMeta,
     App\Models\Member,
     App\Models\Site,
     App\Models\SiteMember,
@@ -101,6 +102,17 @@ class AccountRepository
         if (is_object($account)) {
             $account->confirmation_code = md5(microtime() . Config::get('app.key'));
             return $account;
+        }
+
+        return false;
+    }
+
+    public function isNewAccount()
+    {
+        $account_meta = AccountMeta::where('account_id', \Auth::user()->id)->where('key', 'is_new_account')->first();
+
+        if ($account_meta && $account_meta->value) {
+            return true;
         }
 
         return false;

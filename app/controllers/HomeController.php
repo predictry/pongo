@@ -102,6 +102,13 @@ class HomeController extends BaseController
 
             if ($account) {
                 if (Auth::attempt(array('email' => $input['email'], 'password' => $input['password']), ($input['remember']))) {
+
+                    if (!$account->confirmed) {
+                        $flash_error = 'error.account.have.not.confirmed';
+                        \Auth::logout();
+                        return Redirect::to('login')->with('flash_error', $flash_error)->withInput();
+                    }
+
                     //validate if member or not
                     $is_member = $this->account_repository->isMember();
                     if (!$is_member)
@@ -109,10 +116,6 @@ class HomeController extends BaseController
 
                     return Redirect::to('home');
                 }
-
-                $queries = DB::getQueryLog();
-                Log::info(json_encode(end($queries)));
-
 
                 $flash_error = 'error.login.failed';
             }
@@ -153,9 +156,9 @@ class HomeController extends BaseController
      */
     public function postRegister()
     {
-        $rules = array_add(Account::$rules, 'site_url', 'required|unique:sites,url');
-
-        $validator = $this->account_repository->validate(Input::all(), $rules);
+        $rules           = array_add(Account::$rules, 'site_url', 'required|unique:sites,url');
+        $site_repository = new \App\Pongo\Repository\SiteRepository();
+        $validator       = $this->account_repository->validate(Input::all(), $rules);
 
         if ($validator->passes()) {
             $input   = Input::all();
@@ -168,16 +171,11 @@ class HomeController extends BaseController
             $this->account_repository->assignConfirmation($account);
 
             if ($this->account_repository->saveAccount($account)) {
-                Event::fire("account.registration_confirmed", $account);  //send verification email (skip to confirmation)
 
-                $site             = new Site();
-                $site->name       = Str::random(6);
-                $site->api_key    = md5($input['site_url']);
-                $site->api_secret = md5($input['site_url'] . uniqid(mt_rand(), true));
-                $site->account_id = $account->id;
-                $site->url        = $input['site_url'];
-                $site->save();
-
+                $site_name = Str::random(6); //tenant_id
+                $site      = $site_repository->createNewSite($account->id, $site_name, $input['site_url']);
+                \Log::info($site_name);
+                Event::fire("account.registered", $account);  //send verification email
                 Event::fire("site.set_default_actions", [$site]);
                 Event::fire("site.set_default_funnel_preferences", [$site]);
             }
@@ -291,6 +289,23 @@ class HomeController extends BaseController
 
         $token = Input::get('token');
         return Redirect::to('reset/' . $token)->withInput()->withErrors($validator);
+    }
+
+    public function getConfirmation($confirmation_token = null)
+    {
+        if (is_null($confirmation_token))
+            App::abort(404);
+
+        $account = Account::where('confirmation_code', $confirmation_token)->first();
+
+        if ($account) {
+            $account->confirmed = 1;
+            $account->update();
+            Event::fire("account.registration_confirmed", $account);  //send confirmation email
+            return Redirect::to('login')->with('flash_message', "success.confirmation.correct");
+        }
+
+        return Redirect::to('/');
     }
 
 }

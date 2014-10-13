@@ -40,6 +40,16 @@ class Site extends \Eloquent
         return $this->hasMany("Member");
     }
 
+    public function setApiKeyAttribute($value)
+    {
+        $this->attributes['api_key'] = md5($value);
+    }
+
+    public function setApiSecretAttribute($value)
+    {
+        $this->attributes['api_secret'] = md5($value . uniqid(mt_rand(), true));
+    }
+
 }
 
 /* End of file Site.php */

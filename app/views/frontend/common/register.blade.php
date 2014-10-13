@@ -37,14 +37,14 @@
                 </div>
             </div>
             <div class="form-group {{$var = $errors->first('site_url')}} {{ ($var !== '') ? 'has-error' : ''}}">
-                <?php echo Form::text('site_url', '', array('class' => 'form-control', 'placeholder' => Lang::get("fields.site.url"), 'id' => 'site_url', "tabindex" => 6)); ?>
+                <?php echo Form::text('site_url', '', array('class' => 'form-control', 'placeholder' => Lang::get("fields.site.url"), 'id' => 'site_url', "tabindex" => 5)); ?>
 
                 <span class="help-block">{{$errors->first('site_url')}}</span>
             </div>
             <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-6">
                     <div class="form-group {{$var = $errors->first('site_category_id')}} {{ ($var !== '') ? 'has-error' : ''}}">
-                        <?php echo Form::select('site_category_id', $site_categories, $selected_site_category_id, ['class' => 'form-control', 'id' => 'site_category_id', "tabindex" => 5]) ?>
+                        <?php echo Form::select('site_category_id', $site_categories, $selected_site_category_id, ['class' => 'form-control', 'id' => 'site_category_id', "tabindex" => 6]) ?>
                         <span class="help-block">{{$errors->first('site_category_id')}}</span>
                     </div>
                 </div>
@@ -58,7 +58,7 @@
 
             <div class="row">
                 <div class="col-xs-12 col-md-12">
-                    <?php echo Form::submit(Lang::get("fields.submit"), array('class' => 'btn btn-lg btn-primary btn-block btn-lg', 'tabindex' => 4)); ?>
+                    <?php echo Form::submit(Lang::get("fields.submit"), array('class' => 'btn btn-lg btn-primary btn-block btn-lg', 'tabindex' => 8)); ?>
                 </div>
             </div>
 

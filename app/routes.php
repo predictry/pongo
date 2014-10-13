@@ -18,6 +18,7 @@
   |--------------------------------------------------------------------------
  */
 Route::pattern('token', '[A-Za-z0-9]+');
+Route::pattern('confirmation_code', '[A-Za-z0-9]+');
 Route::pattern('type', '[A-Za-z0-9_]+');
 Route::pattern('bar_type', '[A-Za-z0-9]+');
 Route::pattern('date_unit', '[A-Za-z0-9]+');
@@ -48,9 +49,10 @@ Route::group(array('namespace' => 'App\Controllers'), function() {
     Route::get('reset/{token}', 'HomeController@getReset');
     Route::post('reset/submit', 'HomeController@postReset');
 
-    Route::get('datamigration', 'RedmartMigrationController@index');
+    Route::get('verify/{confirmation_code}', 'HomeController@getConfirmation');
 
-    Route::get('tokenauth', 'TokenAuthenticationController@index');
+//    Route::get('datamigration', 'RedmartMigrationController@index');
+//    Route::get('tokenauth', 'TokenAuthenticationController@index');
 });
 
 /*
