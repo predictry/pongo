@@ -69,7 +69,9 @@ class Recommendation2Controller extends ApiBaseController
         $input     = Input::only("item_id", "user_id", "session_id", "widget_id");
         $response  = $reco_data = array();
 
-        if (isset($input['widget_id'])) {
+        $validator = \Validator::make($input, ['widget_id' => 'required|exists:widgets,id']);
+
+        if ($validator->passes()) {
             $reco_data = $this->repository->populateRecoData($this->site_id, $input);
 
             if (!isset($reco_data['error'])) {
