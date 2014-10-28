@@ -106,7 +106,7 @@ class HomeController extends BaseController
 
                     if (!$account->confirmed) {
                         Auth::logout();
-                        $flash_error = 'error.account.have.not.confirmed';
+                        $flash_error = \Lang::get("home.error.account.have.not.confirmed");
                         return Redirect::to('login')->with('flash_error', $flash_error)->withInput();
                     }
 
@@ -119,10 +119,10 @@ class HomeController extends BaseController
                     return Redirect::to('home');
                 }
 
-                $flash_error = 'error.login.failed';
+                $flash_error = \Lang::get("home.error.login.failed");
             }
             else
-                $flash_error = "error.email.doesnt.exists";
+                $flash_error = \Lang::get("home.error.email.doesnt.exists");
 
             return Redirect::to('login')->with('flash_error', $flash_error)->withInput();
         }
@@ -183,7 +183,7 @@ class HomeController extends BaseController
             else
                 return Redirect::to('register')->withInput()->withErrors("We are unable to process the data. Please try again.");
 
-            return Redirect::to('login')->with('flash_message', "home.success.register");
+            return Redirect::to('login')->with('flash_message', \Lang::get('home.success.register'));
         }
         else {
             return Redirect::to('register')->withInput()->withErrors($validator);
