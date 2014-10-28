@@ -18,6 +18,7 @@ class ActionMeta extends \Eloquent
      *
      * @var string
      */
+    protected $guarded = array("id");
     public $timestamps = false;
     protected $table   = 'action_metas';
 
