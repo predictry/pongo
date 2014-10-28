@@ -20,10 +20,10 @@ class Site extends \Eloquent
      */
     protected $table            = 'sites';
     public $manage_table_header = array(
-        "name"       => "Tenant ID",
-        "url"        => "URL Address",
-        "api_key"    => "API Key",
-        "api_secret" => "API Secret Key"
+        "name"    => "Tenant ID",
+        "url"     => "URL Address",
+        "api_key" => "API Key",
+//        "api_secret" => "API Secret Key"
     );
     public $rules               = array(
         "name" => "required|regex:/^[a-zA-Z]{1}/|alpha_num|max:32",
@@ -38,6 +38,11 @@ class Site extends \Eloquent
     public function members()
     {
         return $this->hasMany("Member");
+    }
+
+    public function siteCategory()
+    {
+        return $this->belongsTo("App\Models\SiteCategory", "site_category_id");
     }
 
     public function setApiKeyAttribute($value)
