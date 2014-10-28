@@ -13,26 +13,32 @@ namespace App\Models;
 class Widget extends \Eloquent
 {
 
-	/**
-	 * The database table used by the model.
-	 *
-	 * @var string
-	 */
-	protected $table			 = 'widgets';
-	public $rules				 = array(
-		"name" => "required|max:64"
-	);
-	public $manage_table_header	 = array(
-		"id"				 => "Widget ID",
-		"name"				 => "Name",
-		"created_at"		 => "Date Created",
-		"number_of_rulesets" => "Number of Ruleset(s)"
-	);
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    protected $table            = 'widgets';
+    public $rules               = array(
+        "name" => "required|max:64"
+    );
+    public $manage_table_header = array(
+        "id"                 => "Widget ID",
+        "name"               => "Name",
+        "created_at"         => "Date Created",
+        "number_of_rulesets" => "Number of Ruleset(s)"
+    );
 
-	public function widget_instances_and_items()
-	{
-		return $this->hasManyThrough("App\Models\WidgetInstanceItem", "App\Models\WidgetInstance");
-	}
+    public function widget_instances_and_items()
+    {
+        return $this->hasManyThrough("App\Models\WidgetInstanceItem", "App\Models\WidgetInstance");
+    }
+
+    public function widget_rule_sets()
+    {
+        return $this->hasMany('App\Models\WidgetRuleSet');
+    }
+
 }
 
 /* End of file Widget.php */
