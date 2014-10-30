@@ -12,12 +12,12 @@
  */
 
 App::before(function($request) {
-	//
+    //
 });
 
 
 App::after(function($request, $response) {
-	//
+    //
 });
 
 /*
@@ -31,17 +31,46 @@ App::after(function($request, $response) {
   |
  */
 Route::filter('auth', function() {
-	if (Auth::guest())
-		return Redirect::guest('login');
+    if (Auth::guest())
+        return Redirect::guest('login');
 });
 
 Route::filter('auth.basic', function() {
-	return Auth::basic();
+    return Auth::basic();
+});
+
+/**
+ * Filter of ajax request for data collection
+ */
+Route::filter('site.ajax', function($route) {
+
+    if (!\Request::ajax()) {
+        return Redirect::to('/');
+    }
+
+    $tenant_id = $route->parameter('tenant_id');
+
+    if (is_null($tenant_id)) {
+        return \Redirect::to('sites');
+    }
+
+    $validator = Validator::make(['name' => $tenant_id], ['name' => 'required|exists:sites,name']);
+    if ($validator->passes()) {
+        $repository = new \App\Pongo\Repository\SiteRepository();
+        $site       = $repository->isBelongToHim($tenant_id);
+        if (!$site)
+            return Redirect::to('/');
+
+        Session::set("active_site_id", $site->id);
+        Session::set("active_site_name", $site->name);
+    }
+    else
+        return Redirect::back()->withErrors($validator);
+    
 });
 
 App::missing(function($exception) {
-	return Response::view('frontend.errors.missing', array('exception' => $exception), 404);
-//	return Redirect::to('home');
+    return Response::view('frontend.errors.missing', array('exception' => $exception), 404);
 });
 
 
@@ -57,8 +86,8 @@ App::missing(function($exception) {
  */
 
 Route::filter('guest', function() {
-	if (Auth::check())
-		return Redirect::to('/');
+    if (Auth::check())
+        return Redirect::to('/');
 });
 
 /*
@@ -73,8 +102,7 @@ Route::filter('guest', function() {
  */
 
 Route::filter('csrf', function() {
-	if (Session::token() != Input::get('_token'))
-	{
-		throw new Illuminate\Session\TokenMismatchException;
-	}
+    if (Session::token() != Input::get('_token')) {
+        throw new Illuminate\Session\TokenMismatchException;
+    }
 });
