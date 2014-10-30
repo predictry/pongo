@@ -120,7 +120,7 @@ class PanelController extends BaseController
      *
      * @return Response
      */
-    public function index2($selected_comparison = "pageview", $type = "31_d_ago", $date_unit = "day", $dt_start = null, $dt_end = null)
+    public function index2($selected_comparison = "pageview", $type = "7_d_ago", $date_unit = "day", $dt_start = null, $dt_end = null)
     {
         $inputs = array(
             "type"                => $type,
@@ -135,7 +135,7 @@ class PanelController extends BaseController
             $end_of_today       = $dt_end->endOfDay();
         }
         else {
-            $dt_start     = new Carbon('31 days ago');
+            $dt_start     = new Carbon('7 days ago');
             $today        = new Carbon("today");
             $dt_end       = $end_of_today = $today->endOfDay();
         }
@@ -612,6 +612,18 @@ class PanelController extends BaseController
         return \Redirect::to('home');
     }
 
+    /**
+     * 
+     * @param carbon $dt_start
+     * @param carbon $dt_end
+     * @param array $action_ids
+     * @param array $action_names
+     * @param boolean $index
+     * @param boolean $is_recommended
+     * @param boolean $all
+     * @param boolean $result_only
+     * @return array
+     */
     function _populateDateRangeActionStats($dt_start, $dt_end, $action_ids, $action_names, $index = false, $is_recommended = false, $all = true, $result_only = false)
     {
         if (!$result_only) {
