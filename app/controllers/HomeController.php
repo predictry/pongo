@@ -110,8 +110,6 @@ class HomeController extends BaseController
                         return Redirect::to('login')->with('flash_error', $flash_error)->withInput();
                     }
 
-                    \Session::set('is_new_account', ($this->account_repository->isNewAccount()) ? true : false);
-
                     $is_member = $this->account_repository->isMember();
                     if (!$is_member) //validate if member or not
                         \Session::set("role", "admin");
