@@ -27,6 +27,10 @@ Route::pattern('dt_start', '^([0-9]{4})-([0-9]{2})-([0-9]{2})$');
 Route::pattern('dt_end', '^([0-9]{4})-([0-9]{2})-([0-9]{2})$');
 Route::pattern('numeric', '[0-9]+');
 
+#Sites
+Route::pattern('tenant_id', '[A-Za-z]+');
+Route::pattern('action_name', '[A-Za-z0-9_]+');
+
 /*
   |--------------------------------------------------------------------------
   | Frontend Routes
@@ -63,12 +67,13 @@ Route::group(array('namespace' => 'App\Controllers'), function() {
 //Route::group(array('domain' => 'dashboard.{domain}', 'before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
 Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
 
+
     #Dashboard
     $role = Session::get("role");
 
     Route::get('user', 'UserController@getDashboard');
     Route::get('home2', array('as' => 'home2', 'uses' => 'PanelController@index'));
-//	Route::get('home2/{selected_comparison?}/{type?}/{bar_type?}/{type_by?}/{dt_start?}/{dt_end?}', array('as' => 'home2', 'uses' => 'PanelController@index2'));
+//  Route::get('home2/{selected_comparison?}/{type?}/{bar_type?}/{type_by?}/{dt_start?}/{dt_end?}', array('as' => 'home2', 'uses' => 'PanelController@index2'));
     Route::get('home/{selected_comparison?}/{type?}/{date_unit?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'PanelController@index2'));
     Route::get('sites/wizard', array('as' => 'sites', 'uses' => 'SitesController@getSiteWizard'));
     Route::get('sites/getModal', array('as' => 'sites', 'uses' => 'SitesController@getModalCreate'));
@@ -77,11 +82,14 @@ Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), f
     #Panel
     Route::post('panel/ajaxGraphComparison', array('as' => 'panel.ajaxGraphComparison', 'uses' => 'AjaxPanelController@comparisonGraph'));
 
-
     #Update Profile
     Route::get('profile', 'UserController@getProfile');
     Route::post('user/profile/submit', 'UserController@postProfile');
     Route::get('user/profile', array('as' => 'profile', 'uses' => 'UserController@getProfile'));
+
+    #Update Business
+    Route::get('sites/{name}/business', 'SitesController@getBusiness');
+    Route::post('sites/{name}/business/submit', 'SitesController@postBusiness');
 
     #Update Password
     Route::get('password', 'UserController@getPassword');
@@ -180,17 +188,28 @@ Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), f
         Route::get('filters/{numeric}/delete', 'FiltersController@getDelete');
         Route::post('filters/{numeric}/delete', 'FiltersController@postDelete');
     }
-    #logout
+
+    # Data Collections
+    Route::get("sites/{tenant_id}/integration", "SitesController@getImplementationWizard");
+    Route::get("sites/{tenant_id}/data_collection", "SitesController@getDataCollection");
+    Route::group(array('before' => 'site.ajax'), function() {
+        Route::get("sites/{tenant_id}/actions/{action_name}/properties", "SitesController@ajaxGetActionProperties");
+        Route::get("sites/{tenant_id}/actions/{action_name}/snipped", "SitesController@ajaxGetActionSnipped");
+        Route::get("sites/{tenant_id}/actions/{action_name}/validate", "SitesController@ajaxGetCheckIfActionImplemented");
+        Route::post("sites/{tenant_id}/integration/submit", "SitesController@ajaxPostImplementationWizard");
+    });
+
+    #Logout
     Route::get('user/logout', 'UserController@logout');
 });
 
 /*
   |--------------------------------------------------------------------------
-  | API Routinglocal
+  | API Routing local
   |--------------------------------------------------------------------------
  */
 Route::group(array('prefix' => 'v1', 'namespace' => 'App\Controllers\Api'), function() {
-    //	 Allow from any origin
+    //   Allow from any origin
     if (isset($_SERVER['HTTP_ORIGIN'])) {
         header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
         header('Access-Control-Allow-Credentials: true');
@@ -215,7 +234,7 @@ Route::group(array('prefix' => 'v1', 'namespace' => 'App\Controllers\Api'), func
 
 /*
   |--------------------------------------------------------------------------
-  | API Routing (can be removed later, testing purpose only)
+  | API Routing (V1)
   |--------------------------------------------------------------------------
  */
 Route::group(array('prefix' => 'api/v1', 'namespace' => 'App\Controllers\Api'), function() {
@@ -228,16 +247,21 @@ Route::group(array('prefix' => 'api/v1', 'namespace' => 'App\Controllers\Api'), 
     Route::resource('widget', 'WidgetInstanceController', array("only" => array("store")));
 });
 
+/*
+  |--------------------------------------------------------------------------
+  | API Routing (V2)
+  |--------------------------------------------------------------------------
+ */
 Route::group(array('prefix' => 'api/v2', 'namespace' => 'App\Controllers\Api'), function() {
     /**
      * Predictry Data End Points
      */
     Route::resource('actions', 'Action2Controller', array("only" => array("index", "store", "show", "destroy")));
-    Route::resource('recommendation', 'Recommendation2Controller', array("only" => array("index")));
-    Route::resource('item', 'ItemController', array("only" => array("store")));
+    Route::resource('recommendations', 'Recommendation2Controller', array("only" => array("index")));
+    Route::resource('items', 'ItemController', array("only" => array("store")));
     Route::resource('carts', 'CartController', array("only" => array("store")));
-    Route::resource('cartlog', 'CartLogController', array("only" => array("store")));
-    Route::resource('widget', 'WidgetInstanceController', array("only" => array("store")));
+    Route::resource('cartlogs', 'CartLogController', array("only" => array("store")));
+    Route::resource('widgets', 'WidgetInstanceController', array("only" => array("store")));
 
     /**
      * api/v2/tenant/{tenant_id}/actions
