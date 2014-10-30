@@ -1074,11 +1074,12 @@ jQuery(document).ready(function () {
      */
     $('#reportrange').daterangepicker({
         ranges: {
+            '7 Days Ago': [moment().subtract('days', 7), moment()],
             '31 Days Ago': [moment().subtract('days', 31), moment()],
             '36 Weeks Ago': [moment().subtract('weeks', 36), moment()],
             '12 Months Ago': [moment().subtract('months', 12), moment()]
         },
-        startDate: moment().subtract('days', 31),
+        startDate: moment().subtract('days', 7),
         endDate: moment(),
         maxDate: moment(),
         applyClass: 'btnApplyRange btn btn-primary btn-sm',
@@ -1095,11 +1096,12 @@ jQuery(document).ready(function () {
     });
     $('#reportrange2').daterangepicker({
         ranges: {
+            '7 Days Ago': [moment().subtract('days', 7), moment()],
             '31 Days Ago': [moment().subtract('days', 31), moment()],
             '36 Weeks Ago': [moment().subtract('weeks', 36), moment()],
             '12 Months Ago': [moment().subtract('months', 12), moment()]
         },
-        startDate: moment().subtract('days', 31),
+        startDate: moment().subtract('days', 7),
         endDate: moment(),
         maxDate: moment(),
         applyClass: 'btnApplyRange btn btn-primary btn-sm',
