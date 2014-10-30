@@ -28,7 +28,7 @@ return array(
 	|
 	*/
 
-	'host' => 'smtp.gmail.com',
+	'host' => $_ENV['SMTP_HOST'],
 
 	/*
 	|--------------------------------------------------------------------------
@@ -41,7 +41,7 @@ return array(
 	|
 	*/
 
-	'port' => 587,
+	'port' => $_ENV['SMTP_PORT'],
 
 	/*
 	|--------------------------------------------------------------------------
@@ -54,7 +54,7 @@ return array(
 	|
 	*/
 
-	'from' => array('address' => 'ikyandhi@gmail.com', 'name' => 'PREDICTRY LOCALHOST'),
+	'from' => array('address' => $_ENV['SMTP_GLOBAL_EMAIL_SENDER'], 'name' => $_ENV['SMTP_GLOBAL_EMAIL_NAME']),
 
 	/*
 	|--------------------------------------------------------------------------
@@ -80,7 +80,7 @@ return array(
 	|
 	*/
 
-	'username' => "ikyandhi@gmail.com",
+	'username' => $_ENV['SMTP_USERNAME'],
 
 	/*
 	|--------------------------------------------------------------------------
@@ -93,7 +93,7 @@ return array(
 	|
 	*/
 
-	'password' => "",
+	'password' => $_ENV['SMTP_PASSWORD'],
 
 	/*
 	|--------------------------------------------------------------------------
