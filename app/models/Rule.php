@@ -13,22 +13,22 @@ namespace App\Models;
 class Rule extends \Eloquent
 {
 
-	/**
-	 * The database table used by the model.
-	 *
-	 * @var string
-	 */
-	protected $table = 'rules';
-	public $rules	 = array(
-		"type"		 => "required",
-		"likelihood" => "required|numeric|min:0|max:100",
-		"item_id"	 => "required"
-	);
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    protected $table = 'rules';
+    public $rules    = array(
+        "type"       => "required",
+        "likelihood" => "required|numeric|min:0|max:100",
+        "item_id"    => "required"
+    );
 
-	public function ruleset()
-	{
-		return $this->belongsTo("App\Models\RuleSet", "id");
-	}
+    public function ruleset()
+    {
+        return $this->belongsTo("App\Models\RuleSet", "id");
+    }
 
 }
 
