@@ -101,8 +101,8 @@ class PanelController extends BaseController
         );
 
 
-        $buy_action  = Action::where("site_id", $this->active_site_id)->where("name", "buy")->get()->first(); //buy action
-        $view_action = Action::where("site_id", $this->active_site_id)->where("name", "view")->get()->first(); //view action
+        $buy_action  = Action::where("site_id", $this->active_site_id)->where("name", "buy")->first(); //buy action
+        $view_action = Action::where("site_id", $this->active_site_id)->where("name", "view")->first(); //view action
 
         if ($buy_action)
             $output_top_items['top_purchased_items'] = \App\Models\ActionInstance::getMostItems($buy_action->id);
@@ -598,7 +598,7 @@ class PanelController extends BaseController
         $funel_preference_id = \Input::get("funel_preference_id");
 
         if ($funel_preference_id) {
-            $funel_default = \App\Models\FunelPreference::where("site_id", $this->active_site_id)->where("name", "Default")->get()->first();
+            $funel_default = \App\Models\FunelPreference::where("site_id", $this->active_site_id)->where("name", "Default")->first();
 
 
             if ($funel_default) {
@@ -699,7 +699,7 @@ class PanelController extends BaseController
 
         //today buy
         $today_total_buy_action = 0;
-        $buy_action             = Action::where("site_id", $this->active_site_id)->where("name", "buy")->get()->first();
+        $buy_action             = Action::where("site_id", $this->active_site_id)->where("name", "buy")->first();
         if ($buy_action)
             $today_total_buy_action = \App\Models\ActionInstance::where("action_id", $buy_action->id)->whereBetween('created', [$today, $end_of_today])->count();
 
@@ -809,7 +809,7 @@ class PanelController extends BaseController
             $dt_end   = $dt_end->endOfDay();
         }
 
-        $complete_purchase_action = Action::where("name", "buy")->where("site_id", $this->active_site_id)->get()->first();
+        $complete_purchase_action = Action::where("name", "buy")->where("site_id", $this->active_site_id)->first();
 
         if (is_object($complete_purchase_action)) {
             $sales_stats['overall'] = Action::find($complete_purchase_action->id)
@@ -851,7 +851,7 @@ class PanelController extends BaseController
             $dt_end   = $dt_end->endOfDay();
         }
 
-        $view_action = Action::where("name", "view")->where("site_id", $this->active_site_id)->get()->first();
+        $view_action = Action::where("name", "view")->where("site_id", $this->active_site_id)->first();
         $temp        = null;
 
         if (is_object($view_action)) {
@@ -1044,7 +1044,7 @@ class PanelController extends BaseController
             $dt_end   = $dt_end->endOfDay();
         }
 
-        $complete_purchase_action = Action::where("name", "buy")->where("site_id", $this->active_site_id)->get()->first();
+        $complete_purchase_action = Action::where("name", "buy")->where("site_id", $this->active_site_id)->first();
 
         if (is_object($complete_purchase_action)) {
             $action_instance_ids = Action::find($complete_purchase_action->id)
@@ -1099,12 +1099,9 @@ class PanelController extends BaseController
                 }
 
                 if (count($cart_ids) > 0) {
-                    $average_recommended_qty_items = ($sum_recommended_qty) / count($cart_ids);
-//				$average_recommended_qty_items	 = (($sum_recommended_qty) / ($sum_recommended_qty + $sum_recommended_qty)) * 100;
-                    $average_regular_qty_items     = ($sum_regular_qty) / count($cart_ids);
-
+                    $average_recommended_qty_items  = ($sum_recommended_qty) / count($cart_ids);
+                    $average_regular_qty_items      = ($sum_regular_qty) / count($cart_ids);
                     $average_recommended_sub_totals = ($sum_recommended_sub_totals) / count($cart_ids);
-//				$average_recommended_sub_totals	 = (($sum_recommended_sub_totals) / ($sum_recommended_sub_totals + $sum_regular_sub_totals)) * 100;
                     $average_regular_sub_totals     = ($sum_regular_sub_totals) / count($cart_ids);
 
                     return array(
@@ -1123,6 +1120,7 @@ class PanelController extends BaseController
                 }
             }
         }
+
         return array(
             'total_carts'                     => 0,
             'total_combination_of_qty'        => 0,
@@ -1173,7 +1171,7 @@ class PanelController extends BaseController
         }
 
         $action_name = ($type === "sales") ? "buy" : "view";
-        $action      = Action::where("name", $action_name)->where("site_id", $this->active_site_id)->get()->first();
+        $action      = Action::where("name", $action_name)->where("site_id", $this->active_site_id)->first();
         $item_ids    = array();
 
         if (is_object($action)) {
@@ -1192,14 +1190,6 @@ class PanelController extends BaseController
         }
 
         $items = array();
-
-//		$queries = \DB::getQueryLog();
-//		
-//		echo '<pre>';
-//		print_r(end($queries));
-//		echo "<br/>----<br/>";
-//		echo '</pre>';
-//		die;
 
         foreach ($item_ids as $id) {
             $item = Item::find($id);
