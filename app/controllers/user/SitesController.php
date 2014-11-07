@@ -421,6 +421,16 @@ class SitesController extends BaseController
                         $action_meta->value = json_encode(array());
                         $action_meta->update();
                     }
+
+
+                    \Session::remove('is_new_account');
+                    $this->is_new_account = true;
+
+                    $is_new_account_meta = App\Models\AccountMeta::where('account_id', \Auth::user()->id)->where('key', 'is_new_account')->first();
+                    if ($is_new_account_meta) {
+                        $is_new_account_meta->value = false;
+                        $is_new_account_meta->update();
+                    }
                 }
             }
         }
