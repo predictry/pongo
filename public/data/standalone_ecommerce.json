@@ -169,6 +169,18 @@
                                     "info": "Image url of displayed item"
                                 },
                                 {
+                                    "field": "is_on_sale",
+                                    "type": "boolean",
+                                    "compulsary": true,
+                                    "info": "Is item currently on sale?"
+                                },
+                                {
+                                    "field": "inventory_qty",
+                                    "type": "int",
+                                    "compulsary": true,
+                                    "info": "Current inventory qty"
+                                },
+                                {
                                     "field": "description",
                                     "type": "string",
                                     "compulsary": false,
@@ -289,10 +301,10 @@
                             ]
                         }
                     ],
-                    "disabled": true
+                    "disabled": false
                 }
             ],
-            "disabled": true
+            "disabled": false
         },
         {
             "name": "thankyou",
