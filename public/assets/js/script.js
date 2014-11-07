@@ -605,7 +605,7 @@ function editItemRule(obj, index) {
     });
 }
 
-function editItemWidgetRuleset(obj, index) {
+function editItemWidgetRuleSet(obj, index) {
     var form_data = {
         obj: obj,
         index: index,
