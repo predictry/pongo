@@ -337,7 +337,7 @@ class Action2Controller extends ApiBaseController
     {
         if (is_array($properties) && count($properties) > 0) {
             foreach ($properties as $key => $val) {
-                if ($val !== "") {
+                if ($val !== "" && (is_array($val) && count($val) > 0 )) {
                     $action_instance_meta                     = new ActionInstanceMeta();
                     $action_instance_meta->key                = $key;
                     $action_instance_meta->value              = is_array($val) ? json_encode($val) : $val;
@@ -418,8 +418,7 @@ class Action2Controller extends ApiBaseController
 
     function _getItemID($item_data)
     {
-        $identifier = $item_data['item_id'];
-        $item       = Item::where("identifier", $identifier)->where("site_id", $this->site_id)->first();
+        $item = Item::where("identifier", $item_data['item_id'])->where("site_id", $this->site_id)->first();
 
         if ($item) {
             if (isset($item_data['name']) && $item_data['name'] !== "" && ($item->name !== $item_data['name'])) {
@@ -431,6 +430,8 @@ class Action2Controller extends ApiBaseController
             unset($properties_keys['item_id']);
 
             $item_metas = ItemMeta::where("item_id", $item->id)->get();
+            
+            //update item properties
             foreach ($item_metas as $meta) {
                 if (in_array($meta->key, $properties_keys)) {
                     $value = $item_data[$meta->key];
