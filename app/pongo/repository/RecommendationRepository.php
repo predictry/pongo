@@ -103,6 +103,10 @@ class RecommendationRepository
             case "trv": //topitemsviewed
             case "trp": //topitemspurchasedrecently
             case "trac": //toprecentadditionstocart
+            case "ct-oivt": //category-otheritemsviewedtogether
+            case "ct-oipt": //category-otheritemspurchasedtogether
+            case "anon-oiv": //anonymous-otheritemsviewed
+            case "anon-oip": //anonymous-otheritemspurchased
                 $response = json_decode(Gui::getRecommended($reco_data['type'], $reco_data, $widget_filter_metas, $fields));
 //                $response             = json_decode('{"status": 200, "data": {"items": [{"matches": 80, "id": 4491}, {"matches": 41, "id": 360}, {"matches": 40, "id": 4492}, {"matches": 40, "id": 356}, {"matches": 40, "id": 61}, {"matches": 40, "id": 63}, {"matches": 40, "id": 54}]}}');
                 break;
