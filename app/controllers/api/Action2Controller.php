@@ -337,11 +337,13 @@ class Action2Controller extends ApiBaseController
     {
         if (is_array($properties) && count($properties) > 0) {
             foreach ($properties as $key => $val) {
-                $action_instance_meta                     = new ActionInstanceMeta();
-                $action_instance_meta->key                = $key;
-                $action_instance_meta->value              = is_array($val) ? json_encode($val) : $val;
-                $action_instance_meta->action_instance_id = $action_instance_id;
-                $action_instance_meta->save();
+                if ($val !== "") {
+                    $action_instance_meta                     = new ActionInstanceMeta();
+                    $action_instance_meta->key                = $key;
+                    $action_instance_meta->value              = is_array($val) ? json_encode($val) : $val;
+                    $action_instance_meta->action_instance_id = $action_instance_id;
+                    $action_instance_meta->save();
+                }
             }
         }
     }
