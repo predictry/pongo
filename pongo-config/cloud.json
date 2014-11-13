@@ -137,12 +137,6 @@
                     {
                         "Ref": "PongoScaleDownAlarmPolicy"
                     }
-                ],
-                "Dimensions": [
-                    {
-                        "Name": "AutoScalingGroupName",
-                        "Value": "auto-scale-group"
-                    }
                 ]
             }
         },
@@ -160,12 +154,6 @@
                 "AlarmActions": [
                     {
                         "Ref": "PongoScaleUpAlarmPolicy"
-                    }
-                ],
-                "Dimensions": [
-                    {
-                        "Name": "AutoScalingGroupName",
-                        "Value": "auto-scale-group"
                     }
                 ]
             }
