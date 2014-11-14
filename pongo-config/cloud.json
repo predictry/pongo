@@ -141,7 +141,7 @@
                 "Dimensions": [
                     {
                         "Name": "AutoScalingGroupName",
-                        "Value": "sg-load-balancer"
+                        "Value": {"Ref": "PongoUpdate"}
                     }
                 ]
             }
@@ -165,7 +165,7 @@
                 "Dimensions": [
                     {
                         "Name": "AutoScalingGroupName",
-                        "Value": "sg-load-balancer"
+                        "Value": {"Ref": "PongoUpdate"}
                     }
                 ]
             }
