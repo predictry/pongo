@@ -4,9 +4,10 @@
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "require": {
-        "laravel/framework": "4.1.*",
+        "laravel/framework": "4.2.*",
         "unikent/curl": "dev-master",
-        "doctrine/dbal": "2.4.*"
+        "doctrine/dbal": "2.4.*",
+        "aws/aws-sdk-php": "~2.7"
     },
     "require-dev": {
         "way/generators": "2.*",
