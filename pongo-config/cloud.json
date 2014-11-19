@@ -141,7 +141,7 @@
                 "Dimensions": [
                     {
                         "Name": "AutoScalingGroupName",
-                        "Value": "auto-scale-group"
+                        "Value": {"Ref": "PongoUpdate"}
                     }
                 ]
             }
@@ -165,7 +165,7 @@
                 "Dimensions": [
                     {
                         "Name": "AutoScalingGroupName",
-                        "Value": "auto-scale-group"
+                        "Value": {"Ref": "PongoUpdate"}
                     }
                 ]
             }
