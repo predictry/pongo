@@ -787,7 +787,7 @@ if (typeof Predictry !== 'object') {
                 //Retrieve cart_id from API by passing session data
                 call_url = config_api_url + config_api_resources[3];
                 config_request_content_type = config_default_request_content_type;
-                var response = sendRequest(call_url, buildUrl({session_id: session}), false);
+                var response = sendRequest(call_url, buildUrl({session_id: session}), true);
                 if (isObject(response) && response.status === 'success')
                 {
                     response = response.response;
