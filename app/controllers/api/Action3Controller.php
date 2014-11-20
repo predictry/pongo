@@ -110,10 +110,9 @@ class Action3Controller extends ApiBaseController
                 $data['site_id']        = $this->site_id;
 
                 \Queue::push('App\Pongo\Queues\SendAction@store', $data);
-                $queries  = \DB::getQueryLog();
                 $response = [
                     'client_message' => '',
-                    'message'        => $queries,
+                    'message'        => '',
                     'status'         => 200,
                     'error'          => false
                 ];
@@ -196,7 +195,7 @@ class Action3Controller extends ApiBaseController
         $items           = $action_data['items'];
         $this->action_id = $this->_getActionID(array("name" => $action_name), $this->is_new_action);
 
-        $action_properties_without_name = $action_data['action'];
+        $action_properties_without_name = array_merge($action_data['action'], ['cart_id', $this->_getCartID($this->session_id)]);
         unset($action_properties_without_name['name']);
 
         $i = 0;
@@ -474,6 +473,22 @@ class Action3Controller extends ApiBaseController
         }
         $this->browser_id = $browser->id;
         return $browser->id;
+    }
+
+    function _getCartID($session_id)
+    {
+        $cart_id           = -1;
+        $cart              = \App\Models\Cart::where("session_id", $session_id)->get()->last();
+        $count_used_before = \App\Models\ActionInstanceMeta::where("key", "cart_id")->where("value", $cart->id)->get()->count();
+
+        if ($count_used_before > 0) {
+            $new_cart = \App\Models\Cart::create(['session_id' => $session_id]);
+            $cart_id  = ($new_cart->id) ? $new_cart->id : -1;
+        }
+        else
+            $cart_id = $cart->id;
+
+        return $cart_id;
     }
 
     private function _translateActionToRating($str_action)
