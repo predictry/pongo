@@ -242,3 +242,6 @@ Route::group(array('prefix' => 'api/v2', 'namespace' => 'App\Controllers\Api'), 
     Route::resource('tenant.actions', 'TenantActionController', array("only" => array("index")));
 });
 
+Route::group(array('prefix' => 'api/v3', 'namespace' => 'App\Controllers\Api'), function() {
+    Route::resource('actions', 'Action3Controller', array("only" => array("index", "store", "show", "destroy")));
+});
