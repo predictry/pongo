@@ -139,30 +139,6 @@ class SendAction
         \DB::reconnect();
     }
 
-    function _validateProceedAction($action_type, $action_name, $user_identifier_id, $email, $session_id, $action_data)
-    {
-        $rules = array(
-            "action"      => "required",
-            "user_id"     => "required",
-            "item_id"     => "required",
-            "session_id"  => "required",
-            "description" => "required",
-            "email"       => ($email !== "") ? "required|email" : ""
-        );
-
-        if ($action_type === "bulk")
-            unset($rules['description']);
-
-        $validator = Validator::make(array(
-                    "action"      => $action_name,
-                    "user_id"     => $user_identifier_id,
-                    "item_id"     => $action_data['item_id'],
-                    "email"       => $action_data['email'],
-                    "session_id"  => $session_id,
-                    "description" => $action_data['description']), $rules);
-        return $validator;
-    }
-
     function _proceedSingleAction($action_name, $action_data)
     {
         $items_data = (isset($action_data['item'])) ? $action_data['item'] : [];
@@ -208,7 +184,7 @@ class SendAction
         $items           = $action_data['items'];
         $this->action_id = $this->_getActionID(array("name" => $action_name), $this->is_new_action);
 
-        $action_properties_without_name = $action_data['action'];
+        $action_properties_without_name = array_merge($action_data['action'], ['cart_id', $this->_getCartID($this->session_id)]);
         unset($action_properties_without_name['name']);
 
         $i = 0;
@@ -486,6 +462,22 @@ class SendAction
         }
         $this->browser_id = $browser->id;
         return $browser->id;
+    }
+
+    function _getCartID($session_id)
+    {
+        $cart_id           = -1;
+        $cart              = \App\Models\Cart::where("session_id", $session_id)->get()->last();
+        $count_used_before = \App\Models\ActionInstanceMeta::where("key", "cart_id")->where("value", $cart->id)->get()->count();
+
+        if ($count_used_before > 0) {
+            $new_cart = \App\Models\Cart::create(['session_id' => $session_id]);
+            $cart_id  = ($new_cart->id) ? $new_cart->id : -1;
+        }
+        else
+            $cart_id = $cart->id;
+
+        return $cart_id;
     }
 
     private function _translateActionToRating($str_action)
