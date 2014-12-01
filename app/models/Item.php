@@ -18,6 +18,7 @@ class Item extends \Eloquent
      *
      * @var string
      */
+    protected $guarded          = array('id');
     protected $table            = 'items';
     public $rules               = array(
         'identifier' => 'required',
