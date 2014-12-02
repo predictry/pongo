@@ -38,7 +38,6 @@
 				<div class="col-xs-12 col-sm-6">
 					<p class="forgotPwd">
 						<a href="<?php echo URL::to('forgot'); ?>"><?php echo Lang::get("home.forgot.password"); ?></a>	
-						{{--|<a href="<?php // echo URL::to('register'); ?>"><?php // echo Lang::get("home.register"); ?></a>--}}
 					</p>
 				</div>
 				{{ Form::close() }}
