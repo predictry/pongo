@@ -4,7 +4,7 @@
  * Email        : rifkiyandhi@gmail.com 
  * Function     : Predictry JS SDK
  * Version      : 0.2.0
- * Revision     : 3
+ * Revision     : 2
  */
 
 if (typeof _predictry !== 'object') {
@@ -271,116 +271,6 @@ if (typeof Predictry !== 'object') {
             return copy;
         }
 
-        /*
-         * guidj@bitbucket
-         */
-
-        function decodeUriParam(value) {
-            var values = value.split("=");
-
-            return {"key": decodeURIComponent(values[0]), "value": decodeURIComponent(values[1])};
-        }
-
-        function mapJSONToUriParams(data, prefix, call) {
-            prefix = typeof prefix !== 'undefined' ? prefix : "";
-            call = typeof call !== 'undefined' ? call : 0;
-
-            var map = [];
-
-            if (Object.prototype.toString.call(data) === '[object Array]') {
-                for (var ik = 0; ik < data.length; ik++) {
-                    map.push(mapJSONToUriParams(data[ik], prefix + "[" + ik + "]", call + 1));
-                }
-            } else if (Object.prototype.toString.call(data) === '[object Object]') {
-                Object.keys(data).map(function (k) {
-                    var sep = "";
-
-                    //not empty
-                    if (prefix !== "") {
-
-                        if (prefix.slice(-1) !== "]") {
-                            sep = ":";
-                        }
-                    }
-
-                    map.push(mapJSONToUriParams(data[k], prefix + sep + k, call + 1));
-                });
-
-            } else {
-                map.push(prefix + "=" + data);
-            }
-
-            return map.join("&");
-        }
-
-        function mapObjectKey(key, value, object) {
-
-            var indexOfObjectSep = key.indexOf(":");
-            var indexOfArray = key.indexOf("[");
-
-            if ((indexOfObjectSep > -1 && indexOfObjectSep < indexOfArray) || (indexOfObjectSep > -1 && indexOfArray === -1)) {
-
-                var extractedKey = key.substr(0, indexOfObjectSep);
-                var remainingKey = key.substr(indexOfObjectSep + 1);
-
-                if (!(extractedKey in object)) {
-                    object[extractedKey] = {};
-                }
-
-                if (remainingKey === "") {
-                    object[extractedKey] = value;
-                } else {
-                    return mapObjectKey(remainingKey, value, object[extractedKey]);
-                }
-
-            } else if ((indexOfArray > -1 && indexOfArray < indexOfObjectSep) || (indexOfArray > -1 && indexOfObjectSep === -1)) {
-
-                var extractedKey = key.substr(0, indexOfArray);
-                var remainingKey = key.substr(key.indexOf("]") + 1);
-
-                if (!(extractedKey in object)) {
-                    object[extractedKey] = [];
-                }
-
-                var index = parseInt(key.substr(indexOfArray + 1, key.indexOf("]") - 1));
-
-                if (!(index in object[extractedKey])) {
-                    object[extractedKey][index] = {};
-                }
-
-                if (remainingKey === "") {
-                    object[extractedKey][index] = value;
-                } else {
-                    return mapObjectKey(remainingKey, value, object[extractedKey][index]);
-                }
-
-            } else {
-                object[key] = value;
-            }
-        }
-
-        function mapUriParamsToJSON(data, object, call) {
-
-            call = typeof call !== 'undefined' ? call : 0;
-            object = typeof object !== 'undefined' ? object : {};
-
-            if (call === 0) {
-                data = decodeURIComponent(data).split("&");
-
-                for (var i = 0; i < data.length; i++) {
-                    mapUriParamsToJSON(data[i], object, call + 1);
-                }
-            } else {
-                //decode data
-                var pair = decodeUriParam(data);
-                //build object recursively
-                mapObjectKey(pair["key"], pair["value"], object);
-            }
-
-            return object;
-        }
-        /* end of Gui */
-
         /**
          * Predictry Executor class
          * 
@@ -394,8 +284,37 @@ if (typeof Predictry !== 'object') {
                     api_key = window_alias.PE_apiKey;
 
             var
+                    PE_options = {
+                        widgetId: null,
+                        platformVer: null,
+                        recoType: null
+                    };
+
+            var
+                    PE_defaults = {
+                        action: null,
+                        user_id: null,
+                        session_id: null,
+                        item_id: null,
+                        description: ""
+                    };
+
+            var
+                    config_default_data = {
+                        action: null,
+                        user_id: null,
+                        session_id: null,
+                        session_user_id: null,
+                        item_id: null,
+                        description: null,
+                        item_properties: {},
+                        action_properties: {}
+                    };
+
+            var
                     response = {},
-                    data = {};
+                    data = {},
+                    reco_data = {};
 
             var
                     compulsary_params = new Array("user_id", "action", "item_id", "session_id", "description"),
@@ -404,6 +323,8 @@ if (typeof Predictry !== 'object') {
             var
                     widget_id = 0,
                     widget_instance_id = 0,
+                    temp_session_id = null,
+                    temp_session_user_id = null,
                     temp_cart_id = -1;
 
             var call_url = null;
@@ -426,11 +347,10 @@ if (typeof Predictry !== 'object') {
                     config_default_request_content_type = "application/x-www-form-urlencoded; charset=UTF-8",
                     config_request_content_type = config_default_request_content_type,
                     config_api_url = "http://api-aws.predictry.com/api/v2/",
-                    config_img_url = "https://d1j642hg7oh3vx.cloudfront.net/",
                     config_api_resources = ["actions", "users", "items", "carts", "cartlogs", "recommendation"],
-                    config_default_actions = ["view", "add_to_cart", "buy", "started_checkout", "started_payment"],
                     config_session_cookie_timeout = 63072000000, // 2 years
                     config_tracking_session_cookie_timeout = 1200000, //20 minutes
+                    config_default_action = "view",
                     config_do_not_track = false,
                     recent_xhr = null;
 
@@ -630,6 +550,149 @@ if (typeof Predictry !== 'object') {
                 sendRequest(config_api_url + config_api_resources[3], buildUrl(data));
             }
 
+            /**
+             * Set Action Data
+             * 
+             * @param {type} data
+             * @returns {Boolean}
+             */
+            function setActionData(data) {
+                data = eExtend(data, PE_defaults);
+                if (widget_instance_id > 0)
+                {
+                    if (data.action_properties !== undefined)
+                    {
+                        data.action_properties.rec = true;
+                        data.action_properties.widget_instance_id = widget_instance_id;
+                    }
+                    else if (data.action_properties === undefined)
+                    {
+                        data.action_properties = {rec: true, widget_instance_id: widget_instance_id};
+                    }
+                }
+
+                if (data.action === 'complete_purchase' || data.action === 'buy')
+                {
+                    temp_cart_id = getCartID();
+                    if (data.action_properties !== undefined)
+                        data.action_properties.cart_id = temp_cart_id;
+                    else if (data.action_properties === undefined)
+                        data.action_properties = {cart_id: temp_cart_id};
+
+                }
+
+                for (var key in data)
+                {
+                    if (!inArray(key, optional_params))
+                    {
+                        if (((data[key] === "" || (data[key] === null)) && inArray(key, compulsary_params)))
+                        {
+                            response.status = "failed";
+                            response.message = key + ' cannot be empty';
+                            return false;
+                        }
+                    }
+
+                    if (key === "item_properties" && data[key].length > 0) {
+
+                        for (var key2 in data[key]) {
+                            data['item_properties[' + key2 + ']'] = data[key][key2];
+                        }
+                        delete data.item_properties;
+                    }
+
+                    if (key === "action_properties" && data[key].length > 0) {
+                        for (var key2 in data[key]) {
+                            data['action_properties[' + key2 + ']'] = data[key][key2];
+                        }
+                        delete data.action_properties;
+                    }
+                }
+
+                data.action_type = 'single';
+                return data;
+            }
+
+            /**
+             * Set Tracking Data
+             * 
+             * @param {type} data
+             * @returns {Boolean}
+             */
+            function setTrackingData(data) {
+                reco_data = eExtend(data, PE_defaults);
+                for (var key in data)
+                {
+                    if (!inArray(key, optional_params)) {
+                        if (((data[key] === "" || (data[key] === null)) && inArray(key, compulsary_params)))
+                        {
+                            response.status = "failed";
+                            response.message = key + ' cannot be empty';
+                            return false;
+                        }
+                    }
+
+                    if (key === "action_properties") {
+                        for (var key2 in data[key]) {
+                            data['action_properties[' + key2 + ']'] = data[key][key2];
+                        }
+                        delete data.action_properties;
+                    }
+                }
+                return true;
+            }
+
+            /**
+             * Set Bulk Actions
+             * 
+             * @param {object} bulk_action_data
+             * @returns {Boolean}
+             */
+            function setBulkActionData(bulk_action_data) {
+                var bulk_compulsary_params = new Array("item_id", "action_properties");
+                var bulk_optional_params = new Array("description", "item_properties");
+                temp_cart_id = getCartID();
+                for (var i = 0; i < bulk_action_data.actions.length; i++)
+                {
+                    for (var key in bulk_action_data.actions[i])
+                    {
+                        if (!inArray(key, bulk_optional_params))
+                        {
+                            if (((bulk_action_data.actions[i][key] === "" || (bulk_action_data.actions[i][key] === null)) && inArray(key, bulk_compulsary_params)))
+                            {
+                                response.status = "failed";
+                                response.message = key + ' cannot be empty';
+                                return false;
+                            }
+                        }
+
+                        if ((bulk_action_data.action === 'complete_purchase' || bulk_action_data.action === 'buy') && key === 'item_id')
+                        {
+                            var item_id = bulk_action_data.actions[i][key];
+                            var cartSession = eval("(" + getCookie(getCookieName("cart")) + ")");
+                            var cartItemIDs = cartSession.c;
+                            var action = bulk_action_data.actions[i];
+
+                            if (action.action_properties !== undefined)
+                                action.action_properties.cart_id = temp_cart_id;
+                            else if (action.action_properties === undefined)
+                                action.action_properties = {cart_id: temp_cart_id};
+
+                            if (inArray(item_id, cartItemIDs))
+                            {
+                                if (action.action_properties !== undefined)
+                                    action.action_properties.rec = true;
+                                else if (action.action_properties === undefined)
+                                    action.action_properties = {rec: true};
+                            }
+                        }
+                    }
+                }
+                bulk_action_data.session_id = getCookie(getCookieName("session"));
+                bulk_action_data.action_type = 'bulk';
+
+                return bulk_action_data;
+            }
 
             /**
              * Update Cart Item Session
@@ -710,9 +773,9 @@ if (typeof Predictry !== 'object') {
              * Get Cart ID
              */
             function getCartID() {
-                var cart_id = -1;
                 var session = getCookie(getCookieName("session"));
                 var cartSession = eval("(" + getCookie(getCookieName("cart")) + ")");
+                var cart_id = -1;
 
                 if (session === undefined)
                     session = setSessionCookieId();
@@ -720,6 +783,20 @@ if (typeof Predictry !== 'object') {
                 if (isDefined(cartSession) && isObject(cartSession) && isDefined(cartSession.cart_id) && cartSession.cart_id !== -1) {
                     return cartSession.cart_id;
                 }
+
+                //Retrieve cart_id from API by passing session data
+                call_url = config_api_url + config_api_resources[3];
+                config_request_content_type = config_default_request_content_type;
+                var response = sendRequest(call_url, buildUrl({session_id: session}), true);
+                if (isObject(response) && response.status === 'success')
+                {
+                    response = response.response;
+                    cart_id = response.cart_id;
+                }
+                if (isDefined(cartSession) && isObject(cartSession)) {
+                    cartSession.cart_id = cart_id;
+                }
+
                 return cart_id;
             }
 
@@ -780,17 +857,107 @@ if (typeof Predictry !== 'object') {
              * Send image request to Predictry server using GET.
              * The infamous web bug (or beacon) is a transparent, single pixel (1x1) image
              */
-            function getImage(resource, queries, callback) {
+            function getImage(resource, queries) {
                 var image = new Image(1, 1);
                 image.onload = function () {
                     iterator = 0; // To avoid JSLint warning of empty block 
-                    if (typeof callback === 'function') {
-                        callback();
-                    }
                 };
+                image.src = config_api_url + resource + (config_api_url.indexOf('?') < 0 ? '?' : '&') + queries;
+            }
 
-                resource = !inArray(resource, config_default_actions) ? "custom" : resource;
-                image.src = config_img_url + resource + ".gif?" + queries;
+            /**
+             * Send Action
+             * 
+             * @param {type} data
+             * @returns {undefined}
+             */
+            function sendAction(data) {
+                var ready_data = false;
+                if (isObject(data)) {
+                    ready_data = setActionData(clone(data));
+                } else {
+                    response.message = "action data undefined";
+                    response.status = "failed";
+                }
+
+                if (ready_data !== false) {
+                    var queries = buildUrl(ready_data);
+                    call_url = config_api_url + config_api_resources[0];
+                    if (ready_data.action === "add_to_cart")
+                    {
+                        var response = sendRequest(call_url, queries, false);
+                        //this is to set cart log, and set cart session
+                        if (response.status === 'success' && ready_data.action === 'add_to_cart')
+                        {
+                            if (widget_instance_id > 0)
+                            {
+                                if (isDefined(data.action_properties)) {
+                                    data.action_properties.widget_instance_id = widget_instance_id;
+                                    data.action_properties.rec = true;
+                                }
+                                else
+                                    data.action_properties = {rec: true, widget_instance_id: widget_instance_id};
+
+                                setItemIntoCartSession(data.item_id);
+                            }
+
+                            if (isDefined(data.action_properties)) {
+                                var qty = isDefined(data.action_properties.qty) ? data.action_properties.qty : 1;
+                                setCartLog(data.item_id, qty, 'added');
+                            } else
+                                setCartLog(data.item_id, 1, 'added');
+
+                        }
+                    } else {
+                        var response = sendRequest(call_url, queries);
+                    }
+                } else {
+                    return JSON.stringify(response);
+                }
+            }
+
+            /**
+             * Send Bulk Actions
+             * 
+             * @param {type} data
+             * @returns {object}
+             */
+            function sendBulkActions(data) {
+
+                var ready_data = false;
+
+                if (data !== undefined) {
+                    if (data.action === undefined) {
+                        response.message = "action name undefined";
+                        response.status = "failed";
+                    }
+
+                    if (data.user_id === undefined) {
+                        response.message = "user id undefined";
+                        response.status = "failed";
+                    }
+                } else {
+                    response.message = "action data undefined";
+                    response.status = "failed";
+                }
+
+                ready_data = setBulkActionData(data);
+
+                if (ready_data !== false) {
+                    return sendRequest(config_api_url + config_api_resources[0], buildUrl(ready_data));
+                } else {
+                    console.log(JSON.stringify(response));
+                }
+            }
+
+            /**
+             * Send Tracking 
+             * 
+             * @param {type} data
+             * @returns {undefined}
+             */
+            function sendTracking(data) {
+                sendAction(data);
             }
 
             /**
@@ -836,22 +1003,24 @@ if (typeof Predictry !== 'object') {
                     }
                 };
 
+
                 http.send(data);
             }
 
             /*
              * Send request
              */
-            function sendRequest(url, data, async, callback, isImage) {
+            function sendRequest(url, data, async, callback, isImage, delay) {
+                //var now = new Date();
                 recent_response = null;
                 if (!config_do_not_track) {
                     if (!isDefined(isImage)) {
                         sendXmlHttpRequest(url, data, async, callback);
                         return recent_response;
                     } else {
-                        var queries = mapJSONToUriParams(data);
-                        getImage(data.action.name, queries, callback);
+                        getImage(request);
                     }
+                    //var expireDateTime = now.getTime() + delay;
                 }
             }
 
@@ -859,8 +1028,6 @@ if (typeof Predictry !== 'object') {
                 data.session_id = getSessionID();
                 data.user_id = getSessionUserID();
                 data.browser_id = getSessionBrowserID();
-                data.tenant_id = tenant_id;
-                data.api_key = api_key;
                 return data;
             }
 
@@ -899,19 +1066,27 @@ if (typeof Predictry !== 'object') {
                     }
                     else {
                         config_request_content_type = "application/json; charset=utf-8";
-                        return sendRequest(config_api_url + config_api_resources[0], data, true, null, true);
+                        return sendRequest(config_api_url + config_api_resources[0], JSON.stringify(data), true);
                     }
                 }
             }
 
             function trackView(data) {
+                if (!isDefined(data) || !isObject(data))
+                    return;
+
+                if (isDefined(data.action)) {
+                    data.action.name = "view"; //append action name
+                }
+
+                data = appendPredictryData(data);
 
                 //if data.action.rec is true store it into cookie
                 if (isDefined(data.action) && isDefined(data.action.rec))
                     setItemIntoViewSession(data.items[0].item_id);
 
                 config_request_content_type = "application/json; charset=utf-8";
-                return sendRequest(config_api_url + config_api_resources[0], data, true, null, true);
+                return sendRequest(config_api_url + config_api_resources[0], JSON.stringify(data), true);
             }
 
             function trackBuy(data) {
@@ -919,6 +1094,12 @@ if (typeof Predictry !== 'object') {
                     return;
 
                 data = appendPredictryData(data);
+
+
+                if (isDefined(data.action))
+                    data.action.cart_id = getCartID();
+                else if (!isDefined(data.action))
+                    data.action = {cart_id: getCartID()};
 
                 var cartSession = eval("(" + getCookie(getCookieName("cart")) + ")");
                 var cartItemIDs = cartSession.c;
@@ -931,11 +1112,11 @@ if (typeof Predictry !== 'object') {
                     for (var key in data.items[i])
                     {
                         var item_id = data.items[i][key];
-                        if (key === "item_id" && isDefined(cartItemIDs) && (cartItemIDs.length > 0)) {
+                        if (key === "item_id" && (cartItemIDs.length > 0)) {
                             if (inArray(item_id, cartItemIDs))
                                 data.items[i].rec = true;
                         }
-                        else if (key === "item_id" && isDefined(viewItemIDs) && (viewItemIDs.length > 0)) {
+                        else if (key === "item_id" && (viewItemIDs.length > 0)) {
                             if (inArray(item_id, viewItemIDs))
                                 data.items[i].rec = true;
                         }
@@ -943,12 +1124,19 @@ if (typeof Predictry !== 'object') {
                 }
 
                 config_request_content_type = "application/json; charset=utf-8";
-                return sendRequest(config_api_url + config_api_resources[0], data, true, null, true);
+                return sendRequest(config_api_url + config_api_resources[0], JSON.stringify(data), true);
             }
 
             function trackBulk(data) {
                 if (!isDefined(data) || !isObject(data))
                     return;
+
+                data = appendPredictryData(data);
+
+                if (isDefined(data.action))
+                    data.action.cart_id = getCartID();
+                else if (!isDefined(data.action))
+                    data.action = {cart_id: getCartID()};
 
                 var cartSession = eval("(" + getCookie(getCookieName("cart")) + ")");
                 var cartItemIDs = cartSession.c;
@@ -958,13 +1146,13 @@ if (typeof Predictry !== 'object') {
                     for (var key in data.items[i])
                     {
                         var item_id = data.items[i][key];
-                        if (key === "item_id" && isDefined(cartItemIDs) && (cartItemIDs.length > 0) && inArray(item_id, cartItemIDs))
+                        if (key === "item_id" && (cartItemIDs.length > 0) && inArray(item_id, cartItemIDs))
                             data.items[i].rec = true;
                     }
                 }
 
                 config_request_content_type = "application/json; charset=utf-8";
-                return sendRequest(config_api_url + config_api_resources[0], data, true, null, true);
+                return sendRequest(config_api_url + config_api_resources[0], JSON.stringify(data), true);
             }
 
             /************************************************************
