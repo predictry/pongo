@@ -425,7 +425,7 @@ if (typeof Predictry !== 'object') {
                     config_request_method = config_default_request_method,
                     config_default_request_content_type = "application/x-www-form-urlencoded; charset=UTF-8",
                     config_request_content_type = config_default_request_content_type,
-                    config_api_url = "http://api-aws.predictry.com/api/v2/",
+                    config_api_url = "http://api-aws.predictry.com/api/v3/",
                     config_img_url = "https://d1j642hg7oh3vx.cloudfront.net/",
                     config_api_resources = ["actions", "users", "items", "carts", "cartlogs", "recommendation"],
                     config_default_actions = ["view", "add_to_cart", "buy", "started_checkout", "started_payment"],
