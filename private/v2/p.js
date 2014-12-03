@@ -1095,11 +1095,10 @@ if (typeof Predictry !== 'object') {
 
                 data = appendPredictryData(data);
 
-
-                if (isDefined(data.action))
-                    data.action.cart_id = getCartID();
-                else if (!isDefined(data.action))
-                    data.action = {cart_id: getCartID()};
+//                if (isDefined(data.action))
+//                    data.action.cart_id = getCartID();
+//                else if (!isDefined(data.action))
+//                    data.action = {cart_id: getCartID()};
 
                 var cartSession = eval("(" + getCookie(getCookieName("cart")) + ")");
                 var cartItemIDs = cartSession.c;
@@ -1133,11 +1132,13 @@ if (typeof Predictry !== 'object') {
 
                 data = appendPredictryData(data);
 
-                if (isDefined(data.action))
-                    data.action.cart_id = getCartID();
-                else if (!isDefined(data.action))
-                    data.action = {cart_id: getCartID()};
+//                if (isDefined(data.action))
+//                    data.action.cart_id = getCartID();
+//                else if (!isDefined(data.action))
+//                    data.action = {cart_id: getCartID()};
 
+                //@TODO: Since getCartID now is async, need to figure out how to get the cart_id value
+                //@TODO: Issue rise when checkout, the cart_id missing.
                 var cartSession = eval("(" + getCookie(getCookieName("cart")) + ")");
                 var cartItemIDs = cartSession.c;
 
