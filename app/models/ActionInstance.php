@@ -20,6 +20,7 @@ class ActionInstance extends \Eloquent
      */
     protected $guarded          = array('id');
     public $timestamps          = false;
+    protected $guarded          = array("id");
     protected $table            = 'action_instances';
     public $manage_table_header = array(
         "user_id"            => "User ID",
