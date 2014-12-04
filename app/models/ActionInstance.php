@@ -18,7 +18,6 @@ class ActionInstance extends \Eloquent
      *
      * @var string
      */
-    protected $guarded          = array('id');
     public $timestamps          = false;
     protected $guarded          = array("id");
     protected $table            = 'action_instances';
