@@ -10,13 +10,18 @@
 
 namespace App\Models;
 
-use Eloquent;
-use Illuminate\Auth\Reminders\RemindableInterface;
-use Illuminate\Auth\UserInterface;
-use Illuminate\Support\Facades\Hash;
+use Eloquent,
+    Illuminate\Auth\Reminders\RemindableInterface,
+    Illuminate\Auth\UserInterface,
+    Illuminate\Database\Eloquent\SoftDeletingTrait,
+    Illuminate\Support\Facades\Hash;
 
 class Account extends Eloquent implements UserInterface, RemindableInterface
 {
+
+    use SoftDeletingTrait;
+
+    protected $dates = ['deleted_at'];
 
     /**
      * The database table used by the model.

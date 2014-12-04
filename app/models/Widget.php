@@ -10,8 +10,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\SoftDeletingTrait;
+
 class Widget extends \Eloquent
 {
+
+    use SoftDeletingTrait;
+
+    protected $dates = ['deleted_at'];
 
     /**
      * The database table used by the model.
@@ -20,7 +26,8 @@ class Widget extends \Eloquent
      */
     protected $table            = 'widgets';
     public $rules               = array(
-        "name" => "required|max:64"
+        "name"      => "required|max:64",
+        "reco_type" => "required|exists:algorithms,name"
     );
     public $manage_table_header = array(
         "id"                 => "Widget ID",

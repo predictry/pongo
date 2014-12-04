@@ -42,7 +42,7 @@ class RecommendationRepository
         $gui_reco_data = array();
 
         if (!is_null($input['widget_id'])) {
-            $widget = Widget::where("id", $input['widget_id'])->where("site_id", $site_id)->get()->first();
+            $widget = Widget::where("id", $input['widget_id'])->where("site_id", $site_id)->first();
         }
 
         if (!is_null($widget)) {
@@ -51,7 +51,7 @@ class RecommendationRepository
             $gui_reco_data = array_add($gui_reco_data, 'type', $widget->reco_type);
 
             if (isset($input['user_id']) && $input['user_id'] > 0) {
-                $visitor = Visitor::where("identifier", $input['user_id'])->get()->first();
+                $visitor = Visitor::where("identifier", $input['user_id'])->first();
 
                 if ($visitor)
                     $gui_reco_data = array_add($gui_reco_data, "user_id", $visitor->id);
@@ -60,7 +60,7 @@ class RecommendationRepository
             }
 
             if (isset($input['item_id']) && $input['item_id'] > 0) {
-                $item = Item::where("identifier", $input['item_id'])->get()->first();
+                $item = Item::where("identifier", $input['item_id'])->first();
 
                 if ($item)
                     $gui_reco_data = array_add($gui_reco_data, "item_id", $item->id);
@@ -70,6 +70,9 @@ class RecommendationRepository
 
             if (!is_null($limit))
                 array_add($gui_reco_data, "limit", $limit);
+        }
+        else {
+            return array("error" => true, 'data' => array("inputUnknown", 400, "widget_id"));
         }
 
         return $gui_reco_data;
@@ -89,7 +92,7 @@ class RecommendationRepository
         $response = [];
 
         //get filters
-        $widget_filter       = WidgetFilter::where("widget_id", $reco_data['widget_id'])->get()->first();
+        $widget_filter       = WidgetFilter::where("widget_id", $reco_data['widget_id'])->first();
         $widget_filter_metas = ($widget_filter) ? Filter::find($widget_filter->filter_id)->metas()->get()->toArray() : [];
         unset($reco_data['widget_id']);
 
@@ -103,6 +106,10 @@ class RecommendationRepository
             case "trv": //topitemsviewed
             case "trp": //topitemspurchasedrecently
             case "trac": //toprecentadditionstocart
+            case "ct-oivt": //category-otheritemsviewedtogether
+            case "ct-oipt": //category-otheritemspurchasedtogether
+            case "anon-oiv": //anonymous-otheritemsviewed
+            case "anon-oip": //anonymous-otheritemspurchased
                 $response = json_decode(Gui::getRecommended($reco_data['type'], $reco_data, $widget_filter_metas, $fields));
 //                $response             = json_decode('{"status": 200, "data": {"items": [{"matches": 80, "id": 4491}, {"matches": 41, "id": 360}, {"matches": 40, "id": 4492}, {"matches": 40, "id": 356}, {"matches": 40, "id": 61}, {"matches": 40, "id": 63}, {"matches": 40, "id": 54}]}}');
                 break;

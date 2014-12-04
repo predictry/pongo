@@ -71,8 +71,9 @@ class WidgetsController extends \App\Controllers\BaseController
 
     public function getCreate()
     {
-        $ruleset_list = \App\Models\RuleSet::where("site_id", $this->active_site_id)->lists("name", "id");
-        $filter_list  = \App\Models\Filter::where("site_id", $this->active_site_id)->lists("name", "id");
+        $ruleset_list   = \App\Models\Ruleset::where("site_id", $this->active_site_id)->lists("name", "id");
+        $filter_list    = \App\Models\Filter::where("site_id", $this->active_site_id)->lists("name", "id");
+        $algorithm_list = \App\Models\Algorithm::all()->lists("description", "name");
 
 
         $custom_script = "<script type='text/javascript'>";
@@ -87,6 +88,7 @@ class WidgetsController extends \App\Controllers\BaseController
             "type"                      => "create",
             'ruleset_list'              => $ruleset_list,
             'filter_list'               => $filter_list,
+            'algorithm_list'            => $algorithm_list,
             "index_item_widget_ruleset" => 1,
             "index_item_widget_filter"  => 1,
             "custom_script"             => $custom_script,
@@ -97,7 +99,7 @@ class WidgetsController extends \App\Controllers\BaseController
 
     public function postCreate()
     {
-        $inputs          = \Input::only("name", "description");
+        $inputs          = \Input::only("name", "description", "algo");
         $ruleset_ids     = \Input::get("item_id");
         $filter_ids      = \Input::get("filter_id");
         $ruleset_actives = array();
@@ -116,6 +118,7 @@ class WidgetsController extends \App\Controllers\BaseController
             $widget->name        = $inputs['name'];
             $widget->site_id     = $this->active_site_id;
             $widget->description = ($inputs['description'] !== "") ? $inputs['description'] : null;
+            $widget->reco_type   = $inputs['algo'];
             $widget->save();
 
             if ($widget->id) {
@@ -172,8 +175,9 @@ class WidgetsController extends \App\Controllers\BaseController
             $widget               = \App\Models\Widget::where("id", $id)->where("site_id", $this->active_site_id)->first();
             $widget_item_rulesets = \App\Models\WidgetRuleSet::where("widget_id", $id)->get()->toArray();
             $widget_item_filters  = \App\Models\WidgetFilter::where("widget_id", $id)->get()->toArray();
-            $ruleset_list         = \App\Models\RuleSet::where("site_id", $this->active_site_id)->lists("name", "id");
+            $ruleset_list         = \App\Models\Ruleset::where("site_id", $this->active_site_id)->lists("name", "id");
             $filter_list          = \App\Models\Filter::where("site_id", $this->active_site_id)->lists("name", "id");
+            $algorithm_list       = \App\Models\Algorithm::all()->lists("description", "name");
 
             $custom_script = "<script type='text/javascript'>";
             $custom_script .= "var site_url = '" . \URL::to('/') . "';";
@@ -182,7 +186,7 @@ class WidgetsController extends \App\Controllers\BaseController
             foreach ($widget_item_rulesets as $obj) {
                 $obj['last_index'] = count($widget_item_rulesets);
                 $json_obj          = json_encode($obj);
-                $custom_script .= "editItemWidgetRuleSet({$json_obj}, {$index_item_rule});"; //js func to make add itemruleedit
+                $custom_script .= "editItemWidgetRuleset({$json_obj}, {$index_item_rule});"; //js func to make add itemruleedit
                 $index_item_rule+=1;
             }
 
@@ -204,6 +208,7 @@ class WidgetsController extends \App\Controllers\BaseController
                         "widget_item_rulesets"      => $widget_item_rulesets,
                         "ruleset_list"              => $ruleset_list,
                         "filter_list"               => $filter_list,
+                        "algorithm_list"            => $algorithm_list,
                         "custom_script"             => $custom_script,
                         "number_of_items"           => $numberOfItems,
                         "number_of_filter_items"    => $numberOfFilterItems,
@@ -215,7 +220,7 @@ class WidgetsController extends \App\Controllers\BaseController
 
     public function postEdit($id)
     {
-        $input                   = \Input::only("name", "description");
+        $input                   = \Input::only("name", "description", "algo");
         $widget_item_ruleset_ids = \Input::get("item_id");
         $edit_widget_ruleset_ids = \Input::get("item_ruleset_id");
         $widget_item_filter_ids  = \Input::get("filter_id");
@@ -233,6 +238,7 @@ class WidgetsController extends \App\Controllers\BaseController
         if (isset($widget) && $widget_validator->passes()) {
             $widget->name        = $input["name"];
             $widget->description = $input["description"];
+            $widget->reco_type   = $input["algo"];
             $widget->update();
 
             $widget_item_rules = \App\Models\WidgetRuleSet::where("widget_id", $id)->get()->toArray();
@@ -295,10 +301,11 @@ class WidgetsController extends \App\Controllers\BaseController
                 if ($i > -1 && ($i <= count($widget_item_ruleset_ids))) {
                     $widget_ruleset             = \App\Models\WidgetRuleSet::find($value);
                     $widget_ruleset->ruleset_id = $widget_item_ruleset_ids[$i];
-                    $widget_ruleset->active     = $filter_actives[$i];
+                    $widget_ruleset->active     = $ruleset_actives[$i];
                     $widget_ruleset->update();
                 }
             }
+
 
             //update
             if (count($result_filter_array_diff_updated) > 0)

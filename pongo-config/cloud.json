@@ -1,0 +1,175 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Parameters": {
+        "Instanceid": {
+            "Type": "String"
+        }
+    },
+    "Resources": {
+        "PongoUpdate": {
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "Properties": {
+                "AvailabilityZones": [
+                    "ap-southeast-1a"
+                ],
+                "Cooldown": "60",
+                "DesiredCapacity": "1",
+                "MaxSize": "10",
+                "MinSize": "1",
+                "HealthCheckGracePeriod": "300",
+                "HealthCheckType": "EC2",
+                "VPCZoneIdentifier": [
+                    "subnet-9b09f7fe"
+                ],
+                "LaunchConfigurationName": {
+                    "Ref": "PongoLaunchConfiguration"
+                },
+                "LoadBalancerNames": [
+                    "sg-load-balancer"
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "Pongo-Autoscaling-instance",
+                        "PropagateAtLaunch": true
+                    }
+                ]
+            },
+            "UpdatePolicy": {
+                "AutoScalingRollingUpdate": {
+                    "MaxBatchSize": "2",
+                    "MinInstancesInService": "2",
+                    "PauseTime": "PT0S"
+                }
+            }
+        },
+        "PongoLaunchConfiguration": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "Properties": {
+                "ImageId": {
+                    "Ref": "Instanceid"
+                },
+                "InstanceType": "m3.medium",
+                "KeyName": "predictry",
+                "InstanceMonitoring": "true",
+                "SecurityGroups": [
+                    {
+                        "Ref": "PongoSecurityGroup"
+                    }
+                ],
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1",
+                        "Ebs": {
+                            "VolumeSize": 8
+                        }
+                    }
+                ]
+            }
+        },
+        "PongoSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "PongoSecurityGroup-with ports open for ssh,postgre and HTTP",
+                "VpcId": "vpc-e616fb83",
+                "SecurityGroupIngress": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "5432",
+                        "ToPort": "5432",
+                        "CidrIp": "0.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "22",
+                        "ToPort": "22",
+                        "CidrIp": "0.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "80",
+                        "ToPort": "80",
+                        "CidrIp": "0.0.0.0/0"
+                    }
+                ],
+                "SecurityGroupEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "CidrIp": "0.0.0.0/0"
+                    }
+                ]
+            }
+        },
+        "PongoScaleDownAlarmPolicy": {
+            "Type": "AWS::AutoScaling::ScalingPolicy",
+            "Properties": {
+                "AdjustmentType": "ChangeInCapacity",
+                "Cooldown": "60",
+                "ScalingAdjustment": "-1",
+                "AutoScalingGroupName": {
+                    "Ref": "PongoUpdate"
+                }
+            }
+        },
+        "PongoScaleUpAlarmPolicy": {
+            "Type": "AWS::AutoScaling::ScalingPolicy",
+            "Properties": {
+                "AdjustmentType": "ChangeInCapacity",
+                "Cooldown": "60",
+                "ScalingAdjustment": "1",
+                "AutoScalingGroupName": {
+                    "Ref": "PongoUpdate"
+                }
+            }
+        },
+        "ScaleDownAlarm": {
+            "Type": "AWS::CloudWatch::Alarm",
+            "Properties": {
+                "ActionsEnabled": "true",
+                "ComparisonOperator": "LessThanThreshold",
+                "EvaluationPeriods": "2",
+                "MetricName": "CPUUtilization",
+                "Namespace": "AWS/EC2",
+                "Period": "900",
+                "Statistic": "Average",
+                "Threshold": "50.0",
+                "AlarmActions": [
+                    {
+                        "Ref": "PongoScaleDownAlarmPolicy"
+                    }
+                ],
+                "Dimensions": [
+                    {
+                        "Name": "AutoScalingGroupName",
+                        "Value": {"Ref": "PongoUpdate"}
+                    }
+                ]
+            }
+        },
+        "ScaleUpAlarm": {
+            "Type": "AWS::CloudWatch::Alarm",
+            "Properties": {
+                "ActionsEnabled": "true",
+                "ComparisonOperator": "GreaterThanThreshold",
+                "EvaluationPeriods": "2",
+                "MetricName": "CPUUtilization",
+                "Namespace": "AWS/EC2",
+                "Period": "60",
+                "Statistic": "Average",
+                "Threshold": "50.0",
+                "AlarmActions": [
+                    {
+                        "Ref": "PongoScaleUpAlarmPolicy"
+                    }
+                ],
+                "Dimensions": [
+                    {
+                        "Name": "AutoScalingGroupName",
+                        "Value": {"Ref": "PongoUpdate"}
+                    }
+                ]
+            }
+        }
+    },
+    "Description": "Pongo-Update"
+}

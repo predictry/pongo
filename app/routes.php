@@ -72,9 +72,10 @@ Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), f
     $role = Session::get("role");
 
     Route::get('user', 'UserController@getDashboard');
+    Route::get('home', array('as' => 'home', 'uses' => 'PanelController@index'));
     Route::get('home2', array('as' => 'home2', 'uses' => 'PanelController@index'));
-//  Route::get('home2/{selected_comparison?}/{type?}/{bar_type?}/{type_by?}/{dt_start?}/{dt_end?}', array('as' => 'home2', 'uses' => 'PanelController@index2'));
-    Route::get('home/{selected_comparison?}/{type?}/{date_unit?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'PanelController@index2'));
+//	Route::get('home2/{selected_comparison?}/{type?}/{bar_type?}/{type_by?}/{dt_start?}/{dt_end?}', array('as' => 'home2', 'uses' => 'PanelController@index2'));
+//    Route::get('home/{selected_comparison?}/{type?}/{date_unit?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'PanelController@index2'));
     Route::get('sites/wizard', array('as' => 'sites', 'uses' => 'SitesController@getSiteWizard'));
     Route::get('sites/getModal', array('as' => 'sites', 'uses' => 'SitesController@getModalCreate'));
     Route::post('sites/ajaxSubmitSite', array('as' => 'sites', 'uses' => 'SitesController@postCreate'));
@@ -274,26 +275,47 @@ Route::group(array('prefix' => 'api/v2', 'namespace' => 'App\Controllers\Api'), 
      * POST - api/v2/user/{email} {get information of the user}
      */
     Route::resource('account', 'AccountController', array("only" => array("store", "show")));
+});
+
+/*
+  |--------------------------------------------------------------------------
+  | API Routing (V3)
+  |--------------------------------------------------------------------------
+ */
+Route::group(array('prefix' => 'api/v3', 'namespace' => 'App\Controllers\Api'), function() {
+    Route::resource('actions', 'Action3Controller', array("only" => array("index", "store", "show", "destroy")));
+    Route::resource('recommendation', 'Recommendation2Controller', array("only" => array("index")));
+    Route::resource('item', 'ItemController', array("only" => array("store")));
+    Route::resource('carts', 'CartController', array("only" => array("store")));
+    Route::resource('cartlog', 'CartLogController', array("only" => array("store")));
+    Route::resource('widget', 'WidgetInstanceController', array("only" => array("store")));
 
     /**
-     * POST - {prefix}/auth (store)
+     * api/v2/tenant/{tenant_id}/actions
      */
-    Route::resource('auth', 'AuthController', ['only' => ['index', 'store']]);
+    Route::resource('tenant', 'TenantController');
+    Route::resource('tenant.actions', 'TenantActionController', array("only" => array("index")));
+});
 
-    /**
-     * UNUSED
-     * AUTH FLOW : CLIENT CREDENTIALS
-     * POST - api/v2/auth
-     * @param string $email
-     * @param string password
-     */
-    Route::post('auth', 'AuthController@postAuth');
 
-    Route::group(array('before' => ''), function() {
-        Route::post('oauth/access_token', 'OAuthController@postAuthAccessToken');
-    });
+/**
+ * POST - {prefix}/auth (store)
+ */
+Route::resource('auth', 'AuthController', ['only' => ['index', 'store']]);
 
-    Route::group(array('before' => 'check-authorization-params|auth'), function() {
-        Route::post('oauth/authorize', 'OAuthController@postAuthorize');
-    });
+/**
+ * UNUSED
+ * AUTH FLOW : CLIENT CREDENTIALS
+ * POST - api/v2/auth
+ * @param string $email
+ * @param string password
+ */
+Route::post('auth', 'AuthController@postAuth');
+
+Route::group(array('before' => ''), function() {
+    Route::post('oauth/access_token', 'OAuthController@postAuthAccessToken');
+});
+
+Route::group(array('before' => 'check-authorization-params|auth'), function() {
+    Route::post('oauth/authorize', 'OAuthController@postAuthorize');
 });

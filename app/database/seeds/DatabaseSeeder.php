@@ -231,14 +231,120 @@ class ActionDataSeeder extends Seeder
                 $action_instance->created    = $dt_created;
                 $action_instance->save();
 
-//				if (true)
-//				{
-//					$action_instance_meta						 = new \App\Models\ActionInstanceMeta();
-//					$action_instance_meta->key					 = 'rec';
-//					$action_instance_meta->value				 = 'true';
-//					$action_instance_meta->action_instance_id	 = $action_instance->id;
-//					$action_instance_meta->save();
-//				}
+//                if (true) {
+//                    $action_instance_meta                     = new \App\Models\ActionInstanceMeta();
+//                    $action_instance_meta->key                = 'rec';
+//                    $action_instance_meta->value              = 'true';
+//                    $action_instance_meta->action_instance_id = $action_instance->id;
+//                    $action_instance_meta->save();
+//                }
+            }
+        }
+    }
+
+}
+
+class EngineTableSeeder extends Seeder
+{
+
+    public function run()
+    {
+        DB::table('engines')->delete();
+        \App\Models\Engine::create(
+                array(
+                    'name'        => 'Tapirus',
+                    'description' => 'Tapirus recommendation engine by using graph db'
+                )
+        );
+    }
+
+}
+
+class AlgorithmTableSeeder extends Seeder
+{
+
+    public function run()
+    {
+        $engines = [
+            [
+                'name'       => 'Tapirus',
+                'algorithms' => [
+                    [
+                        'name'        => 'oiv',
+                        'description' => 'Other items viewed'
+                    ],
+                    [
+                        'name'        => 'anon-oiv',
+                        'description' => 'Other items viewed, anonymously'
+                    ],
+                    [
+                        'name'        => 'oivt',
+                        'description' => 'Other items viewed together'
+                    ],
+                    [
+                        'name'        => 'ct-oivt',
+                        'description' => 'Other items viewed together, within the same category'
+                    ],
+                    [
+                        'name'        => 'oip',
+                        'description' => 'Other items purchased'
+                    ],
+                    [
+                        'name'        => 'anon-oip',
+                        'description' => 'Other items purchased, anonymously'
+                    ],
+                    [
+                        'name'        => 'oipt',
+                        'description' => 'Other items purchased together'
+                    ],
+                    [
+                        'name'        => 'ct-oipt',
+                        'description' => 'Other items purchased together, within the same category'
+                    ],
+                    [
+                        'name'        => 'trv',
+                        'description' => 'Top recent views'
+                    ],
+                    [
+                        'name'        => 'trp',
+                        'description' => 'Top recent purchases'
+                    ],
+                    [
+                        'name'        => 'trac',
+                        'description' => 'Top recent additions to cart'
+                    ],
+                    [
+                        'name'        => 'utrv',
+                        'description' => 'User\'s top recent views'
+                    ],
+                    [
+                        'name'        => 'utrp',
+                        'description' => "User's top recent purchases"
+                    ],
+                    [
+                        'name'        => 'utrac',
+                        'description' => "User's top recent additions to cart"
+                    ],
+                    [
+                        'name'        => 'uvnp',
+                        'description' => "User's unacquired interests"
+                    ],
+                    [
+                        'name'        => 'uacnp',
+                        'description' => "User's recent abandoned items"
+                    ]
+                ]
+            ]
+        ];
+
+        DB::table('algorithms')->delete();
+        foreach ($engines as $engine) {
+            $obj = App\Models\Engine::where('name', $engine['name'])->first();
+            if ($obj) {
+                foreach ($engine['algorithms'] as $algo) {
+                    $algo = array_merge(['engine_id' => $obj->id], $algo);
+                    \App\Models\Algorithm::create($algo);
+                }
             }
         }
     }
