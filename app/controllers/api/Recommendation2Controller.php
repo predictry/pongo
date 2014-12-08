@@ -51,9 +51,9 @@ class Recommendation2Controller extends ApiBaseController
         $this->gui_domain_auth = array(
 //            'appid'  => $this->predictry_server_api_key,
             'appid'  => "pongo", //hardcoded for temporary
-            'domain' => $this->predictry_server_tenant_id
+            'domain' => \Request::header("X-Predictry-Server-Tenant-ID")
         );
-
+        
         Gui::setUri(GUI_RESTAPI_URL);
         Gui::setCredential(GUI_HTTP_USERNAME, GUI_HTTP_PASSWORD);
         Gui::setDomainAuth($this->gui_domain_auth['appid'], $this->gui_domain_auth['domain']);
