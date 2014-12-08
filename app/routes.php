@@ -65,10 +65,10 @@ Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), f
     $role = Session::get("role");
 
     Route::get('user', 'UserController@getDashboard');
-    Route::get('home', array('as' => 'home', 'uses' => 'PanelController@index'));
+//    Route::get('home', array('as' => 'home', 'uses' => 'PanelController@index'));
     Route::get('home2', array('as' => 'home2', 'uses' => 'PanelController@index'));
 //	Route::get('home2/{selected_comparison?}/{type?}/{bar_type?}/{type_by?}/{dt_start?}/{dt_end?}', array('as' => 'home2', 'uses' => 'PanelController@index2'));
-//    Route::get('home/{selected_comparison?}/{type?}/{date_unit?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'PanelController@index2'));
+    Route::get('home/{selected_comparison?}/{type?}/{date_unit?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'PanelController@index2'));
     Route::get('sites/wizard', array('as' => 'sites', 'uses' => 'SitesController@getSiteWizard'));
     Route::get('sites/getModal', array('as' => 'sites', 'uses' => 'SitesController@getModalCreate'));
     Route::post('sites/ajaxSubmitSite', array('as' => 'sites', 'uses' => 'SitesController@postCreate'));
@@ -228,7 +228,7 @@ Route::group(array('prefix' => 'api/v1', 'namespace' => 'App\Controllers\Api'), 
 });
 
 Route::group(array('prefix' => 'api/v2', 'namespace' => 'App\Controllers\Api'), function() {
-    Route::resource('actions', 'Action2Controller', array("only" => array("index", "store", "show", "destroy")));
+    Route::resource('actions', 'Action3Controller', array("only" => array("index", "store", "show", "destroy")));
     Route::resource('recommendation', 'Recommendation2Controller', array("only" => array("index")));
     Route::resource('item', 'ItemController', array("only" => array("store")));
     Route::resource('carts', 'CartController', array("only" => array("store")));
