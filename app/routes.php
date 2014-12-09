@@ -230,7 +230,7 @@ Route::group(array('prefix' => 'api/v1', 'namespace' => 'App\Controllers\Api'), 
 Route::group(array('prefix' => 'api/v2', 'namespace' => 'App\Controllers\Api'), function() {
     Route::resource('actions', 'Action3Controller', array("only" => array("index", "store", "show", "destroy")));
     Route::resource('recommendation', 'Recommendation2Controller', array("only" => array("index")));
-    Route::resource('item', 'ItemController', array("only" => array("store")));
+    Route::resource('items', 'Item2Controller', array("only" => array("store", "destroy")));
     Route::resource('carts', 'CartController', array("only" => array("store")));
     Route::resource('cartlog', 'CartLogController', array("only" => array("store")));
     Route::resource('widget', 'WidgetInstanceController', array("only" => array("store")));
@@ -246,7 +246,7 @@ Route::group(array('prefix' => 'api/v2', 'namespace' => 'App\Controllers\Api'), 
 Route::group(array('prefix' => 'api/v3', 'namespace' => 'App\Controllers\Api'), function() {
     Route::resource('actions', 'Action3Controller', array("only" => array("index", "store", "show", "destroy")));
     Route::resource('recommendation', 'Recommendation2Controller', array("only" => array("index")));
-    Route::resource('item', 'ItemController', array("only" => array("store")));
+    Route::resource('items', 'Item2Controller', array("only" => array("store", "destroy")));
     Route::resource('carts', 'CartController', array("only" => array("store")));
     Route::resource('cartlog', 'CartLogController', array("only" => array("store")));
     Route::resource('widget', 'WidgetInstanceController', array("only" => array("store")));
