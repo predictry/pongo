@@ -19,7 +19,6 @@ use App\Controllers\ApiBaseController,
 class Action3Controller extends ApiBaseController
 {
 
-    protected $response    = array();
     protected $curl        = null;
     protected $is_new_item, $is_new_visitor, $is_new_action, $is_new_session, $is_new_browser, $is_anonymous;
     protected $action_id, $item_id, $visitor_id, $action_instance_id, $session_id, $browser_id;
@@ -37,13 +36,6 @@ class Action3Controller extends ApiBaseController
 
         $this->visitor_dt_created_timestamp = 0;
         $this->action_dt_created_timestamp  = 0;
-
-        $this->response = array(
-            "error"          => false,
-            "status"         => 200,
-            "message"        => "",
-            "client_message" => ""
-        );
 
         $this->gui_domain_auth = array(
 //            'appid'  => $this->predictry_server_api_key,
@@ -89,29 +81,27 @@ class Action3Controller extends ApiBaseController
             $input_validator = Validator::make($inputs, $rules);
             if ($input_validator->passes()) {
 
-                /**
-                 * queue data
-                 */
-                $data['browser_rules']  = $browser_rules;
-                $data['browser_inputs'] = array_merge(['tenant_id' => $this->predictry_server_tenant_id, 'api_key' => $this->predictry_server_api_key], $browser_inputs);
-                $data['inputs']         = $inputs;
-                $data['site_id']        = $this->site_id;
-
-                \Queue::push('App\Pongo\Queues\SendAction@store', $data);
-                $response = [
-                    'client_message' => '',
-                    'message'        => '',
-                    'status'         => 200,
-                    'error'          => false
-                ];
+                $browser_validator = \Validator::make($browser_inputs, $browser_rules);
+                if ($browser_validator->passes()) {
+                    /**
+                     * queue data
+                     */
+                    $data['browser_inputs'] = array_merge(['tenant_id' => $this->predictry_server_tenant_id, 'api_key' => $this->predictry_server_api_key], $browser_inputs);
+                    $data['inputs']         = $inputs;
+                    $data['site_id']        = $this->site_id;
+                    \Queue::push('App\Pongo\Queues\SendAction@store', $data);
+                }
+                else {
+                    $this->response = $this->getErrorResponse("", "200", "", $input_validator->errors()->first());
+                }
             }
             else
-                $response = $this->getErrorResponse("errorValidator", "200", "", $input_validator->errors()->first());
+                $this->response = $this->getErrorResponse("errorValidator", "200", "", $input_validator->errors()->first());
         }
         else
-            $response = $this->getErrorResponse("errorValidator", "200", "", $action_validator->errors()->first());
+            $this->response = $this->getErrorResponse("errorValidator", "200", "", $action_validator->errors()->first());
 
-        return Response::json($response, $this->http_status);
+        return Response::json($this->response, $this->http_status);
     }
 
 }

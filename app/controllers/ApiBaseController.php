@@ -26,6 +26,12 @@ class ApiBaseController extends \Controller
     public $http_status                = 200;
     public $gui_domain_auth            = array();
     private $message                   = "";
+    public $response                   = [
+        'error'          => false,
+        'status'         => 200,
+        'message'        => '',
+        "client_message" => ""
+    ];
 
     public function __construct()
     {
