@@ -20,7 +20,6 @@ use App\Controllers\ApiBaseController,
 class Recommendation2Controller extends ApiBaseController
 {
 
-    protected $response     = array();
     private $operator_types = array();
     protected $repository;
 
@@ -41,19 +40,12 @@ class Recommendation2Controller extends ApiBaseController
             'less_than_equal'    => 'Less Than or Equal'
         );
 
-        $this->response = array(
-            "error"          => false,
-            "status"         => 200,
-            "message"        => "",
-            "client_message" => ""
-        );
-
         $this->gui_domain_auth = array(
 //            'appid'  => $this->predictry_server_api_key,
             'appid'  => "pongo", //hardcoded for temporary
             'domain' => \Request::header("X-Predictry-Server-Tenant-ID")
         );
-        
+
         Gui::setUri(GUI_RESTAPI_URL);
         Gui::setCredential(GUI_HTTP_USERNAME, GUI_HTTP_PASSWORD);
         Gui::setDomainAuth($this->gui_domain_auth['appid'], $this->gui_domain_auth['domain']);
