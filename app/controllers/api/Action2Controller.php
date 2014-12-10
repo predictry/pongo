@@ -22,7 +22,6 @@ use App\Controllers\ApiBaseController,
 class Action2Controller extends ApiBaseController
 {
 
-    protected $response          = array();
     protected $curl              = null;
     protected $action_repository = null;
     protected $is_new_item, $is_new_visitor, $is_new_action, $is_new_session, $is_new_browser, $is_anonymous;
@@ -129,7 +128,7 @@ class Action2Controller extends ApiBaseController
                             $this->session_id = $this->action_repository->getSessionID($inputs['session_id'], $this->site_id, $this->browser_id, $this->visitor_id, $this->is_new_session); //get session_id
                         }
                         else
-                            $this->session_id = $this->action_repository->getSessionID($inputs['session_id'], $this->site_id, null, $this->is_new_session); //get session_id
+                            $this->session_id = $this->action_repository->getSessionID($inputs['session_id'], $this->site_id, $this->browser_id, null, $this->is_new_session); //get session_id
 
                         if ($inputs['action']['name'] === 'view') {
                             $this->_proceedViewAction($inputs);
@@ -140,14 +139,12 @@ class Action2Controller extends ApiBaseController
                         }
                         else
                             $this->_proceedCustomAction($inputs);
-
-                        $response = $this->response;
                     }
                     else
-                        $response = $this->getErrorResponse("errorValidator", "200", "", $user_validator->errors()->first());
+                        $this->response = $this->getErrorResponse("errorValidator", "200", "", $user_validator->errors()->first());
                 }
                 else
-                    $response = $this->getErrorResponse("errorValidator", "200", "", $input_validator->errors()->first());
+                    $this->response = $this->getErrorResponse("errorValidator", "200", "", $input_validator->errors()->first());
             }
             catch (Exception $ex)
             {
@@ -155,9 +152,9 @@ class Action2Controller extends ApiBaseController
             }
         }
         else
-            $response = $this->getErrorResponse("errorValidator", "200", "", $action_validator->errors()->first());
+            $this->response = $this->getErrorResponse("errorValidator", "200", "", $action_validator->errors()->first());
 
-        return Response::json($response, $this->http_status);
+        return Response::json($this->response, $this->http_status);
     }
 
     function _proceedViewAction($inputs)

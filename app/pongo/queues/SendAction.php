@@ -130,7 +130,7 @@ class SendAction
                     $this->session_id = $this->action_repository->getSessionID($inputs['session_id'], $this->site_id, $this->browser_id, $this->visitor_id, $this->is_new_session); //get session_id
                 }
                 else
-                    $this->session_id = $this->action_repository->getSessionID($inputs['session_id'], $this->site_id, null, $this->is_new_session); //get session_id
+                    $this->session_id = $this->action_repository->getSessionID($inputs['session_id'], $this->site_id, $this->browser_id, null, $this->is_new_session); //get session_id
 
                 if ($inputs['action']['name'] === 'view') {
                     $this->_proceedViewAction($inputs);
@@ -269,11 +269,11 @@ class SendAction
     private function _proceedToGui($item_data, $user_data, $action_data)
     {
 //        if ($this->is_new_item)
-            $this->_postItemToGui($item_data);
+        $this->_postItemToGui($item_data);
 
 //        if ($this->is_new_visitor) {
-            $user_data = array_add($user_data, "timestamp", $this->visitor_dt_created_timestamp);
-            $this->_postUserToGui($user_data);
+        $user_data = array_add($user_data, "timestamp", $this->visitor_dt_created_timestamp);
+        $this->_postUserToGui($user_data);
 //        }
 
         $action_data = array_add($action_data, "item_id", $this->item_id);
