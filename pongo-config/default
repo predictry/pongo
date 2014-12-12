@@ -12,7 +12,9 @@ server {
 	rewrite_log on;
 
 	error_page 404 /index.php;
-
+	
+	add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PUT, DELETE';
+	
 	location / {
 		try_files $uri $uri/ /index.php?$query_string;
 
