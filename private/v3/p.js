@@ -819,7 +819,7 @@ if (typeof Predictry !== 'object') {
 
                 recent_xhr = http;
                 http.onreadystatechange = function () {//Call a function when the state changes.
-                    if (http.readyState === 4 && http.status === 200) {
+                    if (http.readyState === 4) {
                         if (isDefined(callback)) {
                             if (isFunction(callback))
                                 callback(http.responseText);
@@ -1077,6 +1077,34 @@ if (typeof Predictry !== 'object') {
                 getRecommendedItems: getRecommendedItems,
                 track: track,
                 drawList: drawTextListRecommendation,
+                removeItem: function (id) {
+                    if (isDefined(id)) {
+                        config_request_content_type = "application/json; charset=utf-8";
+                        config_request_method = "DELETE";
+                        return sendRequest(config_api_url + config_api_resources[2] + "/" + id, {tenant_id: tenant_id, api_key: api_key}, true);
+                    } else {
+                        return;
+                    }
+                },
+                updateItem: function (data) {
+                    console.log(data);
+                    if (isDefined(data) && isObject(data)) {
+                        if (isDefined(data.item)) {
+                            config_request_content_type = "application/json; charset=utf-8";
+                            config_request_method = "PUT";
+                            return sendRequest(config_api_url + config_api_resources[2] + "/" + data.item.item_id, data, true, null, true);
+                        }
+                    }
+                    return;
+                },
+                addItem: function (data) {
+                    if (isDefined(data) && isObject(data)) {
+                        if (isDefined(data.item)) {
+                            config_request_content_type = "application/json; charset=utf-8";
+                            return sendRequest(config_api_url + config_api_resources[2], data, true, null, true);
+                        }
+                    }
+                },
                 cart_id: temp_cart_id,
                 widget_id: widget_id,
                 widget_instance_id: widget_instance_id,

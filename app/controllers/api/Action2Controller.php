@@ -22,7 +22,6 @@ use App\Controllers\ApiBaseController,
 class Action2Controller extends ApiBaseController
 {
 
-    protected $response          = array();
     protected $curl              = null;
     protected $action_repository = null;
     protected $is_new_item, $is_new_visitor, $is_new_action, $is_new_session, $is_new_browser, $is_anonymous;
@@ -82,75 +81,80 @@ class Action2Controller extends ApiBaseController
         $action_validator = Validator::make(Input::only("action"), array("action" => "required"));
 
         if ($action_validator->passes()) {
-            $browser_inputs = Input::only("session_id", "browser_id", "user_id");
-            $inputs         = array_merge($browser_inputs, Input::only("action", "user", "items"));
-            $rules          = array(
-                "session_id" => "required",
-                "browser_id" => "",
-                "user_id"    => "",
-                "items"      => "array"
-            );
+            try
+            {
+                $browser_inputs = Input::only("session_id", "browser_id", "user_id");
+                $inputs         = array_merge($browser_inputs, Input::only("action", "user", "items"));
+                $rules          = array(
+                    "session_id" => "required",
+                    "browser_id" => "",
+                    "user_id"    => "",
+                    "items"      => "array"
+                );
 
-            $input_validator = Validator::make($inputs, $rules);
+                $input_validator = Validator::make($inputs, $rules);
 
-            if ($input_validator->passes()) {
+                if ($input_validator->passes()) {
 
-                //validating user data
-                $user_property_rules = array("email" => (isset($inputs['user']['email']) && $inputs['user']['email'] !== "") ? "required|email" : "");
+                    //validating user data
+                    $user_property_rules = array("email" => (isset($inputs['user']['email']) && $inputs['user']['email'] !== "") ? "required|email" : "");
 
-                //if client didn't set the user object values, then replace it using generated uid
-                if (!isset($inputs['user'])) {
-                    $inputs['user']     = array_add($inputs['user'], "user_id", $inputs['user_id']);
-                    $this->is_anonymous = true;
-                }
+                    //if client didn't set the user object values, then replace it using generated uid
+                    if (!isset($inputs['user'])) {
+                        $inputs['user']     = array_add($inputs['user'], "user_id", $inputs['user_id']);
+                        $this->is_anonymous = true;
+                    }
 
-                $user_validator = Validator::make($inputs['user'], $user_property_rules);
-                if ($user_validator->passes()) {
-                    $this->browser_id = $this->action_repository->getBrowserID($inputs['browser_id'], $this->is_new_browser); //get browser_id
-                    //if user is anonymous, don't create visitor info (only for identified user)
-                    if (!$this->is_anonymous) {
+                    $user_validator = Validator::make($inputs['user'], $user_property_rules);
+                    if ($user_validator->passes()) {
+                        $this->browser_id = $this->action_repository->getBrowserID($inputs['browser_id'], $this->is_new_browser); //get browser_id
+                        //if user is anonymous, don't create visitor info (only for identified user)
+                        if (!$this->is_anonymous) {
 
-                        $this->visitor_id = $this->action_repository->getVisitorID($inputs['user'], $inputs['session_id']);
-                        //none of the session that use any of the visitor_id then create new for that
-                        //possibility, user anonymous and session expired.
-                        if (!$this->visitor_id) {
+                            $this->visitor_id = $this->action_repository->getVisitorID($inputs['user'], $inputs['session_id']);
+                            //none of the session that use any of the visitor_id then create new for that
+                            //possibility, user anonymous and session expired.
+                            if (!$this->visitor_id) {
 
-                            $visitor = $this->action_repository->setVisitor($inputs['user']);
-                            if ($visitor) {
+                                $visitor = $this->action_repository->setVisitor($inputs['user']);
+                                if ($visitor) {
 
-                                $this->is_new_visitor               = $this->visitor_id                   = $visitor->id;
-                                $dt_created                         = new Carbon($visitor->created_at);
-                                $this->visitor_dt_created_timestamp = $dt_created->timestamp;
+                                    $this->is_new_visitor               = $this->visitor_id                   = $visitor->id;
+                                    $dt_created                         = new Carbon($visitor->created_at);
+                                    $this->visitor_dt_created_timestamp = $dt_created->timestamp;
+                                }
                             }
+
+                            $this->session_id = $this->action_repository->getSessionID($inputs['session_id'], $this->site_id, $this->browser_id, $this->visitor_id, $this->is_new_session); //get session_id
                         }
+                        else
+                            $this->session_id = $this->action_repository->getSessionID($inputs['session_id'], $this->site_id, $this->browser_id, null, $this->is_new_session); //get session_id
 
-                        $this->session_id = $this->action_repository->getSessionID($inputs['session_id'], $this->visitor_id, $this->is_new_session); //get session_id
+                        if ($inputs['action']['name'] === 'view') {
+                            $this->_proceedViewAction($inputs);
+                        }
+                        else if ($inputs['action']['name'] === 'buy' || $inputs['action']['name'] === "started_checkout" || $inputs['action']['name'] === "started_payment") {
+                            if ($this->_proceedBulkAction($inputs['action']['name'], $inputs))
+                                $this->http_status = 200;
+                        }
+                        else
+                            $this->_proceedCustomAction($inputs);
                     }
                     else
-                        $this->session_id = $this->action_repository->getSessionID($inputs['session_id'], null, $this->is_new_session); //get session_id
-
-                    if ($inputs['action']['name'] === 'view') {
-                        $this->_proceedViewAction($inputs);
-                    }
-                    else if ($inputs['action']['name'] === 'buy' || $inputs['action']['name'] === "started_checkout" || $inputs['action']['name'] === "started_payment") {
-                        if ($this->_proceedBulkAction($inputs['action']['name'], $inputs))
-                            $this->http_status = 200;
-                    }
-                    else
-                        $this->_proceedCustomAction($inputs);
-
-                    $response = $this->response;
+                        $this->response = $this->getErrorResponse("errorValidator", "200", "", $user_validator->errors()->first());
                 }
                 else
-                    $response = $this->getErrorResponse("errorValidator", "200", "", $user_validator->errors()->first());
+                    $this->response = $this->getErrorResponse("errorValidator", "200", "", $input_validator->errors()->first());
             }
-            else
-                $response = $this->getErrorResponse("errorValidator", "200", "", $input_validator->errors()->first());
+            catch (Exception $ex)
+            {
+                \Log::error($ex->getMessage());
+            }
         }
         else
-            $response = $this->getErrorResponse("errorValidator", "200", "", $action_validator->errors()->first());
+            $this->response = $this->getErrorResponse("errorValidator", "200", "", $action_validator->errors()->first());
 
-        return Response::json($response, $this->http_status);
+        return Response::json($this->response, $this->http_status);
     }
 
     function _proceedViewAction($inputs)

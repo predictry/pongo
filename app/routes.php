@@ -72,10 +72,10 @@ Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), f
     $role = Session::get("role");
 
     Route::get('user', 'UserController@getDashboard');
-    Route::get('home', array('as' => 'home', 'uses' => 'PanelController@index'));
+//    Route::get('home', array('as' => 'home', 'uses' => 'PanelController@index'));
     Route::get('home2', array('as' => 'home2', 'uses' => 'PanelController@index'));
 //	Route::get('home2/{selected_comparison?}/{type?}/{bar_type?}/{type_by?}/{dt_start?}/{dt_end?}', array('as' => 'home2', 'uses' => 'PanelController@index2'));
-//    Route::get('home/{selected_comparison?}/{type?}/{date_unit?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'PanelController@index2'));
+    Route::get('home/{selected_comparison?}/{type?}/{date_unit?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'PanelController@index2'));
     Route::get('sites/wizard', array('as' => 'sites', 'uses' => 'SitesController@getSiteWizard'));
     Route::get('sites/getModal', array('as' => 'sites', 'uses' => 'SitesController@getModalCreate'));
     Route::post('sites/ajaxSubmitSite', array('as' => 'sites', 'uses' => 'SitesController@postCreate'));
@@ -238,63 +238,66 @@ Route::group(array('prefix' => 'v1', 'namespace' => 'App\Controllers\Api'), func
   | API Routing (V1)
   |--------------------------------------------------------------------------
  */
-Route::group(array('prefix' => 'api/v1', 'namespace' => 'App\Controllers\Api'), function() {
-    Route::resource('predictry', 'ActionController', array("only" => array("index", "store", "show", "destroy")));
-    Route::resource('recommendation', 'RecommendationController', array("only" => array("index")));
-    Route::resource('activation', 'ItemActivationController', array("only" => array("index", "store")));
-    Route::resource('item', 'ItemController', array("only" => array("store")));
-    Route::resource('cart', 'CartController', array("only" => array("store")));
-    Route::resource('cartlog', 'CartLogController', array("only" => array("store")));
-    Route::resource('widget', 'WidgetInstanceController', array("only" => array("store")));
-});
+Route::group(array('prefix' => 'api', 'namespace' => 'App\Controllers\Api'), function() {
 
-/*
-  |--------------------------------------------------------------------------
-  | API Routing (V2)
-  |--------------------------------------------------------------------------
- */
-Route::group(array('prefix' => 'api/v2', 'namespace' => 'App\Controllers\Api'), function() {
-    /**
-     * Predictry Data End Points
-     */
-    Route::resource('actions', 'Action2Controller', array("only" => array("index", "store", "show", "destroy")));
-    Route::resource('recommendations', 'Recommendation2Controller', array("only" => array("index")));
-    Route::resource('items', 'ItemController', array("only" => array("store")));
-    Route::resource('carts', 'CartController', array("only" => array("store")));
-    Route::resource('cartlogs', 'CartLogController', array("only" => array("store")));
-    Route::resource('widgets', 'WidgetInstanceController', array("only" => array("store")));
+    //Allow from any origin
+    if (isset($_SERVER['HTTP_ORIGIN'])) {
+        header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
+        header('Access-Control-Allow-Credentials: true');
+        header('Access-Control-Max-Age: 86400'); // cache for 1 day
+    }
+    // Access-Control headers are received during OPTIONS requests
+    if (isset($_SERVER['REQUEST_METHOD']) && ($_SERVER['REQUEST_METHOD'] == 'OPTIONS')) {
+        if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']))
+            header("Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS");
 
-    /**
-     * api/v2/tenant/{tenant_id}/actions
-     */
-    Route::resource('tenant', 'TenantController');
-    Route::resource('tenant.actions', 'TenantActionController', array("only" => array("index")));
+        if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']))
+            header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
 
-    /**
-     * POST - api/v2/user (create new user)
-     * POST - api/v2/user/{email} {get information of the user}
-     */
-    Route::resource('account', 'AccountController', array("only" => array("store", "show")));
-});
+        exit(0);
+    }
 
-/*
-  |--------------------------------------------------------------------------
-  | API Routing (V3)
-  |--------------------------------------------------------------------------
- */
-Route::group(array('prefix' => 'api/v3', 'namespace' => 'App\Controllers\Api'), function() {
-    Route::resource('actions', 'Action3Controller', array("only" => array("index", "store", "show", "destroy")));
-    Route::resource('recommendation', 'Recommendation2Controller', array("only" => array("index")));
-    Route::resource('item', 'ItemController', array("only" => array("store")));
-    Route::resource('carts', 'CartController', array("only" => array("store")));
-    Route::resource('cartlog', 'CartLogController', array("only" => array("store")));
-    Route::resource('widget', 'WidgetInstanceController', array("only" => array("store")));
+    Route::group(array('prefix' => 'v1'), function() {
+        Route::resource('predictry', 'ActionController', array("only" => array("index", "store", "show", "destroy")));
+        Route::resource('recommendation', 'RecommendationController', array("only" => array("index")));
+        Route::resource('activation', 'ItemActivationController', array("only" => array("index", "store")));
+        Route::resource('item', 'ItemController', array("only" => array("store")));
+        Route::resource('cart', 'CartController', array("only" => array("store")));
+        Route::resource('cartlog', 'CartLogController', array("only" => array("store")));
+        Route::resource('widget', 'WidgetInstanceController', array("only" => array("store")));
+    });
 
-    /**
-     * api/v2/tenant/{tenant_id}/actions
-     */
-    Route::resource('tenant', 'TenantController');
-    Route::resource('tenant.actions', 'TenantActionController', array("only" => array("index")));
+    Route::group(array('prefix' => 'v2'), function() {
+        Route::resource('actions', 'Action2Controller', array("only" => array("index", "store", "show", "destroy")));
+        Route::resource('recommendation', 'Recommendation2Controller', array("only" => array("index")));
+        Route::resource('items', 'Item2Controller', array("only" => array("store", "update", "destroy")));
+        Route::resource('carts', 'CartController', array("only" => array("store")));
+        Route::resource('cartlog', 'CartLogController', array("only" => array("store")));
+        Route::resource('widget', 'WidgetInstanceController', array("only" => array("store")));
+
+        //@TODO - Create route to fetch recent actions by site
+        /**
+         * api/v2/tenant/{tenant_id}/actions
+         */
+        Route::resource('tenant', 'TenantController');
+        Route::resource('tenant.actions', 'TenantActionController', array("only" => array("index")));
+    });
+
+    Route::group(array('prefix' => 'v3'), function() {
+        Route::resource('actions', 'Action3Controller', array("only" => array("index", "store", "show", "destroy")));
+        Route::resource('recommendation', 'Recommendation2Controller', array("only" => array("index")));
+        Route::resource('items', 'Item2Controller', array("only" => array("store", "update", "destroy")));
+        Route::resource('carts', 'CartController', array("only" => array("store")));
+        Route::resource('cartlog', 'CartLogController', array("only" => array("store")));
+        Route::resource('widget', 'WidgetInstanceController', array("only" => array("store")));
+
+        //@TODO - Create route to fetch recent actions by site
+        /**
+         * api/v2/tenant/{tenant_id}/actions
+         */
+        Route::resource('tenant', 'TenantController');
+        Route::resource('tenant.actions', 'TenantActionController', array("only" => array("index")));
+    });
 });
 
 
