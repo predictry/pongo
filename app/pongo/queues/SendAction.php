@@ -93,7 +93,6 @@ class SendAction
 
     function _proceed($inputs)
     {
-        \Log::debug(json_encode($inputs));
         //validating user data
         $user_property_rules = array(
             "email" => (isset($inputs['user']['email']) && $inputs['user']['email'] !== "") ? "required|email" : ""
