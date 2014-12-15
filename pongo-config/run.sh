@@ -70,13 +70,11 @@ fi
 sudo rm -R /home/ubuntu/pongo/
 
 #running composer 
-cd /usr/share/nginx/html/www/pongo/ && sudo composer install --prefer-source && sudo php artisan migrate && sudo composer dumpautoload
+cd /usr/share/nginx/html/www/pongo/ && sudo composer install --prefer-source && sudo php artisan migrate --force && sudo composer dumpautoload
 cd /usr/share/nginx/html/www/pongo/ && sudo composer install && sudo composer dumpautoload
 
 #changing permission for app/storage
 sudo chmod -R 777 /usr/share/nginx/html/www/pongo/app/storage 
-
-
 
 # reloading nginx and php
 sudo service php5-fpm reload
