@@ -93,15 +93,24 @@ class SendAction
 
     function _proceed($inputs)
     {
+        \Log::debug(json_encode($inputs));
         //validating user data
         $user_property_rules = array(
             "email" => (isset($inputs['user']['email']) && $inputs['user']['email'] !== "") ? "required|email" : ""
         );
 
         //if client didn't set the user object values, then replace it using generated uid
-        if (!isset($inputs['user'])) {
+        if (!isset($inputs['user']) || count($inputs['user']) <= 0) {
             $inputs['user']     = array_add($inputs['user'], "user_id", $inputs['user_id']);
             $this->is_anonymous = true;
+        }
+        else {
+
+            if (!isset($inputs['user']['user_id'])) {
+                $inputs['user']['user_id'] = isset($inputs['user_id']) ? $inputs['user_id'] : 0;
+            }
+
+            $this->is_anonymous = false;
         }
 
         $user_validator = Validator::make($inputs['user'], $user_property_rules);
@@ -112,7 +121,7 @@ class SendAction
                 $this->browser_id = $this->action_repository->getBrowserID($inputs['browser_id'], $this->is_new_browser); //get browser_id
                 //if user is anonymous, don't create visitor info (only for identified user)
                 if (!$this->is_anonymous) {
-                    $this->visitor_id = $this->action_repository->getVisitorID($inputs['user'], $inputs['session_id']);
+                    $this->visitor_id = $this->action_repository->getVisitorID($inputs['user'], $inputs['session_id'], $this->site_id);
                     //possibility, user anonymous and session expired.
                     if (!$this->visitor_id) {
 
@@ -210,9 +219,10 @@ class SendAction
                 $this->action_id = $this->action_repository->getActionID(array("name" => $action_name), $this->site_id, $this->is_new_action);
                 if ($this->action_id) {
 
-                    $action_instance = $this->action_repository->getActionInstance($this->action_id, $this->item_id, $this->session_id);
-                    if (is_object($action_instance)) {
+                    $log_dt_created  = $this->action_repository->isLogContainDateTime($action_data);
+                    $action_instance = $this->action_repository->getActionInstance($this->action_id, $this->item_id, $this->session_id, ($log_dt_created) ? $log_dt_created : false);
 
+                    if (is_object($action_instance)) {
                         $this->action_instance_id = $action_instance->id;
                         $this->action_repository->setActionMeta($action_instance->id, $action_data['action']);
                     }
@@ -242,17 +252,21 @@ class SendAction
             $action_properties = array_merge($action_properties_without_name, $item);
             unset($action_properties['item_id']);
 
-            $item_model = Item::where("identifier", $item['item_id'])->where("site_id", $this->site_id)->get()->first();
+            $item_model = Item::where("identifier", $item['item_id'])->where("site_id", $this->site_id)->first();
+
+            //what if the item not found?
             if ($item_model) {
-                $action_instance = $this->action_repository->getActionInstance($this->action_id, $this->item_id, $this->session_id);
                 $this->item_id   = $item_model->id;
+                $log_dt_created  = $this->action_repository->isLogContainDateTime($action_data);
+                $action_instance = $this->action_repository->getActionInstance($this->action_id, $this->item_id, $this->session_id, ($log_dt_created) ? $log_dt_created : false);
                 if (is_object($action_instance)) {
                     $this->action_instance_id = $action_instance->id;
                     $this->action_repository->setActionMeta($action_instance->id, $action_data['action']);
                 }
             }
             else {
-                $this->response = $this->getErrorResponse("errorValidator", "200", "", "Item not found.");
+                $this->response['error']   = true;
+                $this->response['message'] = "Item not found";
                 break;
             }
 
