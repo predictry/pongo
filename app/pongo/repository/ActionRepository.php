@@ -86,13 +86,13 @@ class ActionRepository
         }
     }
 
-    function getActionInstance($action_id, $item_id, $session_id)
+    function getActionInstance($action_id, $item_id, $session_id, $created = false)
     {
         $action_instance = ActionInstance::firstOrCreate([
                     'action_id'  => $action_id,
                     'session_id' => $session_id,
                     'item_id'    => isset($item_id) ? $item_id : 0,
-                    'created'    => new Carbon("now")
+                    'created'    => (!$created) ? new Carbon("now") : $created
         ]);
 
         return $action_instance;
@@ -108,7 +108,7 @@ class ActionRepository
         return $browser->id;
     }
 
-    function getVisitorID($data, $session)
+    function getVisitorID($data, $session, $site_id)
     {
         //since the email is optional. Please assign empty if not set
         $visitor_id  = false;
@@ -130,7 +130,7 @@ class ActionRepository
             $visitors = Visitor::where("email", $user_data['email'])->get()->toArray();
             //check if one of the visitor used by one of the session from the specific site.
             foreach ($visitors as $v) {
-                $obj_session = Session::where("site_id", $this->site_id)->where("visitor_id", $v['id'])->first();
+                $obj_session = Session::where("site_id", $site_id)->where("visitor_id", $v['id'])->first();
                 if ($obj_session) {
                     $visitor_id = $v['id'];
                     break;
@@ -231,23 +231,24 @@ class ActionRepository
 
     function getCartID($session_id)
     {
+        $cart_id           = $count_used_before = -1;
+        $cart              = Cart::where("session_id", $session_id)->get()->last();
 
-        function _getCartID($session_id)
-        {
-            $cart_id           = -1;
-            $cart              = Cart::where("session_id", $session_id)->get()->last();
+        if ($cart) {
             $count_used_before = ActionInstanceMeta::where("key", "cart_id")->where("value", $cart->id)->get()->count();
-
-            if ($count_used_before > 0) {
-                $new_cart = Cart::create(['session_id' => $session_id]);
-                $cart_id  = ($new_cart->id) ? $new_cart->id : -1;
-            }
-            else
-                $cart_id = $cart->id;
-
-            return $cart_id;
         }
 
+        if ($count_used_before > 0 || is_null($cart)) {
+            $new_cart             = new Cart();
+            $new_cart->session_id = $session_id;
+            $new_cart->save();
+
+            $cart_id = ($new_cart->id) ? $new_cart->id : -1;
+        }
+        else
+            $cart_id = $cart->id;
+
+        return $cart_id;
     }
 
     function compareAndUpdateItemMetas($item_id, $item_data)
@@ -282,6 +283,15 @@ class ActionRepository
                 $item_meta->save();
             }
         }
+    }
+
+    function isLogContainDateTime($input)
+    {
+        if (isset($input['log_date_created_at']) && $input['log_time_created_at']) {
+            return Carbon::parse("{$input['log_date_created_at']} {$input['log_time_created_at']}");
+        }
+
+        return false;
     }
 
 }
