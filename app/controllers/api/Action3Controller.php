@@ -83,12 +83,16 @@ class Action3Controller extends ApiBaseController
 
                 $browser_validator = \Validator::make($browser_inputs, $browser_rules);
                 if ($browser_validator->passes()) {
+
                     /**
                      * queue data
                      */
-                    $data['browser_inputs'] = array_merge(['tenant_id' => $this->predictry_server_tenant_id, 'api_key' => $this->predictry_server_api_key], $browser_inputs);
-                    $data['inputs']         = $inputs;
-                    $data['site_id']        = $this->site_id;
+                    $now                         = \Carbon\Carbon::now("Europe/Stockholm");
+                    $data['browser_inputs']      = array_merge(['tenant_id' => $this->predictry_server_tenant_id, 'api_key' => $this->predictry_server_api_key], $browser_inputs);
+                    $data['inputs']              = $inputs;
+                    $data['site_id']             = $this->site_id;
+                    $data['log_date_created_at'] = $now->toDateString();
+                    $data['log_time_created_at'] = $now->toTimeString();
                     \Queue::push('App\Pongo\Queues\SendAction@store', $data);
                 }
                 else {
