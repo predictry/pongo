@@ -428,7 +428,7 @@ if (typeof Predictry !== 'object') {
                     config_api_url = "http://api-aws.predictry.com/api/v3/",
                     config_img_url = "https://d1j642hg7oh3vx.cloudfront.net/",
                     config_api_resources = ["actions", "users", "items", "carts", "cartlogs", "recommendation"],
-                    config_default_actions = ["view", "add_to_cart", "buy", "started_checkout", "started_payment"],
+                    config_default_actions = ["view", "add_to_cart", "buy", "started_checkout", "started_payment", "check_delete_item"],
                     config_session_cookie_timeout = 63072000000, // 2 years
                     config_tracking_session_cookie_timeout = 1200000, //20 minutes
                     config_do_not_track = false,
@@ -865,10 +865,14 @@ if (typeof Predictry !== 'object') {
             }
 
             function getWidgetInstanceID(uri) {
-                if (isDefined(uri) && isDefined(getParameter(uri, "predictry_src")))
+
+                if (isDefined(uri) && isDefined(getParameter(uri, "predictry_src"))) {
                     widget_instance_id = getParameter(uri, "predictry_src");
+                    trackDeleteItem(widget_instance_id); //send track check_delete.gif
+                }
                 else
                     widget_instance_id = -1;
+
                 return widget_instance_id;
             }
 
@@ -963,6 +967,18 @@ if (typeof Predictry !== 'object') {
                     }
                 }
 
+                config_request_content_type = "application/json; charset=utf-8";
+                return sendRequest(config_api_url + config_api_resources[0], data, true, null, true);
+            }
+
+            function trackDeleteItem(widget_instance_id) {
+
+                var data = {
+                    "action": {"name": "check_delete_item"},
+                    "widget_instance_id": widget_instance_id
+                };
+
+                data = appendPredictryData(data);
                 config_request_content_type = "application/json; charset=utf-8";
                 return sendRequest(config_api_url + config_api_resources[0], data, true, null, true);
             }

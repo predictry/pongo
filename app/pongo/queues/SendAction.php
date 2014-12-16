@@ -210,29 +210,25 @@ class SendAction
 
         //validating the item first is important since, item will always associated with the action
         //item will no longer compulsary
-        if ($item_validator->passes()) {
+        if ($item_validator->passes())
             $this->item_id = $this->action_repository->getItemID($items_data, $this->site_id, $this->is_new_item);
 
-            if ($this->item_id) {
+        $this->action_id = $this->action_repository->getActionID(array("name" => $action_name), $this->site_id, $this->is_new_action);
+        if ($this->action_id) {
 
-                $this->action_id = $this->action_repository->getActionID(array("name" => $action_name), $this->site_id, $this->is_new_action);
-                if ($this->action_id) {
+            $log_dt_created  = $this->action_repository->isLogContainDateTime($action_data);
+            $action_instance = $this->action_repository->getActionInstance($this->action_id, $this->item_id, $this->session_id, ($log_dt_created) ? $log_dt_created : false);
 
-                    $log_dt_created  = $this->action_repository->isLogContainDateTime($action_data);
-                    $action_instance = $this->action_repository->getActionInstance($this->action_id, $this->item_id, $this->session_id, ($log_dt_created) ? $log_dt_created : false);
-
-                    if (is_object($action_instance)) {
-                        $this->action_instance_id = $action_instance->id;
-                        $this->action_repository->setActionMeta($action_instance->id, $action_data['action']);
-                    }
-
-                    if ($this->response['error'])
-                        return false;
-
-                    $this->action_data = $action_data;
-                    return true;
-                }
+            if (is_object($action_instance)) {
+                $this->action_instance_id = $action_instance->id;
+                $this->action_repository->setActionMeta($action_instance->id, $action_data['action']);
             }
+
+            if ($this->response['error'])
+                return false;
+
+            $this->action_data = $action_data;
+            return true;
         }
 
         return false;
