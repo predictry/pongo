@@ -73,9 +73,10 @@ class ActionRepository
 
     function setActionMeta($action_instance_id, $properties)
     {
+        \Log::info(json_encode($properties));
         if (is_array($properties) && count($properties) > 0) {
             foreach ($properties as $key => $val) {
-                if ($val !== "" && (is_array($val) && count($val) > 0 )) {
+                if ($val !== "" || (is_array($val) && count($val) > 0 )) {
                     $action_instance_meta                     = new ActionInstanceMeta();
                     $action_instance_meta->key                = $key;
                     $action_instance_meta->value              = is_array($val) ? json_encode($val) : $val;
@@ -88,12 +89,12 @@ class ActionRepository
 
     function getActionInstance($action_id, $item_id, $session_id, $created = false)
     {
-        $action_instance = ActionInstance::firstOrCreate([
-                    'action_id'  => $action_id,
-                    'session_id' => $session_id,
-                    'item_id'    => isset($item_id) ? $item_id : 0,
-                    'created'    => (!$created) ? new Carbon("now") : $created
-        ]);
+        $action_instance             = new ActionInstance();
+        $action_instance->action_id  = $action_id;
+        $action_instance->session_id = $session_id;
+        $action_instance->item_id    = isset($item_id) ? $item_id : 0;
+        $action_instance->created    = (!$created) ? new Carbon("now") : $created;
+        $action_instance->save();
 
         return $action_instance;
     }
@@ -154,7 +155,7 @@ class ActionRepository
     {
         $action = Action::where("name", $action_data['name'])->where("site_id", $site_id)->first();
         if (!$action) {
-            $action_id     = $this->setAction($action_data);
+            $action_id     = $this->setAction($action_data, $site_id);
             $is_new_action = true;
         }
         else
