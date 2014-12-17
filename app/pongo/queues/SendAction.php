@@ -143,7 +143,7 @@ class SendAction
                 if ($inputs['action']['name'] === 'view') {
                     $this->_proceedViewAction($inputs);
                 }
-                else if ($inputs['action']['name'] === 'buy' || $inputs['action']['name'] === "started_checkout" || $inputs['action']['name'] === "started_payment") {
+                else if ($inputs['action']['name'] === 'add_to_cart' || $inputs['action']['name'] === 'buy' || $inputs['action']['name'] === "started_checkout" || $inputs['action']['name'] === "started_payment") {
                     if ($this->_proceedBulkAction($inputs['action']['name'], $inputs))
                         $this->http_status = 200;
                 }
@@ -199,12 +199,17 @@ class SendAction
         $items_data = (isset($action_data['item'])) ? $action_data['item'] : [];
 
         $item_property_rules = array(
-            "item_id"  => "required|alpha_num",
-            "name"     => "required",
-            "price"    => "required|numeric",
-            "img_url"  => "required|url",
-            "item_url" => "required|url"
+            "item_id" => "required|alpha_num"
         );
+
+        if ($action_name === "view") {
+            $item_property_rules = array_merge($item_property_rules, [
+                "name"     => "required",
+                "price"    => "required|numeric",
+                "img_url"  => "required|url",
+                "item_url" => "required|url"
+            ]);
+        }
 
         $item_validator = Validator::make($items_data, $item_property_rules);
 
@@ -239,14 +244,14 @@ class SendAction
         $items           = $action_data['items'];
         $this->action_id = $this->action_repository->getActionID(array("name" => $action_name), $this->site_id, $this->is_new_action);
 
-        $action_properties_without_name = array_merge($action_data['action'], ['cart_id', $this->action_repository->getCartID($this->session_id)]);
+        $action_properties_without_name = array_merge($action_data['action'], ['cart_id' => $this->action_repository->getCartID($this->session_id)]);
         unset($action_properties_without_name['name']);
 
         $i = 0;
         foreach ($items as $item) {
             $action_properties = array_merge($action_properties_without_name, $item);
             unset($action_properties['item_id']);
-
+            
             $item_model = Item::where("identifier", $item['item_id'])->where("site_id", $this->site_id)->first();
 
             //what if the item not found?
@@ -256,7 +261,7 @@ class SendAction
                 $action_instance = $this->action_repository->getActionInstance($this->action_id, $this->item_id, $this->session_id, ($log_dt_created) ? $log_dt_created : false);
                 if (is_object($action_instance)) {
                     $this->action_instance_id = $action_instance->id;
-                    $this->action_repository->setActionMeta($action_instance->id, $action_data['action']);
+                    $this->action_repository->setActionMeta($action_instance->id, $action_properties);
                 }
             }
             else {
@@ -265,7 +270,7 @@ class SendAction
                 break;
             }
 
-            $this->_proceedToGui($item, $action_data['user'], $action_data['action']);
+            $this->_proceedToGui($item, $action_data['user'], $action_properties);
             $i++;
         }
 
