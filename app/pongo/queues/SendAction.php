@@ -270,7 +270,7 @@ class SendAction
                 break;
             }
 
-            $this->_proceedToGui($item, $action_data['user'], $action_properties);
+            $this->_proceedToGui($item, $action_data['user'], $action_data['action']);
             $i++;
         }
 
