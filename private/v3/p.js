@@ -866,7 +866,7 @@ if (typeof Predictry !== 'object') {
 
             function getWidgetInstanceID(uri) {
 
-                if (isDefined(uri) && isDefined(getParameter(uri, "predictry_src"))) {
+                if (isDefined(uri) && getParameter(uri, "predictry_src") !== "") {
                     widget_instance_id = getParameter(uri, "predictry_src");
                     trackDeleteItem(widget_instance_id); //send track check_delete.gif
                 }
