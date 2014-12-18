@@ -251,8 +251,11 @@ class SendAction
         foreach ($items as $item) {
             $action_properties = array_merge($action_properties_without_name, $item);
             unset($action_properties['item_id']);
-            
-            $item_model = Item::where("identifier", $item['item_id'])->where("site_id", $this->site_id)->first();
+
+            $item_model = Item::firstOrCreate([
+                        'identifier' => $item['item_id'],
+                        'site_id'    => $this->site_id
+            ]);
 
             //what if the item not found?
             if ($item_model) {
@@ -267,6 +270,7 @@ class SendAction
             else {
                 $this->response['error']   = true;
                 $this->response['message'] = "Item not found";
+                \Log::alert("_proceedBulkAction {$action_name}", $this->response);
                 break;
             }
 

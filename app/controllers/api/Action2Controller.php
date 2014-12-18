@@ -243,7 +243,11 @@ class Action2Controller extends ApiBaseController
             $action_properties = array_merge($action_properties_without_name, $item);
             unset($action_properties['item_id']);
 
-            $item_model = Item::where("identifier", $item['item_id'])->where("site_id", $this->site_id)->get()->first();
+            $item_model = Item::firstOrCreate([
+                        'identifier' => $item['item_id'],
+                        'site_id'    => $this->site_id
+            ]);
+
             if ($item_model) {
                 $action_instance = $this->action_repository->getActionInstance($this->action_id, $this->item_id, $this->session_id);
                 $this->item_id   = $item_model->id;
@@ -254,6 +258,7 @@ class Action2Controller extends ApiBaseController
             }
             else {
                 $this->response = $this->getErrorResponse("errorValidator", "200", "", "Item not found.");
+                \Log::alert("_proceedBulkAction {$action_name}", $this->response);
                 break;
             }
 
