@@ -282,15 +282,19 @@ if (typeof Predictry !== 'object') {
         }
 
         function mapJSONToUriParams(data, prefix, call) {
+
             prefix = typeof prefix !== 'undefined' ? prefix : "";
             call = typeof call !== 'undefined' ? call : 0;
 
             var map = [];
 
             if (Object.prototype.toString.call(data) === '[object Array]') {
+
                 for (var ik = 0; ik < data.length; ik++) {
                     map.push(mapJSONToUriParams(data[ik], prefix + "[" + ik + "]", call + 1));
                 }
+                ;
+
             } else if (Object.prototype.toString.call(data) === '[object Object]') {
                 Object.keys(data).map(function (k) {
                     var sep = "";
@@ -307,7 +311,7 @@ if (typeof Predictry !== 'object') {
                 });
 
             } else {
-                map.push(prefix + "=" + data);
+                map.push(prefix + "=" + encodeURIComponent(data));
             }
 
             return map.join("&");
@@ -366,6 +370,10 @@ if (typeof Predictry !== 'object') {
 
             if (call === 0) {
                 data = decodeURIComponent(data).split("&");
+
+                for (var key in data) {
+                    data[key] = decodeURI(data[key]);
+                }
 
                 for (var i = 0; i < data.length; i++) {
                     mapUriParamsToJSON(data[i], object, call + 1);
@@ -866,12 +874,16 @@ if (typeof Predictry !== 'object') {
 
             function getWidgetInstanceID(uri) {
 
-                if (isDefined(uri) && getParameter(uri, "predictry_src") !== "") {
-                    widget_instance_id = getParameter(uri, "predictry_src");
-                    trackDeleteItem(widget_instance_id); //send track check_delete.gif
+                if (isDefined(uri) && getParameter(uri, "p_src") !== "") {
+                    widget_instance_id = getParameter(uri, "p_src");
                 }
                 else
                     widget_instance_id = -1;
+
+                if (isDefined(uri) && getParameter(uri, "p_id") !== "") {
+                    item_id = getParameter(uri, "p_id");
+                    trackDeleteItem(widget_instance_id, item_id);
+                }
 
                 return widget_instance_id;
             }
@@ -971,11 +983,12 @@ if (typeof Predictry !== 'object') {
                 return sendRequest(config_api_url + config_api_resources[0], data, true, null, true);
             }
 
-            function trackDeleteItem(widget_instance_id) {
+            function trackDeleteItem(widget_instance_id, item_id) {
 
                 var data = {
                     "action": {"name": "check_delete_item"},
-                    "widget_instance_id": widget_instance_id
+                    "widget_instance_id": widget_instance_id,
+                    "item_id": item_id
                 };
 
                 data = appendPredictryData(data);
