@@ -247,7 +247,7 @@ Route::group(array('prefix' => 'api', 'namespace' => 'App\Controllers\Api'), fun
     });
 
     Route::group(array('prefix' => 'v2'), function() {
-        Route::resource('actions', 'Action2Controller', array("only" => array("index", "store", "show", "destroy")));
+        Route::resource('actions', 'Action3Controller', array("only" => array("index", "store", "show", "destroy")));
         Route::resource('recommendation', 'Recommendation2Controller', array("only" => array("index")));
         Route::resource('items', 'Item2Controller', array("only" => array("store", "update", "destroy")));
         Route::resource('carts', 'CartController', array("only" => array("store")));
