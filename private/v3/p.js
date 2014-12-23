@@ -880,8 +880,9 @@ if (typeof Predictry !== 'object') {
                 else
                     widget_instance_id = -1;
 
+
                 if (isDefined(uri) && getParameter(uri, "p_id") !== "") {
-                    item_id = getParameter(uri, "p_id");
+                    var item_id = getParameter(uri, "p_id");
                     trackDeleteItem(widget_instance_id, item_id);
                 }
 
