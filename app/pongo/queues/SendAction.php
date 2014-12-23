@@ -50,13 +50,6 @@ class SendAction
 
     public function store($job, $data)
     {
-        $this->response = array(
-            "error"          => false,
-            "status"         => 200,
-            "message"        => "",
-            "client_message" => ""
-        );
-
         try
         {
             if (isset($data['site_id'])) {
@@ -286,18 +279,18 @@ class SendAction
 
     private function _proceedToGui($item_data, $user_data, $action_data)
     {
-        if ($this->is_new_item)
-            $this->_postItemToGui($item_data);
-
-        if ($this->is_new_visitor) {
-            $user_data = array_add($user_data, "timestamp", $this->visitor_dt_created_timestamp);
-            $this->_postUserToGui($user_data);
-        }
-
-        $action_data = array_add($action_data, "item_id", $this->item_id);
-        $action_data = array_add($action_data, "browser_id", $this->browser_id);
-        $action_data = array_add($action_data, "session_id", $this->session_id);
-        $this->_postAction($action_data);
+//        if ($this->is_new_item)
+//            $this->_postItemToGui($item_data);
+//
+//        if ($this->is_new_visitor) {
+//            $user_data = array_add($user_data, "timestamp", $this->visitor_dt_created_timestamp);
+//            $this->_postUserToGui($user_data);
+//        }
+//
+//        $action_data = array_add($action_data, "item_id", $this->item_id);
+//        $action_data = array_add($action_data, "browser_id", $this->browser_id);
+//        $action_data = array_add($action_data, "session_id", $this->session_id);
+//        $this->_postAction($action_data);
     }
 
     private function _postItemToGui($item_data)
