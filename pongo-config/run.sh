@@ -68,7 +68,7 @@ sudo cp /home/ubuntu/pongo/pongo-config/www.conf /etc/php5/fpm/pool.d
 
 #Copying the config file for supervisor
 
-sudo cp /home/ubuntu/pongo/pongo-config/sendaction_queue.conf etc/supervisor/conf.d/
+sudo cp /home/ubuntu/pongo/pongo-config/sendaction_queue.conf /etc/supervisor/conf.d/
 
 #creating a folder in /usr/share/nginx/html and cloning predictry from github
 
