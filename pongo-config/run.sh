@@ -42,6 +42,14 @@ type aws  >/dev/null 2>&1 || {
          echo "nginx installed successfully and its running"
     }
 
+#Installing supervisor
+
+ type supervisor >/dev/null 2>&1 || {
+        sudo apt-get install -y supervisor
+        sudo service supervisor start
+         echo "supervisor installed successfully and its running"
+    }
+
 
 #instaling mcrypt for php 
  if [[ -z $(php -m | grep mcrypt) ]]; then
