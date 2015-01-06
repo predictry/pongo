@@ -66,10 +66,6 @@ sudo cp /home/ubuntu/pongo/pongo-config/nginx.conf /etc/nginx/
 sudo cp /home/ubuntu/pongo/pongo-config/php.ini /etc/php5/fpm/
 sudo cp /home/ubuntu/pongo/pongo-config/www.conf /etc/php5/fpm/pool.d
 
-#Copying the config file for supervisor
-
-sudo cp /home/ubuntu/pongo/pongo-config/sendaction_queue.conf /etc/supervisor/conf.d/
-
 #creating a folder in /usr/share/nginx/html and cloning predictry from github
 
 if [ ! -e "/usr/share/nginx/html/www" ] ; then
@@ -88,6 +84,13 @@ cd /usr/share/nginx/html/www/pongo/ && sudo composer install && sudo composer du
 #changing permission for app/storage
 sudo chmod -R 777 /usr/share/nginx/html/www/pongo/app/storage 
 
+#Copying the config file for supervisor
+sudo cp /usr/share/nginx/html/www/pongo/pongo-config/sendaction_queue.conf /etc/supervisor/conf.d/
+
 # reloading nginx and php
 sudo service php5-fpm reload
 sudo service nginx reload
+
+# restarting supervisor
+sudo service supervisor restart
+
