@@ -73,17 +73,21 @@ class ActionRepository
 
     function setActionMeta($action_instance_id, $properties)
     {
-        \Log::info(json_encode($properties));
+        $action_instance_meta_data = [];
         if (is_array($properties) && count($properties) > 0) {
             foreach ($properties as $key => $val) {
                 if ($val !== "" || (is_array($val) && count($val) > 0 )) {
-                    $action_instance_meta                     = new ActionInstanceMeta();
-                    $action_instance_meta->key                = $key;
-                    $action_instance_meta->value              = is_array($val) ? json_encode($val) : $val;
-                    $action_instance_meta->action_instance_id = $action_instance_id;
-                    $action_instance_meta->save();
+                    $new_meta = [
+                        'key'                => $key,
+                        'value'              => is_array($val) ? json_encode($val) : $val,
+                        'action_instance_id' => $action_instance_id
+                    ];
+                    array_push($action_instance_meta_data, $new_meta);
                 }
             }
+
+            if (count($action_instance_meta_data) > 0)
+                ActionInstanceMeta::insert($action_instance_meta_data);
         }
     }
 
@@ -202,7 +206,6 @@ class ActionRepository
             return $item->id;
         }
         else {
-
             $item = Item::firstOrCreate([
                         'identifier' => $item_data['item_id'],
                         'name'       => $item_data['name'],
@@ -210,17 +213,25 @@ class ActionRepository
             ]);
 
             if (isset($item->id)) {
+                $now            = Carbon::now();
+                $item_meta_data = [];
                 foreach ($item_data as $key => $value) {
-                    $item_meta          = new ItemMeta();
-                    $item_meta->item_id = $item->id;
-                    $item_meta->key     = $key;
 
                     if (is_array($value))
                         $value = json_encode($value);
 
-                    $item_meta->value = $value;
-                    $item_meta->save();
+                    $new_meta = [
+                        'item_id'    => $item->id,
+                        'key'        => $key,
+                        'value'      => $value,
+                        'created_at' => $now,
+                        'updated_at' => $now
+                    ];
+
+                    array_push($item_meta_data, $new_meta);
                 }
+
+                ItemMeta::insert($item_meta_data); //bulk insert
 
                 $is_new_item   = $this->item_id = $item->id;
                 return $item->id;
