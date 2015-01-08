@@ -14,6 +14,7 @@ class BaseController extends \Controller
     public $manageViewConfig = array();
     public $model            = null;
     public $active_site_id   = 0;
+    public $theme            = 'inspinia';
 
     public function __construct()
     {
@@ -24,6 +25,7 @@ class BaseController extends \Controller
         $this->siteInfo['styles']        = array();
         $this->siteInfo['scripts']       = array();
         $this->siteInfo['custom_script'] = '';
+        $this->siteInfo['theme']         = $this->theme;
         $this->siteInfo['ca']            = '';
 
         $this->manageViewConfig['isManage']       = true;
