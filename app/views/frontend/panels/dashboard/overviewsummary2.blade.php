@@ -1,41 +1,57 @@
 <div class="row">
 
-	<div class="col-sm-3">
-		<div class="the-box no-border bg-success">
-			<div class="tiles-inner text-center">
-				<p class="tiles-title">Today Actions</p>
-				<h1 class="bolded">{{ $overviews['today_total_actions'] }}</h1>
-				<p class="tiles-sub-title">(total actions &amp; tracking received)</p>
-			</div>
-		</div>
-	</div>
-	<div class="col-sm-3">
-		<div class="the-box no-border bg-success">
-			<div class="tiles-inner text-center">
-				<p class="tiles-title">Today Items</p>
-				<h1 class="bolded">{{ $overviews['today_total_items'] }}</h1>
-				<p class="tiles-sub-title">(only new items of today)</p>
-			</div>
-		</div>
-	</div>
-	<div class="col-sm-3">
-		<div class="the-box no-border bg-success">
-			<div class="tiles-inner text-center">
-				<p class="tiles-title">Today Items Sold</p>
-				<h1 class="bolded">{{ $overviews['today_total_buy_action'] }}</h1>
-				<p class="tiles-sub-title">(taken from buy action)</p>
-			</div>
-		</div>
-	</div>
-	<div class="col-sm-3">
-		<div class="the-box no-border bg-success">
-			<div class="tiles-inner text-center">
-				<p class="tiles-title">Completion Rate</p>
-				<h1 class="bolded">{{ $overviews['completion_rate'] }}%</h1>
-				<p class="tiles-sub-title">{{ $overviews['funel_default_name'] }}</p>
-			</div>
-		</div>
-	</div>
-
-
+    <div class="col-sm-3">
+        <div class="the-box no-border bg-success">
+            <div class="tiles-inner text-center">
+                <p class="tiles-title">Pageviews</p>
+                <h1 class="bolded">{{ $overviews['total_pageviews'] }}</h1>
+                <p class="tiles-sub-title">(total actions &amp; tracking received)</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="the-box no-border bg-success">
+            <div class="tiles-inner text-center">
+                <p class="tiles-title">Unique Visitors</p>
+                <h1 class="bolded">{{ $overviews['total_uvs'] }}</h1>
+                <p class="tiles-sub-title">(determine by number of sessions)</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="the-box no-border bg-success">
+            <div class="tiles-inner text-center">
+                <p class="tiles-title">Sales Amount</p>
+                <h1 class="bolded">{{ $overviews['total_sales_amount'] }}</h1>
+                <p class="tiles-sub-title">(taken from regular sales total)</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="the-box no-border bg-success">
+            <div class="tiles-inner text-center">
+                <p class="tiles-title">Orders</p>
+                <h1 class="bolded">{{ $overviews['total_orders'] }}</h1>
+                <p class="tiles-sub-title">Total of orders</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="the-box no-border bg-success">
+            <div class="tiles-inner text-center">
+                <p class="tiles-title">Items Purchased</p>
+                <h1 class="bolded">{{ $overviews['total_item_purchased'] }}</h1>
+                <p class="tiles-sub-title">(Total of items purchased)</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="the-box no-border bg-success">
+            <div class="tiles-inner text-center">
+                <p class="tiles-title">Conversion Rate</p>
+                <h1 class="bolded">{{ $overviews['conversion_rate'] }}%</h1>
+                <p class="tiles-sub-title">(Pageviews / orders) * 100</p>
+            </div>
+        </div>
+    </div>
 </div>
