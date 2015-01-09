@@ -53,7 +53,13 @@ class Panel2Controller extends BaseController
          * Scenario
          * 1. Get pageviews
          */
-        $pageviews_stat = $this->panel_repository->getPageViewStats($dt_start, $dt_end);
+        $cache_pageviews_stat = \Cache::get("pageviews_{$dt_start->toDateString()}_{$dt_end->toDateString()}");
+        if (is_null($cache_pageviews_stat)) {
+            $pageviews_stat = $this->panel_repository->getPageViewStats($dt_start, $dt_end);
+            \Cache::add("pageviews_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $pageviews_stat, 5760);
+        }
+        else
+            $pageviews_stat = $cache_pageviews_stat;
 
         //2 Unique Visitors (By Session)
         //Optional (By IP)
@@ -61,7 +67,14 @@ class Panel2Controller extends BaseController
          * Scenario by Session
          * 1. Get count(id) from sessions where site_id = {current_site_id} distinct(session)
          */
-        $n_session = $this->panel_repository->getTotalUniqueVisitorBySession($dt_start, $dt_end);
+        $cache_n_session = \Cache::get("n_session_{$dt_start->toDateString()}_{$dt_end->toDateString()}");
+
+        if (is_null($cache_n_session)) {
+            $n_session = $this->panel_repository->getTotalUniqueVisitorBySession($dt_start, $dt_end);
+            \Cache::add("n_session_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $n_session, 5760);
+        }
+        else
+            $n_session = $cache_n_session;
 
         //3 Conversion
         // - Sales
@@ -75,10 +88,30 @@ class Panel2Controller extends BaseController
          * ( Count(1) / (2) ) * 100 = N <-- Conversion rate 
          * 
          */
-        $n_item_purchased = $this->panel_repository->getTotalBuyAction($dt_start, $dt_end);
-        $sales_stat       = $this->panel_repository->getSalesStats($dt_start, $dt_end);
-        $n_orders         = $this->panel_repository->getTotalOrders($dt_start, $dt_end);
 
+        $cache_n_item_purchased = \Cache::get("cache_n_item_purchased_{$dt_start->toDateString()}_{$dt_end->toDateString()}");
+        if (is_null($cache_n_item_purchased)) {
+            $n_item_purchased = $this->panel_repository->getTotalBuyAction($dt_start, $dt_end);
+            \Cache::add("cache_n_item_purchased_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $n_item_purchased, 5760);
+        }
+        else
+            $n_item_purchased = $cache_n_item_purchased;
+
+        $cache_sales_stat = \Cache::get("cache_sales_stat_{$dt_start->toDateString()}_{$dt_end->toDateString()}");
+        if (is_null($cache_sales_stat)) {
+            $sales_stat = $this->panel_repository->getSalesStats($dt_start, $dt_end);
+            \Cache::add("cache_sales_stat_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $sales_stat, 5760);
+        }
+        else
+            $sales_stat = $cache_sales_stat;
+
+        $cache_n_orders = \Cache::get("cache_n_orders_{$dt_start->toDateString()}_{$dt_end->toDateString()}");
+        if (is_null($cache_n_orders)) {
+            $n_orders = $this->panel_repository->getTotalOrders($dt_start, $dt_end);
+            \Cache::add("cache_n_orders_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $n_orders, 5760);
+        }
+        else
+            $n_orders = $cache_n_orders;
 
         // 
         // - Basket Size
