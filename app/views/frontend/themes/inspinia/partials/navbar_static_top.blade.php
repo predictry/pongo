@@ -7,7 +7,7 @@
             <span class="m-r-sm text-muted welcome-message">Welcome to Predictry</span>
         </li>
         <li>
-            <a href="login.html">
+            <a href="<?php echo URL::to('user/logout'); ?>">
                 <i class="fa fa-sign-out"></i> Log out
             </a>
         </li>
