@@ -183,6 +183,19 @@ Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), f
     Route::get('user/logout', 'UserController@logout');
 });
 
+Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
+
+    #Dashboard
+    Route::get('home', array('as' => 'home', 'uses' => 'Panel2Controller@index'));
+
+    #Update Profile
+    Route::get('profile', 'User2Controller@getProfile');
+
+    #Update Password
+    Route::get('password', 'User2Controller@getPassword');
+});
+
+
 /*
   |--------------------------------------------------------------------------
   | API Routinglocal
