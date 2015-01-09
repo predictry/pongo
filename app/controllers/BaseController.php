@@ -12,6 +12,7 @@ class BaseController extends \Controller
 
     public $siteInfo         = array();
     public $manageViewConfig = array();
+    public $userInfo         = array();
     public $model            = null;
     public $active_site_id   = 0;
     public $theme            = 'inspinia';
@@ -62,9 +63,13 @@ class BaseController extends \Controller
             }
 
             //Set Default Plan ID
-
             $sites = Site::where("account_id", Auth::user()->id)->get()->toArray();
             View::share(array("sites" => $sites));
+
+            //User Info
+            $default_avatar                 = asset('assets/img/no-avatar.jpeg');
+            $this->userInfo['gravatar_url'] = "http://www.gravatar.com/avatar/" . md5(strtolower(trim(\Auth::user()->email))) . "?d=" . urlencode($default_avatar) . "&s=" . 48;
+            View::share(array("user_info" => $this->userInfo));
         }
     }
 
