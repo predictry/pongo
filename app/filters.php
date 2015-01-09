@@ -12,12 +12,12 @@
  */
 
 App::before(function($request) {
-    //
+//
 });
 
 
 App::after(function($request, $response) {
-    //
+//
 });
 
 /*
@@ -37,6 +37,15 @@ Route::filter('auth', function() {
 
 Route::filter('auth.basic', function() {
     return Auth::basic();
+});
+
+Route::filter('role.admin', function() {
+    $role = Session::get("role");
+    if ($role === "admin") {
+        return true;
+    }
+
+    return false;
 });
 
 App::missing(function($exception) {
