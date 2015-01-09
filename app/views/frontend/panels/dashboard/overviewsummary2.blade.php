@@ -49,8 +49,8 @@
         <div class="the-box no-border bg-success">
             <div class="tiles-inner text-center">
                 <p class="tiles-title">Conversion Rate</p>
-                <h1 class="bolded">{{ $overviews['conversion_rate'] }}%</h1>
-                <p class="tiles-sub-title">(Pageviews / orders) * 100</p>
+                <h1 class="bolded">{{ number_format($overviews['conversion_rate'],2) }}%</h1>
+                <p class="tiles-sub-title">(orders / pageviews) * 100</p>
             </div>
         </div>
     </div>
