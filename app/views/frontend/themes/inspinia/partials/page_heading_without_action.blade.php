@@ -3,10 +3,10 @@
         <h2>{{$pageTitle}}</h2>
         <ol class="breadcrumb">
             <li>
-                <a href="#">Home</a>
+                <a href="{{URL::to('v2/home')}}">Dashboard</a>
             </li>
             <li class="active">
-                <strong>Dashboard</strong>
+                <strong>{{$currentPage or ''}}</strong>
             </li>
         </ol>
     </div>
