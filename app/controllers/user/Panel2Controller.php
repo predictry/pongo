@@ -56,7 +56,7 @@ class Panel2Controller extends BaseController
         $cache_pageviews_stat = \Cache::get("pageviews_{$dt_start->toDateString()}_{$dt_end->toDateString()}");
         if (is_null($cache_pageviews_stat)) {
             $pageviews_stat = $this->panel_repository->getPageViewStats($dt_start, $dt_end);
-            \Cache::add("pageviews_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $pageviews_stat, 5760);
+            \Cache::add("pageviews_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $pageviews_stat, 14400);
         }
         else
             $pageviews_stat = $cache_pageviews_stat;
@@ -71,7 +71,7 @@ class Panel2Controller extends BaseController
 
         if (is_null($cache_n_session)) {
             $n_session = $this->panel_repository->getTotalUniqueVisitorBySession($dt_start, $dt_end);
-            \Cache::add("n_session_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $n_session, 5760);
+            \Cache::add("n_session_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $n_session, 14400);
         }
         else
             $n_session = $cache_n_session;
@@ -92,7 +92,7 @@ class Panel2Controller extends BaseController
         $cache_n_item_purchased = \Cache::get("cache_n_item_purchased_{$dt_start->toDateString()}_{$dt_end->toDateString()}");
         if (is_null($cache_n_item_purchased)) {
             $n_item_purchased = $this->panel_repository->getTotalBuyAction($dt_start, $dt_end);
-            \Cache::add("cache_n_item_purchased_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $n_item_purchased, 5760);
+            \Cache::add("cache_n_item_purchased_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $n_item_purchased, 14400);
         }
         else
             $n_item_purchased = $cache_n_item_purchased;
@@ -100,7 +100,7 @@ class Panel2Controller extends BaseController
         $cache_sales_stat = \Cache::get("cache_sales_stat_{$dt_start->toDateString()}_{$dt_end->toDateString()}");
         if (is_null($cache_sales_stat)) {
             $sales_stat = $this->panel_repository->getSalesStats($dt_start, $dt_end);
-            \Cache::add("cache_sales_stat_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $sales_stat, 5760);
+            \Cache::add("cache_sales_stat_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $sales_stat, 14400);
         }
         else
             $sales_stat = $cache_sales_stat;
@@ -108,7 +108,7 @@ class Panel2Controller extends BaseController
         $cache_n_orders = \Cache::get("cache_n_orders_{$dt_start->toDateString()}_{$dt_end->toDateString()}");
         if (is_null($cache_n_orders)) {
             $n_orders = $this->panel_repository->getTotalOrders($dt_start, $dt_end);
-            \Cache::add("cache_n_orders_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $n_orders, 5760);
+            \Cache::add("cache_n_orders_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $n_orders, 14400);
         }
         else
             $n_orders = $cache_n_orders;
