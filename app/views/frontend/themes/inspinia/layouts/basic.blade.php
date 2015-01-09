@@ -1,0 +1,1 @@
+/Applications/MAMP/htdocs/predictry-pongo/app/views/frontend/layouts/inspinia_basic.blade.php
