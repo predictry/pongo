@@ -27,9 +27,12 @@ class SendAction
     protected $action_type       = "single";
     protected $action_data       = array();
     protected $gui_domain_auth   = array();
+    protected $time_start        = null;
+    protected $job_ids           = [];
 
     public function __construct(ActionRepository $repository)
     {
+        $this->time_start        = microtime(true);
         $this->action_repository = $repository;
 
         $this->is_new_item    = $this->is_new_visitor = $this->is_new_action  = false;
@@ -68,6 +71,9 @@ class SendAction
             \Log::error($ex->getMessage());
         }
 
+        $time_end       = microtime(true);
+        $execution_time = ($time_end - $this->time_start) / 60;
+        \Log::info("Execution time: {$execution_time}", $this->job_ids);
         return;
     }
 
@@ -94,8 +100,9 @@ class SendAction
         if (!is_null($this->site_id)) {
             $inputs = array_merge($log_data['browser_inputs'], $log_data['inputs']);
             //$this->_initGui($data['browser_inputs']['tenant_id']); //temporary off since
-            \Log::info("ready to proceed");
+//            \Log::info("ready to proceed");
             $this->_proceed($inputs);
+            array_push($this->job_ids, $log_data['job_id']);
         }
     }
 
