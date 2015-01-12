@@ -27,9 +27,12 @@ class SendAction
     protected $action_type       = "single";
     protected $action_data       = array();
     protected $gui_domain_auth   = array();
+    protected $time_start        = null;
+    protected $job_ids           = [];
 
     public function __construct(ActionRepository $repository)
     {
+        $this->time_start        = microtime(true);
         $this->action_repository = $repository;
 
         $this->is_new_item    = $this->is_new_visitor = $this->is_new_action  = false;
@@ -52,29 +55,55 @@ class SendAction
     {
         try
         {
-            if (isset($data['site_id'])) {
-                $this->site_id = $data['site_id'];
-            }
-            else {
-                if (isset($data['browser_inputs']['tenant_id']) && isset($data['browser_inputs']['api_key'])) {
-                    $site          = Site::where('name', $data['browser_inputs']['tenant_id'])->where('api_key', $data['browser_inputs']['api_key'])->first();
-                    $this->site_id = ($site) ? $site->id : null;
+            if (is_array($data) && !isset($data['browser_inputs'])) {
+                foreach ($data as $log_data) {
+                    $this->_init($log_data);
                 }
             }
-
-            if (isset($this->site_id)) {
-                $inputs = array_merge($data['browser_inputs'], $data['inputs']);
-                $this->_initGui($data['browser_inputs']['tenant_id']);
-                $this->_proceed($inputs);
-                $job->delete();
+            else if (isset($data['browser_inputs'])) {
+                $this->_init($data);
             }
+
+            $job->delete();
         }
         catch (Exception $ex)
         {
             \Log::error($ex->getMessage());
         }
 
+        $time_end       = microtime(true);
+        $execution_time = ($time_end - $this->time_start) / 60;
+        \Log::info("Execution time: {$execution_time}", $this->job_ids);
         return;
+    }
+
+    function _init($log_data)
+    {
+        if (isset($log_data['site_id'])) {
+            $this->site_id = $log_data['site_id'];
+        }
+        else {
+            if (isset($log_data['browser_inputs']['tenant_id']) && isset($log_data['browser_inputs']['api_key'])) {
+                //get from cache if exist
+                $this->site_id = \Cache::get("site_{$log_data['browser_inputs']['tenant_id']}_{$log_data['browser_inputs']['api_key']}");
+
+                if (is_null($this->site_id)) {
+                    $site = Site::where('name', $log_data['browser_inputs']['tenant_id'])->where('api_key', $log_data['browser_inputs']['api_key'])->first();
+                    if ($site) {
+                        $this->site_id = $site->id;
+                        \Cache::add("site_{$log_data['browser_inputs']['tenant_id']}_{$log_data['browser_inputs']['api_key']}", $site->id, 1440); //keep it for 1 day
+                    }
+                }
+            }
+        }
+
+        if (!is_null($this->site_id)) {
+            $inputs = array_merge($log_data['browser_inputs'], $log_data['inputs']);
+            //$this->_initGui($data['browser_inputs']['tenant_id']); //temporary off since
+//            \Log::info("ready to proceed");
+            $this->_proceed($inputs);
+            array_push($this->job_ids, $log_data['job_id']);
+        }
     }
 
     function _initGui($tenant_id)
@@ -279,6 +308,7 @@ class SendAction
 
     private function _proceedToGui($item_data, $user_data, $action_data)
     {
+        return;
 //        if ($this->is_new_item)
 //            $this->_postItemToGui($item_data);
 //
