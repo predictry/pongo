@@ -7,5 +7,16 @@
 <!-- Custom and plugin javascript -->
 {{ HTML::script('assets/inspinia/js/inspinia.js') }}
 {{ HTML::script('assets/inspinia/js/plugins/pace/pace.min.js') }}
+
+{{ $custom_script or '' }}
+
+@if (count($scripts) > 0)
+
+@foreach ($scripts as $script)
+{{ $script or '' }}
+@endforeach
+
+@endif
+
 </body>
 </html>
