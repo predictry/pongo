@@ -19,6 +19,14 @@
         {{ HTML::style('assets/inspinia/css/animate.css') }}
         {{ HTML::style('assets/inspinia/css/style.css') }}
 
+        @if(count($styles) > 0)
+
+        @foreach ($styles as $style)
+        {{ $style or '' }}
+        @endforeach
+
+        @endif
+
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
         <!--[if lt IE 9]>

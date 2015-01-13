@@ -5,8 +5,9 @@
     <div class="ibox float-e-margins">
         <div class="ibox-title">
             <h5>Overview Summary of ({{$activeSiteName}})</h5>
-            <div class="ibox-tools">
-                <span class="">{{$dt_start->toFormattedDateString()}} to {{$dt_end->toFormattedDateString()}}</span>
+            <div class="pull-right">
+                @include(getenv('FRONTEND_SKINS') . $theme . '.panels.filter_date')
+                <!--<span class="">{{$dt_start->toFormattedDateString()}} to {{$dt_end->toFormattedDateString()}}</span>-->
             </div>
         </div>
     </div>
