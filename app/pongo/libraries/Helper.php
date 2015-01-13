@@ -2,6 +2,8 @@
 
 namespace App\Pongo\Libraries;
 
+use Carbon\Carbon;
+
 /**
  * Author       : Rifki Yandhi
  * Date Created : Jan 7, 2015 12:20:01 PM
@@ -36,6 +38,68 @@ class Helper
             return ($orders / $pageviews) * 100;
         else
             return 0;
+    }
+
+    public static function getSelectedFilterDateRange($type = "today", $dt_start = null, $dt_end = null)
+    {
+        $available_types = ['custom_range', '31_days_ago', '14_days_ago', '7_days_ago', 'yesterday', 'today'];
+
+        if (!in_array($type, $available_types)) {
+            $type = end($available_types);
+        }
+        else {
+            switch ($type) {
+                case $available_types[1]:
+                    $dt_start = new Carbon('31 days ago');
+                    break;
+                case $available_types[2]:
+                    $dt_start = new Carbon('14 days ago');
+                    break;
+                case $available_types[3]:
+                    $dt_start = new Carbon('7 days ago');
+                    break;
+                case $available_types[4]:
+                    $dt_start = new Carbon('yesterday');
+                    break;
+
+                case $available_types[5]:
+                    $dt_start = Carbon::today()->startOfDay();
+                    $dt_end   = Carbon::today()->endOfDay();
+                    break;
+
+                case $available_types[0]:
+
+                    $dt_start = Carbon::createFromFormat("Y-m-d", $dt_start);
+                    $dt_end   = Carbon::createFromFormat("Y-m-d", $dt_end);
+
+                    if (is_object($dt_start) && is_object($dt_end)) {
+                        if ($dt_end->diffInDays($dt_start) > 31) {
+                            return $this->getSelectedFilterDateRange("31_days_ago");
+                        }
+                    }
+                    else {
+                        $type     = end($available_types);
+                        $dt_start = Carbon::today()->startOfDay();
+                    }
+                    break;
+            }
+
+            $dt_start->startOfDay();
+
+            switch ($type) {
+                case $available_types[1]:
+                case $available_types[2]:
+                case $available_types[3]:
+                case $available_types[4]:
+                    $dt_end = Carbon::today()->endOfDay();
+                    break;
+            }
+        }
+
+        return [
+            'dt_start' => $dt_start,
+            'dt_end'   => $dt_end
+        ];
     }
 
 }
