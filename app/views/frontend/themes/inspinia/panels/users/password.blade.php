@@ -1,6 +1,6 @@
 @extends(getenv('FRONTEND_SKINS') . $theme . '.layouts.dashboard')
 @section('content')
-@include(getenv('FRONTEND_SKINS') . $theme . '.partials.page_heading_without_action', ['currentPage' => 'Password'])
+@include(getenv('FRONTEND_SKINS') . $theme . '.partials.page_heading_without_action', ['upper' => [], 'currentPage' => 'Password'])
 <div class="wrapper wrapper-content">
     <div class="row border-bottom">
         <div class="col-lg-12">
