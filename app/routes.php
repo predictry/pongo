@@ -107,7 +107,7 @@ Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), f
         Route::get('members', array("as" => "members", "uses" => 'MembersController@index'));
 
         #Sites Management
-        if (Auth::user()->plan_id !== 3) {
+        if (!is_null(Auth::user()) && Auth::user()->plan_id !== 3) {
             Route::get('sites/create', array("as" => "sites.create", "uses" => 'SitesController@getCreate'));
             Route::post('sites/submit', array("as" => "sites.submit", "uses" => 'SitesController@postCreate'));
             Route::get('sites/{numeric}/edit', array("as" => "sites.{numieric}.edit", "uses" => 'SitesController@getEdit'));
@@ -193,6 +193,17 @@ Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Con
 
     #Update Password
     Route::get('password', 'User2Controller@getPassword');
+
+    #Sites Management
+
+    if (!is_null(Auth::user()) && Auth::user()->plan_id !== 3) {
+        Route::get('sites/create', array("as" => "sites.create", "uses" => 'Sites2Controller@getCreate'));
+        Route::get('sites/{numeric}/edit', array("as" => "sites.{numieric}.edit", "uses" => 'Sites2Controller@getEdit'));
+        Route::get('sites/{numeric}/delete', 'Sites2Controller@getDelete');
+    }
+
+    Route::get('sites/{numeric}/default', array("as" => "sites.{numieric}.edit", "uses" => 'Sites2Controller@getDefault'));
+    Route::get("sites", array("as" => "sites", "uses" => "Sites2Controller@index"));
 });
 
 
