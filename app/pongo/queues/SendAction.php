@@ -27,9 +27,12 @@ class SendAction
     protected $action_type       = "single";
     protected $action_data       = array();
     protected $gui_domain_auth   = array();
+    protected $time_start        = null;
+    protected $job_ids           = [];
 
     public function __construct(ActionRepository $repository)
     {
+        $this->time_start        = microtime(true);
         $this->action_repository = $repository;
 
         $this->is_new_item    = $this->is_new_visitor = $this->is_new_action  = false;
@@ -50,38 +53,57 @@ class SendAction
 
     public function store($job, $data)
     {
-        $this->response = array(
-            "error"          => false,
-            "status"         => 200,
-            "message"        => "",
-            "client_message" => ""
-        );
-
         try
         {
-            if (isset($data['site_id'])) {
-                $this->site_id = $data['site_id'];
-            }
-            else {
-                if (isset($data['browser_inputs']['tenant_id']) && isset($data['browser_inputs']['api_key'])) {
-                    $site          = Site::where('name', $data['browser_inputs']['tenant_id'])->where('api_key', $data['browser_inputs']['api_key'])->first();
-                    $this->site_id = ($site) ? $site->id : null;
+            if (is_array($data) && !isset($data['browser_inputs'])) {
+                foreach ($data as $log_data) {
+                    $this->_init($log_data);
                 }
             }
-
-            if (isset($this->site_id)) {
-                $inputs = array_merge($data['browser_inputs'], $data['inputs']);
-                $this->_initGui($data['browser_inputs']['tenant_id']);
-                $this->_proceed($inputs);
-                $job->delete();
+            else if (isset($data['browser_inputs'])) {
+                $this->_init($data);
             }
+
+            $job->delete();
         }
         catch (Exception $ex)
         {
             \Log::error($ex->getMessage());
         }
 
+        $time_end       = microtime(true);
+        $execution_time = ($time_end - $this->time_start) / 60;
+        \Log::info("Execution time: {$execution_time}", $this->job_ids);
         return;
+    }
+
+    function _init($log_data)
+    {
+        if (isset($log_data['site_id'])) {
+            $this->site_id = $log_data['site_id'];
+        }
+        else {
+            if (isset($log_data['browser_inputs']['tenant_id']) && isset($log_data['browser_inputs']['api_key'])) {
+                //get from cache if exist
+                $this->site_id = \Cache::get("site_{$log_data['browser_inputs']['tenant_id']}_{$log_data['browser_inputs']['api_key']}");
+
+                if (is_null($this->site_id)) {
+                    $site = Site::where('name', $log_data['browser_inputs']['tenant_id'])->where('api_key', $log_data['browser_inputs']['api_key'])->first();
+                    if ($site) {
+                        $this->site_id = $site->id;
+                        \Cache::add("site_{$log_data['browser_inputs']['tenant_id']}_{$log_data['browser_inputs']['api_key']}", $site->id, 1440); //keep it for 1 day
+                    }
+                }
+            }
+        }
+
+        if (!is_null($this->site_id)) {
+            $inputs = array_merge($log_data['browser_inputs'], $log_data['inputs']);
+            //$this->_initGui($data['browser_inputs']['tenant_id']); //temporary off since
+//            \Log::info("ready to proceed");
+            $this->_proceed($inputs);
+            array_push($this->job_ids, $log_data['job_id']);
+        }
     }
 
     function _initGui($tenant_id)
@@ -143,7 +165,7 @@ class SendAction
                 if ($inputs['action']['name'] === 'view') {
                     $this->_proceedViewAction($inputs);
                 }
-                else if ($inputs['action']['name'] === 'buy' || $inputs['action']['name'] === "started_checkout" || $inputs['action']['name'] === "started_payment") {
+                else if ($inputs['action']['name'] === 'add_to_cart' || $inputs['action']['name'] === 'buy' || $inputs['action']['name'] === "started_checkout" || $inputs['action']['name'] === "started_payment") {
                     if ($this->_proceedBulkAction($inputs['action']['name'], $inputs))
                         $this->http_status = 200;
                 }
@@ -199,40 +221,41 @@ class SendAction
         $items_data = (isset($action_data['item'])) ? $action_data['item'] : [];
 
         $item_property_rules = array(
-            "item_id"  => "required|alpha_num",
-            "name"     => "required",
-            "price"    => "required|numeric",
-            "img_url"  => "required|url",
-            "item_url" => "required|url"
+            "item_id" => "required|alpha_num"
         );
+
+        if ($action_name === "view") {
+            $item_property_rules = array_merge($item_property_rules, [
+                "name"     => "required",
+                "price"    => "required|numeric",
+                "img_url"  => "required|url",
+                "item_url" => "required|url"
+            ]);
+        }
 
         $item_validator = Validator::make($items_data, $item_property_rules);
 
         //validating the item first is important since, item will always associated with the action
         //item will no longer compulsary
-        if ($item_validator->passes()) {
+        if ($item_validator->passes())
             $this->item_id = $this->action_repository->getItemID($items_data, $this->site_id, $this->is_new_item);
 
-            if ($this->item_id) {
+        $this->action_id = $this->action_repository->getActionID(array("name" => $action_name), $this->site_id, $this->is_new_action);
+        if ($this->action_id) {
 
-                $this->action_id = $this->action_repository->getActionID(array("name" => $action_name), $this->site_id, $this->is_new_action);
-                if ($this->action_id) {
+            $log_dt_created  = $this->action_repository->isLogContainDateTime($action_data);
+            $action_instance = $this->action_repository->getActionInstance($this->action_id, $this->item_id, $this->session_id, ($log_dt_created) ? $log_dt_created : false);
 
-                    $log_dt_created  = $this->action_repository->isLogContainDateTime($action_data);
-                    $action_instance = $this->action_repository->getActionInstance($this->action_id, $this->item_id, $this->session_id, ($log_dt_created) ? $log_dt_created : false);
-
-                    if (is_object($action_instance)) {
-                        $this->action_instance_id = $action_instance->id;
-                        $this->action_repository->setActionMeta($action_instance->id, $action_data['action']);
-                    }
-
-                    if ($this->response['error'])
-                        return false;
-
-                    $this->action_data = $action_data;
-                    return true;
-                }
+            if (is_object($action_instance)) {
+                $this->action_instance_id = $action_instance->id;
+                $this->action_repository->setActionMeta($action_instance->id, $action_data['action']);
             }
+
+            if ($this->response['error'])
+                return false;
+
+            $this->action_data = $action_data;
+            return true;
         }
 
         return false;
@@ -243,7 +266,7 @@ class SendAction
         $items           = $action_data['items'];
         $this->action_id = $this->action_repository->getActionID(array("name" => $action_name), $this->site_id, $this->is_new_action);
 
-        $action_properties_without_name = array_merge($action_data['action'], ['cart_id', $this->action_repository->getCartID($this->session_id)]);
+        $action_properties_without_name = array_merge($action_data['action'], ['cart_id' => $this->action_repository->getCartID($this->session_id)]);
         unset($action_properties_without_name['name']);
 
         $i = 0;
@@ -251,7 +274,10 @@ class SendAction
             $action_properties = array_merge($action_properties_without_name, $item);
             unset($action_properties['item_id']);
 
-            $item_model = Item::where("identifier", $item['item_id'])->where("site_id", $this->site_id)->first();
+            $item_model = Item::firstOrCreate([
+                        'identifier' => $item['item_id'],
+                        'site_id'    => $this->site_id
+            ]);
 
             //what if the item not found?
             if ($item_model) {
@@ -260,12 +286,13 @@ class SendAction
                 $action_instance = $this->action_repository->getActionInstance($this->action_id, $this->item_id, $this->session_id, ($log_dt_created) ? $log_dt_created : false);
                 if (is_object($action_instance)) {
                     $this->action_instance_id = $action_instance->id;
-                    $this->action_repository->setActionMeta($action_instance->id, $action_data['action']);
+                    $this->action_repository->setActionMeta($action_instance->id, $action_properties);
                 }
             }
             else {
                 $this->response['error']   = true;
                 $this->response['message'] = "Item not found";
+                \Log::alert("_proceedBulkAction {$action_name}", $this->response);
                 break;
             }
 
@@ -281,18 +308,19 @@ class SendAction
 
     private function _proceedToGui($item_data, $user_data, $action_data)
     {
-        if ($this->is_new_item)
-            $this->_postItemToGui($item_data);
-
-        if ($this->is_new_visitor) {
-            $user_data = array_add($user_data, "timestamp", $this->visitor_dt_created_timestamp);
-            $this->_postUserToGui($user_data);
-        }
-
-        $action_data = array_add($action_data, "item_id", $this->item_id);
-        $action_data = array_add($action_data, "browser_id", $this->browser_id);
-        $action_data = array_add($action_data, "session_id", $this->session_id);
-        $this->_postAction($action_data);
+        return;
+//        if ($this->is_new_item)
+//            $this->_postItemToGui($item_data);
+//
+//        if ($this->is_new_visitor) {
+//            $user_data = array_add($user_data, "timestamp", $this->visitor_dt_created_timestamp);
+//            $this->_postUserToGui($user_data);
+//        }
+//
+//        $action_data = array_add($action_data, "item_id", $this->item_id);
+//        $action_data = array_add($action_data, "browser_id", $this->browser_id);
+//        $action_data = array_add($action_data, "session_id", $this->session_id);
+//        $this->_postAction($action_data);
     }
 
     private function _postItemToGui($item_data)

@@ -204,6 +204,19 @@ Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), f
     Route::get('user/logout', 'UserController@logout');
 });
 
+Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
+
+    #Dashboard
+    Route::get('home/{type?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'Panel2Controller@index'));
+
+    #Update Profile
+    Route::get('profile', 'User2Controller@getProfile');
+
+    #Update Password
+    Route::get('password', 'User2Controller@getPassword');
+});
+
+
 /*
   |--------------------------------------------------------------------------
   | API Routing local
@@ -268,7 +281,7 @@ Route::group(array('prefix' => 'api', 'namespace' => 'App\Controllers\Api'), fun
     });
 
     Route::group(array('prefix' => 'v2'), function() {
-        Route::resource('actions', 'Action2Controller', array("only" => array("index", "store", "show", "destroy")));
+        Route::resource('actions', 'Action3Controller', array("only" => array("index", "store", "show", "destroy")));
         Route::resource('recommendation', 'Recommendation2Controller', array("only" => array("index")));
         Route::resource('items', 'Item2Controller', array("only" => array("store", "update", "destroy")));
         Route::resource('carts', 'CartController', array("only" => array("store")));

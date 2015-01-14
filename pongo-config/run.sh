@@ -42,6 +42,14 @@ type aws  >/dev/null 2>&1 || {
          echo "nginx installed successfully and its running"
     }
 
+#Installing supervisor
+
+ type supervisor >/dev/null 2>&1 || {
+        sudo apt-get install -y supervisor
+        sudo service supervisor start
+         echo "supervisor installed successfully and its running"
+    }
+
 
 #instaling mcrypt for php 
  if [[ -z $(php -m | grep mcrypt) ]]; then
@@ -76,6 +84,12 @@ cd /usr/share/nginx/html/www/pongo/ && sudo composer install && sudo composer du
 #changing permission for app/storage
 sudo chmod -R 777 /usr/share/nginx/html/www/pongo/app/storage 
 
+#Copying the config file for supervisor
+#sudo cp /usr/share/nginx/html/www/pongo/pongo-config/sendaction_queue.conf /etc/supervisor/conf.d/
+
 # reloading nginx and php
 sudo service php5-fpm reload
 sudo service nginx reload
+
+# restarting supervisor
+#sudo service supervisor restart

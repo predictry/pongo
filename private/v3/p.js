@@ -282,15 +282,19 @@ if (typeof Predictry !== 'object') {
         }
 
         function mapJSONToUriParams(data, prefix, call) {
+
             prefix = typeof prefix !== 'undefined' ? prefix : "";
             call = typeof call !== 'undefined' ? call : 0;
 
             var map = [];
 
             if (Object.prototype.toString.call(data) === '[object Array]') {
+
                 for (var ik = 0; ik < data.length; ik++) {
                     map.push(mapJSONToUriParams(data[ik], prefix + "[" + ik + "]", call + 1));
                 }
+                ;
+
             } else if (Object.prototype.toString.call(data) === '[object Object]') {
                 Object.keys(data).map(function (k) {
                     var sep = "";
@@ -307,7 +311,7 @@ if (typeof Predictry !== 'object') {
                 });
 
             } else {
-                map.push(prefix + "=" + data);
+                map.push(prefix + "=" + encodeURIComponent(data));
             }
 
             return map.join("&");
@@ -367,6 +371,10 @@ if (typeof Predictry !== 'object') {
             if (call === 0) {
                 data = decodeURIComponent(data).split("&");
 
+                for (var key in data) {
+                    data[key] = decodeURI(data[key]);
+                }
+
                 for (var i = 0; i < data.length; i++) {
                     mapUriParamsToJSON(data[i], object, call + 1);
                 }
@@ -425,10 +433,10 @@ if (typeof Predictry !== 'object') {
                     config_request_method = config_default_request_method,
                     config_default_request_content_type = "application/x-www-form-urlencoded; charset=UTF-8",
                     config_request_content_type = config_default_request_content_type,
-                    config_api_url = "http://api-aws.predictry.com/api/v3/",
+                    config_api_url = "https://api.predictry.com/",
                     config_img_url = "https://d1j642hg7oh3vx.cloudfront.net/",
                     config_api_resources = ["actions", "users", "items", "carts", "cartlogs", "recommendation"],
-                    config_default_actions = ["view", "add_to_cart", "buy", "started_checkout", "started_payment"],
+                    config_default_actions = ["view", "add_to_cart", "buy", "started_checkout", "started_payment", "check_delete_item"],
                     config_session_cookie_timeout = 63072000000, // 2 years
                     config_tracking_session_cookie_timeout = 1200000, //20 minutes
                     config_do_not_track = false,
@@ -865,10 +873,19 @@ if (typeof Predictry !== 'object') {
             }
 
             function getWidgetInstanceID(uri) {
-                if (isDefined(uri) && isDefined(getParameter(uri, "predictry_src")))
-                    widget_instance_id = getParameter(uri, "predictry_src");
+
+                if (isDefined(uri) && getParameter(uri, "p_src") !== "") {
+                    widget_instance_id = getParameter(uri, "p_src");
+                }
                 else
                     widget_instance_id = -1;
+
+
+                if (isDefined(uri) && getParameter(uri, "p_id") !== "") {
+                    var item_id = getParameter(uri, "p_id");
+                    trackDeleteItem(widget_instance_id, item_id);
+                }
+
                 return widget_instance_id;
             }
 
@@ -963,6 +980,19 @@ if (typeof Predictry !== 'object') {
                     }
                 }
 
+                config_request_content_type = "application/json; charset=utf-8";
+                return sendRequest(config_api_url + config_api_resources[0], data, true, null, true);
+            }
+
+            function trackDeleteItem(widget_instance_id, item_id) {
+
+                var data = {
+                    "action": {"name": "check_delete_item"},
+                    "widget_instance_id": widget_instance_id,
+                    "item_id": item_id
+                };
+
+                data = appendPredictryData(data);
                 config_request_content_type = "application/json; charset=utf-8";
                 return sendRequest(config_api_url + config_api_resources[0], data, true, null, true);
             }

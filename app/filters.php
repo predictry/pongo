@@ -12,12 +12,12 @@
  */
 
 App::before(function($request) {
-    //
+//
 });
 
 
 App::after(function($request, $response) {
-    //
+//
 });
 
 /*
@@ -75,37 +75,18 @@ Route::filter('auth.basic', function() {
     return Auth::basic();
 });
 
-/**
- * Filter of ajax request for data collection
- */
-Route::filter('site.ajax', function($route) {
-
-    if (!\Request::ajax()) {
-        return Redirect::to('/');
+Route::filter('role.admin', function() {
+    $role = Session::get("role");
+    if ($role === "admin") {
+        return true;
     }
 
-    $tenant_id = $route->parameter('tenant_id');
-
-    if (is_null($tenant_id)) {
-        return \Redirect::to('sites');
-    }
-
-    $validator = Validator::make(['name' => $tenant_id], ['name' => 'required|exists:sites,name']);
-    if ($validator->passes()) {
-        $repository = new \App\Pongo\Repository\SiteRepository();
-        $site       = $repository->isBelongToHim($tenant_id);
-        if (!$site)
-            return Redirect::to('/');
-
-        Session::set("active_site_id", $site->id);
-        Session::set("active_site_name", $site->name);
-    }
-    else
-        return Redirect::back()->withErrors($validator);
+    return false;
 });
 
 App::missing(function($exception) {
     return Response::view('frontend.errors.missing', array('exception' => $exception), 404);
+//	return Redirect::to('home');
 });
 
 
@@ -137,7 +118,7 @@ Route::filter('guest', function() {
  */
 
 Route::filter('csrf', function() {
-    if (Session::token() != Input::get('_token')) {
+    if (Session::token() !== Input::get('_token')) {
         throw new Illuminate\Session\TokenMismatchException;
     }
 });

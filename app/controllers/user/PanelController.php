@@ -57,6 +57,11 @@ class PanelController extends BaseController
      */
     public function index()
     {
+        if (!$this->active_site_id) {
+            return \Redirect::to('sites/wizard');
+        }
+
+
         $today          = new Carbon("today"); //today begining
         $tomorrow       = new Carbon("tomorrow"); //tomorrow
         $end_of_today   = $tomorrow->subSeconds(1); //today ending

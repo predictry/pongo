@@ -114,7 +114,7 @@ class HomeController extends BaseController
                     if (!$is_member) //validate if member or not
                         \Session::set("role", "admin");
 
-                    return Redirect::to('home');
+                    return Redirect::to('v2/home');
                 }
 
                 $flash_error = \Lang::get("home.error.login.failed");

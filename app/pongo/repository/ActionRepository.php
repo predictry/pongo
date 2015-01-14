@@ -73,27 +73,32 @@ class ActionRepository
 
     function setActionMeta($action_instance_id, $properties)
     {
+        $action_instance_meta_data = [];
         if (is_array($properties) && count($properties) > 0) {
             foreach ($properties as $key => $val) {
-                if ($val !== "" && (is_array($val) && count($val) > 0 )) {
-                    $action_instance_meta                     = new ActionInstanceMeta();
-                    $action_instance_meta->key                = $key;
-                    $action_instance_meta->value              = is_array($val) ? json_encode($val) : $val;
-                    $action_instance_meta->action_instance_id = $action_instance_id;
-                    $action_instance_meta->save();
+                if ($val !== "" || (is_array($val) && count($val) > 0 )) {
+                    $new_meta = [
+                        'key'                => $key,
+                        'value'              => is_array($val) ? json_encode($val) : $val,
+                        'action_instance_id' => $action_instance_id
+                    ];
+                    array_push($action_instance_meta_data, $new_meta);
                 }
             }
+
+            if (count($action_instance_meta_data) > 0)
+                ActionInstanceMeta::insert($action_instance_meta_data);
         }
     }
 
     function getActionInstance($action_id, $item_id, $session_id, $created = false)
     {
-        $action_instance = ActionInstance::firstOrCreate([
-                    'action_id'  => $action_id,
-                    'session_id' => $session_id,
-                    'item_id'    => isset($item_id) ? $item_id : 0,
-                    'created'    => (!$created) ? new Carbon("now") : $created
-        ]);
+        $action_instance             = new ActionInstance();
+        $action_instance->action_id  = $action_id;
+        $action_instance->session_id = $session_id;
+        $action_instance->item_id    = isset($item_id) ? $item_id : 0;
+        $action_instance->created    = (!$created) ? new Carbon("now") : $created;
+        $action_instance->save();
 
         return $action_instance;
     }
@@ -150,16 +155,28 @@ class ActionRepository
         return $visitor_id;
     }
 
+    function getActionIDFromCache($action_name, $site_id)
+    {
+        $val = \Cache::get("actions_{$site_id}_{$action_name}");
+        return isset($val) ? $val : null;
+    }
+
     function getActionID($action_data, $site_id, &$is_new_action = false)
     {
+        $cache_action_id = $this->getActionIDFromCache($action_data['name'], $site_id);
+
+        if (!is_null($cache_action_id))
+            return $cache_action_id;
+
         $action = Action::where("name", $action_data['name'])->where("site_id", $site_id)->first();
         if (!$action) {
-            $action_id     = $this->setAction($action_data);
+            $action_id     = $this->setAction($action_data, $site_id);
             $is_new_action = true;
         }
         else
             $action_id = $action->id;
 
+        \Cache::add("action_{$site_id}_{$action_data['name']}", $action_id, 20160); //store for 14 days
         return $action_id;
     }
 
@@ -187,9 +204,16 @@ class ActionRepository
         return $session_visitor_id;
     }
 
+    function getItemIDFromCache($identifier, $site_id)
+    {
+        $val = \Cache::get("items_{$site_id}_{$identifier}");
+        return isset($val) ? $val : null;
+    }
+
     function getItemID($item_data, $site_id, &$is_new_item = false)
     {
-        $item = Item::where("identifier", $item_data['item_id'])->where("site_id", $site_id)->first();
+        $cache_item = $this->getItemIDFromCache($item_data['item_id'], $site_id);
+        $item       = !is_null($cache_item) ? $cache_item : Item::where("identifier", $item_data['item_id'])->where("site_id", $site_id)->first();
 
         if ($item) {
             if (isset($item_data['name']) && $item_data['name'] !== "" && ($item->name !== $item_data['name'])) {
@@ -201,7 +225,6 @@ class ActionRepository
             return $item->id;
         }
         else {
-
             $item = Item::firstOrCreate([
                         'identifier' => $item_data['item_id'],
                         'name'       => $item_data['name'],
@@ -209,19 +232,28 @@ class ActionRepository
             ]);
 
             if (isset($item->id)) {
+                $now            = Carbon::now();
+                $item_meta_data = [];
                 foreach ($item_data as $key => $value) {
-                    $item_meta          = new ItemMeta();
-                    $item_meta->item_id = $item->id;
-                    $item_meta->key     = $key;
 
                     if (is_array($value))
                         $value = json_encode($value);
 
-                    $item_meta->value = $value;
-                    $item_meta->save();
+                    $new_meta = [
+                        'item_id'    => $item->id,
+                        'key'        => $key,
+                        'value'      => $value,
+                        'created_at' => $now,
+                        'updated_at' => $now
+                    ];
+
+                    array_push($item_meta_data, $new_meta);
                 }
 
+                ItemMeta::insert($item_meta_data); //bulk insert
+
                 $is_new_item   = $this->item_id = $item->id;
+                \Cache::add("items_{$site_id}_{$item_data['item_id']}", $item, 20160);
                 return $item->id;
             }
             else
@@ -251,12 +283,26 @@ class ActionRepository
         return $cart_id;
     }
 
+    function getItemMetasFromCache($item_id)
+    {
+        $val = \Cache::get("item_metas_{$item_id}");
+        return isset($val) ? $val : null;
+    }
+
     function compareAndUpdateItemMetas($item_id, $item_data)
     {
         $properties_keys = array_keys($item_data);
         unset($properties_keys['item_id']);
 
-        $item_metas = ItemMeta::where("item_id", $item_id)->get();
+        $cache_item_metas = $this->getItemMetasFromCache($item_id);
+        if (!is_null($cache_item_metas)) {
+            $item_metas = $cache_item_metas;
+        }
+        else {
+            $item_metas = ItemMeta::where("item_id", $item_id)->get();
+            \Cache::add("item_metas_{$item_id}", $item_metas, 20160);
+        }
+        $item_metas = !is_null($cache_item_metas) ? $cache_item_metas : ItemMeta::where("item_id", $item_id)->get();
 
         //update item properties
         foreach ($item_metas as $meta) {
@@ -275,14 +321,24 @@ class ActionRepository
         }
 
         if (count($properties_keys) > 0) {//means have new additional properties
+            $now            = Carbon::now();
+            $item_meta_data = [];
             foreach ($properties_keys as $key) {
-                $item_meta          = new ItemMeta();
-                $item_meta->key     = $key;
-                $item_meta->value   = is_array($item_data[$key]) ? json_encode($item_data[$key]) : $item_data[$key];
-                $item_meta->item_id = $item_id;
-                $item_meta->save();
+                $new_meta = [
+                    'item_id'    => $item_id,
+                    'key'        => $key,
+                    'value'      => is_array($item_data[$key]) ? json_encode($item_data[$key]) : $item_data[$key],
+                    'created_at' => $now,
+                    'updated_at' => $now
+                ];
+
+                array_push($item_meta_data, $new_meta);
             }
+
+            ItemMeta::insert($item_meta_data); //bulk insert
         }
+
+        return;
     }
 
     function isLogContainDateTime($input)
