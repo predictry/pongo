@@ -68,7 +68,7 @@ class HomeController extends BaseController
     {
         $user = Auth::user();
         if (!empty($user->id)) {
-            return Redirect::to('home');
+            return Redirect::to('home2');
         }
 
         return View::make('frontend.common.login', array("pageTitle" => "Login"));

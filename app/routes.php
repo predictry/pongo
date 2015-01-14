@@ -33,7 +33,7 @@ Route::pattern('numeric', '[0-9]+');
  */
 //Route::group(array('domain' => 'dashboard.{domain}', 'namespace' => 'App\Controllers'), function() {
 Route::group(array('namespace' => 'App\Controllers'), function() {
-    Route::get('/', 'HomeController@getLogin');
+    Route::get('/', 'Home2Controller@getLogin');
     Route::get('/home/{numeric}/{token}', 'HomeController@getHome');
 
     Route::get('login', 'HomeController@getLogin');
@@ -45,13 +45,14 @@ Route::group(array('namespace' => 'App\Controllers'), function() {
     Route::get('forgot', 'HomeController@getForgotPassword');
     Route::post('forgot/submit', 'HomeController@postForgotPassword');
 
-    Route::get('reset/{token}', 'HomeController@getReset');
-    Route::post('reset/submit', 'HomeController@postReset');
+    Route::get('password/reset/{token}', 'HomeController@getReset');
+    Route::post('password/reset/submit', 'HomeController@postReset');
 
     Route::get('datamigration', 'RedmartMigrationController@index');
 
     Route::get('tokenauth', 'TokenAuthenticationController@index');
 });
+
 
 /*
   |--------------------------------------------------------------------------
@@ -181,6 +182,17 @@ Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), f
     }
     #logout
     Route::get('user/logout', 'UserController@logout');
+});
+
+Route::group(array('prefix' => 'v2', 'namespace' => 'App\Controllers'), function() {
+    Route::get('login', 'Home2Controller@getLogin');
+    Route::post('login/submit', 'Home2Controller@postLogin');
+
+    Route::get('register', 'Home2Controller@getRegister');
+    Route::post('register/submit', 'Home2Controller@postRegister');
+
+    Route::get('forgot', 'Home2Controller@getForgotPassword');
+    Route::get('password/reset/{token}', 'Home2Controller@getReset');
 });
 
 Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
