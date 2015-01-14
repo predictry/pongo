@@ -23,7 +23,7 @@ use App,
     Validator,
     View;
 
-class HomeController extends BaseController
+class Home2Controller extends BaseController
 {
 
     protected $layout = 'frontend.layouts.basic';
@@ -68,10 +68,10 @@ class HomeController extends BaseController
     {
         $user = Auth::user();
         if (!empty($user->id)) {
-            return Redirect::to('home2');
+            return Redirect::to('v2/home');
         }
 
-        return View::make('frontend.common.login', array("pageTitle" => "Login"));
+        return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.common.login', array("pageTitle" => "Login"));
     }
 
     /**
@@ -108,10 +108,10 @@ class HomeController extends BaseController
             else
                 $flash_error = "error.email.doesnt.exists";
 
-            return Redirect::to('login')->with('flash_error', $flash_error)->withInput();
+            return Redirect::back()->with('flash_error', $flash_error)->withInput();
         }
         else
-            return Redirect::to('login')->withInput()->withErrors($validator);
+            return Redirect::back()->withInput()->withErrors($validator);
     }
 
     /**
@@ -122,7 +122,7 @@ class HomeController extends BaseController
     public function getRegister()
     {
         $this->siteInfo['pageTitle'] = "signup.now";
-        return View::make('frontend.common.register');
+        return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.common.register');
     }
 
     /**
@@ -148,10 +148,10 @@ class HomeController extends BaseController
             else
                 return Redirect::to('register')->withInput()->withErrors("We are unable to process the data. Please try again.");
 
-            return Redirect::to('login')->with('flash_message', "home.success.register");
+            return Redirect::to('v2/login')->with('flash_message', "home.success.register");
         }
         else {
-            return Redirect::to('register')->withInput()->withErrors($validator);
+            return Redirect::to('v2/register')->withInput()->withErrors($validator);
         }
     }
 
@@ -162,45 +162,7 @@ class HomeController extends BaseController
      */
     public function getForgotPassword()
     {
-        return View::make("frontend.common.forgot");
-    }
-
-    /**
-     * Hanle a POST request to send forgot password email confirmation.
-     * 
-     * @return Response
-     */
-    public function postForgotPassword()
-    {
-        $input = array(
-            'email' => Input::get('email')
-        );
-
-        $rules = array(
-            'email' => 'required|email'
-        );
-
-        $validator = Validator::make($input, $rules);
-        if ($validator->passes()) {
-            $user_id = \App\Models\Account::where("email", $input['email'])->get(array('id'))->first();
-            if (!$user_id)
-                return Redirect::to('forgot')->with('flash_error', "error.email.doesnt.exists");
-            else {
-                $response = Password::remind(Input::only('email'), function($message) {
-                            $message->subject = "subject.password.reminder";
-                        });
-                switch ($response) {
-                    case Password::INVALID_USER:
-                        return Redirect::back()->with('flash_message', \Lang::get($response));
-
-                    case Password::REMINDER_SENT:
-                        return Redirect::back()->with('flash_message', \Lang::get($response));
-                }
-            }
-        }
-        else {
-            return Redirect::back()->withInput()->withErrors($validator);
-        }
+        return View::make(getenv('FRONTEND_SKINS') . $this->theme . ".common.forgot");
     }
 
     /**
@@ -214,7 +176,7 @@ class HomeController extends BaseController
         if (is_null($token))
             App::abort(404);
 
-        return View::make('frontend.common.reset')->with('token', $token);
+        return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.common.reset')->with('token', $token);
     }
 
     /**

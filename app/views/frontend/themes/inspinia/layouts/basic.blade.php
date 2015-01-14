@@ -1,1 +1,2 @@
-/Applications/MAMP/htdocs/predictry-pongo/app/views/frontend/layouts/inspinia_basic.blade.php
+@include(getenv('FRONTEND_SKINS') . $theme . '.partials.basic_header', array('styles' => []))
+@yield('content')
