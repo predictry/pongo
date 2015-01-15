@@ -49,10 +49,11 @@ class Sites2Controller extends BaseController
         $output = array(
             'paginator'          => $paginator,
             'str_message'        => $message,
-            "pageTitle"          => "Manage Members",
+            "pageTitle"          => "Manage Sites",
             "table_header"       => $this->model->manage_table_header,
             "page"               => $page,
-            "custom_action_view" => getenv('FRONTEND_SKINS') . $this->theme . ".panels.sites.customactionview"
+            "custom_action_view" => getenv('FRONTEND_SKINS') . $this->theme . ".panels.sites.customactionview",
+            "upper"              => []
         );
 
         return View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.manage", $output);

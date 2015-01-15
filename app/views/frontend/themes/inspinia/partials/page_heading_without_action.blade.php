@@ -3,7 +3,7 @@
         <h2>{{$pageTitle}}</h2>
         <ol class="breadcrumb">
             <li>
-                <a href="{{URL::to('home')}}">Dashboard</a>
+                <a href="{{URL::to('v2/home')}}">Dashboard</a>
             </li>
             @foreach($upper as $key => $uri)
             <li>
