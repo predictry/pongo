@@ -8,7 +8,6 @@
 {{ HTML::script('assets/inspinia/js/inspinia.js') }}
 {{ HTML::script('assets/inspinia/js/plugins/pace/pace.min.js') }}
 
-{{ $custom_script or '' }}
 
 @if (count($scripts) > 0)
 
@@ -17,6 +16,8 @@
 @endforeach
 
 @endif
+
+{{ $custom_script or '' }}
 
 </body>
 </html>

@@ -10,13 +10,20 @@
 
 namespace App\Controllers\User;
 
-use View,
+use App\Controllers\BaseController,
+    App\Models\Item,
+    App\Models\ItemMeta,
+    App\Models\Rule,
+    Form,
     Input,
+    Paginator,
     Redirect,
+    Response,
+    Str,
     Validator,
-    Paginator;
+    View;
 
-class ItemsController extends \App\Controllers\BaseController
+class Items2Controller extends BaseController
 {
 
     public function __construct()
@@ -32,7 +39,7 @@ class ItemsController extends \App\Controllers\BaseController
      */
     public function index()
     {
-        $this->model = new \App\Models\Item();
+        $this->model = new Item();
         $page        = Input::get('page', 1);
         $data        = $this->getByPage($page, $this->manageViewConfig['limit_per_page'], "site_id", $this->active_site_id);
         $message     = '';
@@ -51,43 +58,49 @@ class ItemsController extends \App\Controllers\BaseController
             "pageTitle"    => "Manage Items",
             "table_header" => $this->model->manage_table_header,
             "page"         => $page,
-            "modalTitle"   => "View Item"
+            "modalTitle"   => "View Item",
+            "upper"        => []
         );
-        return View::make("frontend.panels.manage", $output);
+        return View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.manage", $output);
     }
 
     public function getEdit($id)
     {
-        $item       = \App\Models\Item::find($id);
-        $item_metas = \App\Models\ItemMeta::where("item_id", $id)->get();
+        $item = Item::find($id);
 
-        if ($item_metas) {
-            foreach ($item_metas as $obj) {
-                $item->{$obj->key} = $obj->value;
+        if ($item) {
+            $item_metas = ItemMeta::where("item_id", $id)->get();
+
+            if ($item_metas) {
+                foreach ($item_metas as $obj) {
+                    $item->{$obj->key} = $obj->value;
+                }
             }
+
+            $activated = ($item->active) ? true : false;
+            return View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.items.form", array("item" => $item, "type" => "edit", 'pageTitle' => "Edit Item", "activated" => $activated));
         }
 
-        $activated = ($item->active) ? true : false;
-        return View::make("frontend.panels.items.form", array("item" => $item, "type" => "edit", 'pageTitle' => "Edit Item", "activated" => $activated));
+        return Redirect::to('v2/items')->with("flash_error", "Item doesn't exist.");
     }
 
     public function postEdit($id)
     {
-        $item  = \App\Models\Item::find($id);
+        $item  = Item::find($id);
         $input = Input::only("name", "item_url", "img_url", "active");
         $rules = array(
             'name'     => $item->rules['name'],
-            'item_url' => 'required',
+            "item_url" => 'required',
             'img_url'  => 'required'
         );
 
         $validator = Validator::make($input, $rules);
 
         if ($validator->passes()) { // validator for name and email
-            $item->name   = $input['name'];
-            $item->active = $input['active'];
+            $item->name   = Input::get("name");
+            $item->active = Input::get("active");
             $item->update();
-            return Redirect::route("items")->with("flash_message", "Data successfully updated.");
+            return Redirect::route("v2/items")->with("flash_message", "Data successfully updated.");
         }
         else {
             return Redirect::back()->withInput()->withErrors($validator);
@@ -96,18 +109,20 @@ class ItemsController extends \App\Controllers\BaseController
 
     public function getView($id)
     {
-        $item            = \App\Models\Item::find($id);
+        $item = Item::find($id);
+
         if (is_object($item))
-            $item_properties = \App\Models\ItemMeta::where("item_id", $item->id)->orderBy('created_at', 'ASC')->get();
+            $item_properties = ItemMeta::where("item_id", $item->id)->orderBy('created_at', 'ASC')->get();
 
         $activated = ($item->activte) ? true : false;
-        return View::make("frontend.panels.items.viewmodalcontent", array("item" => $item, "properties" => $item_properties, "type" => "view", 'pageTitle' => "View Item", "columns" => $item->manage_table_header, "activated" => $activated));
+        return View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.items.viewmodalcontent", array("item" => $item, "properties" => $item_properties, "type" => "view", 'pageTitle' => "View Item", "columns" => $item->manage_table_header, "activated" => $activated));
     }
 
     public function postDelete($id)
     {
-        \App\Models\Rule::where("item_id", $id)->delete();
-        \App\Models\Item::find($id)->delete();
+        ItemMeta::where("item_id", $id)->delete();
+        Rule::where("item_id", $id)->delete();
+        Item::find($id)->delete();
         return Redirect::back()->with("flash_message", "Data has been removed.");
     }
 
@@ -118,11 +133,10 @@ class ItemsController extends \App\Controllers\BaseController
         }
 
         $is_dropdown = (!is_null(\Input::get("isDropDown"))) ? \Input::get("isDropDown") : false;
-        $is_view     = (!is_null(\Input::get("isView"))) ? \Input::get("isView") : false;
         $id          = (!is_null(\Input::get("id"))) ? \Input::get("id") : 1;
         $value       = (!is_null(\Input::get("val"))) ? \Input::get("val") : false;
 
-        $items          = \App\Models\Item::with("item_metas")->where("site_id", $this->active_site_id)->get()->toArray();
+        $items          = Item::with("item_metas")->where("site_id", $this->active_site_id)->get()->toArray();
         $key_values     = [];
         $key_properties = [];
 
@@ -148,7 +162,7 @@ class ItemsController extends \App\Controllers\BaseController
                     $data[$property] = array_unique(array_merge($data[$property], [ucwords($arr[$property])]));
 
                     foreach ($data[$property] as $index => $val) {
-                        $data_group[$property][strtolower($property . '.' . \Str::slug($val))] = ucwords($val);
+                        $data_group[$property][strtolower($property . '.' . Str::slug($val))] = ucwords($val);
                     }
                 }
             }
@@ -160,10 +174,10 @@ class ItemsController extends \App\Controllers\BaseController
                 $key_properties_list[strtolower($val)] = ucwords($val);
             }
 //            $view = \Form::select("propertyKey[]", $key_properties_list, ($value && $value !== "") ? $value[2] : head($key_properties_list), array('id' => 'propertyKey' . $id, 'class' => 'form-control chosen-select', 'onchange' => 'viewMetaDetail(' . $id . ',"' . $key . '");'));
-            $view = \Form::select("value[]", $data_group, ($value && $value !== "") ? $value : head($key_properties_list), array('id' => 'value' . $id, 'class' => 'form-control chosen-select'));
+            $view = Form::select("value[]", $data_group, ($value && $value !== "") ? $value : head($key_properties_list), array('id' => 'value' . $id, 'class' => 'form-control chosen-select'));
         }
 
-        return \Response::json(array(
+        return Response::json(array(
                     "status"         => "success",
                     "key_properties" => $key_properties,
                     "data"           => $data,

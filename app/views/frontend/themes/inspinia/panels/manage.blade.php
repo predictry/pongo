@@ -1,12 +1,12 @@
-@extends(getenv('FRONTEND_SKINS') . $theme . '.layouts.dashboard')
+@extends(getenv('FRONTEND_SKINS') . $theme . '.layouts.dashboard', ['scripts' => array(HTML::script('assets/js/script.helper.js'), HTML::script('assets/js/script.panel.items.js'))])
 @section('content')
-@include('frontend.partials.notification')
 @include(getenv('FRONTEND_SKINS') . $theme . '.partials.page_heading_with_action')
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
         <div class="col-lg-12">
             <div class="ibox float-e-margins">
                 <div class="ibox-content">
+                    @include('frontend.partials.notification')
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <thead>
@@ -43,14 +43,19 @@
                                     @endforeach
                                     @if ($edit || $delete || $view || $custom_action)
                                     <td class="">
-                                        {{ Form::open(array('url' => URL::to( URL::current() . "/" . $o->id . "/delete" ), "class" => "mb0")) }}
-                                        {{ Form::hidden("member_id", $o->id) }}
-                                        @if ($edit) <a class="btn btn-default btn-sm tt" href=" {{ URL::to( URL::current() . "/" . $o->id . "/edit" ) }}"  data-toggle="tooltip" data-placement="bottom" title="{{Lang::get('panel.edit')}}"><i class="fa fa-edit"></i></a> @endif
-                                        @if ($delete) <button type="submit" onclick="return confirm('{{Lang::get('panel.remove.confirm')}}');" class="btn btn-default btn-sm tt" href="{{ URL::to( URL::current() . "/" . $o->id . "/delete" )  }}"  data-toggle="tooltip" data-placement="bottom" title="{{Lang::get('panel.remove')}}"><i class="fa fa-trash-o"></i></button> @endif
-                                        @if ($view) <a data-toggle="modal" id="btnViewModal{{ $o->id }}" data-target="#viewModal" data-id="{{ $o->id }}" href=" {{ URL::to( URL::current() . "/" . $o->id . "/view" ) }}" class="btn btn-default btn-sm btnViewModal tt"  data-toggle="tooltip" data-placement="bottom" title="{{Lang::get('panel.view')}}" ><i class="fa fa-search"></i></a> @endif
-                                        @if ($custom_action)
-                                        @include($custom_action_view, array('id' => $o->id))
-                                        @endif
+                                        <div class="btn-group">
+                                            {{ Form::open(array('url' => URL::to( URL::current() . "/" . $o->id . "/delete" ), "class" => "mb0")) }}
+                                            {{ Form::hidden("member_id", $o->id) }}
+                                            <button data-toggle="dropdown" class="btn btn-default btn-xs dropdown-toggle">Action <span class="caret"></span></button>
+                                            <ul class="dropdown-menu">
+                                                @if ($edit) <li><a href="{{URL::to( URL::current() . "/" . $o->id . "/edit" ) }}"  data-toggle="tooltip" data-placement="bottom" title="{{Lang::get('panel.edit')}}">{{Lang::get('panel.edit')}}</a></li> @endif
+                                                @if ($view) <li><a class="btnViewModal" data-toggle="modal" id="btnViewModal{{ $o->id }}" data-target="#viewModal" data-id="{{ $o->id }}" href=" {{ URL::to( URL::current() . "/" . $o->id . "/view" ) }}" data-toggle="tooltip" data-placement="bottom" title="{{Lang::get('panel.view')}}" >{{Lang::get('panel.view')}}</a></li> @endif
+                                                @if ($delete) <li><a type="submit" onclick="return confirm('{{Lang::get('panel.remove.confirm')}}');" href="{{ URL::to( URL::current() . "/" . $o->id . "/delete" )  }}"  data-toggle="tooltip" data-placement="bottom" title="{{Lang::get('panel.remove')}}">{{Lang::get('panel.remove')}}</a></li> @endif
+                                                @if ($custom_action)
+                                                @include($custom_action_view, array('id' => $o->id))
+                                                @endif
+                                            </ul>
+                                        </div>
                                         {{ Form::close() }}
                                     </td>
                                     @endif
@@ -66,13 +71,14 @@
                             </tbody>
                         </table>
                     </div>
+                    @if ($paginator !== null)
+                    {{ $paginator->links('frontend.partials.paginator') }}
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 </div>
 @include('frontend.partials.viewmodal')	
-@if ($paginator !== null)
-{{ $paginator->links('frontend.partials.paginator') }}
-@endif
+
 @stop

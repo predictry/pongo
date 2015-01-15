@@ -3,10 +3,15 @@
         <h2><?php echo Lang::get("panel.manage"); ?> <?php echo ucfirst($moduleName) . "(s)"; ?></h2>
         <ol class="breadcrumb">
             <li>
-                <a href="v2/home">Dashboard</a>
+                <a href="{{URL::to('v2/home')}}">Dashboard</a>
             </li>
+            @foreach($upper as $key => $uri)
+            <li>
+                <a href="{{URL::to($uri)}}">{{$key}}</a>
+            </li>                
+            @endforeach
             <li class="active">
-                <strong>Sites</strong>
+                <strong>{{$pageTitle or ''}}</strong>
             </li>
         </ol>
     </div>

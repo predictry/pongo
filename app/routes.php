@@ -184,6 +184,11 @@ Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), f
     Route::get('user/logout', 'UserController@logout');
 });
 
+/*
+  |--------------------------------------------------------------------------
+  | Frontend Routes V2
+  |--------------------------------------------------------------------------
+ */
 Route::group(array('prefix' => 'v2', 'namespace' => 'App\Controllers'), function() {
     Route::get('login', 'Home2Controller@getLogin');
     Route::post('login/submit', 'Home2Controller@postLogin');
@@ -195,6 +200,11 @@ Route::group(array('prefix' => 'v2', 'namespace' => 'App\Controllers'), function
     Route::get('password/reset/{token}', 'Home2Controller@getReset');
 });
 
+/*
+  |------------------------------------ --------------------------------------
+  | User Dashboard Routing V2
+  |--------------------------------------------------------------------------
+ */
 Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
 
     #Dashboard
@@ -206,16 +216,31 @@ Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Con
     #Update Password
     Route::get('password', 'User2Controller@getPassword');
 
-    #Sites Management
-
     if (!is_null(Auth::user()) && Auth::user()->plan_id !== 3) {
+        #Sites Management
+        Route::get("sites", array("as" => "sites", "uses" => "Sites2Controller@index"));
         Route::get('sites/create', array("as" => "sites.create", "uses" => 'Sites2Controller@getCreate'));
         Route::get('sites/{numeric}/edit', array("as" => "sites.{numieric}.edit", "uses" => 'Sites2Controller@getEdit'));
         Route::get('sites/{numeric}/delete', 'Sites2Controller@getDelete');
-    }
+        Route::get('sites/{numeric}/default', array("as" => "sites.{numieric}.edit", "uses" => 'Sites2Controller@getDefault'));
 
-    Route::get('sites/{numeric}/default', array("as" => "sites.{numieric}.edit", "uses" => 'Sites2Controller@getDefault'));
-    Route::get("sites", array("as" => "sites", "uses" => "Sites2Controller@index"));
+        #Items
+        Route::get("items", array("as" => "items", "uses" => "Items2Controller@index"));
+        Route::get('items/{numeric}/view', array("as" => "items.{numeric}.view", "uses" => 'Items2Controller@getView'));
+        Route::get('items/{numeric}/edit', array("as" => "items.{numieric}.edit", "uses" => 'Items2Controller@getEdit'));
+        Route::get('items/{numeric}/delete', 'Items2Controller@postDelete');
+        Route::post('items/{numeric}/delete', 'Items2Controller@postDelete');
+
+        #Widgets
+        Route::get("widgets", array("as" => "widgets", "uses" => "Widgets2Controller@index"));
+        Route::get('widgets/{numeric}/view', array("as" => "widgets.{numeric}.view", "uses" => 'Widgets2Controller@getView'));
+        Route::get('widgets/create', array("as" => "widgets.create", "uses" => 'Widgets2Controller@getCreate'));
+        Route::get('widgets/item', array("as" => "widgets.item", "uses" => 'Widgets2Controller@getItemWidgetRuleset'));
+        Route::get('widgets/itemEdit', array("as" => "widgets.itemEdit", "uses" => 'Widgets2Controller@getItemEditWidgetRuleset'));
+        Route::get('widgets/itemFilterEdit', array("as" => "widgets.itemFilterEdit", "uses" => 'Widgets2Controller@getItemEditWidgetFilter'));
+        Route::get('widgets/{numeric}/edit', array("as" => "widgets.{numieric}.edit", "uses" => 'Widgets2Controller@getEdit'));
+        Route::get('widgets/{numeric}/delete', 'Widgets2Controller@getDelete');
+    }
 });
 
 
