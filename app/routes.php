@@ -239,7 +239,7 @@ Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Con
         Route::get('widgets/itemEdit', array("as" => "widgets.itemEdit", "uses" => 'Widgets2Controller@getItemEditWidgetRuleset'));
         Route::get('widgets/itemFilterEdit', array("as" => "widgets.itemFilterEdit", "uses" => 'Widgets2Controller@getItemEditWidgetFilter'));
         Route::get('widgets/{numeric}/edit', array("as" => "widgets.{numieric}.edit", "uses" => 'Widgets2Controller@getEdit'));
-        Route::get('widgets/{numeric}/delete', 'Widgets2Controller@getDelete');
+        Route::get('widgets/{numeric}/delete', 'Widgets2Controller@postDelete');
     }
 });
 

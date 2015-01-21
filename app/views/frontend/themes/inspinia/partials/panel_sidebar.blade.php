@@ -22,6 +22,9 @@
             <li class="<?php if ($ca === 'App\Controllers\User\Panel2Controller') echo 'active'; ?>">
                 <a href="<?php echo URL::to('v2/home'); ?>"><i class="fa fa-th-large"></i> <span class="nav-label">Dashboard </span> </a>
             </li>
+            <li class="<?php if ($ca === 'App\Controllers\User\Widgets2Controller') echo 'active'; ?>">
+                <a href="<?php echo URL::to('v2/widgets'); ?>"><i class="fa fa-level-up"></i> <span class="nav-label">Recommendations </span> </a>
+            </li>
             <li class="<?php if ($ca === 'App\Controllers\User\Items2Controller') echo 'active'; ?>">
                 <a href="<?php echo URL::to('v2/items'); ?>"><i class="fa fa-cube"></i> <span class="nav-label">Your Items </span> </a>
             </li>
