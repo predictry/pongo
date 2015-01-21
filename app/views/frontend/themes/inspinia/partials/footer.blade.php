@@ -17,7 +17,13 @@
 
 @endif
 
+{{"<script type='text/javascript'>"}}
 {{ $custom_script or '' }}
+
+$(document).ready(function () {
+});
+
+{{"</script>"}}
 
 </body>
 </html>

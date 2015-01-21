@@ -31,10 +31,7 @@ class Panel2Controller extends BaseController
         $this->panel_repository                 = $repository;
         $this->panel_repository->active_site_id = $this->active_site_id;
 
-        $custom_script = "<script type='text/javascript'>";
-        $custom_script .= "var site_url = '" . URL::to('/') . "';";
-        $custom_script .= "</script>";
-
+        $custom_script = "var site_url = '" . URL::to('/') . "';";
         View::share(array("ca" => get_class(), "custom_script" => $custom_script));
     }
 

@@ -42,9 +42,8 @@
                         <span class="help-block">{{ $errors->first('img_url') }}</span>
                     </div>
                     <div class="hr-line-dashed"></div>
-                    <?php echo Form::hidden("active", true); ?>
                     <div class="form-group">
-                        <label for='img_url' class="col-sm-2 control-label"></label>
+                        <label for='img_url' class="col-sm-2 control-label">Status</label>
                         <div class="col-sm-4">
                             <div class="btn-group" data-toggle="buttons">
                                 <label class="btn btn-default btn-sm <?php echo ($activated === true) ? 'active' : ''; ?>">
@@ -57,7 +56,8 @@
                         </div>
                         <span class="help-block">{{ $errors->first('img_url') }}</span>
                     </div>
-
+                    <div class="hr-line-dashed"></div>
+                    <?php echo Form::hidden("active", true); ?>
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-4">
                             <button type="submit" class="btn btn-primary">Submit</button>

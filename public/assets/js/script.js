@@ -15,7 +15,7 @@ function getGraphData() {
         type: 'POST',
         data: filters,
         dataType: 'json',
-        success: function(data)
+        success: function (data)
         {
             if (data.status === "success") {
 //                console.log(data);
@@ -82,7 +82,7 @@ function getGraphData() {
                 alert("something wrong");
             }
         },
-        error: function() {
+        error: function () {
             alert('error!');
         }
     });
@@ -134,7 +134,7 @@ function getGraphBarComparison(divelem, series_data) {
             shadow: false
         },
         tooltip: {
-            formatter: function() {
+            formatter: function () {
                 return '<b>' + this.x + '</b><br/>' +
                         this.series.name + ': ' + this.y;
             }
@@ -190,7 +190,7 @@ function getGraphLineComparison() {
  * get pie chart
  */
 function getGraphPie(divelem, chart_title, chart_data) {
-    $(function() {
+    $(function () {
         $('#' + divelem).highcharts({
             chart: {
                 plotBackgroundColor: null,
@@ -271,7 +271,7 @@ function getGraphPieWithText(divelem, chart_title, chart_data) {
             enabled: false
         }
     },
-    function(chart) { // on complete
+    function (chart) { // on complete
         var textX = chart.plotLeft + (chart.plotWidth * 0.5);
         var textY = chart.plotTop + (chart.plotHeight * 0.5);
 
@@ -374,7 +374,7 @@ function getFilterType(id, val) {
                     val: value
                 },
                 dataType: 'json',
-                success: function(response)
+                success: function (response)
                 {
                     if (response.status === "success") {
                         data = response.data;
@@ -388,7 +388,7 @@ function getFilterType(id, val) {
                         $(".chosen-select").chosen();
                     }
                 },
-                error: function() {
+                error: function () {
                     alert('error!');
                 }
             });
@@ -438,7 +438,7 @@ function addItemRule(is_modal, container) {
         type: 'GET',
         data: form_data,
         dataType: 'json',
-        success: function(data)
+        success: function (data)
         {
             if (data.status === "success") {
                 $("#" + div_container).append(data.response);
@@ -449,14 +449,14 @@ function addItemRule(is_modal, container) {
                 $(type_identifier + indexOfItem).chosen();
                 $(item_identifier + indexOfItem).val("").trigger('chosen:updated');
 
-                $(item_identifier + indexOfItem).on('change', function(evt, params) {
+                $(item_identifier + indexOfItem).on('change', function (evt, params) {
                     if (!validateSelectedItem(params.selected, "item_id")) {
                         $(item_identifier + indexOfItem).val("").trigger('chosen:updated');
                     }
                 });
             }
         },
-        error: function() {
+        error: function () {
             alert('error!');
         }
     });
@@ -478,7 +478,7 @@ function addItemFunel() {
         type: 'GET',
         data: form_data,
         dataType: 'json',
-        success: function(data)
+        success: function (data)
         {
             if (data.status === "success") {
                 $("#item_funel_action_container").append(data.response);
@@ -487,14 +487,14 @@ function addItemFunel() {
                 $(".chosen-select").chosen();
                 $("#action" + indexOfItem).chosen();
 
-                $("#item_funel" + indexOfItem).on('change', function(evt, params) {
+                $("#item_funel" + indexOfItem).on('change', function (evt, params) {
                     if (!validateSelectedItem(params.selected, "action_id")) {
                         $("#action" + indexOfItem).val("").trigger('chosen:updated');
                     }
                 });
             }
         },
-        error: function() {
+        error: function () {
             alert('error!');
         }
     });
@@ -516,7 +516,7 @@ function addItemFilter() {
         type: 'GET',
         data: form_data,
         dataType: 'json',
-        success: function(data)
+        success: function (data)
         {
             if (data.status === "success") {
                 $("#filter_item_container").append(data.response);
@@ -524,7 +524,7 @@ function addItemFilter() {
                 $(".chosen-select").chosen();
             }
         },
-        error: function() {
+        error: function () {
             alert('error!');
         }
     });
@@ -546,7 +546,7 @@ function addItemWidgetRuleset() {
         type: 'GET',
         data: form_data,
         dataType: 'json',
-        success: function(data)
+        success: function (data)
         {
             if (data.status === "success") {
                 $("#item_rules_container").append(data.response);
@@ -555,14 +555,14 @@ function addItemWidgetRuleset() {
 
                 $("#item" + indexOfItem).chosen();
                 $("#item" + indexOfItem).val("").trigger('chosen:updated');
-                $("#item" + indexOfItem).on('change', function(evt, params) {
+                $("#item" + indexOfItem).on('change', function (evt, params) {
                     if (!validateSelectedItem(params.selected, "item_id")) {
                         $("#item" + indexOfItem).val("").trigger('chosen:updated');
                     }
                 });
             }
         },
-        error: function() {
+        error: function () {
             alert('error!');
         }
     });
@@ -581,7 +581,7 @@ function editItemRule(obj, index) {
         type: 'GET',
         data: form_data,
         dataType: 'json',
-        success: function(data)
+        success: function (data)
         {
             if (data.status === "success") {
                 $("#item_rules_container").append(data.response);
@@ -590,7 +590,7 @@ function editItemRule(obj, index) {
                 $("#type" + index).chosen();
                 $("#item" + index).val(obj.item_id).trigger('chosen:updated');
 
-                $("#item" + index).on('change', function(evt, params) {
+                $("#item" + index).on('change', function (evt, params) {
                     if (!validateSelectedItem(params.selected, "item_id")) {
                         $("#item" + index).val("").trigger('chosen:updated');
                     }
@@ -599,7 +599,7 @@ function editItemRule(obj, index) {
                 indexOfItem = index;
             }
         },
-        error: function() {
+        error: function () {
             alert('error!');
         }
     });
@@ -617,7 +617,7 @@ function editItemWidgetRuleset(obj, index) {
         type: 'GET',
         data: form_data,
         dataType: 'json',
-        success: function(data)
+        success: function (data)
         {
             if (data.status === "success") {
                 $("#item_rules_container").append(data.response);
@@ -626,7 +626,7 @@ function editItemWidgetRuleset(obj, index) {
                 $("#type" + index).chosen();
                 $("#item" + index).val(obj.ruleset_id).trigger('chosen:updated');
 
-                $("#item" + index).on('change', function(evt, params) {
+                $("#item" + index).on('change', function (evt, params) {
                     if (!validateSelectedItem(params.selected, "item_id")) {
                         $("#item" + index).val("").trigger('chosen:updated');
                     }
@@ -635,7 +635,7 @@ function editItemWidgetRuleset(obj, index) {
                 indexOfItem = index;
             }
         },
-        error: function() {
+        error: function () {
             alert('error!');
         }
     });
@@ -653,7 +653,7 @@ function editItemWidgetFilter(obj, index) {
         type: 'GET',
         data: form_data,
         dataType: 'json',
-        success: function(data)
+        success: function (data)
         {
             if (data.status === "success") {
                 $("#item_filters_container").append(data.response);
@@ -662,7 +662,7 @@ function editItemWidgetFilter(obj, index) {
                 $("#type" + index).chosen();
                 $("#itemfilter" + index).val(obj.filter_id).trigger('chosen:updated');
 
-                $("#itemfilter" + index).on('change', function(evt, params) {
+                $("#itemfilter" + index).on('change', function (evt, params) {
                     if (!validateSelectedItem(params.selected, "item_id")) {
                         $("#itemfilter" + index).val("").trigger('chosen:updated');
                     }
@@ -671,7 +671,7 @@ function editItemWidgetFilter(obj, index) {
                 indexOfItem = index;
             }
         },
-        error: function() {
+        error: function () {
             alert('error!');
         }
     });
@@ -689,7 +689,7 @@ function editItemFilter(obj, index) {
         type: 'GET',
         data: form_data,
         dataType: 'json',
-        success: function(data)
+        success: function (data)
         {
             if (data.status === "success") {
                 $("#filter_item_container").append(data.response);
@@ -703,7 +703,7 @@ function editItemFilter(obj, index) {
                     indexOfItem = index;
             }
         },
-        error: function() {
+        error: function () {
             alert('error!');
         }
     });
@@ -722,7 +722,7 @@ function setDefaultComparisonType(comparison_type) {
 
 function gatherSelectedOption(name) {
     var values = [];
-    $("select[name='" + name + "[]'] option:selected").each(function() {
+    $("select[name='" + name + "[]'] option:selected").each(function () {
         values.push(this.value);
     });
     return values;
@@ -776,18 +776,18 @@ function maskInputToNumeric(e) {
 }
 
 var loadBar;
-loadBar = loadBar || (function() {
+loadBar = loadBar || (function () {
     var pleaseWaitDiv = $('<div class="modal fade" style="margin-top: 21%; overflow: hidden; z-index: 1060;" id="loadingModal">\n\
 <div class="modal-dialog"><div class="col-sm-offset-4 col-sm-4"><div class="progress progress-striped active"><div class="progress-bar"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;"><span class="sr-only"></span></div></div></div></div></div>');
     return {
-        showPleaseWait: function() {
+        showPleaseWait: function () {
             pleaseWaitDiv.modal({
                 backdrop: 'static',
                 keyboard: false
             });
             $(".modal-backdrop").first().css("z-index", "1050");
         },
-        hidePleaseWait: function() {
+        hidePleaseWait: function () {
             pleaseWaitDiv.modal('hide');
             $(".modal-backdrop").first().css("z-index", "1040");
 
@@ -795,7 +795,7 @@ loadBar = loadBar || (function() {
     };
 })();
 
-jQuery(document).ready(function() {
+jQuery(document).ready(function () {
 
     $(".alert").alert();
     $('.dropdown-toggle').dropdown();
@@ -838,11 +838,11 @@ jQuery(document).ready(function() {
         getGraphPie("averageRecommendedSalesDonut", "Average Cart Value with Recommended Items", highchart_average_recommended_sales_data);
     if (typeof highchart_series_data !== 'undefined') {
         getGraphBarComparison("highChartComparisonGraph", highchart_combination_graph_of_comparison);
-        $('div#graph_type.btn-group .btn').click(function() {
+        $('div#graph_type.btn-group .btn').click(function () {
             $(this).find('input:radio').attr('checked', true);
             var type = $(this).find('input[name=options]').val();
 
-            $('.options_graph_style').each(function() {
+            $('.options_graph_style').each(function () {
                 if ($(this).val() !== type)
                     $(this).attr('checked', false);
             });
@@ -860,7 +860,7 @@ jQuery(document).ready(function() {
     }
 
     //ACTION BINDING
-    $('div#range-type ul.dropdown-menu li a').click(function(e) {
+    $('div#range-type ul.dropdown-menu li a').click(function (e) {
         var $div = $(this).parent().parent().parent();
         var $btn = $div.find('.dropdown-toggle');
         $btn.html($(this).text() + ' <span class="caret"></span>');
@@ -869,21 +869,21 @@ jQuery(document).ready(function() {
         return false;
     });
 
-    $('a.btnViewModal').on('click', function(e) {
+    $('a.btnViewModal').on('click', function (e) {
         var target_modal = $(e.currentTarget).data('target');
         var remote_content = e.currentTarget.href;
 
         var modal = $(target_modal);
         var modalBody = $(target_modal + ' .modal-body');
         var e = 1;
-        modal.on('show.bs.modal', function() {
+        modal.on('show.bs.modal', function () {
             if (e)
                 modalBody.load(remote_content);
             e = 0;
         }).modal();
         return false;
     });
-    $('#viewModal').on('hidden.bs.modal', function() {
+    $('#viewModal').on('hidden.bs.modal', function () {
         $(this).removeData('bs.modal');
     });
 
@@ -892,12 +892,12 @@ jQuery(document).ready(function() {
     $("#type1").chosen();
     $("#action1").chosen();
     $("#itemfilter1").chosen();
-    $('#item1').on('change', function(evt, params) {
+    $('#item1').on('change', function (evt, params) {
         if (!validateSelectedItem(params.selected)) {
             $('#item1').val("").trigger("chosen:updated");
         }
     });
-    $("#expiry_type").bind('change', function(e) {
+    $("#expiry_type").bind('change', function (e) {
         var valueSelected = this.value;
         var box = $("#expiry_value_box");
 
@@ -908,7 +908,7 @@ jQuery(document).ready(function() {
             dtpicker.find("input.form-control").attr("name", "expiry_value");
             dtpicker.removeClass("hide");
 
-            $(function() {
+            $(function () {
                 $('#datetimepicker').datetimepicker();
                 if (expiry_date !== '')
                     $('#datetimepicker').data("DateTimePicker").setDate(expiry_date);
@@ -926,12 +926,12 @@ jQuery(document).ready(function() {
                 box.find("input#expiry_value").val(0);
         }
     });
-    $("#datetimepicker").bind("dp.change", function() {
+    $("#datetimepicker").bind("dp.change", function () {
         var dt = $('#datetimepicker').data("DateTimePicker").getDate();
         $("#expiry_value_dt").val(dt);
 
     });
-    $("#expiry_type").change(function() {
+    $("#expiry_type").change(function () {
     }).trigger("change");
     $(".multiple-chosen-select").chosen({no_results_text: "Oops, nothing found!"});
 
@@ -941,7 +941,7 @@ jQuery(document).ready(function() {
 
     allWells.hide();
 
-    navListItems.click(function(e) {
+    navListItems.click(function (e) {
         e.preventDefault();
         var $target = $($(this).attr('href')),
                 $item = $(this).closest('li');
@@ -957,7 +957,7 @@ jQuery(document).ready(function() {
     $('ul.setup-panel li.active a').trigger('click');
 
     // WIZARD (PLACEMENT INFO) //
-    $('#btnWizardWidgetInfo').on('click', function(e) {
+    $('#btnWizardWidgetInfo').on('click', function (e) {
         e.preventDefault();
         var form = $(".wizardWidgetForm");
         $.ajax({
@@ -965,7 +965,7 @@ jQuery(document).ready(function() {
             type: 'POST',
             data: form.serialize(),
             dataType: 'json',
-            success: function(data)
+            success: function (data)
             {
                 if (data.status === "success") {
                     $('ul.setup-panel li:eq(1)').removeClass('disabled');
@@ -975,7 +975,7 @@ jQuery(document).ready(function() {
                     $(".wizardWidget").html(data.response);
                 }
             },
-            error: function() {
+            error: function () {
             }
         });
 
@@ -983,7 +983,7 @@ jQuery(document).ready(function() {
     });
 
     // WIZARD (RULESETS INFO) //
-    $("#btnWizardComplete").on("click", function(e) {
+    $("#btnWizardComplete").on("click", function (e) {
         //show loading
         var form = $(".wizardRulesetForm");
 
@@ -992,7 +992,7 @@ jQuery(document).ready(function() {
             type: 'POST',
             data: form.serialize(),
             dataType: 'json',
-            success: function(data)
+            success: function (data)
             {
                 if (data.status === "success") {
                     $('ul.setup-panel li:eq(2)').removeClass('disabled');
@@ -1003,7 +1003,7 @@ jQuery(document).ready(function() {
                 }
                 //hide loading
             },
-            error: function() {
+            error: function () {
             }
         });
 
@@ -1011,7 +1011,7 @@ jQuery(document).ready(function() {
     });
 
     //CHOSEN ACTION FOR TRACKING COMPARISON
-    $("#btnSubmitActionNonDefaultSelector").on("click", function(e) {
+    $("#btnSubmitActionNonDefaultSelector").on("click", function (e) {
         e.preventDefault();
         //show loading
         var form = $(".actionNoDefaultSelectorForm");
@@ -1021,7 +1021,7 @@ jQuery(document).ready(function() {
             type: 'POST',
             data: form.serialize(),
             dataType: 'json',
-            success: function(data)
+            success: function (data)
             {
                 if (data.status === "success") {
                     window.location = site_url + data.response;
@@ -1029,22 +1029,22 @@ jQuery(document).ready(function() {
                     $(".modal-body").html(data.response);
                 }
             },
-            error: function() {
+            error: function () {
             }
         });
 
         return;
     });
 
-    $("#funel_preference_id").change(function() {
+    $("#funel_preference_id").change(function () {
         $('#funelSelector').submit();
     });
 
-    $('div#type_options.btn-group .btn').click(function() {
+    $('div#type_options.btn-group .btn').click(function () {
         $(this).find('input:radio').attr('checked', true);
         var type = $(this).find('input[name=options]').val();
 
-        $('.options_trend').each(function() {
+        $('.options_trend').each(function () {
             if ($(this).val() !== type)
                 $(this).attr('checked', false);
         });
@@ -1054,13 +1054,13 @@ jQuery(document).ready(function() {
             type: 'POST',
             data: {type: type},
             dataType: 'json',
-            success: function(data)
+            success: function (data)
             {
                 if (data.status === "success") {
                     $("#trendsContent").html(data.response);
                 }
             },
-            error: function() {
+            error: function () {
             }
         });
 
@@ -1081,10 +1081,10 @@ jQuery(document).ready(function() {
         maxDate: moment(),
         applyClass: 'btnApplyRange btn btn-primary btn-sm',
         cancelClass: 'btnCancelRange btn btn-default btn-sm pull-right'
-    }, function(start, end) {
+    }, function (start, end) {
         $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
     });
-    $('#reportrange').on('apply.daterangepicker', function(ev, picker) {
+    $('#reportrange').on('apply.daterangepicker', function (ev, picker) {
 //        console.log(picker.startDate.format('YYYY-MM-DD'));
 //        console.log(picker.endDate.format('YYYY-MM-DD'));
 //        console.log(site_url + "/home2/" + selected_comparison + "/range/" + type_by + "/" + picker.startDate.format('YYYY-MM-DD') + "/" + picker.endDate.format('YYYY-MM-DD'));
@@ -1102,19 +1102,19 @@ jQuery(document).ready(function() {
         maxDate: moment(),
         applyClass: 'btnApplyRange btn btn-primary btn-sm',
         cancelClass: 'btnCancelRange btn btn-default btn-sm pull-right'
-    }, function(start, end) {
+    }, function (start, end) {
         filters.dt_start = start.format('YYYY-MM-DD');
         filters.dt_end = end.format('YYYY-MM-DD');
         $('#reportrange2 span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
     });
-    $('#reportrange2').on('apply.daterangepicker', function(ev, picker) {
+    $('#reportrange2').on('apply.daterangepicker', function (ev, picker) {
         filters.dt_start = picker.startDate.format('YYYY-MM-DD');
         filters.dt_end = picker.endDate.format('YYYY-MM-DD');
         getGraphData();
 //        console.log(picker.startDate.format('YYYY-MM-DD'));
 //        console.log(picker.endDate.format('YYYY-MM-DD'));
     });
-    $("#date_unit").bind('change', function(e) {
+    $("#date_unit").bind('change', function (e) {
         var valueSelected = this.value;
         filters.date_unit = valueSelected;
         getGraphData();
