@@ -1,22 +1,3 @@
-function validateSelectedItem(selected, name) {
-    excludeOptionIDs = gatherSelectedOption(name);
-    if (excludeOptionIDs.length > 1) {
-        var counter = 0;
-        for (var i = 0; i < excludeOptionIDs.length; i++) {
-            if (excludeOptionIDs[i] === selected)
-                counter += 1;
-
-            if (counter === 2)
-            {
-                alert("This option already selected");
-                return false;
-            }
-        }
-
-    }
-    return true;
-}
-
 function editItemWidgetRuleset(obj, index) {
     var form_data = {
         obj: obj,

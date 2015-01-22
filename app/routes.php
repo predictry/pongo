@@ -251,6 +251,21 @@ Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Con
         Route::post('filters/{numeric}/edit', array("as" => "filters.update", "uses" => 'Filters2Controller@postEdit'));
         Route::get('filters/{numeric}/delete', 'Filters2Controller@postDelete');
         Route::post('filters/{numeric}/delete', 'Filters2Controller@postDelete');
+
+        #Rules Management
+        Route::get('rules/create', array("as" => "rules.create", "uses" => 'Rules2Controller@getCreate'));
+        Route::get('rules/formCreate', array("as" => "rules.formCreate", "uses" => 'Rules2Controller@getFormCreate'));
+        Route::post('rules/submit', array("as" => "rules.submit", "uses" => 'Rules2Controller@postCreate'));
+        Route::get('rules/item', array("as" => "rules.item", "uses" => 'Rules2Controller@getItemRule'));
+        Route::get('rules/modalItem', array("as" => "rules.modalItem", "uses" => 'Rules2Controller@getModalItemRule'));
+        Route::get('rules/itemEdit', array("as" => "rules.itemEdit", "uses" => 'Rules2Controller@getItemEditRule'));
+        Route::post('rules/fetchItems', array("as" => "rules.fetchitem", "uses" => 'Rules2Controller@postFetchItems'));
+        Route::get('rules/{numeric}/view', array("as" => "rules.{numeric}.view", "uses" => 'Rules2Controller@getView'));
+        Route::get('rules/{numeric}/edit', array("as" => "rules.{numieric}.edit", "uses" => 'Rules2Controller@getEdit'));
+        Route::post('rules/{numeric}/edit', array("as" => "rules.update", "uses" => 'Rules2Controller@postEdit'));
+        Route::get('rules/{numeric}/delete', 'Rules2Controller@getDelete');
+        Route::post('rules/{numeric}/delete', 'Rules2Controller@postDelete');
+        Route::get("rules", array("as" => "rules", "uses" => "Rules2Controller@index"));
     }
 });
 
