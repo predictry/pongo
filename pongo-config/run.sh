@@ -81,8 +81,11 @@ sudo rm -R /home/ubuntu/pongo/
 cd /usr/share/nginx/html/www/pongo/ && sudo composer install --prefer-source && sudo php artisan migrate --force && sudo composer dumpautoload
 cd /usr/share/nginx/html/www/pongo/ && sudo composer install && sudo composer dumpautoload
 
-#changing permission for app/storage
-sudo chmod -R 777 /usr/share/nginx/html/www/pongo/app/storage 
+#changing mode permission for app/storage
+sudo chmod -R 777 /usr/share/nginx/html/www/pongo/app/storage
+
+#changing ownership permission for app/storage
+sudo chown -R www-data:www-data /usr/share/nginx/html/www/pongo/app/storage
 
 #Copying the config file for supervisor
 sudo cp /usr/share/nginx/html/www/pongo/pongo-config/sendaction_queue.conf /etc/supervisor/conf.d/
