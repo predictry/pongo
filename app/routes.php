@@ -240,6 +240,17 @@ Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Con
         Route::get('widgets/itemFilterEdit', array("as" => "widgets.itemFilterEdit", "uses" => 'Widgets2Controller@getItemEditWidgetFilter'));
         Route::get('widgets/{numeric}/edit', array("as" => "widgets.{numieric}.edit", "uses" => 'Widgets2Controller@getEdit'));
         Route::get('widgets/{numeric}/delete', 'Widgets2Controller@postDelete');
+
+        #Filters 
+        Route::get("filters", array("as" => "filters", "uses" => "Filters2Controller@index"));
+        Route::get('filters/create', array("as" => "filters.create", "uses" => 'Filters2Controller@getCreate'));
+        Route::post('filters/submit', array("as" => "filters.submit", "uses" => 'Filters2Controller@postCreate'));
+        Route::get('filters/item', array("as" => "filters.item", "uses" => 'Filters2Controller@getItem'));
+        Route::get('filters/{numeric}/edit', array("as" => "filters.{numieric}.edit", "uses" => 'Filters2Controller@getEdit'));
+        Route::get('filters/itemEdit', array("as" => "filters.itemEdit", "uses" => 'Filters2Controller@getItemEdit'));
+        Route::post('filters/{numeric}/edit', array("as" => "filters.update", "uses" => 'Filters2Controller@postEdit'));
+        Route::get('filters/{numeric}/delete', 'Filters2Controller@postDelete');
+        Route::post('filters/{numeric}/delete', 'Filters2Controller@postDelete');
     }
 });
 
