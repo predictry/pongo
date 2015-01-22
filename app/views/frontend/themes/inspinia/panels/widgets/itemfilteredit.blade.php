@@ -5,7 +5,7 @@
             <div class="form-group">
                 <label for='item{{ $index_item_widget_filter }}' class="control-label col-sm-4">Filter Name</label>
                 <div class="col-sm-8">
-                    <?php echo Form::select("filter_id[]", $filter_list, $obj['filter_id'], array('class' => 'form-control chosen-select', 'id' => "itemfilter{$index_item_widget_filter}", 'data-placeholder' => "Choose Item...")); ?>
+                    <?php echo Form::select("filter_id[]", $filter_list, $obj['filter_id'], array('class' => 'form-control chosen-select', 'id' => "itemfilter{$index_item_widget_filter}", 'data-placeholder' => "Choose Item...", "style" => "width:350px;")); ?>
                 </div>
             </div>
         </div>
