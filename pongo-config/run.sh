@@ -83,6 +83,7 @@ cd /usr/share/nginx/html/www/pongo/ && sudo composer install && sudo composer du
 
 #changing mode permission for app/storage
 sudo chmod -R 777 /usr/share/nginx/html/www/pongo/app/storage
+sudo chmod -R 777 /usr/share/nginx/html/www/pongo/app/storage/cache
 
 #changing ownership permission for app/storage
 sudo chown -R www-data:www-data /usr/share/nginx/html/www/pongo/app/storage
