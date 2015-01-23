@@ -7,21 +7,24 @@
  * Function     : 
  */
 return array(
-	#fields
-	"email.address"			 => "Email Address",
-	"full.name"				 => "Full Name",
-	"first.name"			 => "First Name",
-	"last.name"				 => "Last Name",
-	"password"				 => "Password",
-	"confirm.password"		 => "Confirm Password",
-	"new.confirm.password"	 => "Confirm New Password",
-	"current.password"		 => "Current Password",
-	"new.password"			 => "New Password",
-	"old.password"			 => "Old Password",
-	"remember.me"			 => "Remember Me",
-	"forgot.password"		 => "Forgot password?",
-	"register.account"		 => "Register Account",
-	#buttons
-	"submit"				 => "Submit",
-	"submit.reset"			 => "Submit Reset"
+#fields
+    "email.address"                  => "Email Address",
+    "full.name"                      => "Full Name",
+    "first.name"                     => "First Name",
+    "last.name"                      => "Last Name",
+    "password"                       => "Password",
+    "confirm.password"               => "Confirm Password",
+    "new.confirm.password"           => "Confirm New Password",
+    "current.password"               => "Current Password",
+    "new.password"                   => "New Password",
+    "old.password"                   => "Old Password",
+    "remember.me"                    => "Remember Me",
+    "forgot.password"                => "Forgot password?",
+    "register.account"               => "Register Account",
+    "site.url"                       => "Website URL",
+    "site.business.name.placeholder" => "Google Inc",
+    "site.business.name"             => "Business Name",
+#buttons
+    "submit"                         => "Submit",
+    "submit.reset"                   => "Submit Reset"
 );

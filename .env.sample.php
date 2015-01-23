@@ -21,5 +21,5 @@ return array(
     "TAPIRUS_API_URL"          => "http://tapirus-lb-sg-788431201.ap-southeast-1.elb.amazonaws.com/predictry/api/v1/",
     "TAPIRUS_HTTP_USERNAME"    => "username",
     "TAPIRUS_HTTP_PASSWORD"    => "password",
-    "FRONTEND_SKINS"	       => "frontend.themes."
+    "FRONTEND_SKINS"           => "frontend.themes."
 );

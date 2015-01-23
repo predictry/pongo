@@ -69,6 +69,7 @@ App::down(function() {
  */
 Event::subscribe("AccountEventHandler");
 Event::subscribe("RecommendationEventHandler");
+Event::subscribe("SiteEventHandler");
 
 /*
   |--------------------------------------------------------------------------

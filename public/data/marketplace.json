@@ -1,0 +1,460 @@
+{
+    "name": "Marketplace",
+    "common": {
+        "actions": {
+            "entities": [
+                {
+                    "entity_name": "user",
+                    "type": "object",
+                    "compulsary": false,
+                    "properties": [
+                        {
+                            "field": "user_id",
+                            "type": "alpha_num",
+                            "compulsary": false
+                        },
+                        {
+                            "field": "email",
+                            "type": "email",
+                            "compulsary": false
+                        }
+                    ]
+                }
+            ],
+            "shared": [
+                "view_home_page",
+                "view_category_page",
+                "view",
+                "add_to_cart",
+                "buy",
+                "started_checkout"
+            ]
+        }
+    },
+    "sections": [
+        {
+            "name": "homepage",
+            "actions": [
+                {
+                    "name": "view_home_page",
+                    "entities": [
+                        {
+                            "entity_name": "action",
+                            "type": "object",
+                            "compulsary": true,
+                            "properties": [
+                                {
+                                    "field": "name",
+                                    "default_value": "view_home_page",
+                                    "type": "string",
+                                    "compulsary": true
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "category",
+            "actions": [
+                {
+                    "name": "view_category_page",
+                    "entities": [
+                        {
+                            "entity_name": "action",
+                            "type": "object",
+                            "compulsary": true,
+                            "properties": [
+                                {
+                                    "field": "name",
+                                    "default_value": "view_category_page",
+                                    "type": "string",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "category_id",
+                                    "type": "alpha_num",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "category",
+                                    "type": "string",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "sub_category",
+                                    "type": "string",
+                                    "compulsary": false
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "product",
+            "actions": [
+                {
+                    "name": "view",
+                    "entities": [
+                        {
+                            "entity_name": "action",
+                            "type": "object",
+                            "compulsary": true,
+                            "properties": [
+                                {
+                                    "field": "name",
+                                    "default_value": "view",
+                                    "type": "string",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "rec",
+                                    "default_value": false,
+                                    "type": "boolean",
+                                    "compulsary": false,
+                                    "hidden": true
+                                }
+                            ]
+                        },
+                        {
+                            "entity_name": "items",
+                            "type": "array",
+                            "compulsary": true,
+                            "properties": [
+                                {
+                                    "field": "item_id",
+                                    "type": "alpha_num",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "name",
+                                    "type": "alpha_num",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "currency",
+                                    "type": "alpha_num",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "price",
+                                    "type": "double",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "img_url",
+                                    "type": "url",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "item_url",
+                                    "type": "url",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "store_id",
+                                    "type": "string",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "store_name",
+                                    "type": "string",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "store_url",
+                                    "type": "url",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "short_description",
+                                    "type": "string",
+                                    "compulsary": false
+                                },
+                                {
+                                    "field": "category",
+                                    "type": "string",
+                                    "compulsary": false
+                                },
+                                {
+                                    "field": "sub_category",
+                                    "type": "string",
+                                    "compulsary": false
+                                },
+                                {
+                                    "field": "tags",
+                                    "type": "list",
+                                    "compulsary": false
+                                },
+                                {
+                                    "field": "brand",
+                                    "type": "string",
+                                    "compulsary": false
+                                },
+                                {
+                                    "field": "locations",
+                                    "type": "object",
+                                    "compulsary": false,
+                                    "properties": [
+                                        {
+                                            "name": "country",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "city",
+                                            "type": "string"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "add_to_cart",
+                    "entities": [
+                        {
+                            "entity_name": "action",
+                            "type": "object",
+                            "compulsary": true,
+                            "properties": [
+                                {
+                                    "field": "name",
+                                    "default_value": "add_to_cart",
+                                    "type": "string",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "rec",
+                                    "default_value": false,
+                                    "type": "boolean",
+                                    "compulsary": false,
+                                    "hidden": true
+                                }
+                            ]
+                        },
+                        {
+                            "entity_name": "items",
+                            "type": "array",
+                            "compulsary": true,
+                            "properties": [
+                                {
+                                    "field": "item_id",
+                                    "type": "alpha_num",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "qty",
+                                    "type": "integer",
+                                    "compulsary": true
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "extends": "product.actions.view",
+            "name": "store",
+            "actions": [
+                {
+                    "name": "view_category_page",
+                    "entities": [
+                        {
+                            "entity_name": "action",
+                            "type": "object",
+                            "compulsary": true,
+                            "properties": [
+                                {
+                                    "field": "type",
+                                    "default_value": "store",
+                                    "type": "string",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "name",
+                                    "default_value": "view_category_page",
+                                    "type": "string",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "category_id",
+                                    "type": "alpha_num",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "category",
+                                    "type": "string",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "sub_category",
+                                    "type": "string",
+                                    "compulsary": false
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "extends": "product.actions.view",
+            "name": "product_promo",
+            "actions": [
+                {
+                    "name": "view",
+                    "entities": [
+                        {
+                            "entity_name": "items",
+                            "type": "array",
+                            "compulsary": true,
+                            "properties": [
+                                {
+                                    "field": "type",
+                                    "type": "promo",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "start_date",
+                                    "type": "timestamp",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "end_date",
+                                    "type": "timestamp",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "discount",
+                                    "type": "string",
+                                    "compulsary": true
+                                }
+                            ]
+                        }
+                    ]
+                }
+
+            ]
+        },
+        {
+            "name": "checkout",
+            "actions": [
+                {
+                    "name": "started_checkout",
+                    "entities": [
+                        {
+                            "entity_name": "action",
+                            "type": "object",
+                            "compulsary": true,
+                            "properties": [
+                                {
+                                    "field": "name",
+                                    "default_value": "started_checkout",
+                                    "type": "string",
+                                    "compulsary": true
+                                }
+                            ]
+                        },
+                        {
+                            "entity_name": "items",
+                            "type": "array",
+                            "compulsary": true,
+                            "properties": [
+                                {
+                                    "field": "item_id",
+                                    "type": "alpha_num",
+                                    "compulsary": true
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "buy",
+                    "entities": [
+                        {
+                            "entity_name": "action",
+                            "type": "object",
+                            "compulsary": true,
+                            "properties": [
+                                {
+                                    "field": "name",
+                                    "default_value": "buy",
+                                    "type": "string",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "rec",
+                                    "default_value": false,
+                                    "type": "boolean",
+                                    "compulsary": false,
+                                    "hidden": true
+                                }
+                            ]
+                        },
+                        {
+                            "entity_name": "items",
+                            "type": "array",
+                            "compulsary": true,
+                            "properties": [
+                                {
+                                    "field": "item_id",
+                                    "type": "alpha_num",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "qty",
+                                    "type": "integer",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "sub_total",
+                                    "type": "double",
+                                    "compulsary": true
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "search",
+            "actions": [
+                {
+                    "name": "search",
+                    "entities": [
+                        {
+                            "entity_name": "action",
+                            "type": "object",
+                            "compulsary": true,
+                            "properties": [
+                                {
+                                    "field": "name",
+                                    "default_value": "search",
+                                    "type": "string",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "keywords",
+                                    "type": "string",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "category",
+                                    "type": "string",
+                                    "compulsary": false
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

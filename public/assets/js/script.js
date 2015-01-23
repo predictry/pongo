@@ -605,7 +605,7 @@ function editItemRule(obj, index) {
     });
 }
 
-function editItemWidgetRuleset(obj, index) {
+function editItemWidgetRuleSet(obj, index) {
     var form_data = {
         obj: obj,
         index: index,
@@ -889,10 +889,13 @@ jQuery(document).ready(function () {
     });
 
     //initilize 1st item rule that appear first time
-    $("#item1").chosen();
-    $("#type1").chosen();
-    $("#action1").chosen();
-    $("#itemfilter1").chosen();
+    ($("#item1").length > 0) ? $("#item1").chosen() : '';
+    ($("#type1").length > 0) ? $("#type1").chosen() : '';
+    ($("#action1").length > 0) ? $("#action1").chosen() : '';
+    ($("#itemfilter1").length > 0) ? $("#itemfilter1").chosen() : '';
+    ($(".multiple-chosen-select").length > 0) ? $(".multiple-chosen-select").chosen({no_results_text: "Oops, nothing found!"}) : '';
+    ($('#guideModal').length > 0) ? $("#guideModal").modal('show') : '';
+
     $('#item1').on('change', function (evt, params) {
         if (!validateSelectedItem(params.selected)) {
             $('#item1').val("").trigger("chosen:updated");
@@ -934,7 +937,6 @@ jQuery(document).ready(function () {
     });
     $("#expiry_type").change(function () {
     }).trigger("change");
-    $(".multiple-chosen-select").chosen({no_results_text: "Oops, nothing found!"});
 
     //wizard
     var navListItems = $('ul.setup-panel li a'),
@@ -1073,11 +1075,12 @@ jQuery(document).ready(function () {
      */
     $('#reportrange').daterangepicker({
         ranges: {
+            '7 Days Ago': [moment().subtract('days', 7), moment()],
             '31 Days Ago': [moment().subtract('days', 31), moment()],
             '36 Weeks Ago': [moment().subtract('weeks', 36), moment()],
             '12 Months Ago': [moment().subtract('months', 12), moment()]
         },
-        startDate: moment().subtract('days', 31),
+        startDate: moment().subtract('days', 7),
         endDate: moment(),
         maxDate: moment(),
         applyClass: 'btnApplyRange btn btn-primary btn-sm',
@@ -1094,11 +1097,12 @@ jQuery(document).ready(function () {
     });
     $('#reportrange2').daterangepicker({
         ranges: {
+            '7 Days Ago': [moment().subtract('days', 7), moment()],
             '31 Days Ago': [moment().subtract('days', 31), moment()],
             '36 Weeks Ago': [moment().subtract('weeks', 36), moment()],
             '12 Months Ago': [moment().subtract('months', 12), moment()]
         },
-        startDate: moment().subtract('days', 31),
+        startDate: moment().subtract('days', 7),
         endDate: moment(),
         maxDate: moment(),
         applyClass: 'btnApplyRange btn btn-primary btn-sm',

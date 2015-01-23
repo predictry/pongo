@@ -22,7 +22,7 @@ class ItemsController extends \App\Controllers\BaseController
     public function __construct()
     {
         parent::__construct();
-        View::share(array("ca" => get_class(), "moduleName" => "Item", "create" => false));
+        View::share(array("ca" => get_class(), "moduleName" => "Item", "create" => false, "delete" => false));
     }
 
     /**

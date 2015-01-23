@@ -33,10 +33,75 @@ App::after(function($request, $response) {
 Route::filter('auth', function() {
     if (Auth::guest())
         return Redirect::guest('login');
+
+
+    $site_exists    = false;
+    $is_new_account = false;
+
+    if (Session::get("active_site_id") !== null) {
+        $site_exists = App\Models\Site::find(Session::get("active_site_id"))->count();
+        View::share(array("activeSiteName" => Session::get("active_site_name")));
+    }
+
+
+    $site_id   = $tenant_id = null;
+    if (Session::get("active_site_id") === null && !$site_exists) {
+        $site = App\Models\Site::where("account_id", Auth::user()->id)->get(array('id', 'name'))->first();
+        if ($site) {
+            $site_id   = $site->id;
+            $tenant_id = $site->name;
+
+            Session::set("active_site_id", $site->id);
+            Session::set("active_site_name", $site->name);
+            Session::remove("default_action_view");
+
+            $account_repository = new App\Pongo\Repository\AccountRepository();
+            $is_new_account     = $account_repository->isNewAccount();
+            Session::set('is_new_account', $is_new_account ? true : false);
+        }
+    }
+    else {
+        $site_id   = Session::get("active_site_id");
+        $tenant_id = Session::get("active_site_name");
+    }
+
+    if ($is_new_account) {
+        Session::remove('is_new_account');
+        return Redirect::to("sites/{$tenant_id}/integration");
+    }
 });
 
 Route::filter('auth.basic', function() {
     return Auth::basic();
+});
+
+/**
+ * Filter of ajax request for data collection
+ */
+Route::filter('site.ajax', function($route) {
+
+    if (!\Request::ajax()) {
+        return Redirect::to('/');
+    }
+
+    $tenant_id = $route->parameter('tenant_id');
+
+    if (is_null($tenant_id)) {
+        return \Redirect::to('sites');
+    }
+
+    $validator = Validator::make(['name' => $tenant_id], ['name' => 'required|exists:sites,name']);
+    if ($validator->passes()) {
+        $repository = new \App\Pongo\Repository\SiteRepository();
+        $site       = $repository->isBelongToHim($tenant_id);
+        if (!$site)
+            return Redirect::to('/');
+
+        Session::set("active_site_id", $site->id);
+        Session::set("active_site_name", $site->name);
+    }
+    else
+        return Redirect::back()->withErrors($validator);
 });
 
 Route::filter('role.admin', function() {

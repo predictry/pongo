@@ -20,6 +20,9 @@ class DatabaseSeeder extends Seeder
         $this->call('ActionsSeeder');
         $this->call('CombinationTableSeeder');
         $this->call('ItemTableSeeder');
+        $this->call('AlgorithmTableSeeder');
+        $this->call('SiteCategoryTableSeeder');
+        $this->call('IndustryTableSeeder');
 //		$this->call('ActionDataSeeder');
     }
 

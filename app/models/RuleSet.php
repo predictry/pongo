@@ -10,31 +10,31 @@
 
 namespace App\Models;
 
-class Ruleset extends \Eloquent
+class RuleSet extends \Eloquent
 {
 
-	/**
-	 * The database table used by the model.
-	 *
-	 * @var string
-	 */
-	protected $table			 = 'rule_sets';
-	public $rules				 = array(
-		"name"			 => "required",
-		"expiry_type"	 => "required"
-	);
-	public $manage_table_header	 = array(
-		"name"				 => "Name",
-		"description"		 => "Description",
-		"expiry_type"		 => "Expiry Type",
-		"expiry_datetime"	 => "Expiry Date",
-		"expiry_value"		 => "Expiry Value"
-	);
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    protected $table            = 'rule_sets';
+    public $rules               = array(
+        "name"        => "required",
+        "expiry_type" => "required"
+    );
+    public $manage_table_header = array(
+        "name"            => "Name",
+        "description"     => "Description",
+        "expiry_type"     => "Expiry Type",
+        "expiry_datetime" => "Expiry Date",
+        "expiry_value"    => "Expiry Value"
+    );
 
-	public function item_rules()
-	{
-		return $this->hasMany("App\Models\Rule", "ruleset_id");
-	}
+    public function item_rules()
+    {
+        return $this->hasMany("App\Models\Rule", "ruleset_id");
+    }
 
 }
 

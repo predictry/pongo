@@ -1,6 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Log,
+use App\Models\AccountMeta,
+    Illuminate\Support\Facades\Log,
     Illuminate\Support\Facades\Mail;
 
 /**
@@ -22,7 +23,7 @@ class AccountEventHandler
     public function sendAccountVerification($account)
     {
         Log::info('account.registered fired');
-        $email_data = array("fullname" => ucwords($account->name));
+        $email_data = array("fullname" => ucwords($account->name), 'confirmation_code' => $account->confirmation_code);
         Mail::send('emails.auth.accountconfirmation', $email_data, function($message) use ($account) {
             $message->to($account->email, ucwords($account->name))->subject('One step a head to become an awesome member!');
         });
@@ -32,8 +33,16 @@ class AccountEventHandler
     {
         Log::info('account.registration_confirmed fired');
         $email_data = array("fullname" => ucwords($account->name));
-        Mail::send('emails.auth.accountconfirmation', $email_data, function($message) use ($account) {
+        Mail::send('emails.auth.accountconfirmed', $email_data, function($message) use ($account) {
+
             $message->to($account->email, ucwords($account->name))->subject('Welcome on board!');
+
+            //Create is_new_account meta
+            AccountMeta::firstOrCreate([
+                'account_id' => $account->id,
+                'key'        => 'is_new_account',
+                'value'      => true
+            ]);
         });
     }
 

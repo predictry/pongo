@@ -41,6 +41,11 @@ class Widget extends \Eloquent
         return $this->hasManyThrough("App\Models\WidgetInstanceItem", "App\Models\WidgetInstance");
     }
 
+    public function widget_rule_sets()
+    {
+        return $this->hasMany('App\Models\WidgetRuleSet');
+    }
+
 }
 
 /* End of file Widget.php */

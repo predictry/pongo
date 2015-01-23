@@ -7,10 +7,11 @@
  * Function     : 
  */
 return array(
-	"edit.password"	 => "Edit Password",
-	""				 => "",
-	""				 => "",
-	""				 => "",
-	""				 => "",
-	""				 => "",
+    "edit.password"          => "Edit Password",
+    "site.business"          => "Site Business Detail",
+    "site.data.collection"   => "Data Collection",
+    "site.integration.steps" => "Integration Steps",
+    ""                       => "",
+    ""                       => "",
+    ""                       => "",
 );
