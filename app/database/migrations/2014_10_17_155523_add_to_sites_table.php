@@ -14,8 +14,7 @@ class AddToSitesTable extends Migration
     public function up()
     {
         Schema::table('sites', function(Blueprint $table) {
-            $table->integer('site_category_id')->unsigned()->default(1);
-            $table->foreign('site_category_id')->references('id')->on('site_categories')->onDelete('restrict')->onUpdate('cascade');
+            $table->integer('site_category_id')->unsigned()->nullable();
         });
     }
 

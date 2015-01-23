@@ -76,14 +76,16 @@ class ItemsController extends \App\Controllers\BaseController
         $item  = \App\Models\Item::find($id);
         $input = Input::only("name", "item_url", "img_url", "active");
         $rules = array(
-            'name' => $item->rules['name']
+            'name'     => $item->rules['name'],
+            'item_url' => 'required',
+            'img_url'  => 'required'
         );
 
         $validator = Validator::make($input, $rules);
 
         if ($validator->passes()) { // validator for name and email
-            $item->name   = Input::get("name");
-            $item->active = Input::get("active");
+            $item->name   = $input['name'];
+            $item->active = $input['active'];
             $item->update();
             return Redirect::route("items")->with("flash_message", "Data successfully updated.");
         }

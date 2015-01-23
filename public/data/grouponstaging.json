@@ -1,0 +1,296 @@
+[
+    {
+        "action": "search",
+        "action_properties": [
+            {
+                "key": "name",
+                "value": "search"
+            },
+            {
+                "key": "keywords",
+                "value": "Hotel Bali"
+            },
+            {
+                "key": "location",
+                "value": "Array"
+            }
+        ],
+        "action_item": [
+        ],
+        "dt_created": "2014-11-07 14:27:48"
+    },
+    {
+        "action": "buy",
+        "action_properties": [
+            {
+                "key": "total",
+                "value": "78150"
+            },
+            {
+                "key": "cart_id",
+                "value": "14270"
+            },
+            {
+                "key": "qty",
+                "value": "1"
+            },
+            {
+                "key": "sub_total",
+                "value": "78150"
+            },
+            {
+                "key": "rec",
+                "value": "1"
+            }
+        ],
+        "action_item": [
+            
+        ],
+        "dt_created": "2014-11-07 14:20:30"
+    },
+    {
+        "action": "view",
+        "action_properties": [
+            {
+                "key": "name",
+                "value": "view"
+            },
+            {
+                "key": "rec",
+                "value": "1"
+            }
+        ],
+        "action_item": {
+            "name": "Tempered Glass Screen Protector for Xiaomi Redmi 1S. Only Rp. 69.000,-",
+            "metas": [
+                {
+                    "key": "item_id",
+                    "value": "1006985"
+                },
+                {
+                    "key": "name",
+                    "value": "Tempered Glass Screen Protector for Xiaomi Redmi 1S. Only Rp. 69.000,-"
+                },
+                {
+                    "key": "price",
+                    "value": "69000.00"
+                },
+                {
+                    "key": "img_url",
+                    "value": "https:\/\/static2.groupon.co.id\/product\/images\/picpromobig\/25ddc0f8c9d3e22e03d3076f98d83cb20b779956e27f8065425aea50b54fd629.jpg"
+                },
+                {
+                    "key": "item_url",
+                    "value": "http:\/\/lombok.disdus.com\/product\/1006985\/tempered-glass-screen-protector-for-xiaomi-redmi-1s"
+                },
+                {
+                    "key": "category",
+                    "value": "Gadget, Tech & Oto"
+                },
+                {
+                    "key": "sub_category",
+                    "value": ""
+                },
+                {
+                    "key": "discount",
+                    "value": "74%"
+                },
+                {
+                    "key": "description",
+                    "value": "Tempered Glass Screen Protector for Xiaomi Redmi 1S. Only Rp. 69.000,-"
+                },
+                {
+                    "key": "inventory_qty",
+                    "value": "1400"
+                },
+                {
+                    "key": "tags",
+                    "value": "[\"aksesoris gadget\",\"gadget\"]"
+                },
+                {
+                    "key": "locations",
+                    "value": "{\"country\":\"Indonesia\",\"city\":\"Jakarta\"}"
+                },
+                {
+                    "key": "start_date",
+                    "value": "1414688400"
+                },
+                {
+                    "key": "end_date",
+                    "value": "1415552400"
+                }
+            ]
+        },
+        "dt_created": "2014-11-07 14:10:52"
+    },
+    {
+        "action": "view",
+        "action_properties": [
+            {
+                "key": "name",
+                "value": "view"
+            },
+            {
+                "key": "rec",
+                "value": "1"
+            }
+        ],
+        "action_item": {
+            "name": "Alive Museum + Garden by The Bay Include Flower Dome and Cloud Forest Entrance Ticket from Cebu Air Travel & Tours. Start from Rp. 265.000,- Nett",
+            "metas": [
+                {
+                    "key": "item_id",
+                    "value": "70552"
+                },
+                {
+                    "key": "name",
+                    "value": "Alive Museum + Garden by The Bay Include Flower Dome and Cloud Forest Entrance Ticket from Cebu Air Travel & Tours. Start from Rp. 265.000,- Nett"
+                },
+                {
+                    "key": "price",
+                    "value": "265000.00"
+                },
+                {
+                    "key": "img_url",
+                    "value": "https:\/\/static2.groupon.co.id\/images\/picpromobig\/d554f7bb7be44a7267068a7df88ddd2070552.jpg"
+                },
+                {
+                    "key": "item_url",
+                    "value": "http:\/\/lombok.disdus.com\/voucher\/travel-deals\/70552\/alive-museum-garden-by-the-bay-entrance-from-cebu-air-travel-tours"
+                },
+                {
+                    "key": "category",
+                    "value": "Hobby & Leisure"
+                },
+                {
+                    "key": "sub_category",
+                    "value": ""
+                },
+                {
+                    "key": "discount",
+                    "value": "21%"
+                },
+                {
+                    "key": "description",
+                    "value": "Alive Museum + Garden by The Bay Include Flower Dome and Cloud Forest Entrance Ticket from Cebu Air Travel & Tours. Start from Rp. 265.000,- Nett"
+                },
+                {
+                    "key": "inventory_qty",
+                    "value": "1342"
+                },
+                {
+                    "key": "tags",
+                    "value": "[\"singapore\",\"other\",\"trip\"]"
+                },
+                {
+                    "key": "locations",
+                    "value": "{\"country\":\"Indonesia\",\"city\":\"Travel Deals\"}"
+                },
+                {
+                    "key": "start_date",
+                    "value": "1410714000"
+                },
+                {
+                    "key": "end_date",
+                    "value": "1418144400"
+                }
+            ]
+        },
+        "dt_created": "2014-11-07 14:09:17"
+    },
+    {
+        "action": "view",
+        "action_properties": [
+            {
+                "key": "name",
+                "value": "view"
+            },
+            {
+                "key": "rec",
+                "value": "1"
+            }
+        ],
+        "action_item": {
+            "name": "[88% Off] Voucher Value Seharga Rp. 500.000,- Senilai dengan Rp. 4.000.000,- untuk Jasa Wedding Organizer dari Wedding Chandelier",
+            "metas": [
+                {
+                    "key": "item_id",
+                    "value": "70769"
+                },
+                {
+                    "key": "name",
+                    "value": "[88% Off] Voucher Value Seharga Rp. 500.000,- Senilai dengan Rp. 4.000.000,- untuk Jasa Wedding Organizer dari Wedding Chandelier"
+                },
+                {
+                    "key": "price",
+                    "value": "500000.00"
+                },
+                {
+                    "key": "img_url",
+                    "value": "https:\/\/static2.groupon.co.id\/images\/picpromobig\/170c944978496731ba71f34c25826a3470769.jpg"
+                },
+                {
+                    "key": "item_url",
+                    "value": "http:\/\/lombok.disdus.com\/voucher\/jakarta\/70769\/voucher-value-untuk-wedding-organizer-dari-wedding-chandelier"
+                },
+                {
+                    "key": "category",
+                    "value": "Service"
+                },
+                {
+                    "key": "sub_category",
+                    "value": ""
+                },
+                {
+                    "key": "discount",
+                    "value": "88%"
+                },
+                {
+                    "key": "description",
+                    "value": "[88% Off] Voucher Value Seharga Rp. 500.000,- Senilai dengan Rp. 4.000.000,- untuk Jasa Wedding Organizer dari Wedding Chandelier"
+                },
+                {
+                    "key": "inventory_qty",
+                    "value": "499"
+                },
+                {
+                    "key": "tags",
+                    "value": "[\"photo voucher\",\"wedding voucher\"]"
+                },
+                {
+                    "key": "locations",
+                    "value": "{\"country\":\"Indonesia\",\"city\":\"Jakarta\"}"
+                },
+                {
+                    "key": "start_date",
+                    "value": "1411578000"
+                },
+                {
+                    "key": "end_date",
+                    "value": "1415638800"
+                }
+            ]
+        },
+        "dt_created": "2014-11-07 14:03:45"
+    },
+    {
+        "action": "search",
+        "action_properties": [
+            {
+                "key": "name",
+                "value": "search"
+            },
+            {
+                "key": "keywords",
+                "value": "Test Search Bro"
+            },
+            {
+                "key": "location",
+                "value": "Array"
+            }
+        ],
+        "action_item": [
+        ],
+        "dt_created": "2014-11-07 11:55:20"
+    }
+]

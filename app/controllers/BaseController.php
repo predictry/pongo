@@ -2,7 +2,8 @@
 
 namespace App\Controllers;
 
-use Auth,
+use App\Models\Site,
+    Auth,
     Session,
     View;
 
@@ -11,8 +12,10 @@ class BaseController extends \Controller
 
     public $siteInfo         = array();
     public $manageViewConfig = array();
+    public $userInfo         = array();
     public $model            = null;
     public $active_site_id   = 0;
+    public $theme            = 'inspinia';
 
     public function __construct()
     {
@@ -23,6 +26,7 @@ class BaseController extends \Controller
         $this->siteInfo['styles']        = array();
         $this->siteInfo['scripts']       = array();
         $this->siteInfo['custom_script'] = '';
+        $this->siteInfo['theme']         = $this->theme;
         $this->siteInfo['ca']            = '';
 
         $this->manageViewConfig['isManage']       = true;
@@ -40,13 +44,32 @@ class BaseController extends \Controller
 
         if (Auth::check()) {
             //set default active site id
+            $site_exists = false;
             if (Session::get("active_site_id") !== null) {
                 $this->active_site_id = Session::get("active_site_id");
+                $site_exists          = Site::find($this->active_site_id)->count();
                 View::share(array("activeSiteName" => Session::get("active_site_name")));
             }
+
+            if (Session::get("active_site_id") === null && !$site_exists) {
+                $site = Site::where("account_id", Auth::user()->id)->get(array('id', 'name'))->first();
+                if ($site) {
+                    $this->active_site_id = $site->id;
+                    Session::set("active_site_id", $site->id);
+                    Session::set("active_site_name", $site->name);
+                    Session::remove("default_action_view");
+                    View::share(array("activeSiteName" => Session::get("active_site_name")));
+                }
+            }
+
             //Set Default Plan ID
-            $sites = \App\Models\Site::where("account_id", Auth::user()->id)->get()->toArray();
+            $sites = Site::where("account_id", Auth::user()->id)->get()->toArray();
             View::share(array("sites" => $sites));
+
+            //User Info
+            $default_avatar                 = asset('assets/img/no-avatar.jpeg');
+            $this->userInfo['gravatar_url'] = "http://www.gravatar.com/avatar/" . md5(strtolower(trim(\Auth::user()->email))) . "?d=" . urlencode($default_avatar) . "&s=" . 48;
+            View::share(array("user_info" => $this->userInfo));
         }
     }
 

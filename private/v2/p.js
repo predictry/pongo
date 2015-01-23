@@ -558,7 +558,7 @@ if (typeof Predictry !== 'object') {
              */
             function setActionData(data) {
                 data = eExtend(data, PE_defaults);
-                if (widget_instance_id !== 0)
+                if (widget_instance_id > 0)
                 {
                     if (data.action_properties !== undefined)
                     {
@@ -787,7 +787,7 @@ if (typeof Predictry !== 'object') {
                 //Retrieve cart_id from API by passing session data
                 call_url = config_api_url + config_api_resources[3];
                 config_request_content_type = config_default_request_content_type;
-                var response = sendRequest(call_url, buildUrl({session_id: session}), false);
+                var response = sendRequest(call_url, buildUrl({session_id: session}), true);
                 if (isObject(response) && response.status === 'success')
                 {
                     response = response.response;
@@ -889,7 +889,7 @@ if (typeof Predictry !== 'object') {
                         //this is to set cart log, and set cart session
                         if (response.status === 'success' && ready_data.action === 'add_to_cart')
                         {
-                            if (widget_instance_id !== 0)
+                            if (widget_instance_id > 0)
                             {
                                 if (isDefined(data.action_properties)) {
                                     data.action_properties.widget_instance_id = widget_instance_id;
@@ -986,7 +986,7 @@ if (typeof Predictry !== 'object') {
 
                 recent_xhr = http;
                 http.onreadystatechange = function () {//Call a function when the state changes.
-                    if (http.readyState === 4 && http.status === 200) {
+                    if (http.readyState === 4) {
                         if (isDefined(callback)) {
                             if (isFunction(callback))
                                 callback(http.responseText);
@@ -1032,7 +1032,7 @@ if (typeof Predictry !== 'object') {
             }
 
             function getWidgetInstanceID(uri) {
-                if (isDefined(uri) && isDefined(getParameter(uri, "predictry_src")))
+                if (isDefined(uri) && getParameter(uri, "predictry_src") !== "")
                     widget_instance_id = getParameter(uri, "predictry_src");
                 else
                     widget_instance_id = -1;
@@ -1052,9 +1052,9 @@ if (typeof Predictry !== 'object') {
                 {
                     if (data.action.name === "view" && data.items.length === 1) {
                         //check if the viewed item is from reco or not
-                        if (widget_instance_id !== 0 && isDefined(data.action))
+                        if (widget_instance_id > 0 && isDefined(data.action))
                             data.action.rec = true;
-                        else if (widget_instance_id !== 0 && !isDefined(data.action))
+                        else if (widget_instance_id > 0 && !isDefined(data.action))
                             data.action = {rec: true};
 
                         trackView(data);
@@ -1095,11 +1095,10 @@ if (typeof Predictry !== 'object') {
 
                 data = appendPredictryData(data);
 
-
-                if (isDefined(data.action))
-                    data.action.cart_id = getCartID();
-                else if (!isDefined(data.action))
-                    data.action = {cart_id: getCartID()};
+//                if (isDefined(data.action))
+//                    data.action.cart_id = getCartID();
+//                else if (!isDefined(data.action))
+//                    data.action = {cart_id: getCartID()};
 
                 var cartSession = eval("(" + getCookie(getCookieName("cart")) + ")");
                 var cartItemIDs = cartSession.c;
@@ -1133,11 +1132,13 @@ if (typeof Predictry !== 'object') {
 
                 data = appendPredictryData(data);
 
-                if (isDefined(data.action))
-                    data.action.cart_id = getCartID();
-                else if (!isDefined(data.action))
-                    data.action = {cart_id: getCartID()};
+//                if (isDefined(data.action))
+//                    data.action.cart_id = getCartID();
+//                else if (!isDefined(data.action))
+//                    data.action = {cart_id: getCartID()};
 
+                //@TODO: Since getCartID now is async, need to figure out how to get the cart_id value
+                //@TODO: Issue rise when checkout, the cart_id missing.
                 var cartSession = eval("(" + getCookie(getCookieName("cart")) + ")");
                 var cartItemIDs = cartSession.c;
 

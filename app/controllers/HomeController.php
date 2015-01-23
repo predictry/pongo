@@ -21,10 +21,10 @@ use App\Models\Account,
     Event,
     Input,
     Lang,
-    Log,
     Password,
     Redirect,
     Response,
+    Session,
     Str,
     Validator,
     View;
@@ -74,7 +74,7 @@ class HomeController extends BaseController
     {
         $user = Auth::user();
         if (!empty($user->id)) {
-            return Redirect::to('home');
+            return Redirect::to('home2');
         }
 
         return View::make('frontend.common.login', array("pageTitle" => "Login"));
@@ -112,9 +112,9 @@ class HomeController extends BaseController
 
                     $is_member = $this->account_repository->isMember();
                     if (!$is_member) //validate if member or not
-                        \Session::set("role", "admin");
+                        Session::set("role", "admin");
 
-                    return Redirect::to('home');
+                    return Redirect::to('v2/home');
                 }
 
                 $flash_error = \Lang::get("home.error.login.failed");

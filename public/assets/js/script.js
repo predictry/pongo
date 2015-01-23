@@ -678,6 +678,7 @@ function editItemWidgetFilter(obj, index) {
 }
 
 function editItemFilter(obj, index) {
+
     var form_data = {
         obj: obj,
         index: index,

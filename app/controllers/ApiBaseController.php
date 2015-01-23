@@ -26,12 +26,16 @@ class ApiBaseController extends \Controller
     public $http_status                = 200;
     public $gui_domain_auth            = array();
     private $message                   = "";
+    public $response                   = [
+        'error'          => false,
+        'status'         => 200,
+        'message'        => '',
+        "client_message" => ""
+    ];
 
     public function __construct()
     {
         $this->beforeFilter('@filterRequests');
-        $this->predictry_server_tenant_id = \Request::header("X-Predictry-Server-Tenant-ID");
-        $this->predictry_server_api_key   = \Request::header("X-Predictry-Server-Api-Key");
     }
 
     /**
@@ -39,19 +43,26 @@ class ApiBaseController extends \Controller
      */
     public function filterRequests($route, $request)
     {
-        $this->site_id  = false;
-        $api_credential = array(
-            "tenant_id"  => "",
-            "api_key"    => "",
-            "secret_key" => ""
-        );
 
-        if (!empty(\Request::header("X-Predictry-Server-Api-Key")) && !empty(\Request::header("X-Predictry-Server-Tenant-ID"))) {
-            $api_credential['tenant_id'] = \Request::header("X-Predictry-Server-Tenant-ID");
-            $api_credential['api_key']   = \Request::header("X-Predictry-Server-Api-Key");
+        $this->site_id                    = false;
+        $this->predictry_server_tenant_id = \Request::header("X-Predictry-Server-Tenant-ID");
+        $this->predictry_server_api_key   = \Request::header("X-Predictry-Server-Api-Key");
+        $api_credential                   = [];
 
+        if (!empty($this->predictry_server_api_key) && !empty($this->predictry_server_tenant_id)) {
 
-            $this->site_id = $this->validateApiKey($api_credential);
+            $api_credential['tenant_id'] = $this->predictry_server_tenant_id;
+            $api_credential['api_key']   = $this->predictry_server_api_key;
+
+            try
+            {
+                $this->site_id = $this->validateApiKey($api_credential);
+            }
+            catch (Exception $ex)
+            {
+                \Log::error($ex->getMessage());
+                return \Response::json($this->getErrorResponse("", "500", "", "System malfunction [code 5]", ""), "500");
+            }
         }
         else {
             return \Response::json(array("message" => "Auth failed " . $this->message, "status" => "401"), "401");
@@ -63,26 +74,31 @@ class ApiBaseController extends \Controller
 
     public function validateApiKey($api_credential)
     {
-        $site = \App\Models\Site::where("api_key", $api_credential['api_key'])
-                        ->where("name", $api_credential['tenant_id'])
-                        ->get()->first();
+        try
+        {
+            $site = \App\Models\Site::where("name", $api_credential['tenant_id'])->where("api_key", $api_credential['api_key'])->first();
+        }
+        catch (\Exception $ex)
+        {
+            \Log::error($ex->getMessage());
+            $this->message = "Site malfunction [code 5]";
+            return false;
+        }
 
-        if (is_object($site))
-            $site = $site->toArray();
+        if (is_object($site)) {
+            $site = (count($site->toArray()) > 0 && isset($site['url'])) ? $site->toArray() : false;
+//            $site = (count($site->toArray()) > 0 && isset($site['url']) && (($site['url'] === "http://" . \Request::server("HTTP_ORIGIN")) || $site['url'] === \Request::server("HTTP_ORIGIN"))) ? $site->toArray() : false;
+            if (!$site) {
+                $this->message = "[unknown site]";
+                return false;
+            }
+            $this->site = $site;
+            return $site['id'];
+        }
         else {
             $this->message = "[credential hasn't assigned or wrong]";
             return false;
         }
-
-        if (count($site) > 0 && !empty($site['url'])) {// && (($site['url'] === "http://" . \Request::server("HTTP_ORIGIN")) || $site['url'] === \Request::server("HTTP_ORIGIN")))
-            $this->site = $site;
-
-            return $site['id'];
-        }
-        else
-            $this->message = "[unknown site]";
-
-        return false;
     }
 
     public function getErrorResponse($error_key, $http_status, $resources = "", $msg = "", $c_msg = "")
@@ -122,6 +138,9 @@ class ApiBaseController extends \Controller
                 break;
 
             default:
+                $message        = $msg;
+                $client_message = $c_msg;
+
                 break;
         }
 

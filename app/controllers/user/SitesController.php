@@ -11,6 +11,7 @@
 namespace App\Controllers\User;
 
 use App\Controllers\BaseController,
+    App\Models\AccountMeta,
     App\Models\Action,
     App\Models\ActionMeta,
     App\Models\Industry,
@@ -50,7 +51,6 @@ class SitesController extends BaseController
     /**
      * Display a listing of the resource.
      *
-     * @return Response
      */
     public function index()
     {
@@ -110,10 +110,11 @@ class SitesController extends BaseController
                 if ($id)
                     return Response::json(array("status" => "success", "response" => "/home"));
                 else
-                    return Response::json(array("status"   => "error",
-                                "response" => \View::make("frontend.panels.sites.addform", array(
-                                    "flash_error" => "Inserting problem. Please check your inputs."
-                                ))->render()));
+                    return Response::json(
+                                    array("status"   => "error",
+                                        "response" => \View::make("frontend.panels.sites.addform", array(
+                                            "flash_error" => "Inserting problem. Please check your inputs."
+                                        ))->render()));
             }else {
 
                 if ($id)
@@ -224,7 +225,7 @@ class SitesController extends BaseController
         return View::make("frontend.panels.sites.addform");
     }
 
-    public function ajaxPostCreate()
+    public function postAjaxCreate()
     {
         $input               = Input::only("name", "url");
         $input['account_id'] = Auth::user()->id;
@@ -426,7 +427,7 @@ class SitesController extends BaseController
                     \Session::remove('is_new_account');
                     $this->is_new_account = true;
 
-                    $is_new_account_meta = App\Models\AccountMeta::where('account_id', \Auth::user()->id)->where('key', 'is_new_account')->first();
+                    $is_new_account_meta = AccountMeta::where('account_id', \Auth::user()->id)->where('key', 'is_new_account')->first();
                     if ($is_new_account_meta) {
                         $is_new_account_meta->value = false;
                         $is_new_account_meta->update();

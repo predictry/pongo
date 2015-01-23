@@ -10,26 +10,32 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\SoftDeletingTrait;
+
 class AccountMember extends \Eloquent
 {
 
-	/**
-	 * The database table used by the model.
-	 *
-	 * @var string
-	 */
-	protected $primaryKey	 = 'member_id';
-	protected $table		 = 'accounts_members';
-	public $timestamps		 = false;
-	public $rules			 = array(
-		"account_id" => "required|exists:accounts",
-		"member_id"	 => "required"
-	);
+    use SoftDeletingTrait;
 
-	public function profile()
-	{
-		return $this->hasOne("\App\Models\Member", "id");
-	}
+    protected $dates      = ['deleted_at'];
+
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'member_id';
+    protected $table      = 'accounts_members';
+    public $timestamps    = false;
+    public $rules         = array(
+        "account_id" => "required|exists:accounts",
+        "member_id"  => "required"
+    );
+
+    public function profile()
+    {
+        return $this->hasOne("\App\Models\Member", "id");
+    }
 
 }
 

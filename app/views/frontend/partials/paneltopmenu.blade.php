@@ -33,7 +33,7 @@
 
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
-                    <!--<li class="navbar-text"><?php // echo Lang::get("panel.welcome");             ?>, <span class="displayName"> <?php // echo Auth::user()->name;             ?></span></li>-->
+                    <!--<li class="navbar-text"><?php // echo Lang::get("panel.welcome");              ?>, <span class="displayName"> <?php // echo Auth::user()->name;              ?></span></li>-->
                 {{--<li><a href="<?php echo URL::to('dashboard'); ?>"><?php echo Lang::get("panel.dashboard"); ?></a></li>--}}
                 <li class="dropdown">
                     <a id="dLabel" role="button" data-toggle="dropdown" data-target="#" href="javascript:void(0);"><?php echo Lang::get("panel.settings"); ?> <span class="caret"></span></a>

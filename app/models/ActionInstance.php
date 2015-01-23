@@ -19,6 +19,7 @@ class ActionInstance extends \Eloquent
      * @var string
      */
     public $timestamps          = false;
+    protected $guarded          = array("id");
     protected $table            = 'action_instances';
     public $manage_table_header = array(
         "user_id"            => "User ID",
@@ -36,9 +37,9 @@ class ActionInstance extends \Eloquent
         return $this->hasMany("App\Models\ActionInstanceMeta");
     }
 
-    static function getMostItems($action_id)
+    static function getMostItems($action_id, $limit = 5)
     {
-        $top_items = \App\Models\ActionInstance::select(\DB::raw('count(item_id) as numb, item_id'))->where("action_id", $action_id)->groupBy("item_id")->orderBy("numb", "DESC")->limit(5)->get()->toArray();
+        $top_items = \App\Models\ActionInstance::select(\DB::raw('count(item_id) as numb, item_id'))->where("action_id", $action_id)->groupBy("item_id")->orderBy("numb", "DESC")->limit($limit)->get()->toArray();
         $items     = array();
 
         foreach ($top_items as $top) {

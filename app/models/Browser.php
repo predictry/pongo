@@ -10,9 +10,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\SoftDeletingTrait;
+
 class Browser extends \Eloquent
 {
 
+    use SoftDeletingTrait;
+
+    protected $dates   = ['deleted_at'];
     protected $guarded = array("id");
     protected $table   = 'browsers';
 

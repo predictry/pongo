@@ -20,7 +20,6 @@ use App\Controllers\ApiBaseController,
 class Recommendation2Controller extends ApiBaseController
 {
 
-    protected $response     = array();
     private $operator_types = array();
     protected $repository;
 
@@ -41,17 +40,10 @@ class Recommendation2Controller extends ApiBaseController
             'less_than_equal'    => 'Less Than or Equal'
         );
 
-        $this->response = array(
-            "error"          => false,
-            "status"         => 200,
-            "message"        => "",
-            "client_message" => ""
-        );
-
         $this->gui_domain_auth = array(
 //            'appid'  => $this->predictry_server_api_key,
             'appid'  => "pongo", //hardcoded for temporary
-            'domain' => $this->predictry_server_tenant_id
+            'domain' => \Request::header("X-Predictry-Server-Tenant-ID")
         );
 
         Gui::setUri(GUI_RESTAPI_URL);
@@ -69,38 +61,44 @@ class Recommendation2Controller extends ApiBaseController
         $input     = Input::only("item_id", "user_id", "session_id", "widget_id");
         $response  = $reco_data = array();
 
-        $validator = \Validator::make($input, ['widget_id' => 'required|exists:widgets,id']);
+        if (isset($input['widget_id'])) {
+            try
+            {
+                $reco_data = $this->repository->populateRecoData($this->site_id, $input);
 
-        if ($validator->passes()) {
-            $reco_data = $this->repository->populateRecoData($this->site_id, $input);
+                if (!isset($reco_data['error'])) {
+                    //get recommendation
+                    $response = $this->repository->getRecommendation($reco_data);
 
-            if (!isset($reco_data['error'])) {
-                //get recommendation
-                $response = $this->repository->getRecommendation($reco_data);
-
-                if (!is_null($response) && count($response) > 0) {
-                    if ($response && isset($response->error)) {
-                        $this->http_status = $response->status;
+                    if (!is_null($response) && count($response) > 0) {
+                        if ($response && isset($response->error)) {
+                            $this->http_status = $response->status;
+                        }
+                        else {
+                            if ($response->data->items && count($response->data->items) > 0) {
+                                $widget_instance_id = $this->repository->createWidgetInstance($input['widget_id'], $input['session_id']); //no error found, then we have to create new widget instance
+                                if ($widget_instance_id && count($response->data->item_ids) > 0) { //when the widget instance ready, then we record the result
+                                    $response->data->widget_instance_id = $widget_instance_id; //widget_instance_id
+                                    $response->data->items              = $this->repository->appendWidgetInstanceId($response->data->items, $widget_instance_id); //need to append predictry_src=widget_instance_id   
+                                    Event::fire("recommendation.response_received", array($response->data->item_ids, $widget_instance_id));
+                                }
+                            }
+                            unset($response->data->item_ids);
+                        }
                     }
                     else {
-                        if ($response->data->items && count($response->data->items) > 0) {
-                            $widget_instance_id = $this->repository->createWidgetInstance($input['widget_id'], $input['session_id']); //no error found, then we have to create new widget instance
-                            if ($widget_instance_id && count($response->data->item_ids) > 0) { //when the widget instance ready, then we record the result
-                                $response->data->widget_instance_id = $widget_instance_id; //widget_instance_id
-                                $response->data->items              = $this->repository->appendWidgetInstanceId($response->data->items, $widget_instance_id); //need to append predictry_src=widget_instance_id   
-                                Event::fire("recommendation.response_received", array($response->data->item_ids, $widget_instance_id));
-                            }
-                        }
-                        unset($response->data->item_ids);
+                        $response                  = $this->getErrorResponse("noResults", 200);
+                        $response['data']['items'] = [];
                     }
                 }
-                else {
-                    $response                  = $this->getErrorResponse("noResults", 200);
-                    $response['data']['items'] = [];
-                }
+                else
+                    $response = $this->getErrorResponse($reco_data['data'][0], $reco_data['data'][1], $reco_data['data'][2]);
             }
-            else
-                $response = $this->getErrorResponse($reco_data['data'][0], $reco_data['data'][1], $reco_data['data'][2]);
+            catch (Exception $ex)
+            {
+                \Log::error($ex->getMessage());
+                $response = $this->getErrorResponse("", 400, "", "Malfunction system, please contact administrator", "");
+            }
         }
         else
             $response = $this->getErrorResponse("inputUnknown", 400, "widget_id");

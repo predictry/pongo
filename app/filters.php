@@ -12,12 +12,12 @@
  */
 
 App::before(function($request) {
-    //
+//
 });
 
 
 App::after(function($request, $response) {
-    //
+//
 });
 
 /*
@@ -104,8 +104,18 @@ Route::filter('site.ajax', function($route) {
         return Redirect::back()->withErrors($validator);
 });
 
+Route::filter('role.admin', function() {
+    $role = Session::get("role");
+    if ($role === "admin") {
+        return true;
+    }
+
+    return false;
+});
+
 App::missing(function($exception) {
     return Response::view('frontend.errors.missing', array('exception' => $exception), 404);
+//	return Redirect::to('home');
 });
 
 
@@ -137,7 +147,7 @@ Route::filter('guest', function() {
  */
 
 Route::filter('csrf', function() {
-    if (Session::token() != Input::get('_token')) {
+    if (Session::token() !== Input::get('_token')) {
         throw new Illuminate\Session\TokenMismatchException;
     }
 });
