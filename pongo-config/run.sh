@@ -96,4 +96,4 @@ sudo service php5-fpm reload
 sudo service nginx reload
 
 # restarting supervisor
-sudo service supervisor restart
+sudo service supervisor stop

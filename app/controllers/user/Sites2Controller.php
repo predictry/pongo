@@ -30,13 +30,16 @@ class Sites2Controller extends BaseController
 {
 
     private $repository;
+    protected $custom_script = '';
 
     function __construct(\App\Pongo\Repository\SiteRepository $repository)
     {
         parent::__construct();
-        $this->repository = $repository;
 
-        View::share(array("ca" => get_class(), "moduleName" => "Site", "view" => false, "custom_action" => "true", "delete" => false));
+        $this->repository    = $repository;
+        $this->custom_script = "var site_url = '" . URL::to('/') . "';";
+
+        View::share(array("ca" => get_class(), "moduleName" => "Site", "view" => false, "custom_action" => "true", "delete" => false, "custom_script" => $this->custom_script));
 
         if (Auth::user()->plan_id === 3) { //redmart
             View::share(array("create" => false, "edit" => false));
@@ -112,19 +115,14 @@ class Sites2Controller extends BaseController
                 $site_category_name_slug = Str::slug($site_category->name, '_');
                 $json_path               = public_path() . '/data/' . $site_category_name_slug . '.json';
                 $data                    = json_decode(File::get($json_path));
-
-                $custom_script = "<script type='text/javascript'>";
-                $custom_script .= "var site_url = '" . URL::to('/') . "';";
-                $custom_script .= "</script>";
             }
 
             $output = [
-                'reco_js_url'   => $reco_js_url,
-                'site'          => $site,
-                'data'          => $data,
-                'tenant_id'     => $tenant_id,
-                'custom_script' => $custom_script,
-                'pageTitle'     => "Implementation Wizard"
+                'reco_js_url' => $reco_js_url,
+                'site'        => $site,
+                'data'        => $data,
+                'tenant_id'   => $tenant_id,
+                'pageTitle'   => "Implementation Wizard"
             ];
             return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.sites.wizard.implementation', $output);
         }
@@ -184,14 +182,9 @@ class Sites2Controller extends BaseController
                 $json_path               = public_path() . '/data/' . $site_category_name_slug . '.json';
                 $data                    = json_decode(File::get($json_path));
 
-                $custom_script = "<script type='text/javascript'>";
-                $custom_script .= "var site_url = '" . URL::to('/') . "';";
-                $custom_script .= "</script>";
-
                 $output = [
-                    'data'          => $data,
-                    'tenant_id'     => $tenant_id,
-                    'custom_script' => $custom_script
+                    'data'      => $data,
+                    'tenant_id' => $tenant_id
                 ];
 
                 return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.sites.wizard.data_collection', $output);
