@@ -3,12 +3,20 @@
 namespace App\Controllers\User;
 
 use App\Controllers\BaseController,
+    App\Models\AccountMeta,
+    App\Models\Action,
+    App\Models\ActionMeta,
     App\Models\Site,
     Auth,
+    File,
     Input,
     Paginator,
     Redirect,
+    Response,
     Session,
+    Str,
+    URL,
+    Validator,
     View;
 
 /**
@@ -21,9 +29,13 @@ use App\Controllers\BaseController,
 class Sites2Controller extends BaseController
 {
 
-    function __construct()
+    private $repository;
+
+    function __construct(\App\Pongo\Repository\SiteRepository $repository)
     {
         parent::__construct();
+        $this->repository = $repository;
+
         View::share(array("ca" => get_class(), "moduleName" => "Site", "view" => false, "custom_action" => "true", "delete" => false));
 
         if (Auth::user()->plan_id === 3) { //redmart
@@ -79,6 +91,186 @@ class Sites2Controller extends BaseController
             Session::remove("default_action_view");
         }
         return Redirect::to('v2/home');
+    }
+
+    /*
+     * Implementation Wizard
+     */
+
+    public function getImplementationWizard($tenant_id)
+    {
+        $validator = Validator::make(['name' => $tenant_id], ['name' => 'required|exists:sites,name']);
+        $site      = $this->repository->isBelongToHim($tenant_id);
+        if ($validator->passes() && $site) {
+
+            $reco_js_url = asset('reco.js');
+            $reco_js_url = str_replace("https", "", $reco_js_url);
+            $reco_js_url = str_replace("http", "", $reco_js_url);
+
+            $site_category = Site::find(Session::get('active_site_id'))->siteCategory()->first();
+            if ($site_category) {
+                $site_category_name_slug = Str::slug($site_category->name, '_');
+                $json_path               = public_path() . '/data/' . $site_category_name_slug . '.json';
+                $data                    = json_decode(File::get($json_path));
+
+                $custom_script = "<script type='text/javascript'>";
+                $custom_script .= "var site_url = '" . URL::to('/') . "';";
+                $custom_script .= "</script>";
+            }
+
+            $output = [
+                'reco_js_url'   => $reco_js_url,
+                'site'          => $site,
+                'data'          => $data,
+                'tenant_id'     => $tenant_id,
+                'custom_script' => $custom_script,
+                'pageTitle'     => "Implementation Wizard"
+            ];
+            return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.sites.wizard.implementation', $output);
+        }
+
+        return \Redirect::to('sites')->with('flash_error', $validator->messages()->first());
+    }
+
+    public function ajaxPostImplementationWizard($tenant_id)
+    {
+        $action_names        = \Input::get("action_names");
+        $excluded_properties = \Input::get("excluded_properties");
+
+        if (is_array($action_names)) {
+            foreach ($action_names as $action_name) {
+                $action = Action::where('name', $action_name)->where('site_id', Session::get('active_site_id'))->first();
+                if ($action) {
+                    $action_meta = ActionMeta::firstOrNew(['key' => 'excluded_properties', 'action_id' => $action->id]);
+                    if (isset($excluded_properties[$action_name]) && is_array(($excluded_properties[$action_name]))) {
+                        $action_meta->value = json_encode($excluded_properties[$action_name]);
+                        $action_meta->save();
+                    }
+                    else {
+                        $action_meta->value = json_encode(array());
+                        $action_meta->update();
+                    }
+
+
+                    \Session::remove('is_new_account');
+                    $this->is_new_account = true;
+
+                    $is_new_account_meta = AccountMeta::where('account_id', \Auth::user()->id)->where('key', 'is_new_account')->first();
+                    if ($is_new_account_meta) {
+                        $is_new_account_meta->value = false;
+                        $is_new_account_meta->update();
+                    }
+                }
+            }
+        }
+        return Response::json([
+                    "error" => false,
+                    "data"  => [
+                        'redirect' => url("sites")
+                    ]
+        ]);
+    }
+
+    public function getDataCollection($tenant_id)
+    {
+        $validator = Validator::make(['name' => $tenant_id], ['name' => 'required|exists:sites,name']);
+        if ($validator->passes() && $this->repository->isBelongToHim($tenant_id)) {
+
+            $site_category = Site::find(Session::get('active_site_id'))->siteCategory()->first();
+
+            if ($site_category) {
+
+                $site_category_name_slug = Str::slug($site_category->name, '_');
+                $json_path               = public_path() . '/data/' . $site_category_name_slug . '.json';
+                $data                    = json_decode(File::get($json_path));
+
+                $custom_script = "<script type='text/javascript'>";
+                $custom_script .= "var site_url = '" . URL::to('/') . "';";
+                $custom_script .= "</script>";
+
+                $output = [
+                    'data'          => $data,
+                    'tenant_id'     => $tenant_id,
+                    'custom_script' => $custom_script
+                ];
+
+                return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.sites.wizard.data_collection', $output);
+            }
+        }
+        else
+            return Redirect::to('sites')->with('flash_error', $validator->messages()->first());
+    }
+
+    public function ajaxGetActionProperties($tenant_id, $action_name)
+    {
+        $site_category = Site::find(Session::get('active_site_id'))->siteCategory()->first();
+
+        if ($site_category) {
+
+            $site_category_name_slug = Str::slug($site_category->name, '_');
+            $json_path               = public_path() . '/data/' . $site_category_name_slug . '.json';
+            $data                    = json_decode(File::get($json_path));
+            $selected_action         = $this->repository->getSelectedActionFromJson($data, $action_name);
+
+            $excluded_properties = $this->repository->getExcludedProperties(Session::get('active_site_id'), $action_name);
+        }
+
+        return Response::json([
+                    "error"    => false,
+                    "data"     => [
+                        "action" => $selected_action
+                    ],
+                    "response" => View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.sites.wizard.list_action_properties", ['action' => $selected_action, "tenant_id" => $tenant_id, "action_name" => $action_name, "excluded_properties" => ($excluded_properties) ? json_decode($excluded_properties->value) : []])->render()
+        ]);
+    }
+
+    public function ajaxGetActionSnipped($tenant_id, $action_name)
+    {
+        $site_category = Site::find(Session::get('active_site_id'))->siteCategory()->first();
+
+        if ($site_category) {
+
+            $site_category_name_slug = Str::slug($site_category->name, '_');
+            $json_path               = public_path() . '/data/' . $site_category_name_slug . '.json';
+            $data                    = json_decode(File::get($json_path));
+            $selected_action         = $this->repository->getSelectedActionFromJson($data, $action_name);
+            $excluded_properties     = \Input::get("excluded_properties");
+
+            $js_snipped_data = $this->repository->buildSnippedJSData($action_name, $selected_action, $data->common, $excluded_properties);
+        }
+
+        return Response::json([
+                    "error" => false,
+                    "data"  => [
+                        "snipped"   => json_encode($js_snipped_data, JSON_PRETTY_PRINT),
+                        "tenant_id" => $tenant_id
+                    ]
+        ]);
+    }
+
+    public function ajaxGetCheckIfActionImplemented($tenant_id, $action_name)
+    {
+        $action = Action::where('name', $action_name)->where('site_id', Session::get('active_site_id'))->first();
+
+        if ($action) {
+            $current_total_action_received = Action::getNumberOfTotalActionsOverallByActionId($action->id);
+            $is_action_received            = ($current_total_action_received > 0) ? true : false;
+        }
+        else
+            return Response::json([
+                        'error'   => true,
+                        'message' => "Action not found"
+            ]);
+
+        return Response::json([
+                    'error' => false,
+                    'data'  => [
+                        'tenant_id'                     => $tenant_id,
+                        'action_name'                   => $action_name,
+                        'action_recieved'               => $is_action_received,
+                        'current_total_action_received' => $current_total_action_received
+                    ]
+        ]);
     }
 
 }

@@ -288,6 +288,16 @@ Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Con
         Route::post('rules/{numeric}/delete', 'Rules2Controller@postDelete');
         Route::get("rules", array("as" => "rules", "uses" => "Rules2Controller@index"));
     }
+    # Data Collections
+    Route::get("sites/{tenant_id}/integration", "Sites2Controller@getImplementationWizard");
+    Route::get("sites/{tenant_id}/data_collection", "Sites2Controller@getDataCollection");
+
+    Route::group(array('before' => 'site.ajax'), function() {
+        Route::get("sites/{tenant_id}/actions/{action_name}/properties", "Sites2Controller@ajaxGetActionProperties");
+        Route::get("sites/{tenant_id}/actions/{action_name}/snipped", "Sites2Controller@ajaxGetActionSnipped");
+        Route::get("sites/{tenant_id}/actions/{action_name}/validate", "Site2sController@ajaxGetCheckIfActionImplemented");
+        Route::post("sites/{tenant_id}/integration/submit", "Sites2Controller@ajaxPostImplementationWizard");
+    });
 });
 
 
