@@ -1,5 +1,6 @@
 @extends(getenv('FRONTEND_SKINS') . $theme . '.layouts.blank_dashboard', ['scripts' => array(HTML::script('assets/js/script.helper.js'), HTML::script('assets/js/script.panel.sites.js'), HTML::script('assets/js/data_collection.js'))])
 @section('content')
+@include(getenv('FRONTEND_SKINS') . $theme . '.partials.page_heading_without_action', ['upper' => ['Sites' => 'v2/sites']])
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
         <div class="col-lg-12">
@@ -31,16 +32,16 @@
                                 <p>Paste the code below in your site's HTML (preferably as close as possible to the open <code>&lt;head&gt;</code> tag and we're ready to go. (Predictry is designed not to slow down your site)</p>
                                 <textarea class="form-control js-code" rows="10" onclick="this.select()">
 <script type="text/javascript">
-            var _predictry = _predictry || [];
-            (function () {
-            _predictry.push(['setTenantId', "{{ $site->name }}"], ['setApiKey', "{{ $site->api_key }}"]);
-                    var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
-                    g.type = 'text/javascript';
-                    g.defer = true;
-                    g.async = true;
-                    g.src = '//d2gq0qsnoi5tbv.cloudfront.net/v2/p.min.js';
-                    s.parentNode.insertBefore(g, s);
-            })();</script>
+                                                var _predictry = _predictry || [];
+                                                (function () {
+                                                _predictry.push(['setTenantId', "{{ $site->name }}"], ['setApiKey', "{{ $site->api_key }}"]);
+                                                        var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+                                                        g.type = 'text/javascript';
+                                                        g.defer = true;
+                                                        g.async = true;
+                                                        g.src = '//d2gq0qsnoi5tbv.cloudfront.net/v3/p.min.js';
+                                                        s.parentNode.insertBefore(g, s);
+                                                })();</script>
                                 </textarea>
                                 <div class="row">
                                     <div class="col-sm-6">
@@ -95,7 +96,7 @@
                                                                                             <span class="status"></span>
                                                                                         </a>
                                                                                     </div>
-                                                                                    <div class="col-xs-2">
+                                                                                    <div class="col-xs-2 text-right" style="padding-right: 11px;">
                                                                                         <i class="fa fa-info-circle" data-toggle="tooltip" role="tooltip" data-placement="right" title="{{ $action->info or "" }}"></i>
                                                                                     </div>
                                                                                 </li>
@@ -148,7 +149,7 @@
                                                     <div class="tab-pane" id="tab_{{ $name }}">
                                                         <textarea class="form-control" style="margin-top: 0;" rows="15" onclick="this.select()"></textarea>
                                                         <div class="clearfix pt20">
-                                                            <p class="pull-left small">Once you have implement the JS embed code, and have send your first action. Validate by clicking button below.
+                                                            <p class="pull-left">Once you have implement the JS embed code, and have send your first action. Validate by clicking button below.
                                                                 If it's success, you will see green check icon on the right side of the action name.</p>
                                                             <a class="btn btn-primary pull-right" href="javascript:void(0);" onclick="checkIfActionImplemented('{{ $tenant_id }}', '{{ $name }}');">Validate</a>
                                                         </div>
@@ -174,11 +175,6 @@
         </div>
     </div>
 </div>
-
-
-
-
-
 <script type="text/javascript">
 
                                     var action_names = <?php echo json_encode($action_names); ?>;

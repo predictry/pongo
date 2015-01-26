@@ -28,7 +28,7 @@ Route::pattern('dt_end', '^([0-9]{4})-([0-9]{2})-([0-9]{2})$');
 Route::pattern('numeric', '[0-9]+');
 
 #Sites
-Route::pattern('tenant_id', '[A-Za-z]+');
+Route::pattern('tenant_id', '[A-Za-z0-9]+');
 Route::pattern('action_name', '[A-Za-z0-9_]+');
 
 /*
@@ -295,7 +295,7 @@ Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Con
     Route::group(array('before' => 'site.ajax'), function() {
         Route::get("sites/{tenant_id}/actions/{action_name}/properties", "Sites2Controller@ajaxGetActionProperties");
         Route::get("sites/{tenant_id}/actions/{action_name}/snipped", "Sites2Controller@ajaxGetActionSnipped");
-        Route::get("sites/{tenant_id}/actions/{action_name}/validate", "Site2sController@ajaxGetCheckIfActionImplemented");
+        Route::get("sites/{tenant_id}/actions/{action_name}/validate", "Sites2Controller@ajaxGetCheckIfActionImplemented");
         Route::post("sites/{tenant_id}/integration/submit", "Sites2Controller@ajaxPostImplementationWizard");
     });
 });
