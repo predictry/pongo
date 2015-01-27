@@ -87,13 +87,14 @@ sudo chmod -R 777 /usr/share/nginx/html/www/pongo/app/storage/cache
 
 #changing ownership permission for app/storage
 sudo chown -R www-data:www-data /usr/share/nginx/html/www/pongo/app/storage
+sudo chown -R www-data:www-data /usr/share/nginx/html/www/pongo/app/storage/cache
 
 #Copying the config file for supervisor
-sudo cp /usr/share/nginx/html/www/pongo/pongo-config/sendaction_queue.conf /etc/supervisor/conf.d/
+#sudo cp /usr/share/nginx/html/www/pongo/pongo-config/sendaction_queue.conf /etc/supervisor/conf.d/
 
 # reloading nginx and php
 sudo service php5-fpm reload
 sudo service nginx reload
 
 # restarting supervisor
-sudo service supervisor stop
+#sudo service supervisor restart
