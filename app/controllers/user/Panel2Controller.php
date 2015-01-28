@@ -83,24 +83,19 @@ class Panel2Controller extends BaseController
          * ( Count(1) / (2) ) * 100 = N <-- Conversion rate 
          * 
          */
-
-        $cache_n_item_purchased = Cache::get("cache_n_item_purchased_{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}");
-        if (is_null($cache_n_item_purchased)) {
-            $n_item_purchased = $this->panel_repository->getTotalBuyAction($dt_start, $dt_end);
-            Cache::add("cache_n_item_purchased_{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $n_item_purchased, 14400);
+        $cache_summary_sales = null; // Cache::get("cache_summary_sales_{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}");
+        if (is_null($cache_summary_sales)) {
+            $summary_sales = $this->panel_repository->getSalesStats($dt_start, $dt_end);
+            Cache::add("cache_summary_sales_{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $summary_sales, 14400);
         }
         else
-            $n_item_purchased = $cache_n_item_purchased;
+            $summary_sales = $cache_summary_sales;
 
-        $cache_sales_stat = Cache::get("cache_sales_stat_{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}");
-        if (is_null($cache_sales_stat)) {
-            $sales_stat = $this->panel_repository->getSalesStats($dt_start, $dt_end);
-            Cache::add("cache_sales_stat_{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $sales_stat, 14400);
-        }
-        else
-            $sales_stat = $cache_sales_stat;
-
-        $cache_n_orders = Cache::get("cache_n_orders_{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}");
+        //4 Orders
+        /*
+         * 
+         */
+        $cache_n_orders = null; // Cache::get("cache_n_orders_{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}");
         if (is_null($cache_n_orders)) {
             $n_orders = $this->panel_repository->getTotalOrders($dt_start, $dt_end);
             Cache::add("cache_n_orders_{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $n_orders, 14400);
@@ -108,17 +103,36 @@ class Panel2Controller extends BaseController
         else
             $n_orders = $cache_n_orders;
 
-        // 
-        // - Basket Size
-//        $queries = DB::getQueryLog();
+
+        $cache_summary_item_purchased = null; //Cache::get("cache_summary_item_purchased _{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}");
+        if (is_null($cache_summary_item_purchased)) {
+            $summary_item_purchased = $this->panel_repository->getTotalBuyAction($dt_start, $dt_end);
+            Cache::add("cache_summary_item_purchased _{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $summary_item_purchased, 14400);
+        }
+        else
+            $summary_item_purchased = $cache_summary_item_purchased;
+
+        //5 Cart summary (qty and sales)
+        /*
+         * 
+         */
+//        $cache_summary_details = Cache::get("cache_summary_details_{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}");
+//        if (is_null($cache_summary_details)) {
+//            $cart_summary_details = $this->panel_repository->getCartSummaryDetails($dt_start, $dt_end);
+//            Cache::add("cache_n_item_purchased_{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $summary_item_purchased, 14400);
+//        }
+//        else
+//            $cart_summary_details = $cache_summary_details;
+//            
+//        $queries = \DB::getQueryLog();
 //        echo '<pre>';
 //        print_r($pageviews_stat);
 //        echo "<br/>----<br/>";
 //        print_r($n_session);
 //        echo "<br/>----<br/>";
-//        print_r($n_item_purchased);
+//        print_r($summary_item_purchased);
 //        echo "<br/>----<br/>";
-//        print_r($sales_stat);
+//        print_r($summary_sales);
 //        echo "<br/>----<br/>";
 //        print_r($n_orders);
 //        echo "<br/>----<br/>";
@@ -127,8 +141,8 @@ class Panel2Controller extends BaseController
 //        echo '</pre>';
 //        die;
 
-        $buy_action  = Action::where("site_id", $this->active_site_id)->where("name", "buy")->get()->first(); //buy action
-        $view_action = Action::where("site_id", $this->active_site_id)->where("name", "view")->get()->first(); //view action
+        $buy_action  = Action::where("site_id", $this->active_site_id)->where("name", "buy")->first(); //buy action
+        $view_action = Action::where("site_id", $this->active_site_id)->where("name", "view")->first(); //view action
 
         if ($buy_action)
             $output_top_items['top_purchased_items'] = ActionInstance::getMostItems($buy_action->id);
@@ -136,22 +150,23 @@ class Panel2Controller extends BaseController
         if ($view_action)
             $output_top_items['top_viewed_items'] = ActionInstance::getMostItems($view_action->id);
 
-
-
         $output = [
             'overviews'           => [
                 'total_pageviews'      => number_format($pageviews_stat['regular']),
                 'total_uvs'            => number_format($n_session),
-                'total_sales_amount'   => number_format($sales_stat['regular']),
-                'total_item_purchased' => number_format($n_item_purchased),
+                'total_sales_amount'   => number_format($summary_sales['overall']),
+                'total_item_purchased' => number_format($summary_item_purchased['regular']),
                 'total_orders'         => number_format($n_orders),
+                'total_item_per_cart'  => number_format(($n_orders) > 0 ? ($summary_item_purchased['regular'] / $n_orders) : 0, 2),
+                'total_sales_per_cart' => number_format(($n_orders) > 0 ? ($summary_sales['regular'] / $n_orders) : 0),
                 //thousands
 //                'total_uvs'            => \App\Pongo\Libraries\Helper::thousandsCurrencyFormat($n_session),
 //                'total_pageviews'      => \App\Pongo\Libraries\Helper::thousandsCurrencyFormat($pageviews_stat['regular']),
-//                'total_sales_amount'   => \App\Pongo\Libraries\Helper::thousandsCurrencyFormat($sales_stat['regular']),
-//                'total_item_purchased' => \App\Pongo\Libraries\Helper::thousandsCurrencyFormat($n_item_purchased),
+//                'total_sales_amount'   => \App\Pongo\Libraries\Helper::thousandsCurrencyFormat($summary_sales['overall']),
+//                'total_item_purchased' => \App\Pongo\Libraries\Helper::thousandsCurrencyFormat($summary_item_purchased['regular']),
 //                'total_orders'         => \App\Pongo\Libraries\Helper::thousandsCurrencyFormat($n_orders),
-                'total_avg_sales'      => 0,
+//                'total_item_per_cart'  => \App\Pongo\Libraries\Helper::thousandsCurrencyFormat(($n_orders) > 0 ? ($summary_item_purchased['regular'] / $n_orders) : 0),
+//                'total_sales_per_cart' => \App\Pongo\Libraries\Helper::thousandsCurrencyFormat(($n_orders) > 0 ? ($summary_sales['regular'] / $n_orders) : 0),
                 'conversion_rate'      => Helper::calcConversionRate($n_orders, $pageviews_stat['regular'])
             ],
             'dt_range'            => [
