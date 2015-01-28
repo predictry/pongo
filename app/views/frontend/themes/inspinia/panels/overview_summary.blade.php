@@ -79,4 +79,29 @@
             </div>
         </div>
     </div>
+
+    <div class="col-lg-3">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Sales Amount per Cart</h5>
+            </div>
+            <div class="ibox-content">
+                <h1 class="no-margins">{{ $overviews['total_sales_per_cart'] }}</h1>
+                <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
+                <small>Average sales amount per cart</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Items per Cart</h5>
+            </div>
+            <div class="ibox-content">
+                <h1 class="no-margins">{{ $overviews['total_item_per_cart'] }}</h1>
+                <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
+                <small>Average of items in the cart</small>
+            </div>
+        </div>
+    </div>
 </div>
