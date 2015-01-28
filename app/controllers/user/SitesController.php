@@ -96,12 +96,13 @@ class SitesController extends BaseController
 
             $salt = uniqid(mt_rand(), true);
 
-            $site->name       = $input['name'];
-            $site->api_key    = md5($input['url']);
-            $site->api_secret = md5($input['url'] . $salt);
-            $site->account_id = $input['account_id'];
-            $site->url        = $input['url'];
-            $id               = $site->save();
+            $site->name             = $input['name'];
+            $site->api_key          = md5($input['url']);
+            $site->api_secret       = md5($input['url'] . $salt);
+            $site->account_id       = $input['account_id'];
+            $site->url              = $input['url'];
+            $site->site_category_id = SiteCategory::first()->id;
+            $id                     = $site->save();
 
             Event::fire("site.set_default_actions", array($site));
             Event::fire("site.set_default_funnel_preferences", array($site));
@@ -118,7 +119,7 @@ class SitesController extends BaseController
             }else {
 
                 if ($id)
-                    return \Redirect::route('sites')->with("flash_message", "Successfully added new site.");
+                    return \Redirect::to("v2/sites/{$site->name}/integration")->with("flash_message", "Successfully added new site.");
                 else
                     return \Redirect::back()->with("flash_error", "Inserting problem. Please try again.");
             }

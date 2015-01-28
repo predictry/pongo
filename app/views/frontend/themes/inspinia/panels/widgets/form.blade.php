@@ -1,4 +1,4 @@
-@extends(getenv('FRONTEND_SKINS') . $theme . '.layouts.dashboard', ['scripts' => array(HTML::script('assets/inspinia/js/plugins/chosen/chosen.jquery.js'), HTML::script('assets/js/script.helper.js'), HTML::script('assets/js/script.panel.widgets.js')) ])
+@extends(getenv('FRONTEND_SKINS') . $theme . '.layouts.dashboard', ['scripts' => array(HTML::script('assets/inspinia/js/plugins/chosen/chosen.jquery.js'), HTML::script('assets/js/script.helper.js'), HTML::script('assets/js/script.panel.widgets.js'))])
 @section('content')
 @include(getenv('FRONTEND_SKINS') . $theme . '.partials.page_heading_without_action', ['upper' => ['Widgets' => 'v2/widgets']])
 <div class="wrapper wrapper-content animated fadeInRight">

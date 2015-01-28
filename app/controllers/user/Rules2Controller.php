@@ -13,8 +13,7 @@ namespace App\Controllers\User;
 use App\Controllers\BaseController,
     App\Models\Item,
     App\Models\Rule,
-    App\Models\Ruleset,
-    App\Models\WidgetRuleSet,
+    App\Models\RuleSet,
     Carbon\Carbon,
     Input,
     Paginator,
@@ -242,7 +241,7 @@ class Rules2Controller extends BaseController
 
     public function getEdit($id)
     {
-        $is_exists = Ruleset::where("id", $id)->where("site_id", $this->active_site_id)->count();
+        $is_exists = RuleSet::where("id", $id)->where("site_id", $this->active_site_id)->count();
 
         if ($is_exists) {
             $item_rules = Rule::where("ruleset_id", $id)->get()->toArray();
@@ -261,7 +260,7 @@ class Rules2Controller extends BaseController
         );
 
         $items   = Item::where("site_id", $this->active_site_id)->where("name", "!=", "")->lists("name", "id");
-        $ruleset = Ruleset::where("id", $id)->where("site_id", $this->active_site_id)->first();
+        $ruleset = RuleSet::where("id", $id)->where("site_id", $this->active_site_id)->first();
 
         $index_item_rule = 1;
         foreach ($item_rules as $obj) {
@@ -296,7 +295,7 @@ class Rules2Controller extends BaseController
 
         $rule_model    = new Rule();
         $ruleset_model = new Ruleset();
-        $ruleset       = Ruleset::find($id);
+        $ruleset       = RuleSet::find($id);
 
         if ($input['expiry_type'] !== "no_expiry") {
             switch ($input['expiry_type']) {
@@ -412,15 +411,15 @@ class Rules2Controller extends BaseController
 
     public function postDelete($id)
     {
-        $is_exists = Ruleset::where("id", $id)->where("site_id", $this->active_site_id)->count();
+        $is_exists = RuleSet::where("id", $id)->where("site_id", $this->active_site_id)->count();
         if ($is_exists) {
-            $widget_rulesets = WidgetRuleSet::where("ruleset_id", $id)->get();
+            $widget_rulesets = WidgetRuleset::where("ruleset_id", $id)->get();
             foreach ($widget_rulesets as $ruleset) {
-                $widget_ruleset = WidgetRuleSet::find($ruleset->id);
+                $widget_ruleset = WidgetRuleset::find($ruleset->id);
                 $widget_ruleset->delete();
             }
 
-            $ruleset = Ruleset::find($id);
+            $ruleset = RuleSet::find($id);
             $ruleset->delete();
         }
         return Redirect::route('rules')->with("flash_message", "Ruleset has been successfully removed.");

@@ -10,7 +10,9 @@
 
 namespace App\Models;
 
-class ActionMeta extends \Eloquent
+use Eloquent;
+
+class ActionMeta extends Eloquent
 {
 
     /**

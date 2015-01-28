@@ -8,7 +8,7 @@
             <li class="list-group-item">
                 <div class="row toggle-property" id="dropdown-detail-property-{{ $i }}" data-toggle="detail-property-{{ $i }}">
                     <div class="col-xs-10">{{ $entity->entity_name }}</div>
-                    <div class="col-xs-2"><i class="fa fa-chevron-down pull-right"></i></div>
+                    <div class="col-xs-2 text-right" style="padding-right: 11px;"><i class="fa fa-chevron-down pull-right"></i></div>
                 </div>
                 <div id="detail-property-{{ $i }}" class="property-wrap">
                     <div class="row">
@@ -24,7 +24,7 @@
                                         </label>
                                     </div>
                                 </div>
-                                <div class="col-xs-2 info">
+                                <div class="col-xs-2 info text-right" style="padding-right: 11px;">
                                     <i class="fa fa-info-circle" data-toggle="tooltip" role="tooltip" data-placement="right" title="{{ $property->info or "" }}"></i>
                                 </div>
                                 <?php

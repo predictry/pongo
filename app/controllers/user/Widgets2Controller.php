@@ -15,7 +15,7 @@ use App\Controllers\BaseController,
     App\Models\Filter,
     App\Models\Item,
     App\Models\Rule,
-    App\Models\Ruleset,
+    App\Models\RuleSet,
     App\Models\Site,
     App\Models\Widget,
     App\Models\WidgetFilter,
@@ -99,7 +99,7 @@ class Widgets2Controller extends BaseController
 
     public function getCreate()
     {
-        $ruleset_list   = Ruleset::where("site_id", $this->active_site_id)->lists("name", "id");
+        $ruleset_list   = RuleSet::where("site_id", $this->active_site_id)->lists("name", "id");
         $filter_list    = Filter::where("site_id", $this->active_site_id)->lists("name", "id");
         $algorithm_list = Algorithm::all()->lists("description", "name");
 
@@ -197,7 +197,7 @@ class Widgets2Controller extends BaseController
             $widget               = Widget::where("id", $id)->where("site_id", $this->active_site_id)->first();
             $widget_item_rulesets = WidgetRuleSet::where("widget_id", $id)->get()->toArray();
             $widget_item_filters  = WidgetFilter::where("widget_id", $id)->get()->toArray();
-            $ruleset_list         = Ruleset::where("site_id", $this->active_site_id)->lists("name", "id");
+            $ruleset_list         = RuleSet::where("site_id", $this->active_site_id)->lists("name", "id");
             $filter_list          = Filter::where("site_id", $this->active_site_id)->lists("name", "id");
             $algorithm_list       = Algorithm::all()->lists("description", "name");
 
@@ -346,7 +346,7 @@ class Widgets2Controller extends BaseController
     {
         $index_item_widget_ruleset = Input::get("index");
 
-        $ruleset_list = Ruleset::where("site_id", $this->active_site_id)->lists("name", "id");
+        $ruleset_list = RuleSet::where("site_id", $this->active_site_id)->lists("name", "id");
 
         return Response::json(
                         array("status"   => "success",
@@ -361,7 +361,7 @@ class Widgets2Controller extends BaseController
     {
         $obj             = Input::get("obj");
         $index_item_rule = Input::get("index");
-        $ruleset_list    = Ruleset::where("site_id", $this->active_site_id)->lists("name", "id");
+        $ruleset_list    = RuleSet::where("site_id", $this->active_site_id)->lists("name", "id");
 
         $output = array(
             "type"                      => "create",
@@ -413,7 +413,7 @@ class Widgets2Controller extends BaseController
 
     public function getWizard()
     {
-        $ruleset_list = Ruleset::where("site_id", $this->active_site_id)->lists("name", "id");
+        $ruleset_list = RuleSet::where("site_id", $this->active_site_id)->lists("name", "id");
 
         if (count($ruleset_list) <= 0) {
             return Redirect::to("widgets")->with("flash_error", "Currently, you don't have any ruleset to set into widget.");

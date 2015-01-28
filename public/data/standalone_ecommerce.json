@@ -43,7 +43,7 @@
                         {
                             "entity_name": "action",
                             "type": "object",
-                            "compulsary": true,
+                            "compulsary": false,
                             "properties": [
                                 {
                                     "field": "name",
@@ -97,7 +97,7 @@
                     ]
                 }
             ],
-            "disabled": false
+            "disabled": true
         },
         {
             "name": "product",
