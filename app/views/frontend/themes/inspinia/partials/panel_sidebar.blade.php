@@ -16,7 +16,7 @@
                     </ul>
                 </div>
                 <div class="logo-element">
-                    PT
+                    <img src="{{asset("assets/img/logo-sm.png")}}"/>
                 </div>
             </li>
             <li class="<?php if ($ca === 'App\Controllers\User\Panel2Controller') echo 'active'; ?>">

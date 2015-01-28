@@ -3,7 +3,11 @@
 <div class="middle-box text-center loginscreen  animated fadeInDown">
     <div>
         <div>
-            <h1 class="logo-name">PT</h1>
+            <h1 class="logo-name">
+                <a href="#">
+                    <img src="{{asset("assets/img/logo.png")}}"/>
+                </a>
+            </h1>
         </div>
         @include('frontend.partials.notification')
         <h3>Welcome to Predictry</h3>

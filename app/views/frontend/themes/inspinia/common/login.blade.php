@@ -3,10 +3,14 @@
 <div class="middle-box text-center loginscreen  animated fadeInDown">
     <div>
         <div>
-            <h1 class="logo-name">PT</h1>
+            <h1 class="logo-name">
+                <a href="#">
+                    <img src="{{asset("assets/img/logo.png")}}"/>
+                </a>
+            </h1>
         </div>
         @include('frontend.partials.notification')
-        <h3>Welcome to Predictry</h3>
+        <h3 class="">Welcome to Predictry</h3>
         <p>Login in. To see it in action.</p>
         {{ Form::open(array('url' => 'v2/login/submit', 'class' => 'm-t', 'autocomplete' => 'off', 'role' => 'form')) }}
         <div class="form-group {{$var = $errors->first('email')}} {{ ($var !== '') ? 'has-error' : ''}}">
