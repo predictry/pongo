@@ -26,6 +26,7 @@ class PanelRepository
 {
 
     public $active_site_id;
+    public $buy_action_id = null;
 
     public function getSiteActions($site_id)
     {
@@ -132,8 +133,13 @@ class PanelRepository
 
         //today buy
         $today_total_buy_action = 0;
-        $buy_action             = Action::where("site_id", $this->active_site_id)->where("name", "buy")->get()->first();
-        if ($buy_action)
+
+        if (is_null($this->buy_action_id)) {
+            $buy_action          = Action::where("site_id", $this->active_site_id)->where("name", "buy")->get()->first();
+            $this->buy_action_id = ($buy_action) ? $buy_action->id : null;
+        }
+
+        if (!is_null($this->buy_action_id))
             $today_total_buy_action = ActionInstance::where("action_id", $buy_action->id)->whereBetween('created', [$today, $end_of_today])->count();
 
         //completion rate
@@ -205,16 +211,19 @@ class PanelRepository
             $dt_end   = $dt_end->endOfDay();
         }
 
-        $complete_purchase_action = Action::where("name", "buy")->where("site_id", $this->active_site_id)->get()->first();
+        if (is_null($this->buy_action_id)) {
+            $complete_purchase_action = Action::where("name", "buy")->where("site_id", $this->active_site_id)->first();
+            $this->buy_action_id      = is_object($complete_purchase_action) ? $complete_purchase_action->id : null;
+        }
 
-        if (is_object($complete_purchase_action)) {
-            $sales_stats['overall'] = Action::find($complete_purchase_action->id)
+        if (!is_null($this->buy_action_id)) {
+            $sales_stats['overall'] = Action::find($this->buy_action_id)
                             ->action_instances_and_metas()
                             ->where("action_instance_metas.key", "sub_total")
                             ->whereBetween('created', [$dt_start, $dt_end])
                             ->get(array("action_instances.id AS action_instance_id", "action_instance_metas.key", "action_instance_metas.value"))->sum('value');
 
-            $action_instance_ids = Action::find($complete_purchase_action->id)
+            $action_instance_ids = Action::find($this->buy_action_id)
                             ->action_instances_and_metas()
                             ->where("action_instance_metas.key", "rec")
                             ->where("action_instance_metas.value", "true")
@@ -432,7 +441,7 @@ class PanelRepository
         return $stats;
     }
 
-    public function getAverageOfCart($dt_start = null, $dt_end = null)
+    public function getCartSummaryDetails($dt_start = null, $dt_end = null)
     {
         if (!isset($dt_start) && !isset($dt_end)) {
             $dt_start = new Carbon("today"); //today begining
@@ -440,10 +449,13 @@ class PanelRepository
             $dt_end   = $dt_end->endOfDay();
         }
 
-        $complete_purchase_action = Action::where("name", "buy")->where("site_id", $this->active_site_id)->get()->first();
+        if (is_null($this->buy_action_id)) {
+            $complete_purchase_action = Action::where("name", "buy")->where("site_id", $this->active_site_id)->first();
+            $this->buy_action_id      = is_object($complete_purchase_action) ? $complete_purchase_action->id : null;
+        }
 
-        if (is_object($complete_purchase_action)) {
-            $action_instance_ids = Action::find($complete_purchase_action->id)
+        if (!is_null($this->buy_action_id)) {
+            $action_instance_ids = Action::find($this->buy_action_id)
                             ->action_instances()
                             ->whereBetween('created', [$dt_start, $dt_end])
                             ->get(array("action_instances.id AS action_instance_id"))->lists("action_instance_id");
@@ -454,7 +466,7 @@ class PanelRepository
                                 ->where("action_instance_metas.key", "cart_id")
                                 ->get(array("action_instance_metas.value AS value"))->lists("value"));
 
-                $recommended_action_instance_metas = Action::find($complete_purchase_action->id)
+                $recommended_action_instance_metas = Action::find($this->buy_action_id)
                                 ->action_instances_and_metas()
                                 ->where("action_instance_metas.key", "rec")
                                 ->where("action_instance_metas.value", "true")
@@ -464,6 +476,7 @@ class PanelRepository
 
                 $regular_action_instance_metas = array_diff($action_instance_ids, $recommended_action_instance_metas);
 
+                // Recommendation
                 if (count($recommended_action_instance_metas) > 0) {
                     $sum_recommended_qty = ActionInstanceMeta::whereIn("action_instance_id", $recommended_action_instance_metas)
                             ->where("action_instance_metas.key", "qty")
@@ -479,6 +492,7 @@ class PanelRepository
                     $sum_recommended_qty        = $sum_recommended_sub_totals = 0;
                 }
 
+                // Regular
                 if (count($regular_action_instance_metas) > 0) {
                     $sum_regular_qty = ActionInstanceMeta::whereIn("action_instance_id", $regular_action_instance_metas)
                             ->where("action_instance_metas.key", "qty")
@@ -504,33 +518,37 @@ class PanelRepository
                     $average_regular_sub_totals     = ($sum_regular_sub_totals) / count($cart_ids);
 
                     return array(
-                        'total_carts'                     => count($cart_ids),
-                        'total_combination_of_qty'        => $sum_recommended_qty + $sum_recommended_qty,
-                        'total_combination_of_sub_totals' => $sum_recommended_sub_totals + $sum_regular_sub_totals,
-                        'sum_recommended_qty'             => $sum_recommended_qty,
-                        'average_recommended_qty_items'   => number_format($average_recommended_qty_items, 2),
-                        'sum_regular_qty'                 => $sum_regular_qty,
-                        'average_regular_qty_items'       => number_format($average_regular_qty_items, 2),
-                        'sum_recommended_sub_totals'      => $sum_recommended_sub_totals,
-                        'average_recommended_sub_totals'  => number_format($average_recommended_sub_totals, 2),
-                        'sum_regular_sub_totals'          => $sum_regular_sub_totals,
-                        'average_regular_sub_totals'      => number_format($average_regular_sub_totals, 2),
+                        'total_carts'                               => count($cart_ids),
+                        'total_combination_of_qty'                  => $sum_recommended_qty + $sum_recommended_qty,
+                        'total_combination_of_sub_totals'           => $sum_recommended_sub_totals + $sum_regular_sub_totals,
+                        'sum_recommended_qty'                       => $sum_recommended_qty,
+                        'average_recommended_qty_items'             => number_format($average_recommended_qty_items, 2),
+                        'average_percentage_recommended_qty_items'  => number_format(($sum_recommended_qty + $sum_recommended_qty) > 0 ? $sum_recommended_qty / ($sum_recommended_qty + $sum_recommended_qty) * 100 : 0, 2),
+                        'sum_regular_qty'                           => $sum_regular_qty,
+                        'average_regular_qty_items'                 => number_format($average_regular_qty_items, 2),
+                        'sum_recommended_sub_totals'                => $sum_recommended_sub_totals,
+                        'average_recommended_sub_totals'            => number_format($average_recommended_sub_totals, 2),
+                        'average_percentage_recommended_sub_totals' => number_format(($sum_recommended_sub_totals + $sum_regular_sub_totals) > 0 ? $sum_recommended_sub_totals / ($sum_recommended_sub_totals + $sum_regular_sub_totals) * 100 : 0, 2),
+                        'sum_regular_sub_totals'                    => $sum_regular_sub_totals,
+                        'average_regular_sub_totals'                => number_format($average_regular_sub_totals, 2),
                     );
                 }
             }
         }
         return array(
-            'total_carts'                     => 0,
-            'total_combination_of_qty'        => 0,
-            'total_combination_of_sub_totals' => 0,
-            'sum_recommended_qty'             => 0,
-            'average_recommended_qty_items'   => number_format(0, 2),
-            'sum_regular_qty'                 => 0,
-            'average_regular_qty_items'       => number_format(0, 2),
-            'sum_recommended_sub_totals'      => 0,
-            'average_recommended_sub_totals'  => number_format(0, 2),
-            'sum_regular_sub_totals'          => 0,
-            'average_regular_sub_totals'      => number_format(0, 2),
+            'total_carts'                               => 0,
+            'total_combination_of_qty'                  => 0,
+            'total_combination_of_sub_totals'           => 0,
+            'sum_recommended_qty'                       => 0,
+            'average_recommended_qty_items'             => number_format(0, 2),
+            'average_percentage_recommended_qty_items'  => number_format(0, 2),
+            'sum_regular_qty'                           => 0,
+            'average_regular_qty_items'                 => number_format(0, 2),
+            'sum_recommended_sub_totals'                => 0,
+            'average_recommended_sub_totals'            => number_format(0, 2),
+            'average_percentage_recommended_sub_totals' => number_format(0, 2),
+            'sum_regular_sub_totals'                    => 0,
+            'average_regular_sub_totals'                => number_format(0, 2),
         );
     }
 
@@ -588,14 +606,6 @@ class PanelRepository
         }
 
         $items = array();
-
-//		$queries = \DB::getQueryLog();
-//		
-//		echo '<pre>';
-//		print_r(end($queries));
-//		echo "<br/>----<br/>";
-//		echo '</pre>';
-//		die;
 
         foreach ($item_ids as $id) {
             $item = Item::find($id);
@@ -668,22 +678,45 @@ class PanelRepository
 
     public function getTotalBuyAction($dt_start = null, $dt_end = null)
     {
-        $buy_action       = Action::where("site_id", $this->active_site_id)->where("name", "buy")->get()->first();
-        $n_item_purchased = is_object($buy_action) ? ActionInstance::where("action_id", $buy_action->id)->whereBetween('created', [$dt_start, $dt_end])->count() : 0;
-        return $n_item_purchased;
-    }
+        if (is_null($this->buy_action_id)) {
+            $complete_purchase_action = Action::where("name", "buy")->where("site_id", $this->active_site_id)->first();
+            $this->buy_action_id      = is_object($complete_purchase_action) ? $complete_purchase_action->id : null;
+        }
 
-    public function getTotalOrders($dt_start = null, $dt_end = null)
-    {
+        $n_item_purchased = !is_null($this->buy_action_id) ? ActionInstance::where("action_id", $this->buy_action_id)->whereBetween('created', [$dt_start, $dt_end])->count() : 0;
 
-        $buy_action = Action::where("site_id", $this->active_site_id)->where("name", "buy")->get()->first();
-        $results    = is_object($buy_action) ? DB::select('SELECT COUNT(DISTINCT tbl.value) AS total FROM ('
+        $results = !is_null($this->buy_action_id) ? DB::select('SELECT COUNT(DISTINCT tbl.action_instance_id) AS total FROM ('
                         . 'SELECT * FROM "action_instance_metas" '
                         . 'INNER JOIN "action_instances" on "action_instances"."id" = "action_instance_metas"."action_instance_id"'
                         . 'WHERE "action_instances"."action_id" = ? '
                         . 'AND "action_instance_metas"."key" = ? '
                         . 'AND "created" between ? AND ? '
-                        . ') as tbl LIMIT 1', [$buy_action->id, "cart_id", $dt_start, $dt_end]) : null;
+                        . ') as tbl LIMIT 1', [$this->buy_action_id, "rec", $dt_start, $dt_end]) : null;
+
+        $n_item_recommend_purchased = !is_null($results) && is_object(current($results)) ? current($results)->total : 0;
+
+        return [
+            'overall'     => $n_item_purchased,
+            'regular'     => $n_item_purchased - $n_item_recommend_purchased,
+            'recommended' => $n_item_recommend_purchased
+        ];
+    }
+
+    public function getTotalOrders($dt_start = null, $dt_end = null)
+    {
+
+        if (is_null($this->buy_action_id)) {
+            $complete_purchase_action = Action::where("name", "buy")->where("site_id", $this->active_site_id)->first();
+            $this->buy_action_id      = is_object($complete_purchase_action) ? $complete_purchase_action->id : null;
+        }
+
+        $results = !is_null($this->buy_action_id) ? DB::select('SELECT COUNT(DISTINCT tbl.value) AS total FROM ('
+                        . 'SELECT * FROM "action_instance_metas" '
+                        . 'INNER JOIN "action_instances" on "action_instances"."id" = "action_instance_metas"."action_instance_id"'
+                        . 'WHERE "action_instances"."action_id" = ? '
+                        . 'AND "action_instance_metas"."key" = ? '
+                        . 'AND "created" between ? AND ? '
+                        . ') as tbl LIMIT 1', [$this->buy_action_id, "cart_id", $dt_start, $dt_end]) : null;
 
         $n_orders = !is_null($results) && is_object(current($results)) ? current($results)->total : 0;
 
