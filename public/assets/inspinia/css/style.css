@@ -3532,7 +3532,7 @@ body.modal-open {
     font-size: 180px;
     font-weight: 800;
     letter-spacing: -10px;
-    margin-bottom: 0px;
+    margin-bottom: 60px;
 }
 .middle-box h1 {
     font-size: 170px;
@@ -4684,4 +4684,9 @@ body.skin-3 {
 }
 .nav-pills>li.active>a, .nav-pills>li.active>a:hover, .nav-pills>li.active>a:focus{
     background-color: #1ab394;
+}
+
+.logo{
+    background: url("../img/logo.png") no-repeat; 
+    display: block;
 }
