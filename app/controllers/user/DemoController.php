@@ -158,7 +158,7 @@ class DemoController extends BaseController
                     "pageTitle"           => "Recommendation Demo",
                     'item'                => $item->toArray(),
                     'item_metas'          => $item_metas,
-                    'widget'              => $widget->toArray(),
+                    'widget'              => is_object($widget) ? $widget->toArray() : ['id' => 0],
                     'api_credential_vars' => $api_credential_vars,
                     'dummy_reco_response' => $dummy_reco_response,
                     'custom_script'       => $custom_script
