@@ -106,16 +106,13 @@ Route::filter('site.ajax', function($route) {
 
 Route::filter('role.admin', function() {
     $role = Session::get("role");
-    if ($role === "admin") {
-        return true;
+    if ($role !== "admin") {
+        return Redirect::to('v2/home')->with("flash_error", "You are not allowed to access the page.");
     }
-
-    return false;
 });
 
 App::missing(function($exception) {
     return Response::view('frontend.errors.missing', array('exception' => $exception), 404);
-//	return Redirect::to('home');
 });
 
 
