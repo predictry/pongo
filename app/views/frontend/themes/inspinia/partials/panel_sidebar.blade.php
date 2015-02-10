@@ -28,6 +28,7 @@
                     <li class="<?php if ($ca === 'App\Controllers\User\Widgets2Controller') echo 'active'; ?>"><a href="<?php echo URL::to('v2/widgets'); ?>">Widgets</a></li>
                     <li class="<?php if ($ca === 'App\Controllers\User\Filters2Controller') echo 'active'; ?>"><a href="<?php echo URL::to('v2/filters'); ?>">Filters</a></li>
                     <li class="<?php if ($ca === 'App\Controllers\User\Rules2Controller') echo 'active'; ?>"><a href="<?php echo URL::to('v2/rules'); ?>">Rule Sets</a></li>
+                    <li class="<?php if ($ca === 'App\Controllers\User\DemoController') echo 'active'; ?>"><a href="<?php echo URL::to('v2/demo'); ?>">Demo</a></li>
                 </ul>
             </li>
 
