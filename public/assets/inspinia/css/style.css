@@ -4690,3 +4690,11 @@ body.skin-3 {
     background: url("../img/logo.png") no-repeat; 
     display: block;
 }
+
+.product{
+    padding: 10px;
+}
+
+.product .name{
+    margin-top: 10px;
+}

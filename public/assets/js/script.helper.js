@@ -56,3 +56,21 @@ function removeItem(id, name) {
 }
 
 
+function testCallback(response) {
+    var data = response.data;
+
+    var $recommended_items = $("#recommended_items");
+
+    for (i = 0; i < data.items.length; i++) {
+        console.log(data.items[i]);
+
+        var div = '<div class="col-sm-3"><div class="panel product">';
+        div += '<img src="' + data.items[i].img_url + '" class="img-rounded img-responsive"/>';
+        div += '<h4 class="mt10" style="padding-left: 10px; padding-right: 10px;">' + data.items[i].name + '</h4>';
+        div += '<h5 style="padding-left: 10px; padding-right: 10px;">Price: ' + data.items[i].price + '</h5>';
+        div += '<a href="' + site_url + '/demo/show/' +  data.items[i].id + '"' + 'class="btn btn-primary btn-block text-capitalize btn-sm">Show me recommendation</a>';
+        div += '</div></div>';
+
+        $recommended_items.append(div);
+    }
+}
