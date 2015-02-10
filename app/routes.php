@@ -59,7 +59,6 @@ Route::group(array('namespace' => 'App\Controllers'), function() {
 //    Route::get('tokenauth', 'TokenAuthenticationController@index');
 });
 
-
 /*
   |--------------------------------------------------------------------------
   | User Dashboard Routing
@@ -67,7 +66,6 @@ Route::group(array('namespace' => 'App\Controllers'), function() {
  */
 //Route::group(array('domain' => 'dashboard.{domain}', 'before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
 Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
-
 
     #Dashboard
     $role = Session::get("role");
@@ -237,7 +235,7 @@ Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Con
     #Update Password
     Route::get('password', 'User2Controller@getPassword');
 
-    if (!is_null(Auth::user()) && Auth::user()->plan_id !== 3) {
+    Route::group(array('before' => 'role.admin'), function() {
         #Sites Management
         Route::get("sites", array("as" => "sites", "uses" => "Sites2Controller@index"));
         Route::get('sites/create', array("as" => "sites.create", "uses" => 'Sites2Controller@getCreate'));
@@ -287,7 +285,12 @@ Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Con
         Route::get('rules/{numeric}/delete', 'Rules2Controller@getDelete');
         Route::post('rules/{numeric}/delete', 'Rules2Controller@postDelete');
         Route::get("rules", array("as" => "rules", "uses" => "Rules2Controller@index"));
-    }
+
+        #Demo
+        Route::get("demo", ['as' => 'demo', 'uses' => 'DemoController@index']);
+        Route::get("demo/show/{id}", ['as' => 'demo.show.{id}', 'uses' => 'DemoController@show']);
+    });
+
     # Data Collections
     Route::get("sites/{tenant_id}/integration", "Sites2Controller@getImplementationWizard");
     Route::get("sites/{tenant_id}/data_collection", "Sites2Controller@getDataCollection");
