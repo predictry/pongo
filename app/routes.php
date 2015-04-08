@@ -227,7 +227,8 @@ Route::group(array('prefix' => 'v2', 'namespace' => 'App\Controllers'), function
 Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
 
     #Dashboard
-    Route::get('home/{type?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'Panel2Controller@index'));
+//    Route::get('home/{type?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'Panel2Controller@index'));
+    Route::get('home/{type?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'Panel2Controller@ajaxIndex'));
 
     #Update Profile
     Route::get('profile', 'User2Controller@getProfile');

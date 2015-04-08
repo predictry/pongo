@@ -51,10 +51,10 @@
     </div>
     @include('frontend.panels.dashboard.trendssumary')	
 
-    <div class="row">
+<!--    <div class="row">
         @include('frontend.panels.dashboard.top5', array('title'=>'Top 5 (Most Viewed Items)', 'contents'=>$top_viewed_items))
         @include('frontend.panels.dashboard.top5', array('title'=>'Top 5 (Most Purchased Items)', 'contents'=>$top_purchased_items))
-    </div>
+    </div>-->
 </div>
 
 @if($is_new_account)
