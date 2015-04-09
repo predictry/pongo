@@ -235,7 +235,7 @@ Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Con
     #Update Password
     Route::get('password', 'User2Controller@getPassword');
 
-    Route::group(array('before' => 'role.admin'), function() {
+    Route::group(array('before' => 'role.site.admin'), function() {
         #Sites Management
         Route::get("sites", array("as" => "sites", "uses" => "Sites2Controller@index"));
         Route::get('sites/create', array("as" => "sites.create", "uses" => 'Sites2Controller@getCreate'));
@@ -303,6 +303,10 @@ Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Con
     });
 });
 
+Route::group(array('prefix' => 'v2/admin', 'before' => 'auth|role.admin', 'namespace' => 'App\Controllers\Admin'), function() {
+    Route::get('dashboard/{type?}/{dt_start?}/{dt_end?}', ['as' => 'admin.dashboard', 'uses' => 'PanelController@index']);
+    Route::post('panel/ajaxSiteOverviewSummary/{type?}/{dt_start?}/{dt_end?}', ['as' => 'admin.dashboard', 'uses' => 'AjaxPanelController@postSiteOverviewSummary']);
+});
 
 /*
   |--------------------------------------------------------------------------
