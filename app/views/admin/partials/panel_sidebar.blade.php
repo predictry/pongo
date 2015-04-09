@@ -1,31 +1,34 @@
-<div class="col-sm-3 col-md-2 sidebar">
-	<?php if (Session::get("role") !== "member") : ?>
-		<?php // if (Auth::user()->plan_id !== 3) : ?>
-<!--			<div class="text-center">
-				<a class="btn btn-success text-center" href="{{ URL::to('widgets/wizard'); }}"><?php // echo Lang::get("panel.create.recommendation"); ?></a>
-			</div>
-			<div class="clearfix mb20"></div>-->
-		<?php // endif; ?>
-		<ul class="nav nav-sidebar">
-			<li class="<?php if ($ca === 'App\Controllers\User\PanelController') echo 'active'; ?>"><a href="{{ URL::to('home'); }}"><?php echo Lang::get("panel.dashboard"); ?></a></li>
-			<li class="<?php if ($ca === 'App\Controllers\User\PlacementsController') echo 'active'; ?>"><a href="{{ URL::to('widgets'); }}"><?php echo Lang::get("panel.recommendations"); ?></a></li>
-			<li class="<?php if ($ca === 'App\Controllers\User\ItemsController') echo 'active'; ?>"><a href="{{ URL::to('items'); }}"><?php echo Lang::get("panel.your.items"); ?></a></li>
-			<!--<li class="<?php // if ($ca === 'App\Controllers\User\MembersController') echo 'active';  ?>"><a href="{{ URL::to('members'); }}"><i class="fa fa-users"></i> <?php echo Lang::get("panel.members"); ?></a></li>-->
-<!--			<li class="<?php if ($ca === 'App\Controllers\User\ItemsController') echo 'active'; ?>"><a href="{{ URL::to('items'); }}"><i class="fa fa-exchange"></i> <?php echo Lang::get("panel.items"); ?></a></li>
-			<li class="<?php if ($ca === 'App\Controllers\User\StatisticsController') echo 'active'; ?>"><a href="{{ URL::to('statistics'); }}"><i class="fa fa-signal"></i> <?php echo Lang::get("panel.statistics"); ?></a></li>
-			<li class="<?php if ($ca === 'App\Controllers\User\ActionsController') echo 'active'; ?>"><a href="{{ URL::to('actions'); }}"><i class="fa fa-tasks"></i> <?php echo Lang::get("panel.actions"); ?></a></li>
-			<?php if (Auth::user()->plan_id !== 3) : ?>
-				<li class="<?php if ($ca === 'App\Controllers\User\RulesController') echo 'active'; ?>"><a href="{{ URL::to('rules'); }}"><i class="fa fa-beer"></i> <?php echo Lang::get("panel.rulesets"); ?></a></li>
-				<li class="<?php if ($ca === 'App\Controllers\User\FiltersController') echo 'active'; ?>"><a href="{{ URL::to('filters'); }}"><i class="fa fa-filter"></i> <?php echo Lang::get("panel.filters"); ?></a></li>
-			<?php endif; ?>
-			<li class="<?php if ($ca === 'App\Controllers\User\PlacementsController') echo 'active'; ?>"><a href="{{ URL::to('widgets'); }}"><i class="fa fa-tasks"></i> <?php echo Lang::get("panel.widgets"); ?></a></li>-->
-		</ul>
-	<?php else: ?>
-		<ul class="nav nav-sidebar">
-			<li class="<?php if ($ca === 'App\Controllers\User\PanelController') echo 'active'; ?>"><a href="{{ URL::to('home'); }}"><?php echo Lang::get("panel.overview"); ?></a></li>
-		</ul>
-	<?php endif; ?>
-	<!--	<ul class="nav nav-sidebar">
-			<li><a href="">Nav item</a></li>
-		</ul>-->
-</div>
+<nav class="navbar-default navbar-static-side" role="navigation">
+    <div class="sidebar-collapse">
+        <ul class="nav" id="side-menu">
+            <li class="nav-header">
+                <div class="dropdown profile-element"> <span>
+                        <img alt="image" class="img-circle" src="{{$user_info['gravatar_url']}}" />
+                    </span>
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                        <span class="clear"> <span class="block m-t-xs"> <strong class="font-bold">{{Auth::user()->name}}</strong>
+                            </span> <span class="text-muted text-xs block">Account <b class="caret"></b></span> </span> </a>
+                    <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                        <li><a href="<?php echo URL::to('v2/profile'); ?>">Profile</a></li>
+                        <li><a href="<?php echo URL::to('v2/password'); ?>">Password</a></li>
+                        <li class="divider"></li>
+                        <li><a href="login.html">Logout</a></li>
+                    </ul>
+                </div>
+                <div class="logo-element">
+                    <img src="{{asset("assets/img/logo-sm.png")}}"/>
+                </div>
+            </li>
+            <li class="<?php if ($ca === 'App\Controllers\User\Panel2Controller') echo 'active'; ?>">
+                <a href="<?php echo URL::to('v2/home'); ?>"><i class="fa fa-th-large"></i> <span class="nav-label">Dashboard </span> </a>
+            </li>
+            <li class="<?php if ($ca === 'App\Controllers\User\Widgets2Controller' || $ca === 'App\Controllers\User\Filters2Controller' || $ca === 'App\Controllers\User\Rules2Controller') echo 'active'; ?>">
+                <a href="javascript:void(0);"><i class="fa fa-level-up"></i> <span class="nav-label">Recommendations </span><span class="fa arrow"></span> </a>
+                <ul class="nav nav-second-level">
+                    <li class="<?php if ($ca === 'App\Controllers\User\DemoController') echo 'active'; ?>"><a href="<?php echo URL::to('v2/demo'); ?>">Demo</a></li>
+                </ul>
+            </li>
+        </ul>
+
+    </div>
+</nav>
