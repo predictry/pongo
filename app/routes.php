@@ -310,7 +310,7 @@ Route::group(array('prefix' => 'v2/admin', 'before' => 'auth|role.admin', 'names
 
 /*
   |--------------------------------------------------------------------------
-  | API Routinglocal
+  | API Routing local
   |--------------------------------------------------------------------------
  */
 Route::group(array('prefix' => 'v1', 'namespace' => 'App\Controllers\Api'), function() {

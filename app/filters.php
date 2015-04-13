@@ -104,11 +104,24 @@ Route::filter('site.ajax', function($route) {
         return Redirect::back()->withErrors($validator);
 });
 
-Route::filter('role.admin', function() {
+Route::filter('role.site.admin', function() {
     $role = Session::get("role");
     if ($role !== "admin") {
         return Redirect::to('v2/home')->with("flash_error", "You are not allowed to access the page.");
     }
+});
+
+Route::filter('role.admin', function() {
+    /*
+     * Filter for role designer
+     */
+    if (Auth::check()) {
+        if (!Auth::user()->hasRole('Administrator')) {
+            return Redirect::to('v2/home')->with("flash_error", "You are not allowed to access the page.");
+        }
+    }
+    else
+        return Redirect::to('v2/home')->with("flash_error", "You are not allowed to access the page.");
 });
 
 App::missing(function($exception) {
