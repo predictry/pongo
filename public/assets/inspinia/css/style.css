@@ -2751,7 +2751,7 @@ ol.unstyled {
 .footer {
     background: none repeat scroll 0 0 white;
     border-top: 1px solid #e7eaec;
-    bottom: 0;
+    /*bottom: 0;*/
     left: 0;
     padding: 10px 20px;
     position: absolute;
@@ -4569,6 +4569,10 @@ body.skin-3 {
     margin-top:0;
 }
 
+.mt10{
+    margin-top: 10px;
+}
+
 .nav.nav-pills li.active{
     border-left: none;
     background: none;
@@ -4698,3 +4702,21 @@ body.skin-3 {
 .product .name{
     margin-top: 10px;
 }
+
+.ibox-content.sites-overview{
+    padding: 0;
+}
+
+.ibox-title.sites-overview-title h5{
+    margin-top: 2px;
+}
+
+.ibox-title.sites-overview-title .switchery{
+    width: 45px;
+    height: 22px;
+}
+.ibox-title.sites-overview-title .switchery > small{
+    height: 22px;
+    width: 22px;
+}
+

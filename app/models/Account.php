@@ -14,12 +14,14 @@ use Eloquent,
     Illuminate\Auth\Reminders\RemindableInterface,
     Illuminate\Auth\UserInterface,
     Illuminate\Database\Eloquent\SoftDeletingTrait,
-    Illuminate\Support\Facades\Hash;
+    Illuminate\Support\Facades\Hash,
+    Zizaco\Entrust\HasRole;
 
 class Account extends Eloquent implements UserInterface, RemindableInterface
 {
 
-    use SoftDeletingTrait;
+    use HasRole,
+        SoftDeletingTrait;
 
     protected $dates = ['deleted_at'];
 
@@ -93,6 +95,11 @@ class Account extends Eloquent implements UserInterface, RemindableInterface
     public function metas()
     {
         return $this->hasMany("App\Models\AccountMeta");
+    }
+
+    public function sites()
+    {
+        return $this->hasMany("App\Models\Site");
     }
 
 }
