@@ -12,19 +12,19 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-3">
+<!--    <div class="col-lg-3">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
-                <!--<span class="label label-info pull-right">Annual</span>-->
+                <span class="label label-info pull-right">Annual</span>
                 <h5>Unique Visitors</h5>
             </div>
             <div class="ibox-content">
                 <h1 class="no-margins">{{ $overviews['total_uvs'] }}</h1>
-                <!--<div class="stat-percent font-bold text-info">20% <i class="fa fa-level-up"></i></div>-->
+                <div class="stat-percent font-bold text-info">20% <i class="fa fa-level-up"></i></div>
                 <small>Determine by number of sessions</small>
             </div>
         </div>
-    </div>
+    </div>-->
     <div class="col-lg-3">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
@@ -51,8 +51,6 @@
             </div>
         </div>
     </div>
-</div>
-<div class="row">
     <div class="col-lg-3">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
@@ -66,6 +64,8 @@
             </div>
         </div>
     </div>
+</div>
+<div class="row">
     <div class="col-lg-3">
         <div class="ibox float-e-margins">
             <div class="ibox-title">

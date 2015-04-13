@@ -28,6 +28,9 @@
                     <li class="<?php if ($ca === 'App\Controllers\User\DemoController') echo 'active'; ?>"><a href="<?php echo URL::to('v2/demo'); ?>">Demo</a></li>
                 </ul>
             </li>
+            <li class="disabled">
+                <a href="#"><i class="fa fa-money"></i> <span class="nav-label">Billing </span> </a>
+            </li>
         </ul>
 
     </div>

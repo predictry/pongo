@@ -100,6 +100,10 @@ class Home2Controller extends BaseController
                     if (!$is_member)
                         \Session::set("role", "admin");
 
+                    if (Auth::user()->hasRole("Administrator")) {
+                        return Redirect::to('v2/admin/dashboard');
+                    }
+
                     return Redirect::to('v2/home');
                 }
 
