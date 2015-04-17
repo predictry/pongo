@@ -25,7 +25,7 @@
             <li class="<?php if ($ca === 'App\Controllers\User\Widgets2Controller' || $ca === 'App\Controllers\User\Filters2Controller' || $ca === 'App\Controllers\User\Rules2Controller') echo 'active'; ?>">
                 <a href="javascript:void(0);"><i class="fa fa-level-up"></i> <span class="nav-label">Recommendations </span><span class="fa arrow"></span> </a>
                 <ul class="nav nav-second-level">
-                    <li class="<?php if ($ca === 'App\Controllers\User\DemoController') echo 'active'; ?>"><a href="<?php echo URL::to('v2/demo'); ?>">Demo</a></li>
+                    <li class="<?php if ($ca === 'App\Controllers\User\DemoController') echo 'active'; ?>"><a href="<?php echo URL::to('v2/admin/sites/demo'); ?>">Demo</a></li>
                 </ul>
             </li>
             <li class="disabled">
