@@ -26,7 +26,7 @@ class AjaxPanelController extends AdminBaseController
         if (Request::ajax()) {
 
             $tenant = Input::get("tenant");
-            $client = new Client('http://localhost/predictry-analytics/public/api/v1/tenants/' . $tenant . '/');
+            $client = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'tenants/' . $tenant . '/');
 
             $ranges   = Helper::getSelectedFilterDateRange($dt_range_group, $dt_start, $dt_end);
             $dt_start = $ranges['dt_start'];
