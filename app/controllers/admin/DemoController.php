@@ -54,7 +54,7 @@ class DemoController extends AdminBaseController
         if ($validator->passes()) {
             $skip         = (int) ($current_page == 1) ? 0 : ($current_page * $per_page) - $per_page;
             $tenant       = Site::find($site_id);
-            $client       = new Client($_ENv['PREDICTRY_ANALYTICS_URL'] . 'tenants/' . $tenant->name . '/');
+            $client       = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'tenants/' . $tenant->name . '/');
             $response     = $client->get("items/paginated-items/{$skip}/{$per_page}")->send();
             $arr_response = $response->json();
 
