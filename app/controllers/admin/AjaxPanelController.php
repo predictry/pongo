@@ -77,7 +77,6 @@ class AjaxPanelController extends AdminBaseController
             else
                 $summary_sales = $cache_summary_sales;
 
-
             /*
              * Orders 
              */
@@ -94,15 +93,44 @@ class AjaxPanelController extends AdminBaseController
             /*
              * Sessions
              */
-            $cache_n_orders = Cache::get("cache_n_sessions_{$tenant}_{$dt_start->toDateString()}_{$dt_end->toDateString()}");
-            if (is_null($cache_n_orders)) {
+            $cache_n_sessions = Cache::get("cache_n_sessions_{$tenant}_{$dt_start->toDateString()}_{$dt_end->toDateString()}");
+            if (is_null($cache_n_sessions)) {
                 $response     = $client->get("stats-summary/unique-visitors/{$dt_start}/{$dt_end}/session")->send();
                 $arr_response = $response->json();
                 $n_sessions   = (isset($arr_response['error']) && $arr_response['error']) ? 0 : array_get($arr_response, 'data.count');
                 Cache::add("cache_n_sessions_{$tenant}_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $n_sessions, 60);
             }
             else
-                $n_sessions = $cache_n_orders;
+                $n_sessions = $cache_n_sessions;
+
+            /*
+             * Total Skus
+             */
+            $cache_n_skus = Cache::get("cache_n_skus_{$tenant}");
+            if (is_null($cache_n_skus)) {
+                $response     = $client->get("stats-summary/total-skus")->send();
+                $arr_response = $response->json();
+                $n_skus       = (isset($arr_response['error']) && $arr_response['error']) ? 0 : array_get($arr_response, 'data.count');
+                Cache::add("cache_n_skus_{$tenant}", $n_skus, 60);
+            }
+            else {
+                $n_skus = $cache_n_skus;
+            }
+
+            /*
+             * Top Bought Items
+             */
+            $limit                    = 10;
+            $cache_n_top_bought_items = Cache::get("cache_n_top_bought_items_{$tenant}");
+            if (is_null($cache_n_top_bought_items)) {
+                $response         = $client->get("stats-summary/top-bought-items/{$limit}")->send();
+                $arr_response     = $response->json();
+                $top_bought_items = (isset($arr_response['error']) && $arr_response['error']) ? 0 : array_get($arr_response, 'data.items');
+                Cache::add("cache_n_top_bought_items_{$tenant}", $top_bought_items, 60);
+            }
+            else {
+                $top_bought_items = $cache_n_top_bought_items;
+            }
 
             $output = [
                 'overviews' => [
@@ -111,9 +139,11 @@ class AjaxPanelController extends AdminBaseController
                     'total_sales_amount'   => number_format($summary_sales['overall']),
                     'total_item_purchased' => number_format($summary_item_purchased['regular']),
                     'total_orders'         => number_format($n_orders),
+                    'total_skus'           => number_format($n_skus),
                     'total_item_per_cart'  => number_format(($n_orders) > 0 ? ($summary_item_purchased['regular'] / $n_orders) : 0, 2),
                     'total_sales_per_cart' => number_format(($n_orders) > 0 ? ($summary_sales['regular'] / $n_orders) : 0),
-                    'conversion_rate'      => Helper::calcConversionRate($n_orders, $pageviews_stat['regular'])
+                    'conversion_rate'      => Helper::calcConversionRate($n_orders, $pageviews_stat['regular']),
+                    'top_bought_items'     => $top_bought_items
                 ]
             ];
 

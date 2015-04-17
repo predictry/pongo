@@ -1,3 +1,3 @@
 <div class="text-center">
-	{{ $paginator->links() }}
+    {{ $paginator->links() }}
 </div>

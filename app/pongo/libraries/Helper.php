@@ -73,8 +73,8 @@ class Helper
                     $dt_end   = Carbon::createFromFormat("Y-m-d", $dt_end);
 
                     if (is_object($dt_start) && is_object($dt_end)) {
-                        if ($dt_end->diffInDays($dt_start) > 31) {
-                            return $this->getSelectedFilterDateRange("31_days_ago");
+                        if ($dt_end->diffInDays($dt_start, false) > 31) {
+                            return Helper::getSelectedFilterDateRange("31_days_ago");
                         }
                     }
                     else {

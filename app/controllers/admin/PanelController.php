@@ -18,8 +18,7 @@ class PanelController extends AdminBaseController
         parent::__construct();
 
         $custom_script = "var site_url = '" . URL::to('/v2/admin') . "';";
-
-        \View::share(array("custom_script" => $custom_script));
+        \View::share(array("ca" => get_class(), "custom_script" => $custom_script));
     }
 
     /**
@@ -34,25 +33,14 @@ class PanelController extends AdminBaseController
         $dt_end   = $ranges['dt_end'];
 
         //list of sites
-        $sites = Site::all();
-
+        $sites         = Site::all();
+        $allowed_sites = null;
         //filter account under specific account
-        $allowed_sites = Account::find(10)->sites();
+        $allowed_sites = Account::find(10)->sites(); //null
 
         if ($allowed_sites) {
             $allowed_sites = $allowed_sites->get();
         }
-        else {
-            $allowed_sites = false;
-        }
-
-        $pageviews_stat['regular']         = 100;
-        $summary_sales['regular']          = 100;
-        $summary_sales['overall']          = 100;
-        $summary_item_purchased['regular'] = 100;
-
-        $n_session = 100;
-        $n_orders  = 100;
 
         $output = [
             'pageTitle' => 'Admin Dashboard Overview',
@@ -63,16 +51,6 @@ class PanelController extends AdminBaseController
             'dt_start'  => $dt_start,
             'dt_end'    => $dt_end,
             'sites'     => $allowed_sites ? $allowed_sites : $sites,
-            'overviews' => [
-                'total_pageviews'      => number_format($pageviews_stat['regular']),
-                'total_uvs'            => number_format($n_session),
-                'total_sales_amount'   => number_format($summary_sales['overall']),
-                'total_item_purchased' => number_format($summary_item_purchased['regular']),
-                'total_orders'         => number_format($n_orders),
-                'total_item_per_cart'  => number_format(($n_orders) > 0 ? ($summary_item_purchased['regular'] / $n_orders) : 0, 2),
-                'total_sales_per_cart' => number_format(($n_orders) > 0 ? ($summary_sales['regular'] / $n_orders) : 0),
-                'conversion_rate'      => Helper::calcConversionRate($n_orders, $pageviews_stat['regular'])
-            ]
         ];
 
         return View::make('admin.panels.dashboard', $output);

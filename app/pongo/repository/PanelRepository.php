@@ -722,6 +722,12 @@ class PanelRepository
 
         return $n_orders;
     }
+    
+    
+    /*
+     * Panel Overviews
+     */
+    
 
 }
 

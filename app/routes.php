@@ -31,6 +31,8 @@ Route::pattern('numeric', '[0-9]+');
 Route::pattern('tenant_id', '[A-Za-z0-9]+');
 Route::pattern('action_name', '[A-Za-z0-9_]+');
 
+#Items
+Route::pattern('item_id', '[A-Za-z0-9]+');
 /*
   |--------------------------------------------------------------------------
   | Frontend Routes
@@ -227,7 +229,8 @@ Route::group(array('prefix' => 'v2', 'namespace' => 'App\Controllers'), function
 Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
 
     #Dashboard
-    Route::get('home/{type?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'Panel2Controller@index'));
+//    Route::get('home/{type?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'Panel2Controller@index'));
+    Route::get('home/{type?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'Panel2Controller@ajaxIndex'));
 
     #Update Profile
     Route::get('profile', 'User2Controller@getProfile');
@@ -306,6 +309,14 @@ Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Con
 Route::group(array('prefix' => 'v2/admin', 'before' => 'auth|role.admin', 'namespace' => 'App\Controllers\Admin'), function() {
     Route::get('dashboard/{type?}/{dt_start?}/{dt_end?}', ['as' => 'admin.dashboard', 'uses' => 'PanelController@index']);
     Route::post('panel/ajaxSiteOverviewSummary/{type?}/{dt_start?}/{dt_end?}', ['as' => 'admin.dashboard', 'uses' => 'AjaxPanelController@postSiteOverviewSummary']);
+    Route::get('dashboard/{type?}/{dt_start?}/{dt_end?}', ['as' => 'admin.dashboard', 'uses' => 'PanelController@index']);
+
+    /*
+     * Demo
+     */
+    Route::get('sites/demo', ['as' => 'admin.sites.demo', 'uses' => 'DemoController@index']);
+    Route::get('sites/demo/{id}/view', ['as' => 'admin.sites.demo.{site_id}.show', 'uses' => 'DemoController@show']);
+    Route::get('sites/demo/{id}/view/item/{item_id}', ['as' => 'admin.sites.demo.{site_id}.view.item.{item_id}', 'uses' => 'DemoController@getItemDetail']);
 });
 
 /*

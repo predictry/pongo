@@ -1,7 +1,7 @@
 <div class="ibox float-e-margins">
     <div class="ibox-title sites-overview-title">
         <h5>Sites Overview</h5>
-<!--        <div class="pull-right clearfix">
+        <div class="pull-right clearfix">
             <div class="form-group">
                 <div class="checkbox-inline">
                     <label>
@@ -11,11 +11,11 @@
 
                 </div>
             </div>
-        </div>-->
+        </div>
     </div>
     <div class="ibox-content sites-overview">
         <div class="panel-heading">
-            
+
         </div>
         <div class="panel-body">
             <div class="panel-group" id="accorSiteOverview">
@@ -40,6 +40,3 @@
     </div>
 </div>
 </div>
-<script type="text/javascript">
-
-</script>

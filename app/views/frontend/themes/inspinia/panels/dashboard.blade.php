@@ -12,10 +12,10 @@
     @include(getenv('FRONTEND_SKINS') . $theme . '.panels.overview_summary')
     <div class="row">
         <div class="col-lg-6">
-            @include(getenv('FRONTEND_SKINS') . $theme . '.panels.top_5', ['tableHeader' => 'Top 10 (Most Purchased Items)', 'contents' => $top_purchased_items])
+            {{--@include(getenv('FRONTEND_SKINS') . $theme . '.panels.top_5', ['tableHeader' => 'Top 10 (Most Purchased Items)', 'contents' => $top_purchased_items])--}}
         </div>
         <div class="col-lg-6">
-            @include(getenv('FRONTEND_SKINS') . $theme . '.panels.top_5', ['tableHeader' => 'Top 10 (Most Viewed Items)', 'contents' => $top_viewed_items])
+            {{--@include(getenv('FRONTEND_SKINS') . $theme . '.panels.top_5', ['tableHeader' => 'Top 10 (Most Viewed Items)', 'contents' => $top_viewed_items])--}}
         </div>
     </div>
 </div>
