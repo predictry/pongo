@@ -110,7 +110,7 @@ class Sites2Controller extends BaseController
 
             if (Request::ajax()) {
                 if ($id)
-                    return Response::json(array("status" => "success", "response" => "v2/home"));
+                    return Response::json(array("status" => "success", "response" => "/home"));
                 else
                     return Response::json(
                                     array("status"   => "error",
@@ -264,7 +264,7 @@ class Sites2Controller extends BaseController
             }
         }
         else
-            return Redirect::to('sites')->with('flash_error', $validator->messages()->first());
+            return Redirect::to('v2/sites')->with('flash_error', $validator->messages()->first());
     }
 
     public function ajaxGetActionProperties($tenant_id, $action_name)
@@ -429,14 +429,14 @@ class Sites2Controller extends BaseController
     public function getBusiness($tenant_id)
     {
         if (is_null($tenant_id)) {
-            return \Redirect::to('sites');
+            return \Redirect::to('v2/sites');
         }
 
         $site          = Site::where('name', $tenant_id)->where('account_id', \Auth::user()->id)->first();
         $site_category = ($site) ? SiteCategory::find($site->site_category_id)->first() : null;
 
         if (is_null($site_category))
-            return \Redirect::to('sites');
+            return \Redirect::to('v2/sites');
 
         $industries = Industry::all()->lists("name", "id");
         $output     = [
@@ -461,7 +461,7 @@ class Sites2Controller extends BaseController
     public function postBusiness($tenant_id)
     {
         if (is_null($tenant_id)) {
-            return \Redirect::to('sites');
+            return \Redirect::to('v2/sites');
         }
 
         $site_business = new SiteBusiness();
@@ -494,10 +494,10 @@ class Sites2Controller extends BaseController
                             'range_number_of_items' => isset($input['range_number_of_items']) ? $input['range_number_of_items'] : '',
                             'industry_id'           => $input['industry_id']
                 ]);
-                return \Redirect::to("sites/{$site->name}/integration")->with('flash_message', 'Site business has been updated.');
+                return \Redirect::to("v2/sites/{$site->name}/integration")->with('flash_message', 'Site business has been updated.');
             }
             else
-                return \Redirect::to("sites");
+                return \Redirect::to("v2/sites");
         }
 
         return \Redirect::back()->withInput()->withErrors($validator);
