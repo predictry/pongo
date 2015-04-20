@@ -3,6 +3,9 @@
 namespace App\Controllers\User;
 
 use App\Controllers\BaseController,
+    Auth,
+    Redirect,
+    Session,
     View;
 
 /**
@@ -28,6 +31,13 @@ class User2Controller extends BaseController
     public function getPassword()
     {
         return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.users.password', ['pageTitle' => 'Edit Password']);
+    }
+
+    public function logout()
+    {
+        Auth::logout();
+        Session::clear();
+        return Redirect::to('v2/login');
     }
 
 }
