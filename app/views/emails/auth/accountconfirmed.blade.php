@@ -6,7 +6,7 @@
     <body>
         <h2>Welcome to Predictry, {{ $fullname }}!</h2>
         <div>
-            Your account has been successfully created. {{ link_to('/login', 'Login') }} to access your account now.
+            Your account has been successfully created. {{ link_to('v2/login', 'Login') }} to access your account now.
         </div>
     </body>
 </html>
