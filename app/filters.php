@@ -32,7 +32,7 @@ App::after(function($request, $response) {
  */
 Route::filter('auth', function() {
     if (Auth::guest())
-        return Redirect::guest('login');
+        return Redirect::guest('/');
 
 
     $site_exists    = false;
@@ -104,24 +104,34 @@ Route::filter('site.ajax', function($route) {
         return Redirect::back()->withErrors($validator);
 });
 
-Route::filter('role.site.admin', function() {
-    $role = Session::get("role");
-    if ($role !== "admin") {
-        return Redirect::to('v2/home')->with("flash_error", "You are not allowed to access the page.");
+Route::filter('role.user', function() {
+    if (Auth::check()) {
+        if (!Auth::user()->hasRole('User'))
+            return Response::view('frontend.errors.missing', [], 404);
     }
+    else
+        return Redirect::guest('/');
+});
+
+Route::filter('has.site', function () {
+    if (Auth::check()) {
+        $count_sites = App\Models\Account::find(Auth::user()->id)->sites()->count();
+        if ($count_sites <= 0) {
+            return "Signup site";
+        }
+    }
+    else
+        return Redirect::guest('/');
 });
 
 Route::filter('role.admin', function() {
-    /*
-     * Filter for role designer
-     */
     if (Auth::check()) {
         if (!Auth::user()->hasRole('Administrator')) {
             return Redirect::to('v2/home')->with("flash_error", "You are not allowed to access the page.");
         }
     }
     else
-        return Redirect::to('v2/home')->with("flash_error", "You are not allowed to access the page.");
+        return Redirect::guest('/');
 });
 
 App::missing(function($exception) {
