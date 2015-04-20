@@ -18,8 +18,11 @@ use App,
     Event,
     Hash,
     Input,
+    Lang,
     Password,
     Redirect,
+    Response,
+    Session,
     Validator,
     View;
 
@@ -98,10 +101,10 @@ class Home2Controller extends BaseController
                     //validate if member or not
                     $is_member = $this->account_repository->isMember();
                     if (!$is_member)
-                        \Session::set("role", "admin");
+                        Session::set("role", "admin");
 
                     if (Auth::user()->hasRole("Administrator")) {
-                        return Redirect::to('v2/admin/dashboard');
+                        return Redirect::to('v2/admin/home');
                     }
 
                     return Redirect::to('v2/home');
@@ -136,27 +139,29 @@ class Home2Controller extends BaseController
      */
     public function postRegister()
     {
-        $input     = Input::only("name", "email", "password", "password_confirmation");
+        $input = Input::only("name", "email", "password", "password_confirmation");
+        $input = array_add($input, 'plan_id', 1);
+
         $validator = $this->account_repository->validate($input);
 
         if ($validator->passes()) {
             // add necessary info for new account
-            $input = array_add($input, 'plan_id', 1);
             $input = array_add($input, "confirmed", 1);
             $input = array_add($input, "confirmation_code", md5(microtime() . Config::get('app.key')));
             unset($input['password_confirmation']);   //we don't need password confirmation on account attributes
 
             $account = $this->account_repository->newInstance($input); //create new instance
-            if ($this->account_repository->saveAccount($account))
+            if ($this->account_repository->saveAccount($account)) {
+                $this->account_repository->assignUserRoleByEmail($input['email']); //assign user role
                 Event::fire("account.registration_confirmed", $account);  //send verification email (skip to confirmation)
+            }
             else
-                return Redirect::to('register')->withInput()->withErrors("We are unable to process the data. Please try again.");
+                return Redirect::to('v2/register')->withInput()->withErrors("We are unable to process the data. Please try again.");
 
             return Redirect::to('v2/login')->with('flash_message', "home.success.register");
         }
-        else {
-            return Redirect::to('v2/register')->withInput()->withErrors($validator);
-        }
+        else
+            return Redirect::back()->withInput()->with('flash_error', $validator->messages()->first());
     }
 
     /**
