@@ -86,6 +86,17 @@ class AccountRepository
         return false;
     }
 
+    public function isNewAccount()
+    {
+        $account_meta = AccountMeta::where('account_id', \Auth::user()->id)->where('key', 'is_new_account')->first();
+
+        if ($account_meta && $account_meta->value) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function assignConfirmation($account, $is_confirmed = false)
     {
         if (is_object($account)) {
@@ -107,15 +118,17 @@ class AccountRepository
         return false;
     }
 
-    public function isNewAccount()
+    public function assignUserRoleByEmail($email)
     {
-        $account_meta = AccountMeta::where('account_id', \Auth::user()->id)->where('key', 'is_new_account')->first();
+        $user_role = \App\Models\Role::where('name', 'User')->first();
 
-        if ($account_meta && $account_meta->value) {
-            return true;
+        if ($user_role) {
+            $account = Account::where('email', $email)->first();
+            if ($account)
+                $account->roles()->attach($user_role->id);
         }
 
-        return false;
+        return;
     }
 
 }
