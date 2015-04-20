@@ -22,4 +22,28 @@ jQuery(document).ready(function () {
 
     $('.navbar-minimalize').trigger('click');
 
+    // CREATE SITE (FIRST TIME USER) //
+    $("#btnWizardSubmitSite").on("click", function (e) {
+        e.preventDefault();
+        var form = $(".wizardModalSiteForm");
+        $.ajax({
+            url: site_url + "/sites/ajaxSubmitSite",
+            type: 'POST',
+            data: form.serialize(),
+            dataType: 'json',
+            success: function (data)
+            {
+                if (data.status === "success") {
+                    window.location = site_url + data.response;
+                } else {
+                    $(".wizardModalSiteFormContainer").html(data.response);
+                }
+                //hide loading
+            },
+            error: function () {
+            }
+        });
+
+        return;
+    });
 });
