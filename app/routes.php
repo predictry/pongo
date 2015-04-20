@@ -47,7 +47,12 @@ Route::group(array('prefix' => 'v2', 'namespace' => 'App\Controllers'), function
     Route::post('register/submit', 'Home2Controller@postRegister');
 
     Route::get('forgot', 'Home2Controller@getForgotPassword');
+    Route::post('forgot/submit', 'Home2Controller@postForgotPassword');
+
     Route::get('password/reset/{token}', 'Home2Controller@getReset');
+    Route::post('password/reset/submit', 'Home2Controller@postReset');
+
+    Route::get('verify/{confirmation_code}', 'Home2Controller@getConfirmation');
 });
 
 /*
@@ -62,75 +67,86 @@ Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Con
     #Update Password
     Route::get('password', 'User2Controller@getPassword');
 
-    Route::group(array('before' => 'role.user|has.site'), function() {
-        #Dashboard
-        Route::get('home/{type?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'Panel2Controller@index'));
+    Route::group(array('before' => 'role.user'), function() {
+
+        #Sites Wizard Creation
+        Route::get('sites/wizard', array('as' => 'sites', 'uses' => 'Sites2Controller@getSiteWizard'));
+        Route::get('sites/getModal', array('as' => 'sites', 'uses' => 'Sites2Controller@getModalCreate'));
+        Route::post('sites/ajaxSubmitSite', array('as' => 'sites', 'uses' => 'Sites2Controller@postCreate'));
+
 
         #Sites Management
         Route::get("sites", array("as" => "sites", "uses" => "Sites2Controller@index"));
         Route::get('sites/create', array("as" => "sites.create", "uses" => 'Sites2Controller@getCreate'));
+        Route::post('sites/submit', array("as" => "sites.submit", "uses" => 'Sites2Controller@postCreate'));
         Route::get('sites/{numeric}/edit', array("as" => "sites.{numieric}.edit", "uses" => 'Sites2Controller@getEdit'));
         Route::get('sites/{numeric}/delete', 'Sites2Controller@getDelete');
         Route::get('sites/{numeric}/default', array("as" => "sites.{numieric}.edit", "uses" => 'Sites2Controller@getDefault'));
 
-        #Items
-        Route::get("items", array("as" => "items", "uses" => "Items2Controller@index"));
-        Route::get('items/{numeric}/view', array("as" => "items.{numeric}.view", "uses" => 'Items2Controller@getView'));
-        Route::get('items/{numeric}/edit', array("as" => "items.{numieric}.edit", "uses" => 'Items2Controller@getEdit'));
-        Route::get('items/{numeric}/delete', 'Items2Controller@postDelete');
-        Route::post('items/{numeric}/delete', 'Items2Controller@postDelete');
+        Route::group(array('before' => 'role.user|has.site'), function() {
+            #Dashboard
+            Route::get('home/{type?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'Panel2Controller@index'));
 
-        #Widgets
-        Route::get("widgets", array("as" => "widgets", "uses" => "Widgets2Controller@index"));
-        Route::get('widgets/{numeric}/view', array("as" => "widgets.{numeric}.view", "uses" => 'Widgets2Controller@getView'));
-        Route::get('widgets/create', array("as" => "widgets.create", "uses" => 'Widgets2Controller@getCreate'));
-        Route::get('widgets/item', array("as" => "widgets.item", "uses" => 'Widgets2Controller@getItemWidgetRuleset'));
-        Route::get('widgets/itemEdit', array("as" => "widgets.itemEdit", "uses" => 'Widgets2Controller@getItemEditWidgetRuleset'));
-        Route::get('widgets/itemFilterEdit', array("as" => "widgets.itemFilterEdit", "uses" => 'Widgets2Controller@getItemEditWidgetFilter'));
-        Route::get('widgets/{numeric}/edit', array("as" => "widgets.{numieric}.edit", "uses" => 'Widgets2Controller@getEdit'));
-        Route::get('widgets/{numeric}/delete', 'Widgets2Controller@postDelete');
+            #Items
+            Route::get("items", array("as" => "items", "uses" => "Items2Controller@index"));
+            Route::get('items/{numeric}/view', array("as" => "items.{numeric}.view", "uses" => 'Items2Controller@getView'));
+            Route::get('items/{numeric}/edit', array("as" => "items.{numieric}.edit", "uses" => 'Items2Controller@getEdit'));
+            Route::get('items/{numeric}/delete', 'Items2Controller@postDelete');
+            Route::post('items/{numeric}/delete', 'Items2Controller@postDelete');
 
-        #Filters 
-        Route::get("filters", array("as" => "filters", "uses" => "Filters2Controller@index"));
-        Route::get('filters/create', array("as" => "filters.create", "uses" => 'Filters2Controller@getCreate'));
-        Route::post('filters/submit', array("as" => "filters.submit", "uses" => 'Filters2Controller@postCreate'));
-        Route::get('filters/item', array("as" => "filters.item", "uses" => 'Filters2Controller@getItem'));
-        Route::get('filters/{numeric}/edit', array("as" => "filters.{numieric}.edit", "uses" => 'Filters2Controller@getEdit'));
-        Route::get('filters/itemEdit', array("as" => "filters.itemEdit", "uses" => 'Filters2Controller@getItemEdit'));
-        Route::post('filters/{numeric}/edit', array("as" => "filters.update", "uses" => 'Filters2Controller@postEdit'));
-        Route::get('filters/{numeric}/delete', 'Filters2Controller@postDelete');
-        Route::post('filters/{numeric}/delete', 'Filters2Controller@postDelete');
+            #Widgets
+            Route::get("widgets", array("as" => "widgets", "uses" => "Widgets2Controller@index"));
+            Route::get('widgets/{numeric}/view', array("as" => "widgets.{numeric}.view", "uses" => 'Widgets2Controller@getView'));
+            Route::get('widgets/create', array("as" => "widgets.create", "uses" => 'Widgets2Controller@getCreate'));
+            Route::get('widgets/item', array("as" => "widgets.item", "uses" => 'Widgets2Controller@getItemWidgetRuleset'));
+            Route::get('widgets/itemEdit', array("as" => "widgets.itemEdit", "uses" => 'Widgets2Controller@getItemEditWidgetRuleset'));
+            Route::get('widgets/itemFilterEdit', array("as" => "widgets.itemFilterEdit", "uses" => 'Widgets2Controller@getItemEditWidgetFilter'));
+            Route::get('widgets/{numeric}/edit', array("as" => "widgets.{numieric}.edit", "uses" => 'Widgets2Controller@getEdit'));
+            Route::get('widgets/{numeric}/delete', 'Widgets2Controller@postDelete');
 
-        #Rules Management
-        Route::get('rules/create', array("as" => "rules.create", "uses" => 'Rules2Controller@getCreate'));
-        Route::get('rules/formCreate', array("as" => "rules.formCreate", "uses" => 'Rules2Controller@getFormCreate'));
-        Route::post('rules/submit', array("as" => "rules.submit", "uses" => 'Rules2Controller@postCreate'));
-        Route::get('rules/item', array("as" => "rules.item", "uses" => 'Rules2Controller@getItemRule'));
-        Route::get('rules/modalItem', array("as" => "rules.modalItem", "uses" => 'Rules2Controller@getModalItemRule'));
-        Route::get('rules/itemEdit', array("as" => "rules.itemEdit", "uses" => 'Rules2Controller@getItemEditRule'));
-        Route::post('rules/fetchItems', array("as" => "rules.fetchitem", "uses" => 'Rules2Controller@postFetchItems'));
-        Route::get('rules/{numeric}/view', array("as" => "rules.{numeric}.view", "uses" => 'Rules2Controller@getView'));
-        Route::get('rules/{numeric}/edit', array("as" => "rules.{numieric}.edit", "uses" => 'Rules2Controller@getEdit'));
-        Route::post('rules/{numeric}/edit', array("as" => "rules.update", "uses" => 'Rules2Controller@postEdit'));
-        Route::get('rules/{numeric}/delete', 'Rules2Controller@getDelete');
-        Route::post('rules/{numeric}/delete', 'Rules2Controller@postDelete');
-        Route::get("rules", array("as" => "rules", "uses" => "Rules2Controller@index"));
+            #Filters 
+            Route::get("filters", array("as" => "filters", "uses" => "Filters2Controller@index"));
+            Route::get('filters/create', array("as" => "filters.create", "uses" => 'Filters2Controller@getCreate'));
+            Route::post('filters/submit', array("as" => "filters.submit", "uses" => 'Filters2Controller@postCreate'));
+            Route::get('filters/item', array("as" => "filters.item", "uses" => 'Filters2Controller@getItem'));
+            Route::get('filters/{numeric}/edit', array("as" => "filters.{numieric}.edit", "uses" => 'Filters2Controller@getEdit'));
+            Route::get('filters/itemEdit', array("as" => "filters.itemEdit", "uses" => 'Filters2Controller@getItemEdit'));
+            Route::post('filters/{numeric}/edit', array("as" => "filters.update", "uses" => 'Filters2Controller@postEdit'));
+            Route::get('filters/{numeric}/delete', 'Filters2Controller@postDelete');
+            Route::post('filters/{numeric}/delete', 'Filters2Controller@postDelete');
 
-        #Demo
-        Route::get("demo", ['as' => 'demo', 'uses' => 'DemoController@index']);
-        Route::get("demo/show/{id}", ['as' => 'demo.show.{id}', 'uses' => 'DemoController@show']);
+            #Rules Management
+            Route::get('rules/create', array("as" => "rules.create", "uses" => 'Rules2Controller@getCreate'));
+            Route::get('rules/formCreate', array("as" => "rules.formCreate", "uses" => 'Rules2Controller@getFormCreate'));
+            Route::post('rules/submit', array("as" => "rules.submit", "uses" => 'Rules2Controller@postCreate'));
+            Route::get('rules/item', array("as" => "rules.item", "uses" => 'Rules2Controller@getItemRule'));
+            Route::get('rules/modalItem', array("as" => "rules.modalItem", "uses" => 'Rules2Controller@getModalItemRule'));
+            Route::get('rules/itemEdit', array("as" => "rules.itemEdit", "uses" => 'Rules2Controller@getItemEditRule'));
+            Route::post('rules/fetchItems', array("as" => "rules.fetchitem", "uses" => 'Rules2Controller@postFetchItems'));
+            Route::get('rules/{numeric}/view', array("as" => "rules.{numeric}.view", "uses" => 'Rules2Controller@getView'));
+            Route::get('rules/{numeric}/edit', array("as" => "rules.{numieric}.edit", "uses" => 'Rules2Controller@getEdit'));
+            Route::post('rules/{numeric}/edit', array("as" => "rules.update", "uses" => 'Rules2Controller@postEdit'));
+            Route::get('rules/{numeric}/delete', 'Rules2Controller@getDelete');
+            Route::post('rules/{numeric}/delete', 'Rules2Controller@postDelete');
+            Route::get("rules", array("as" => "rules", "uses" => "Rules2Controller@index"));
+
+            #Demo
+            Route::get("demo", ['as' => 'demo', 'uses' => 'DemoController@index']);
+            Route::get("demo/show/{id}", ['as' => 'demo.show.{id}', 'uses' => 'DemoController@show']);
+
+            # Data Collections
+            Route::get("sites/{tenant_id}/integration", "Sites2Controller@getImplementationWizard");
+            Route::get("sites/{tenant_id}/data_collection", "Sites2Controller@getDataCollection");
+
+            Route::group(array('before' => 'site.ajax'), function() {
+                Route::get("sites/{tenant_id}/actions/{action_name}/properties", "Sites2Controller@ajaxGetActionProperties");
+                Route::get("sites/{tenant_id}/actions/{action_name}/snipped", "Sites2Controller@ajaxGetActionSnipped");
+                Route::get("sites/{tenant_id}/actions/{action_name}/validate", "Sites2Controller@ajaxGetCheckIfActionImplemented");
+                Route::post("sites/{tenant_id}/integration/submit", "Sites2Controller@ajaxPostImplementationWizard");
+            });
+        });
     });
 
-    # Data Collections
-    Route::get("sites/{tenant_id}/integration", "Sites2Controller@getImplementationWizard");
-    Route::get("sites/{tenant_id}/data_collection", "Sites2Controller@getDataCollection");
-
-    Route::group(array('before' => 'site.ajax'), function() {
-        Route::get("sites/{tenant_id}/actions/{action_name}/properties", "Sites2Controller@ajaxGetActionProperties");
-        Route::get("sites/{tenant_id}/actions/{action_name}/snipped", "Sites2Controller@ajaxGetActionSnipped");
-        Route::get("sites/{tenant_id}/actions/{action_name}/validate", "Sites2Controller@ajaxGetCheckIfActionImplemented");
-        Route::post("sites/{tenant_id}/integration/submit", "Sites2Controller@ajaxPostImplementationWizard");
-    });
 
     Route::get('user/logout', 'User2Controller@logout');
 });
