@@ -54,12 +54,12 @@ class Panel2Controller extends BaseController
             $response     = $client->get("stats-summary/pageviews/{$dt_start}/{$dt_end}")->send();
             $arr_response = $response->json();
 
-            $pageviews_regular_sum = (isset($arr_response['error']) && $arr_response['error']) ? "TEST" : array_get($arr_response, 'data.pageviews');
+            $pageviews_regular_sum = (isset($arr_response['error']) && $arr_response['error']) ? false : array_get($arr_response, 'data.pageviews');
 
             $pageviews_stat = [
-                'overall'     => $pageviews_regular_sum['overall'],
-                'recommended' => $pageviews_regular_sum['recommended'],
-                'regular'     => $pageviews_regular_sum['regular']
+                'overall'     => ($pageviews_regular_sum) ? $pageviews_regular_sum['overall'] : 0,
+                'recommended' => ($pageviews_regular_sum) ? $pageviews_regular_sum['recommended'] : 0,
+                'regular'     => ($pageviews_regular_sum) ? $pageviews_regular_sum['regular'] : 0
             ];
 
             Cache::add("pageviews_{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $pageviews_stat, 14400);
@@ -72,12 +72,12 @@ class Panel2Controller extends BaseController
         if (is_null($cache_summary_item_purchased)) {
             $response                   = $client->get("stats-summary/item-purchased/{$dt_start}/{$dt_end}")->send();
             $arr_response               = $response->json();
-            $item_purchased_regular_sum = (isset($arr_response['error']) && $arr_response['error']) ? 0 : array_get($arr_response, 'data.sum');
+            $item_purchased_regular_sum = (isset($arr_response['error']) && $arr_response['error']) ? false : array_get($arr_response, 'data.sum');
 
             $summary_item_purchased = [
-                'overall'     => $item_purchased_regular_sum['overall'],
-                'recommended' => $item_purchased_regular_sum['recommended'],
-                'regular'     => $item_purchased_regular_sum['regular']
+                'overall'     => ($item_purchased_regular_sum) ? $item_purchased_regular_sum['overall'] : 0,
+                'recommended' => ($item_purchased_regular_sum) ? $item_purchased_regular_sum['recommended'] : 0,
+                'regular'     => ($item_purchased_regular_sum) ? $item_purchased_regular_sum['regular'] : 0
             ];
             Cache::add("cache_summary_item_purchased _{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $summary_item_purchased, 14400);
         }
@@ -104,9 +104,9 @@ class Panel2Controller extends BaseController
             $arr_response      = $response->json();
             $sales_regular_sum = (isset($arr_response['error']) && $arr_response['error']) ? 0 : array_get($arr_response, 'data.sum');
             $summary_sales     = [
-                'overall'     => $sales_regular_sum['overall'],
-                'recommended' => $sales_regular_sum['recommended'],
-                'regular'     => $sales_regular_sum['regular']
+                'overall'     => ($sales_regular_sum) ? $sales_regular_sum['overall'] : 0,
+                'recommended' => ($sales_regular_sum) ? $sales_regular_sum['recommended'] : 0,
+                'regular'     => ($sales_regular_sum) ? $sales_regular_sum['regular'] : 0
             ];
 
             Cache::add("cache_summary_sales_{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $summary_sales, 14400);
