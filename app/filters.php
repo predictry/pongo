@@ -67,7 +67,7 @@ Route::filter('auth', function() {
 
     if ($is_new_account) {
         Session::remove('is_new_account');
-        return Redirect::to("sites/{$tenant_id}/integration");
+        return Redirect::to("v2/sites/{$tenant_id}/integration");
     }
 });
 
@@ -117,7 +117,7 @@ Route::filter('has.site', function () {
     if (Auth::check()) {
         $count_sites = App\Models\Account::find(Auth::user()->id)->sites()->count();
         if ($count_sites <= 0) {
-            return "Signup site";
+            return Redirect::to('v2/sites/wizard');
         }
     }
     else
