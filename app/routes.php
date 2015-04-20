@@ -33,12 +33,185 @@ Route::pattern('action_name', '[A-Za-z0-9_]+');
 
 #Items
 Route::pattern('item_id', '[A-Za-z0-9]+');
+
+/*
+  |--------------------------------------------------------------------------
+  | Frontend Routes V2
+  |--------------------------------------------------------------------------
+ */
+Route::group(array('prefix' => 'v2', 'namespace' => 'App\Controllers'), function() {
+    Route::get('login', 'Home2Controller@getLogin');
+    Route::post('login/submit', 'Home2Controller@postLogin');
+
+    Route::get('register', 'Home2Controller@getRegister');
+    Route::post('register/submit', 'Home2Controller@postRegister');
+
+    Route::get('forgot', 'Home2Controller@getForgotPassword');
+    Route::get('password/reset/{token}', 'Home2Controller@getReset');
+});
+
+/*
+  |------------------------------------ --------------------------------------
+  | User Dashboard Routing V2
+  |--------------------------------------------------------------------------
+ */
+Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
+    #Update Profile
+    Route::get('profile', 'User2Controller@getProfile');
+
+    #Update Password
+    Route::get('password', 'User2Controller@getPassword');
+
+    Route::group(array('before' => 'role.user|has.site'), function() {
+        #Dashboard
+        Route::get('home/{type?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'Panel2Controller@index'));
+
+        #Sites Management
+        Route::get("sites", array("as" => "sites", "uses" => "Sites2Controller@index"));
+        Route::get('sites/create', array("as" => "sites.create", "uses" => 'Sites2Controller@getCreate'));
+        Route::get('sites/{numeric}/edit', array("as" => "sites.{numieric}.edit", "uses" => 'Sites2Controller@getEdit'));
+        Route::get('sites/{numeric}/delete', 'Sites2Controller@getDelete');
+        Route::get('sites/{numeric}/default', array("as" => "sites.{numieric}.edit", "uses" => 'Sites2Controller@getDefault'));
+
+        #Items
+        Route::get("items", array("as" => "items", "uses" => "Items2Controller@index"));
+        Route::get('items/{numeric}/view', array("as" => "items.{numeric}.view", "uses" => 'Items2Controller@getView'));
+        Route::get('items/{numeric}/edit', array("as" => "items.{numieric}.edit", "uses" => 'Items2Controller@getEdit'));
+        Route::get('items/{numeric}/delete', 'Items2Controller@postDelete');
+        Route::post('items/{numeric}/delete', 'Items2Controller@postDelete');
+
+        #Widgets
+        Route::get("widgets", array("as" => "widgets", "uses" => "Widgets2Controller@index"));
+        Route::get('widgets/{numeric}/view', array("as" => "widgets.{numeric}.view", "uses" => 'Widgets2Controller@getView'));
+        Route::get('widgets/create', array("as" => "widgets.create", "uses" => 'Widgets2Controller@getCreate'));
+        Route::get('widgets/item', array("as" => "widgets.item", "uses" => 'Widgets2Controller@getItemWidgetRuleset'));
+        Route::get('widgets/itemEdit', array("as" => "widgets.itemEdit", "uses" => 'Widgets2Controller@getItemEditWidgetRuleset'));
+        Route::get('widgets/itemFilterEdit', array("as" => "widgets.itemFilterEdit", "uses" => 'Widgets2Controller@getItemEditWidgetFilter'));
+        Route::get('widgets/{numeric}/edit', array("as" => "widgets.{numieric}.edit", "uses" => 'Widgets2Controller@getEdit'));
+        Route::get('widgets/{numeric}/delete', 'Widgets2Controller@postDelete');
+
+        #Filters 
+        Route::get("filters", array("as" => "filters", "uses" => "Filters2Controller@index"));
+        Route::get('filters/create', array("as" => "filters.create", "uses" => 'Filters2Controller@getCreate'));
+        Route::post('filters/submit', array("as" => "filters.submit", "uses" => 'Filters2Controller@postCreate'));
+        Route::get('filters/item', array("as" => "filters.item", "uses" => 'Filters2Controller@getItem'));
+        Route::get('filters/{numeric}/edit', array("as" => "filters.{numieric}.edit", "uses" => 'Filters2Controller@getEdit'));
+        Route::get('filters/itemEdit', array("as" => "filters.itemEdit", "uses" => 'Filters2Controller@getItemEdit'));
+        Route::post('filters/{numeric}/edit', array("as" => "filters.update", "uses" => 'Filters2Controller@postEdit'));
+        Route::get('filters/{numeric}/delete', 'Filters2Controller@postDelete');
+        Route::post('filters/{numeric}/delete', 'Filters2Controller@postDelete');
+
+        #Rules Management
+        Route::get('rules/create', array("as" => "rules.create", "uses" => 'Rules2Controller@getCreate'));
+        Route::get('rules/formCreate', array("as" => "rules.formCreate", "uses" => 'Rules2Controller@getFormCreate'));
+        Route::post('rules/submit', array("as" => "rules.submit", "uses" => 'Rules2Controller@postCreate'));
+        Route::get('rules/item', array("as" => "rules.item", "uses" => 'Rules2Controller@getItemRule'));
+        Route::get('rules/modalItem', array("as" => "rules.modalItem", "uses" => 'Rules2Controller@getModalItemRule'));
+        Route::get('rules/itemEdit', array("as" => "rules.itemEdit", "uses" => 'Rules2Controller@getItemEditRule'));
+        Route::post('rules/fetchItems', array("as" => "rules.fetchitem", "uses" => 'Rules2Controller@postFetchItems'));
+        Route::get('rules/{numeric}/view', array("as" => "rules.{numeric}.view", "uses" => 'Rules2Controller@getView'));
+        Route::get('rules/{numeric}/edit', array("as" => "rules.{numieric}.edit", "uses" => 'Rules2Controller@getEdit'));
+        Route::post('rules/{numeric}/edit', array("as" => "rules.update", "uses" => 'Rules2Controller@postEdit'));
+        Route::get('rules/{numeric}/delete', 'Rules2Controller@getDelete');
+        Route::post('rules/{numeric}/delete', 'Rules2Controller@postDelete');
+        Route::get("rules", array("as" => "rules", "uses" => "Rules2Controller@index"));
+
+        #Demo
+        Route::get("demo", ['as' => 'demo', 'uses' => 'DemoController@index']);
+        Route::get("demo/show/{id}", ['as' => 'demo.show.{id}', 'uses' => 'DemoController@show']);
+    });
+
+    # Data Collections
+    Route::get("sites/{tenant_id}/integration", "Sites2Controller@getImplementationWizard");
+    Route::get("sites/{tenant_id}/data_collection", "Sites2Controller@getDataCollection");
+
+    Route::group(array('before' => 'site.ajax'), function() {
+        Route::get("sites/{tenant_id}/actions/{action_name}/properties", "Sites2Controller@ajaxGetActionProperties");
+        Route::get("sites/{tenant_id}/actions/{action_name}/snipped", "Sites2Controller@ajaxGetActionSnipped");
+        Route::get("sites/{tenant_id}/actions/{action_name}/validate", "Sites2Controller@ajaxGetCheckIfActionImplemented");
+        Route::post("sites/{tenant_id}/integration/submit", "Sites2Controller@ajaxPostImplementationWizard");
+    });
+
+    Route::get('user/logout', 'User2Controller@logout');
+});
+
+/*
+  |------------------------------------ --------------------------------------
+  | Admin Dashboard Routing V2
+  |--------------------------------------------------------------------------
+ */
+Route::group(array('prefix' => 'v2/admin', 'before' => 'auth|role.admin', 'namespace' => 'App\Controllers\Admin'), function() {
+    /*
+     * Dashboard
+     */
+    Route::get('home/{type?}/{dt_start?}/{dt_end?}', ['as' => 'admin.home', 'uses' => 'PanelController@index']);
+    Route::post('panel/ajaxSiteOverviewSummary/{type?}/{dt_start?}/{dt_end?}', ['as' => 'admin.dashboard', 'uses' => 'AjaxPanelController@postSiteOverviewSummary']);
+
+    /*
+     * Demo
+     */
+    Route::get('sites/demo', ['as' => 'admin.sites.demo', 'uses' => 'DemoController@index']);
+    Route::get('sites/demo/{id}/view', ['as' => 'admin.sites.demo.{site_id}.show', 'uses' => 'DemoController@show']);
+    Route::get('sites/demo/{id}/view/item/{item_id}', ['as' => 'admin.sites.demo.{site_id}.view.item.{item_id}', 'uses' => 'DemoController@getItemDetail']);
+});
+
+/*
+ * API Routing
+ */
+Route::group(array('prefix' => 'api', 'namespace' => 'App\Controllers\Api'), function() {
+
+    //Allow from any origin
+    if (isset($_SERVER['HTTP_ORIGIN'])) {
+        header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
+        header('Access-Control-Allow-Credentials: true');
+        header('Access-Control-Max-Age: 86400'); // cache for 1 day
+    }
+    // Access-Control headers are received during OPTIONS requests
+    if (isset($_SERVER['REQUEST_METHOD']) && ($_SERVER['REQUEST_METHOD'] == 'OPTIONS')) {
+        if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']))
+            header("Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS");
+
+        if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']))
+            header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
+
+        exit(0);
+    }
+
+    Route::group(array('prefix' => 'v1'), function() {
+
+        /**
+         * Registration End Point
+         * 
+         * POST - api/v2/user (create new user)
+         * POST - api/v2/user/{email} {get information of the user}
+         */
+        Route::resource('account', 'AccountController', array("only" => array("store", "show")));
+
+        /**
+         * POST - {prefix}/auth (store)
+         */
+        Route::resource('auth', 'AuthController', ['only' => ['index', 'store']]);
+
+        /**
+         * AUTH FLOW : CLIENT CREDENTIALS
+         * POST - api/v1/auth
+         * @param string $email
+         * @param string password
+         */
+        Route::post('auth', 'AuthController@postAuth');
+    });
+});
+
+/*
+ * UNUSED
+ * Has been replaced with the V2
+ */
+
 /*
   |--------------------------------------------------------------------------
   | Frontend Routes
   |--------------------------------------------------------------------------
  */
-//Route::group(array('domain' => 'dashboard.{domain}', 'namespace' => 'App\Controllers'), function() {
 Route::group(array('namespace' => 'App\Controllers'), function() {
     Route::get('/', 'Home2Controller@getLogin');
     Route::get('/home/{numeric}/{token}', 'HomeController@getHome');
@@ -56,26 +229,20 @@ Route::group(array('namespace' => 'App\Controllers'), function() {
     Route::post('password/reset/submit', 'HomeController@postReset');
 
     Route::get('verify/{confirmation_code}', 'HomeController@getConfirmation');
-
-//    Route::get('datamigration', 'RedmartMigrationController@index');
-//    Route::get('tokenauth', 'TokenAuthenticationController@index');
 });
 
 /*
   |--------------------------------------------------------------------------
-  | User Dashboard Routing
+  | User Dashboard Routing (Un used)
   |--------------------------------------------------------------------------
  */
-//Route::group(array('domain' => 'dashboard.{domain}', 'before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
 Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
 
     #Dashboard
     $role = Session::get("role");
 
     Route::get('user', 'UserController@getDashboard');
-//    Route::get('home', array('as' => 'home', 'uses' => 'PanelController@index'));
     Route::get('home2', array('as' => 'home2', 'uses' => 'PanelController@index'));
-//  Route::get('home2/{selected_comparison?}/{type?}/{bar_type?}/{type_by?}/{dt_start?}/{dt_end?}', array('as' => 'home2', 'uses' => 'PanelController@index2'));
     Route::get('home/{selected_comparison?}/{type?}/{date_unit?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'PanelController@index2'));
     Route::get('sites/wizard', array('as' => 'sites', 'uses' => 'SitesController@getSiteWizard'));
     Route::get('sites/getModal', array('as' => 'sites', 'uses' => 'SitesController@getModalCreate'));
@@ -203,248 +370,4 @@ Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), f
 
     #Logout
     Route::get('user/logout', 'UserController@logout');
-});
-
-/*
-  |--------------------------------------------------------------------------
-  | Frontend Routes V2
-  |--------------------------------------------------------------------------
- */
-Route::group(array('prefix' => 'v2', 'namespace' => 'App\Controllers'), function() {
-    Route::get('login', 'Home2Controller@getLogin');
-    Route::post('login/submit', 'Home2Controller@postLogin');
-
-    Route::get('register', 'Home2Controller@getRegister');
-    Route::post('register/submit', 'Home2Controller@postRegister');
-
-    Route::get('forgot', 'Home2Controller@getForgotPassword');
-    Route::get('password/reset/{token}', 'Home2Controller@getReset');
-});
-
-/*
-  |------------------------------------ --------------------------------------
-  | User Dashboard Routing V2
-  |--------------------------------------------------------------------------
- */
-Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Controllers\User'), function() {
-
-    #Dashboard
-//    Route::get('home/{type?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'Panel2Controller@index'));
-    Route::get('home/{type?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'Panel2Controller@ajaxIndex'));
-
-    #Update Profile
-    Route::get('profile', 'User2Controller@getProfile');
-
-    #Update Password
-    Route::get('password', 'User2Controller@getPassword');
-
-    Route::group(array('before' => 'role.site.admin'), function() {
-        #Sites Management
-        Route::get("sites", array("as" => "sites", "uses" => "Sites2Controller@index"));
-        Route::get('sites/create', array("as" => "sites.create", "uses" => 'Sites2Controller@getCreate'));
-        Route::get('sites/{numeric}/edit', array("as" => "sites.{numieric}.edit", "uses" => 'Sites2Controller@getEdit'));
-        Route::get('sites/{numeric}/delete', 'Sites2Controller@getDelete');
-        Route::get('sites/{numeric}/default', array("as" => "sites.{numieric}.edit", "uses" => 'Sites2Controller@getDefault'));
-
-        #Items
-        Route::get("items", array("as" => "items", "uses" => "Items2Controller@index"));
-        Route::get('items/{numeric}/view', array("as" => "items.{numeric}.view", "uses" => 'Items2Controller@getView'));
-        Route::get('items/{numeric}/edit', array("as" => "items.{numieric}.edit", "uses" => 'Items2Controller@getEdit'));
-        Route::get('items/{numeric}/delete', 'Items2Controller@postDelete');
-        Route::post('items/{numeric}/delete', 'Items2Controller@postDelete');
-
-        #Widgets
-        Route::get("widgets", array("as" => "widgets", "uses" => "Widgets2Controller@index"));
-        Route::get('widgets/{numeric}/view', array("as" => "widgets.{numeric}.view", "uses" => 'Widgets2Controller@getView'));
-        Route::get('widgets/create', array("as" => "widgets.create", "uses" => 'Widgets2Controller@getCreate'));
-        Route::get('widgets/item', array("as" => "widgets.item", "uses" => 'Widgets2Controller@getItemWidgetRuleset'));
-        Route::get('widgets/itemEdit', array("as" => "widgets.itemEdit", "uses" => 'Widgets2Controller@getItemEditWidgetRuleset'));
-        Route::get('widgets/itemFilterEdit', array("as" => "widgets.itemFilterEdit", "uses" => 'Widgets2Controller@getItemEditWidgetFilter'));
-        Route::get('widgets/{numeric}/edit', array("as" => "widgets.{numieric}.edit", "uses" => 'Widgets2Controller@getEdit'));
-        Route::get('widgets/{numeric}/delete', 'Widgets2Controller@postDelete');
-
-        #Filters 
-        Route::get("filters", array("as" => "filters", "uses" => "Filters2Controller@index"));
-        Route::get('filters/create', array("as" => "filters.create", "uses" => 'Filters2Controller@getCreate'));
-        Route::post('filters/submit', array("as" => "filters.submit", "uses" => 'Filters2Controller@postCreate'));
-        Route::get('filters/item', array("as" => "filters.item", "uses" => 'Filters2Controller@getItem'));
-        Route::get('filters/{numeric}/edit', array("as" => "filters.{numieric}.edit", "uses" => 'Filters2Controller@getEdit'));
-        Route::get('filters/itemEdit', array("as" => "filters.itemEdit", "uses" => 'Filters2Controller@getItemEdit'));
-        Route::post('filters/{numeric}/edit', array("as" => "filters.update", "uses" => 'Filters2Controller@postEdit'));
-        Route::get('filters/{numeric}/delete', 'Filters2Controller@postDelete');
-        Route::post('filters/{numeric}/delete', 'Filters2Controller@postDelete');
-
-        #Rules Management
-        Route::get('rules/create', array("as" => "rules.create", "uses" => 'Rules2Controller@getCreate'));
-        Route::get('rules/formCreate', array("as" => "rules.formCreate", "uses" => 'Rules2Controller@getFormCreate'));
-        Route::post('rules/submit', array("as" => "rules.submit", "uses" => 'Rules2Controller@postCreate'));
-        Route::get('rules/item', array("as" => "rules.item", "uses" => 'Rules2Controller@getItemRule'));
-        Route::get('rules/modalItem', array("as" => "rules.modalItem", "uses" => 'Rules2Controller@getModalItemRule'));
-        Route::get('rules/itemEdit', array("as" => "rules.itemEdit", "uses" => 'Rules2Controller@getItemEditRule'));
-        Route::post('rules/fetchItems', array("as" => "rules.fetchitem", "uses" => 'Rules2Controller@postFetchItems'));
-        Route::get('rules/{numeric}/view', array("as" => "rules.{numeric}.view", "uses" => 'Rules2Controller@getView'));
-        Route::get('rules/{numeric}/edit', array("as" => "rules.{numieric}.edit", "uses" => 'Rules2Controller@getEdit'));
-        Route::post('rules/{numeric}/edit', array("as" => "rules.update", "uses" => 'Rules2Controller@postEdit'));
-        Route::get('rules/{numeric}/delete', 'Rules2Controller@getDelete');
-        Route::post('rules/{numeric}/delete', 'Rules2Controller@postDelete');
-        Route::get("rules", array("as" => "rules", "uses" => "Rules2Controller@index"));
-
-        #Demo
-        Route::get("demo", ['as' => 'demo', 'uses' => 'DemoController@index']);
-        Route::get("demo/show/{id}", ['as' => 'demo.show.{id}', 'uses' => 'DemoController@show']);
-    });
-
-    # Data Collections
-    Route::get("sites/{tenant_id}/integration", "Sites2Controller@getImplementationWizard");
-    Route::get("sites/{tenant_id}/data_collection", "Sites2Controller@getDataCollection");
-
-    Route::group(array('before' => 'site.ajax'), function() {
-        Route::get("sites/{tenant_id}/actions/{action_name}/properties", "Sites2Controller@ajaxGetActionProperties");
-        Route::get("sites/{tenant_id}/actions/{action_name}/snipped", "Sites2Controller@ajaxGetActionSnipped");
-        Route::get("sites/{tenant_id}/actions/{action_name}/validate", "Sites2Controller@ajaxGetCheckIfActionImplemented");
-        Route::post("sites/{tenant_id}/integration/submit", "Sites2Controller@ajaxPostImplementationWizard");
-    });
-});
-
-Route::group(array('prefix' => 'v2/admin', 'before' => 'auth|role.admin', 'namespace' => 'App\Controllers\Admin'), function() {
-    Route::get('dashboard/{type?}/{dt_start?}/{dt_end?}', ['as' => 'admin.dashboard', 'uses' => 'PanelController@index']);
-    Route::post('panel/ajaxSiteOverviewSummary/{type?}/{dt_start?}/{dt_end?}', ['as' => 'admin.dashboard', 'uses' => 'AjaxPanelController@postSiteOverviewSummary']);
-    Route::get('dashboard/{type?}/{dt_start?}/{dt_end?}', ['as' => 'admin.dashboard', 'uses' => 'PanelController@index']);
-
-    /*
-     * Demo
-     */
-    Route::get('sites/demo', ['as' => 'admin.sites.demo', 'uses' => 'DemoController@index']);
-    Route::get('sites/demo/{id}/view', ['as' => 'admin.sites.demo.{site_id}.show', 'uses' => 'DemoController@show']);
-    Route::get('sites/demo/{id}/view/item/{item_id}', ['as' => 'admin.sites.demo.{site_id}.view.item.{item_id}', 'uses' => 'DemoController@getItemDetail']);
-});
-
-/*
-  |--------------------------------------------------------------------------
-  | API Routing local
-  |--------------------------------------------------------------------------
- */
-Route::group(array('prefix' => 'v1', 'namespace' => 'App\Controllers\Api'), function() {
-    //   Allow from any origin
-    if (isset($_SERVER['HTTP_ORIGIN'])) {
-        header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
-        header('Access-Control-Allow-Credentials: true');
-        header('Access-Control-Max-Age: 86400'); // cache for 1 day
-    }
-    // Access-Control headers are received during OPTIONS requests
-    if (isset($_SERVER['REQUEST_METHOD']) && ($_SERVER['REQUEST_METHOD'] == 'OPTIONS')) {
-        if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']))
-            header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
-
-        if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']))
-            header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
-
-        exit(0);
-    }
-
-    Route::resource('predictry', 'ActionController', array("only" => array("index", "store", "show", "destroy")));
-    Route::resource('recommendation', 'RecommendationController', array("only" => array("index")));
-    Route::resource('activation', 'ItemActivationController', array("only" => array("index", "store")));
-    Route::resource('item', 'ItemController', array("only" => array("store")));
-});
-
-/*
-  |--------------------------------------------------------------------------
-  | API Routing (V1)
-  |--------------------------------------------------------------------------
- */
-Route::group(array('prefix' => 'api', 'namespace' => 'App\Controllers\Api'), function() {
-
-    //Allow from any origin
-    if (isset($_SERVER['HTTP_ORIGIN'])) {
-        header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
-        header('Access-Control-Allow-Credentials: true');
-        header('Access-Control-Max-Age: 86400'); // cache for 1 day
-    }
-    // Access-Control headers are received during OPTIONS requests
-    if (isset($_SERVER['REQUEST_METHOD']) && ($_SERVER['REQUEST_METHOD'] == 'OPTIONS')) {
-        if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']))
-            header("Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS");
-
-        if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']))
-            header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
-
-        exit(0);
-    }
-
-    Route::group(array('prefix' => 'v1'), function() {
-        Route::resource('predictry', 'ActionController', array("only" => array("index", "store", "show", "destroy")));
-        Route::resource('recommendation', 'RecommendationController', array("only" => array("index")));
-        Route::resource('activation', 'ItemActivationController', array("only" => array("index", "store")));
-        Route::resource('item', 'ItemController', array("only" => array("store")));
-        Route::resource('cart', 'CartController', array("only" => array("store")));
-        Route::resource('cartlog', 'CartLogController', array("only" => array("store")));
-        Route::resource('widget', 'WidgetInstanceController', array("only" => array("store")));
-    });
-
-    Route::group(array('prefix' => 'v2'), function() {
-        Route::resource('actions', 'Action3Controller', array("only" => array("index", "store", "show", "destroy")));
-        Route::resource('recommendation', 'Recommendation2Controller', array("only" => array("index")));
-        Route::resource('items', 'Item2Controller', array("only" => array("store", "update", "destroy")));
-        Route::resource('carts', 'CartController', array("only" => array("store")));
-        Route::resource('cartlog', 'CartLogController', array("only" => array("store")));
-        Route::resource('widget', 'WidgetInstanceController', array("only" => array("store")));
-
-        //@TODO - Create route to fetch recent actions by site
-        /**
-         * api/v2/tenant/{tenant_id}/actions
-         */
-        Route::resource('tenant', 'TenantController');
-        Route::resource('tenant.actions', 'TenantActionController', array("only" => array("index")));
-
-        /**
-         * api/v2/tenant/{tenant_id}/actions
-         */
-        Route::resource('tenant', 'TenantController');
-        Route::resource('tenant.actions', 'TenantActionController', array("only" => array("index")));
-
-        /**
-         * POST - api/v2/user (create new user)
-         * POST - api/v2/user/{email} {get information of the user}
-         */
-        Route::resource('account', 'AccountController', array("only" => array("store", "show")));
-
-        /**
-         * POST - {prefix}/auth (store)
-         */
-        Route::resource('auth', 'AuthController', ['only' => ['index', 'store']]);
-
-        /**
-         * UNUSED
-         * AUTH FLOW : CLIENT CREDENTIALS
-         * POST - api/v2/auth
-         * @param string $email
-         * @param string password
-         */
-        Route::post('auth', 'AuthController@postAuth');
-
-        Route::group(array('before' => ''), function() {
-            Route::post('oauth/access_token', 'OAuthController@postAuthAccessToken');
-        });
-
-        Route::group(array('before' => 'check-authorization-params|auth'), function() {
-            Route::post('oauth/authorize', 'OAuthController@postAuthorize');
-        });
-    });
-
-    Route::group(array('prefix' => 'v3'), function() {
-        Route::resource('actions', 'Action3Controller', array("only" => array("index", "store", "show", "destroy")));
-        Route::resource('recommendation', 'Recommendation2Controller', array("only" => array("index")));
-        Route::resource('items', 'Item2Controller', array("only" => array("store", "update", "destroy")));
-        Route::resource('carts', 'CartController', array("only" => array("store")));
-        Route::resource('cartlog', 'CartLogController', array("only" => array("store")));
-        Route::resource('widget', 'WidgetInstanceController', array("only" => array("store")));
-
-        //@TODO - Create route to fetch recent actions by site
-        /**
-         * api/v2/tenant/{tenant_id}/actions
-         */
-        Route::resource('tenant', 'TenantController');
-        Route::resource('tenant.actions', 'TenantActionController', array("only" => array("index")));
-    });
 });
