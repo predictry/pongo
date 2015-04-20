@@ -6,6 +6,7 @@
                 <h4 class="modal-title">{{ $modalTitle or '&nbsp;' }}</h4>
             </div>
             <div class="modal-body">
+                {{ $modalContent or '' }}
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

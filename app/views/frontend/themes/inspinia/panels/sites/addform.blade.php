@@ -1,5 +1,5 @@
 <div class="wizardModalSiteFormContainer">
-    {{ Form::open(array('url' => 'sites/submit', 'class' => 'form-horizontal wizardModalSiteForm')) }}
+    {{ Form::open(array('url' => 'v2/sites/submit', 'class' => 'form-horizontal wizardModalSiteForm')) }}
     <div class="form-group {{$var = $errors->first('name')}} {{ ($var !== '') ? 'has-error' : ''}}">
         <label for="name" class="col-sm-3 control-label">Tenant ID</label>
         <div class="col-sm-5">
@@ -23,30 +23,3 @@
     </div>
     {{ Form::close() }}
 </div>
-
-<script type="text/javascript">
-    // CREATE SITE (FIRST TIME USER) //
-    $("#btnWizardSubmitSite").on("click", function (e) {
-        e.preventDefault();
-        var form = $(".wizardModalSiteForm");
-        $.ajax({
-            url: site_url + "/sites/ajaxSubmitSite",
-            type: 'POST',
-            data: form.serialize(),
-            dataType: 'json',
-            success: function (data)
-            {
-                if (data.status === "success") {
-                    window.location = site_url + data.response;
-                } else {
-                    $(".wizardModalSiteFormContainer").html(data.response);
-                }
-                //hide loading
-            },
-            error: function () {
-            }
-        });
-
-        return;
-    });
-</script>

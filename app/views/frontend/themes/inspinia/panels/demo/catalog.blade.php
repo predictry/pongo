@@ -1,4 +1,4 @@
-@extends(getenv('FRONTEND_SKINS') . $theme . '.layouts.recommendation', ['scripts' => [HTML::script('assets/js/script.helper.js')] ])
+@extends(getenv('FRONTEND_SKINS') . $theme . '.layouts.recommendation', ['scripts' => [HTML::script('assets/js/script.helper.js')]])
 @section('content')
 {{ HTML::script('assets/js/holder.js') }}
 <script type="text/javascript">
