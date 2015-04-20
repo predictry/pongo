@@ -1,1 +1,1 @@
-404 not found
+Restricted area. You are not allowed to access the page.
