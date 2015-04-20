@@ -128,8 +128,7 @@ class Home2Controller extends BaseController
      */
     public function getRegister()
     {
-        $this->siteInfo['pageTitle'] = "signup.now";
-        return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.common.register');
+        return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.common.register', ['pageTitle' => "signup.now"]);
     }
 
     /**
@@ -175,6 +174,44 @@ class Home2Controller extends BaseController
     }
 
     /**
+     * Hanle a POST request to send forgot password email confirmation.
+     * 
+     * @return Response
+     */
+    public function postForgotPassword()
+    {
+        $input = array(
+            'email' => Input::get('email')
+        );
+
+        $rules = array(
+            'email' => 'required|email'
+        );
+
+        $validator = Validator::make($input, $rules);
+        if ($validator->passes()) {
+            $user_id = App\Models\Account::where("email", $input['email'])->get(array('id'))->first();
+            if (!$user_id)
+                return Redirect::to('v2/forgot')->with('flash_error', "error.email.doesnt.exists");
+            else {
+                $response = Password::remind(Input::only('email'), function($message) {
+                            $message->subject = "subject.password.reminder";
+                        });
+                switch ($response) {
+                    case Password::INVALID_USER:
+                        return Redirect::back()->with('flash_message', Lang::get($response));
+
+                    case Password::REMINDER_SENT:
+                        return Redirect::back()->with('flash_message', Lang::get($response));
+                }
+            }
+        }
+        else {
+            return Redirect::back()->withInput()->withErrors($validator);
+        }
+    }
+
+    /**
      * Display the password reset view for the given token.
      *
      * @param  string  $token
@@ -208,7 +245,7 @@ class Home2Controller extends BaseController
 
         if ($validator->passes()) {
             $response = Password::reset($credentials, function($user, $password) {
-                        $user->password = Hash::make($password);
+                        $user->password = $password;
                         $user->save();
                     });
 
@@ -218,12 +255,12 @@ class Home2Controller extends BaseController
                 case Password::INVALID_USER:
                     return Redirect::back()->with('flash_error', Lang::get($response));
                 case Password::PASSWORD_RESET:
-                    return Redirect::to('login')->with('flash_message', "success.password.changed");
+                    return Redirect::to('/')->with('flash_message', "success.password.changed");
             }
         }
 
         $token = Input::get('token');
-        return Redirect::to('reset/' . $token)->withInput()->withErrors($validator);
+        return Redirect::to('v2/password/reset/' . $token)->withInput()->withErrors($validator);
     }
 
 }
