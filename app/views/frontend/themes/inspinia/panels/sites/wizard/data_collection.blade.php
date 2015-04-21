@@ -92,11 +92,11 @@
                         @foreach ($action_names as $name)
                         <div class="tab-pane" id="tab_{{ $name }}">
                             <textarea class="form-control" style="margin-top: 0;" rows="15" onclick="this.select()"></textarea>
-                            <div class="clearfix pt20">
+<!--                            <div class="clearfix pt20">
                                 <p class="pull-left small">Once you have implement the JS embed code, and have send your first action. Validate by clicking button below.
                                     If it's success, you will see green check icon on the right side of the action name.</p>
                                 <a class="btn btn-default pull-right" href="javascript:void();" onclick="checkIfActionImplemented('{{ $tenant_id }}', '{{ $name }}');">Validate</a>
-                            </div>
+                            </div>-->
                         </div>
                         @endforeach
                     </div>

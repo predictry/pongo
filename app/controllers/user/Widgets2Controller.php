@@ -104,7 +104,7 @@ class Widgets2Controller extends BaseController
         $algorithm_list = Algorithm::all()->lists("description", "name");
 
         if (count($ruleset_list) <= 0) {
-            return Redirect::to("widgets")->with("flash_error", "Currently, you don't have any ruleset to set into widget.");
+            return Redirect::to("v2/widgets")->with("flash_error", "Currently, you don't have any ruleset to set into widget.");
         }
 
         $output = array(
@@ -182,7 +182,7 @@ class Widgets2Controller extends BaseController
             foreach ($widget_filter_objs as $obj)
                 $obj->save();
 
-            return Redirect::route('widgets')->with("flash_message", "Successfully added new widget.");
+            return Redirect::to('v2/widgets')->with("flash_message", "Successfully added new widget.");
         }
         else
             $widget->delete();
@@ -339,7 +339,7 @@ class Widgets2Controller extends BaseController
                     }
                 }
         }
-        return Redirect::route('widgets')->with("flash_message", "Successfully added new rule.");
+        return Redirect::route('v2/widgets')->with("flash_message", "Successfully added new rule.");
     }
 
     public function getItemwidgetRuleset()
@@ -404,7 +404,7 @@ class Widgets2Controller extends BaseController
             $ruleset = Widget::find($id);
             $ruleset->delete();
         }
-        return Redirect::route('widgets')->with("flash_message", "widget has been successfully removed.");
+        return Redirect::to('v2/widgets')->with("flash_message", "widget has been successfully removed.");
     }
 
     /*
@@ -416,7 +416,7 @@ class Widgets2Controller extends BaseController
         $ruleset_list = RuleSet::where("site_id", $this->active_site_id)->lists("name", "id");
 
         if (count($ruleset_list) <= 0) {
-            return Redirect::to("widgets")->with("flash_error", "Currently, you don't have any ruleset to set into widget.");
+            return Redirect::to("v2/widgets")->with("flash_error", "Currently, you don't have any ruleset to set into widget.");
         }
 
         $output = array(

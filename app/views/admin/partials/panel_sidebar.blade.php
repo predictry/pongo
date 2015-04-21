@@ -20,7 +20,7 @@
                 </div>
             </li>
             <li class="<?php if ($ca === 'App\Controllers\User\Panel2Controller') echo 'active'; ?>">
-                <a href="<?php echo URL::to('v2/admin/dashboard'); ?>"><i class="fa fa-th-large"></i> <span class="nav-label">Dashboard </span> </a>
+                <a href="<?php echo URL::to('v2/admin/home'); ?>"><i class="fa fa-th-large"></i> <span class="nav-label">Dashboard </span> </a>
             </li>
             <li class="<?php if ($ca === 'App\Controllers\User\Widgets2Controller' || $ca === 'App\Controllers\User\Filters2Controller' || $ca === 'App\Controllers\User\Rules2Controller') echo 'active'; ?>">
                 <a href="javascript:void(0);"><i class="fa fa-level-up"></i> <span class="nav-label">Recommendations </span><span class="fa arrow"></span> </a>

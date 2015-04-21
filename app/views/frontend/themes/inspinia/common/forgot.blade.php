@@ -13,7 +13,7 @@
         @include('frontend.partials.notification')
         <h3>Reset Password</h3>
         <p>Fill your email below to reset the password.</p>
-        {{ Form::open(array('url' => 'forgot/submit', 'class' => 'forgotForm')) }}
+        {{ Form::open(array('url' => 'v2/forgot/submit', 'class' => 'forgotForm')) }}
         <div class="form-group {{$var = $errors->first('email')}} {{ ($var !== '') ? 'has-error' : ''}}">
             <?php echo Form::text('email', '', array('class' => 'form-control input-lg', 'placeholder' => Lang::get("fields.email.address"), 'id' => 'email')); ?>
             <span class="help-block">{{$errors->first('email')}}</span>

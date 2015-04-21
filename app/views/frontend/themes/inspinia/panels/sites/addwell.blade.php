@@ -1,4 +1,4 @@
-@extends('frontend.layouts.blankdashboard')
+@extends(getenv('FRONTEND_SKINS') . $theme . '.layouts.blank_dashboard', ['scripts' => [HTML::script('assets/js/script.panel.sites.js')]])
 @section('content')
 <div class="col-xs-12 main">
     <div class="text-center">
@@ -10,7 +10,7 @@
         </div>
     </div>
     <div class="well-create-button-container text-center">
-        <a data-toggle="modal" id="btnViewModal" data-target="#viewModal" href=" {{ URL::to("sites/getModal") }} " class="btn btn-success btn-lg btnViewModal tt">Add New Site</a>
+        <a data-toggle="modal" id="btnViewModal" data-target="#viewModal" class="btn btn-success btn-lg btnViewModal tt">Add New Site</a>
     </div>
 </div>
 @include('frontend.partials.viewmodalnormal')	

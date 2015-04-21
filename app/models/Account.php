@@ -52,6 +52,11 @@ class Account extends Eloquent implements UserInterface, RemindableInterface
         $this->attributes['password'] = Hash::make($password);
     }
 
+    public function setRememberToken($value)
+    {
+        $this->remember_token = $value;
+    }
+
     /**
      * Get the unique identifier for the user.
      *
@@ -87,10 +92,9 @@ class Account extends Eloquent implements UserInterface, RemindableInterface
         return $this->email;
     }
 
-    public function setRememberToken($value)
-    {
-        $this->remember_token = $value;
-    }
+    /*
+     * Relationship
+     */
 
     public function metas()
     {

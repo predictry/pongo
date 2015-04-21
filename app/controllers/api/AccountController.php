@@ -34,8 +34,7 @@ class AccountController extends \Controller
     {
         if (Request::isJson()) {
 
-            $rules     = array_add(Account::$rules, 'site_url', 'required|unique:sites,url');
-            $validator = $this->repository->validate(Input::all(), $rules);
+            $validator = $this->repository->validate(Input::all(), Account::$rules);
 
             if ($validator->passes()) {
                 $input   = Input::all();
@@ -45,23 +44,17 @@ class AccountController extends \Controller
                 $account->email    = $input['email'];
                 $account->password = $input['password'];
                 $account->plan_id  = $input['plan_id'];
+
                 $this->repository->assignConfirmation($account);
 
                 if ($this->repository->saveAccount($account)) {
+                    $this->repository->assignUserRoleByEmail($input['email']); //assign user role
                     Event::fire("account.registration_confirmed", $account);  //send verification email (skip to confirmation)
-//                    $site             = new Site();
-//                    $site->name       = Str::random(6);
-//                    $site->api_key    = md5($input['url']);
-//                    $site->api_secret = md5($input['url'] . uniqid(mt_rand(), true));
-//                    $site->account_id = $account->id;
-//                    $site->url        = $input['url'];
-//                    $site->save();
-//
-//                    Event::fire("site.set_default_actions", [$site]);
-//                    Event::fire("site.set_default_funnel_preferences", [$site]);
-
                     $response = [
                         'error'   => false,
+                        "data"    => [
+                            'user' => $account
+                        ],
                         'status'  => 200,
                         'message' => Lang::get('home.success.register')];
                 }

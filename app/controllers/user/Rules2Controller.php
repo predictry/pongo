@@ -90,7 +90,7 @@ class Rules2Controller extends BaseController
         $items = Item::where("site_id", $this->active_site_id)->where("name", "!=", "")->lists("name", "id");
 
         if (count($items) <= 0) {
-            return Redirect::to("rules")->with("flash_error", "Currently, you don't have any items to set as a rule.");
+            return Redirect::to("v2/rules")->with("flash_error", "Currently, you don't have any items to set as a rule.");
         }
 
         return View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.rules.form", array(
@@ -210,7 +210,7 @@ class Rules2Controller extends BaseController
                 }
             }
 
-            return Redirect::route('rules')->with("flash_message", "Successfully added new rule.");
+            return Redirect::to('v2/rules')->with("flash_message", "Successfully added new rule.");
         }
         else {
             return Redirect::back()->withErrors($ruleset_validator)->with("flash_error", "Inserting problem. Please check your inputs.");
@@ -402,7 +402,7 @@ class Rules2Controller extends BaseController
                 }
             }
 
-            return Redirect::route('rules')->with("flash_message", "Ruleset has been successfully updated.");
+            return Redirect::to('v2/rules')->with("flash_message", "Ruleset has been successfully updated.");
         }
         else {
             return Redirect::back()->withErrors($ruleset_validator)->with("flash_error", "Inserting problem. Please check your inputs.");
@@ -422,7 +422,7 @@ class Rules2Controller extends BaseController
             $ruleset = RuleSet::find($id);
             $ruleset->delete();
         }
-        return Redirect::route('rules')->with("flash_message", "Ruleset has been successfully removed.");
+        return Redirect::to('v2/rules')->with("flash_message", "Ruleset has been successfully removed.");
     }
 
     public function getItemRule()

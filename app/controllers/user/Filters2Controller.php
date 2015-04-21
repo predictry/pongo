@@ -95,7 +95,7 @@ class Filters2Controller extends BaseController
     {
         $items = Item::where("site_id", $this->active_site_id)->where("name", "!=", "")->limit(10)->lists("name", "id");
         if (count($items) <= 0) {
-            return Redirect::to("filters")->with("flash_error", "Currently, you don't any properties from the item yet.");
+            return Redirect::to("v2/filters")->with("flash_error", "Currently, you don't any properties from the item yet.");
         }
 
         $item_ids   = Item::where("site_id", $this->active_site_id)->limit(10)->get()->lists("id");
@@ -146,7 +146,7 @@ class Filters2Controller extends BaseController
                 }
             }
 
-            return Redirect::route('filters')->with("flash_message", "Successfully added filter.");
+            return Redirect::to('v2/filters')->with("flash_message", "Successfully added filter.");
         }
         else {
             return Redirect::back()->withErrors($validator)->with("flash_error", "Inserting problem. Please check your inputs.");
@@ -275,7 +275,7 @@ class Filters2Controller extends BaseController
                 FilterMeta::whereNotIn("id", $filter_meta_ids)->where("filter_id", $filter->id)->delete();
             }
 
-            return Redirect::route('filters')->with("flash_message", "Successfully update filter.");
+            return Redirect::to('v2/filters')->with("flash_message", "Successfully update filter.");
         }
         else {
             return Redirect::back()->withErrors($validator)->with("flash_error", "Please check your inputs.");
@@ -291,12 +291,12 @@ class Filters2Controller extends BaseController
             //check if the filter associated with any widget
             $number_of_widget_contain_this_filter = WidgetFilter::where("filter_id", $id)->get()->count();
             if ($number_of_widget_contain_this_filter > 0)
-                return Redirect::route('filters')->with("flash_error", "This filter cannot be removed. There is a widget that still associated with this filter.");
+                return Redirect::to('v2/filters')->with("flash_error", "This filter cannot be removed. There is a widget that still associated with this filter.");
 
             FilterMeta::where("filter_id", $filter->id)->delete();
             $filter->delete();
         }
-        return Redirect::route('filters')->with("flash_message", "Filter has been successfully removed.");
+        return Redirect::to('v2/filters')->with("flash_message", "Filter has been successfully removed.");
     }
 
     function _validateArray($key, $inputs, $rules)

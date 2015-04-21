@@ -1,4 +1,4 @@
-@extends('frontend.layouts.basic')
+@extends(getenv('FRONTEND_SKINS') . $theme . '.layouts.basic')
 @section('content')
 <div class="container">
     <div class="row">
@@ -6,7 +6,7 @@
             @include('frontend.partials.notification')
             <h2 class="text-center">reset.password</h2>
             <hr class="line">
-            {{ Form::open(array('url' => 'reset/submit', 'class' => 'resetPasswordForm',  'role' => 'form')) }}
+            {{ Form::open(array('url' => 'v2/password/reset/submit', 'class' => 'resetPasswordForm',  'role' => 'form')) }}
             <?php echo Form::hidden('token', $token); ?>
             <div class="form-group  {{$var = $errors->first('email')}} {{ ($var !== '') ? 'has-error' : ''}}">
                 <?php echo Form::text('email', '', array('class' => 'form-control', 'placeholder' => 'email.address', 'id' => 'email', "tabindex" => 1)); ?>

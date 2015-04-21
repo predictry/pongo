@@ -6,13 +6,18 @@ use App\Controllers\BaseController,
     App\Models\AccountMeta,
     App\Models\Action,
     App\Models\ActionMeta,
+    App\Models\Industry,
     App\Models\Site,
+    App\Models\SiteBusiness,
+    App\Models\SiteCategory,
     App\Pongo\Repository\SiteRepository,
     Auth,
+    Event,
     File,
     Input,
     Paginator,
     Redirect,
+    Request,
     Response,
     Session,
     Str,
@@ -78,6 +83,59 @@ class Sites2Controller extends BaseController
     public function getCreate()
     {
         return View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.sites.form", array("type" => "create", 'pageTitle' => "Add New Site"));
+    }
+
+    public function postCreate()
+    {
+        $input               = Input::only("name", "url");
+        $input['account_id'] = Auth::user()->id;
+
+        $site      = new Site();
+        $validator = Validator::make($input, $site->rules, array("regex" => "The name format should start with character. Ex. ABC123"));
+
+        if ($validator->passes()) {
+
+            $salt = uniqid(mt_rand(), true);
+
+            $site->name             = $input['name'];
+            $site->api_key          = md5($input['url']);
+            $site->api_secret       = md5($input['url'] . $salt);
+            $site->account_id       = $input['account_id'];
+            $site->url              = $input['url'];
+            $site->site_category_id = SiteCategory::first()->id;
+            $id                     = $site->save();
+
+            Event::fire("site.set_default_actions", array($site));
+            Event::fire("site.set_default_funnel_preferences", array($site));
+
+            if (Request::ajax()) {
+                if ($id)
+                    return Response::json(array("status" => "success", "response" => "/home"));
+                else
+                    return Response::json(
+                                    array("status"   => "error",
+                                        "response" => \View::make("frontend.panels.sites.addform", array(
+                                            "flash_error" => "Inserting problem. Please check your inputs."
+                                        ))->render()));
+            }else {
+
+                if ($id)
+                    return \Redirect::to("v2/sites/{$site->name}/integration")->with("flash_message", "Successfully added new site.");
+                else
+                    return \Redirect::back()->with("flash_error", "Inserting problem. Please try again.");
+            }
+        }
+        else {
+            if (Request::ajax()) {
+                return Response::json(
+                                array("status"   => "error",
+                                    "response" => \View::make("frontend.panels.sites.addform", array(
+                                        "flash_error" => "Inserting problem. Please check your inputs."
+                                    ))->withInput($input)->withErrors($validator)->render()));
+            }
+            else
+                return \Redirect::back()->withInput()->withErrors($validator);
+        }
     }
 
     public function getEdit($id)
@@ -206,7 +264,7 @@ class Sites2Controller extends BaseController
             }
         }
         else
-            return Redirect::to('sites')->with('flash_error', $validator->messages()->first());
+            return Redirect::to('v2/sites')->with('flash_error', $validator->messages()->first());
     }
 
     public function ajaxGetActionProperties($tenant_id, $action_name)
@@ -279,6 +337,170 @@ class Sites2Controller extends BaseController
                         'current_total_action_received' => $current_total_action_received
                     ]
         ]);
+    }
+
+    /*
+     * Site Creation Wizard
+     */
+
+    public function getSiteWizard()
+    {
+        $output = array(
+            "pageTitle"    => "Welcome to predictry. Create your first site.",
+            "modalTitle"   => "Add New Site",
+            "sites"        => array(),
+            "modalContent" => View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.sites.addform")->render()
+        );
+
+        return \View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.sites.addwell", $output);
+    }
+
+    public function getModalCreate()
+    {
+        return View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.sites.addform");
+    }
+
+    public function postAjaxCreate()
+    {
+        $input               = Input::only("name", "url");
+        $input['account_id'] = Auth::user()->id;
+
+        $site      = new Site();
+        $validator = Validator::make($input, $site->rules);
+
+        if ($validator->passes()) {
+            $salt = uniqid(mt_rand(), true);
+
+            $site->name       = $input['name'];
+            $site->api_key    = md5($input['url']);
+            $site->api_secret = md5($input['url'] . $salt);
+            $site->account_id = $input['account_id'];
+            $site->url        = $input['url'];
+            $id               = $site->save();
+
+            //can be migrate to table
+            $default_actions = array(
+                "view"        => array("score" => 1),
+                "rate"        => array("score" => 2),
+                "add_to_cart" => array("score" => 3),
+                "buy"         => array("score" => 4)
+            );
+
+            //set default action types for the site
+            foreach ($default_actions as $key => $arr) {
+                $action              = new Action();
+                $action->name        = $key;
+                $action->description = null;
+                $action->site_id     = $site->id;
+                $action->save();
+
+                foreach ($arr as $key2 => $val) {
+                    $action_meta            = new ActionMeta();
+                    $action_meta->key       = $key2;
+                    $action_meta->value     = $val;
+                    $action_meta->action_id = $action->id;
+                    $action_meta->save();
+                }
+            }
+
+            if ($id)
+                return Response::json(array("status" => "success"));
+            else
+                return Response::json(
+                                array("status"   => "error",
+                                    "response" => \View::make("frontend.panels.sites.addform", array(
+                                        "flash_error" => "Inserting problem. Please check your inputs."
+                                    ))->render()));
+        }
+        else
+            return Response::json(
+                            array("status"   => "error",
+                                "response" => \View::make("frontend.panels.sites.addform", array(
+                                    "flash_error" => "Inserting problem. Please check your inputs."
+                                ))->withInput($input)->withErrors($validator)->render()));
+    }
+
+    /**
+     * Update Business Detail
+     * 
+     * @param type $tenant_id
+     * @return object
+     */
+    public function getBusiness($tenant_id)
+    {
+        if (is_null($tenant_id)) {
+            return \Redirect::to('v2/sites');
+        }
+
+        $site          = Site::where('name', $tenant_id)->where('account_id', \Auth::user()->id)->first();
+        $site_category = ($site) ? SiteCategory::find($site->site_category_id)->first() : null;
+
+        if (is_null($site_category))
+            return \Redirect::to('v2/sites');
+
+        $industries = Industry::all()->lists("name", "id");
+        $output     = [
+            'industries'                     => $industries,
+            'selected_industry_id'           => 1,
+            'range_number_of_users'          => ['0_to_1k' => '0 to 1k', '0_to_10k' => '0 to 10k', '0_to_100k' => '0 to 100k', '0_to_1M' => '0 to 1M'],
+            'selected_range_number_of_users' => '0_to_1k',
+            'range_number_of_items'          => ['0_to_100' => '0 to 100', '0_to_500' => '0 to 500', '0_to_1k' => '0 to 1k', '0_to_10k' => '0 to 10k'],
+            'selected_range_number_of_items' => '0_to_100',
+            'site'                           => $site,
+            'site_category'                  => $site_category
+        ];
+
+        return View::make('frontend.panels.sites.business', $output);
+    }
+
+    /**
+     * 
+     * @param string $tenant_id
+     * @return object
+     */
+    public function postBusiness($tenant_id)
+    {
+        if (is_null($tenant_id)) {
+            return \Redirect::to('v2/sites');
+        }
+
+        $site_business = new SiteBusiness();
+        $validator     = Validator::make(\Input::all(), $site_business->rules);
+
+        if ($validator->passes()) {
+
+            $input           = \Input::all();
+            $site_repository = new SiteRepository();
+
+            if ($site_repository->isBelongToHim($tenant_id)) {
+
+                $site = Site::where('name', $tenant_id)->first();
+
+                if ($site->url !== $input['url']) {
+
+                    $url_validator = $site_repository->validateUniqueUrl($input['url']);
+                    if (is_bool($url_validator)) {
+                        $site->url = $input['url'];
+                        $site->update();
+                    }
+                    else
+                        return \Redirect::back()->withInput()->withErrors($url_validator);
+                }
+
+                $site_business = SiteBusiness::firstOrCreate([
+                            'name'                  => $input['name'],
+                            'site_id'               => $site->id,
+                            'range_number_of_users' => isset($input['range_number_of_users']) ? $input['range_number_of_users'] : '',
+                            'range_number_of_items' => isset($input['range_number_of_items']) ? $input['range_number_of_items'] : '',
+                            'industry_id'           => $input['industry_id']
+                ]);
+                return \Redirect::to("v2/sites/{$site->name}/integration")->with('flash_message', 'Site business has been updated.');
+            }
+            else
+                return \Redirect::to("v2/sites");
+        }
+
+        return \Redirect::back()->withInput()->withErrors($validator);
     }
 
 }

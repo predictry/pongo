@@ -1,0 +1,1 @@
+Restricted area. You are not allowed to access the page.
