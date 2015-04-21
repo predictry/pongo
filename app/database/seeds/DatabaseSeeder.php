@@ -23,7 +23,10 @@ class DatabaseSeeder extends Seeder
         $this->call('AlgorithmTableSeeder');
         $this->call('SiteCategoryTableSeeder');
         $this->call('IndustryTableSeeder');
-//		$this->call('ActionDataSeeder');
+        $this->call('RoleSeeder');
+        $this->call('PermissionRoleSeeder');
+        $this->call('PermissionSeeder');
+        $this->call('AssignedRoleSeeder');
     }
 
 }
@@ -117,25 +120,25 @@ class AccountSeeder extends Seeder
         App\Models\Account::create(array(
             'id'                => 1,
             'name'              => 'Rifki Yandhi',
-            'email'             => 'rifkiyandhi@gmail.com',
-            'password'          => Hash::make('password'),
+            'email'             => 'rifki@predictry.com',
+            'password'          => "password",
             'confirmed'         => 1,
             'confirmation_code' => md5(microtime() . Config::get('app.key')),
             'plan_id'           => 1
         ));
 
-        $faker = Faker::create();
-        foreach (range(2, 10) as $index) {
-            App\Models\Account::create(array(
-                'id'                => $index,
-                'name'              => $faker->name,
-                'email'             => $faker->email,
-                'password'          => Hash::make('password'),
-                'confirmed'         => 1,
-                'confirmation_code' => md5(microtime() . Config::get('app.key')),
-                'plan_id'           => 1
-            ));
-        }
+//        $faker = Faker::create();
+//        foreach (range(2, 10) as $index) {
+//            App\Models\Account::create(array(
+//                'id'                => $index,
+//                'name'              => $faker->name,
+//                'email'             => $faker->email,
+//                'password'          => "password",
+//                'confirmed'         => 1,
+//                'confirmation_code' => md5(microtime() . Config::get('app.key')),
+//                'plan_id'           => 1
+//            ));
+//        }
     }
 
 }
@@ -147,6 +150,7 @@ class SitesTableSeeder extends Seeder
     {
         DB::table('sites')->delete();
         $faker = Faker::create();
+
         foreach (range(2, 10) as $index) {
             App\Models\Site::create(
                     array(

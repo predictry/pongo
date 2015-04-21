@@ -82,7 +82,11 @@ class Sites2Controller extends BaseController
 
     public function getCreate()
     {
-        return View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.sites.form", array("type" => "create", 'pageTitle' => "Add New Site"));
+        $site_category_list = SiteCategory::all()->lists("name", "id");
+        return View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.sites.form", array(
+                    "type"               => "create",
+                    "pageTitle"          => \Lang::get("panel.add.new.site"),
+                    "site_category_list" => $site_category_list));
     }
 
     public function postCreate()
@@ -129,8 +133,9 @@ class Sites2Controller extends BaseController
             if (Request::ajax()) {
                 return Response::json(
                                 array("status"   => "error",
-                                    "response" => \View::make("frontend.panels.sites.addform", array(
-                                        "flash_error" => "Inserting problem. Please check your inputs."
+                                    "response" => \View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.sites.addform", array(
+                                        "flash_error"        => "Inserting problem. Please check your inputs.",
+                                        "site_category_list" => SiteCategory::all()->lists("name", "id")
                                     ))->withInput($input)->withErrors($validator)->render()));
             }
             else
@@ -345,11 +350,13 @@ class Sites2Controller extends BaseController
 
     public function getSiteWizard()
     {
+        $site_category_list = SiteCategory::all()->lists("name", "id");
+
         $output = array(
             "pageTitle"    => "Create your first site",
             "modalTitle"   => "Add New Site",
             "sites"        => array(),
-            "modalContent" => View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.sites.addform")->render()
+            "modalContent" => View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.sites.addform", ["site_category_list" => $site_category_list])->render()
         );
 
         return \View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.sites.addwell", $output);
@@ -408,7 +415,7 @@ class Sites2Controller extends BaseController
             else
                 return Response::json(
                                 array("status"   => "error",
-                                    "response" => \View::make("frontend.panels.sites.addform", array(
+                                    "response" => \View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.sites.addform", array(
                                         "flash_error" => "Inserting problem. Please check your inputs."
                                     ))->render()));
         }
@@ -508,7 +515,7 @@ class Sites2Controller extends BaseController
                     ]);
 
 
-                return \Redirect::back()->with('flash_message', 'Site business has been updated.');
+                return \Redirect::back()->with('flash_message', \Lang::get("panel.site.updated"));
             }
             else
                 return \Redirect::to("v2/sites");
