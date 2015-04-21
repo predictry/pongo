@@ -33,7 +33,7 @@ class Site extends \Eloquent
     );
     public $rules               = array(
         "name" => "required|regex:/^[a-zA-Z]{1}/|alpha_num|max:32",
-        "url"  => "required|active_url",
+        "url"  => "required",
     );
 
     public function actions()
