@@ -41,5 +41,6 @@ return array(
     "remove.confirm"        => "Are you sure want to remove this?",
     "edit.business"         => "Edit Business",
     "site.updated"          => "Site business has been updated.",
+    "add.new.site"          => "Add New Site",
     ""                      => "",
 );

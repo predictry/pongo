@@ -33,6 +33,15 @@
                     </div>
                     <div class="hr-line-dashed"></div>
 
+                    <div class="form-group {{$var = $errors->first('site_category_id')}} {{ ($var !== '') ? 'has-error' : ''}}">
+                        <label for="email" class="col-sm-2 control-label">Site Category</label>
+                        <div class="col-sm-10">
+                            <?php echo Form::select('site_category_id', $site_category_list, 1, ['class' => 'form-control', 'id' => 'site_category_id', "tabindex" => 6]) ?>
+                            <span class="help-block">{{$errors->first('site_category_id')}}</span>
+                        </div>
+                    </div>
+                    <div class="hr-line-dashed"></div>
+
                     <div class="form-group">
                         <div class="col-sm-4 col-sm-offset-2">
                             <button class="btn btn-white" type="reset">Cancel</button>
