@@ -1,7 +1,7 @@
 @extends(getenv('FRONTEND_SKINS') . $theme . '.layouts.dashboard', ['scripts' => array(HTML::script('assets/js/script.helper.js'), HTML::script('assets/js/script.panel.items.js'))])
 @section('content')
 @include(getenv('FRONTEND_SKINS') . $theme . '.partials.page_heading_with_action')
-<div class="wrapper wrapper-content animated fadeInRight">
+<div class="wrapper wrapper-content animated fadeInRight manage">
     <div class="row">
         <div class="col-lg-12">
             <div class="ibox float-e-margins">

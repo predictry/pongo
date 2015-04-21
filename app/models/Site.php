@@ -51,6 +51,11 @@ class Site extends \Eloquent
         return $this->belongsTo("App\Models\SiteCategory", "site_category_id");
     }
 
+    public function business()
+    {
+        return $this->hasOne("App\Models\SiteBusiness");
+    }
+
     public function setApiKeyAttribute($value)
     {
         $this->attributes['api_key'] = md5($value);
