@@ -73,19 +73,24 @@ Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Con
         Route::get('sites/wizard', array('as' => 'sites', 'uses' => 'Sites2Controller@getSiteWizard'));
         Route::get('sites/getModal', array('as' => 'sites', 'uses' => 'Sites2Controller@getModalCreate'));
         Route::post('sites/ajaxSubmitSite', array('as' => 'sites', 'uses' => 'Sites2Controller@postCreate'));
-
-
-        #Sites Management
-        Route::get("sites", array("as" => "sites", "uses" => "Sites2Controller@index"));
-        Route::get('sites/create', array("as" => "sites.create", "uses" => 'Sites2Controller@getCreate'));
         Route::post('sites/submit', array("as" => "sites.submit", "uses" => 'Sites2Controller@postCreate'));
-        Route::get('sites/{numeric}/edit', array("as" => "sites.{numieric}.edit", "uses" => 'Sites2Controller@getEdit'));
-        Route::get('sites/{numeric}/delete', 'Sites2Controller@getDelete');
-        Route::get('sites/{numeric}/default', array("as" => "sites.{numieric}.edit", "uses" => 'Sites2Controller@getDefault'));
+
 
         Route::group(array('before' => 'role.user|has.site'), function() {
+
             #Dashboard
             Route::get('home/{type?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'Panel2Controller@index'));
+
+            #Sites Management
+            Route::get("sites", array("as" => "sites", "uses" => "Sites2Controller@index"));
+            Route::get('sites/create', array("as" => "sites.create", "uses" => 'Sites2Controller@getCreate'));
+            Route::get('sites/{numeric}/edit', array("as" => "sites.{numieric}.edit", "uses" => 'Sites2Controller@getEdit'));
+            Route::get('sites/{numeric}/delete', 'Sites2Controller@getDelete');
+            Route::get('sites/{numeric}/default', array("as" => "sites.{numieric}.edit", "uses" => 'Sites2Controller@getDefault'));
+
+            #Update Business
+            Route::get('sites/{name}/business', 'Sites2Controller@getBusiness');
+            Route::post('sites/{name}/business/submit', 'Sites2Controller@postBusiness');
 
             #Items
             Route::get("items", array("as" => "items", "uses" => "Items2Controller@index"));

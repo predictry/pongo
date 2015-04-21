@@ -346,7 +346,7 @@ class Sites2Controller extends BaseController
     public function getSiteWizard()
     {
         $output = array(
-            "pageTitle"    => "Welcome to predictry. Create your first site.",
+            "pageTitle"    => "Create your first site",
             "modalTitle"   => "Add New Site",
             "sites"        => array(),
             "modalContent" => View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.sites.addform")->render()
@@ -434,6 +434,7 @@ class Sites2Controller extends BaseController
 
         $site          = Site::where('name', $tenant_id)->where('account_id', \Auth::user()->id)->first();
         $site_category = ($site) ? SiteCategory::find($site->site_category_id)->first() : null;
+        $site_business = ($site) ? SiteBusiness::where('site_id', $site->id)->first() : null;
 
         if (is_null($site_category))
             return \Redirect::to('v2/sites');
@@ -443,14 +444,16 @@ class Sites2Controller extends BaseController
             'industries'                     => $industries,
             'selected_industry_id'           => 1,
             'range_number_of_users'          => ['0_to_1k' => '0 to 1k', '0_to_10k' => '0 to 10k', '0_to_100k' => '0 to 100k', '0_to_1M' => '0 to 1M'],
-            'selected_range_number_of_users' => '0_to_1k',
-            'range_number_of_items'          => ['0_to_100' => '0 to 100', '0_to_500' => '0 to 500', '0_to_1k' => '0 to 1k', '0_to_10k' => '0 to 10k'],
-            'selected_range_number_of_items' => '0_to_100',
+            'selected_range_number_of_users' => ($site_business && !is_null($site_business)) ? $site_business->range_number_of_users : '0_to_1k',
+            'range_number_of_items'          => ['0_to_100' => '0 to 100', '0_to_500' => '0 to 500', '0_to_1k' => '0 to 1k', '0_to_10k' => '0 to 10k', '0_to_100k' => '0 to 100k', '0_to_1M' => '0 to 1m', 'over_1M' => 'Over 1m'],
+            'selected_range_number_of_items' => ($site_business && !is_null($site_business)) ? $site_business->range_number_of_items : '0_to_100',
             'site'                           => $site,
-            'site_category'                  => $site_category
+            'site_category'                  => $site_category,
+            'site_business'                  => $site_business,
+            'pageTitle'                      => \Lang::get("panel.edit.business")
         ];
 
-        return View::make('frontend.panels.sites.business', $output);
+        return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.sites.business', $output);
     }
 
     /**
@@ -487,14 +490,25 @@ class Sites2Controller extends BaseController
                         return \Redirect::back()->withInput()->withErrors($url_validator);
                 }
 
-                $site_business = SiteBusiness::firstOrCreate([
-                            'name'                  => $input['name'],
-                            'site_id'               => $site->id,
-                            'range_number_of_users' => isset($input['range_number_of_users']) ? $input['range_number_of_users'] : '',
-                            'range_number_of_items' => isset($input['range_number_of_items']) ? $input['range_number_of_items'] : '',
-                            'industry_id'           => $input['industry_id']
-                ]);
-                return \Redirect::to("v2/sites/{$site->name}/integration")->with('flash_message', 'Site business has been updated.');
+                $current_site_business = SiteBusiness::where('site_id', $site->id)->first();
+                if ($current_site_business) {
+                    $current_site_business->name                  = $input['name'];
+                    $current_site_business->range_number_of_items = isset($input['range_number_of_items']) ? $input['range_number_of_items'] : '';
+                    $current_site_business->range_number_of_items = isset($input['range_number_of_items']) ? $input['range_number_of_items'] : '';
+                    $current_site_business->industry_id           = $input['industry_id'];
+                    $current_site_business->update();
+                }
+                else
+                    $site_business = SiteBusiness::firstOrCreate([
+                                'name'                  => $input['name'],
+                                'site_id'               => $site->id,
+                                'range_number_of_users' => isset($input['range_number_of_users']) ? $input['range_number_of_users'] : '',
+                                'range_number_of_items' => isset($input['range_number_of_items']) ? $input['range_number_of_items'] : '',
+                                'industry_id'           => $input['industry_id']
+                    ]);
+
+
+                return \Redirect::back()->with('flash_message', 'Site business has been updated.');
             }
             else
                 return \Redirect::to("v2/sites");
