@@ -24,8 +24,8 @@ class DatabaseSeeder extends Seeder
         $this->call('SiteCategoryTableSeeder');
         $this->call('IndustryTableSeeder');
         $this->call('RoleSeeder');
-        $this->call('PermissionRoleSeeder');
         $this->call('PermissionSeeder');
+        $this->call('PermissionRoleSeeder');
         $this->call('AssignedRoleSeeder');
     }
 
@@ -127,18 +127,18 @@ class AccountSeeder extends Seeder
             'plan_id'           => 1
         ));
 
-//        $faker = Faker::create();
-//        foreach (range(2, 10) as $index) {
-//            App\Models\Account::create(array(
-//                'id'                => $index,
-//                'name'              => $faker->name,
-//                'email'             => $faker->email,
-//                'password'          => "password",
-//                'confirmed'         => 1,
-//                'confirmation_code' => md5(microtime() . Config::get('app.key')),
-//                'plan_id'           => 1
-//            ));
-//        }
+        $faker = Faker::create();
+        foreach (range(2, 10) as $index) {
+            App\Models\Account::create(array(
+                'id'                => $index,
+                'name'              => $faker->name,
+                'email'             => $faker->email,
+                'password'          => "password",
+                'confirmed'         => 1,
+                'confirmation_code' => md5(microtime() . Config::get('app.key')),
+                'plan_id'           => 1
+            ));
+        }
     }
 
 }
@@ -151,6 +151,16 @@ class SitesTableSeeder extends Seeder
         DB::table('sites')->delete();
         $faker = Faker::create();
 
+        App\Models\Site::create(
+                array(
+                    'name'       => "PREDICTRY",
+                    'url'        => $faker->url,
+                    'api_key'    => md5($faker->url),
+                    "api_secret" => md5($faker->url . "TEST"),
+                    "account_id" => 1
+        ));
+
+
         foreach (range(2, 10) as $index) {
             App\Models\Site::create(
                     array(
@@ -161,14 +171,6 @@ class SitesTableSeeder extends Seeder
                         "account_id" => $index
             ));
         }
-        App\Models\Site::create(
-                array(
-                    'name'       => "REDMART",
-                    'url'        => $faker->url,
-                    'api_key'    => md5($faker->url),
-                    "api_secret" => md5($faker->url . "TEST"),
-                    "account_id" => 1
-        ));
     }
 
 }

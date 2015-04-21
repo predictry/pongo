@@ -19,11 +19,20 @@ class AssignedRoleSeeder extends Seeder
 
         $admin_account = Account::find(1);
         $admin_role    = Role::where('name', 'Administrator')->first();
+        $user_role     = Role::where('name', 'User')->first();
 
         AssignedRole::create([
             'user_id' => $admin_account->id,
             'role_id' => $admin_role->id
         ]);
+
+
+        foreach (range(2, 10) as $index) {
+            AssignedRole::create([
+                'user_id' => $index,
+                'role_id' => $user_role->id
+            ]);
+        }
     }
 
 }
