@@ -36,7 +36,7 @@ class PanelController extends AdminBaseController
         $sites         = Site::all();
         $allowed_sites = null;
         //filter account under specific account
-        $allowed_sites = Account::find(10)->sites(); //null
+//        $allowed_sites = Account::find(10)->sites(); //null
 
         if ($allowed_sites) {
             $allowed_sites = $allowed_sites->get();
