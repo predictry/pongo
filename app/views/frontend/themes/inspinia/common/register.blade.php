@@ -1,7 +1,7 @@
 @extends(getenv('FRONTEND_SKINS') . $theme . '.layouts.basic')
 @section('content')
 <div class="middle-box text-center loginscreen  animated fadeInDown">
-    <div>
+    <div class="mb20">
         <div>
             <h1 class="logo-name">
                 <a href="#">
@@ -33,7 +33,7 @@
         <p class="m-t"> 
             <small>
                 {{ Lang::get('home.info.pre.register_pref') }} 
-                <a href="{{ URL::to('login') }}">{{ Lang::get('home.terms.and.conditions') }} </a>
+                <a href="{{ URL::to('#') }}">{{ Lang::get('home.terms.and.conditions') }} </a>
                 {{ Lang::get('home.info.pre.register_suf') }} 
             </small> 
         </p>

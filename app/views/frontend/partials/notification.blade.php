@@ -1,7 +1,7 @@
 @if(Session::has('flash_error'))
 <div class="alert alert-danger alert-dismissable">
     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-    <strong>Something Wrong!</strong> {{ Session::get('flash_error') }}
+    {{ Session::get('flash_error') }}
 </div>
 @endif
 

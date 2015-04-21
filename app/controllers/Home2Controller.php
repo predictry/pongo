@@ -16,7 +16,6 @@ use App,
     Config,
     DateTime,
     Event,
-    Hash,
     Input,
     Lang,
     Password,
@@ -74,7 +73,7 @@ class Home2Controller extends BaseController
             return Redirect::to('v2/home');
         }
 
-        return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.common.login', array("pageTitle" => "Login"));
+        return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.common.login', array("pageTitle" => \Lang::get("home.login")));
     }
 
     /**
@@ -110,10 +109,10 @@ class Home2Controller extends BaseController
                     return Redirect::to('v2/home');
                 }
 
-                $flash_error = 'error.login.failed';
+                $flash_error = \Lang::get("error.login.failed");
             }
             else
-                $flash_error = "error.email.doesnt.exists";
+                $flash_error = \Lang::get("error.email.doesnt.exists");
 
             return Redirect::back()->with('flash_error', $flash_error)->withInput();
         }
@@ -128,7 +127,7 @@ class Home2Controller extends BaseController
      */
     public function getRegister()
     {
-        return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.common.register', ['pageTitle' => "signup.now"]);
+        return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.common.register', ['pageTitle' => \Lang::get("home.signup.now")]);
     }
 
     /**
@@ -157,10 +156,10 @@ class Home2Controller extends BaseController
             else
                 return Redirect::to('v2/register')->withInput()->withErrors("We are unable to process the data. Please try again.");
 
-            return Redirect::to('v2/login')->with('flash_message', "home.success.register");
+            return Redirect::to('v2/login')->with('flash_message', \Lang::get("home.success.register"));
         }
         else
-            return Redirect::back()->withInput()->with('flash_error', $validator->messages()->first());
+            return Redirect::back()->withInput()->withErrors($validator);
     }
 
     /**
@@ -170,7 +169,7 @@ class Home2Controller extends BaseController
      */
     public function getForgotPassword()
     {
-        return View::make(getenv('FRONTEND_SKINS') . $this->theme . ".common.forgot");
+        return View::make(getenv('FRONTEND_SKINS') . $this->theme . ".common.forgot", ['pageTitle' => \Lang::get("home.reset.password")]);
     }
 
     /**
@@ -192,10 +191,10 @@ class Home2Controller extends BaseController
         if ($validator->passes()) {
             $user_id = App\Models\Account::where("email", $input['email'])->get(array('id'))->first();
             if (!$user_id)
-                return Redirect::to('v2/forgot')->with('flash_error', "error.email.doesnt.exists");
+                return Redirect::to('v2/forgot')->with('flash_error', \Lang::get("error.email.doesnt.exists"));
             else {
                 $response = Password::remind(Input::only('email'), function($message) {
-                            $message->subject = "subject.password.reminder";
+                            $message->subject = \Lang::get("home.subject.password.reminder");
                         });
                 switch ($response) {
                     case Password::INVALID_USER:
@@ -255,7 +254,7 @@ class Home2Controller extends BaseController
                 case Password::INVALID_USER:
                     return Redirect::back()->with('flash_error', Lang::get($response));
                 case Password::PASSWORD_RESET:
-                    return Redirect::to('/')->with('flash_message', "success.password.changed");
+                    return Redirect::to('/')->with('flash_message', \Lang::get("home.success.password.changed"));
             }
         }
 

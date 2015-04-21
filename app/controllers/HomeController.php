@@ -106,7 +106,7 @@ class HomeController extends BaseController
 
                     if (!$account->confirmed) {
                         Auth::logout();
-                        $flash_error = \Lang::get("home.error.account.have.not.confirmed");
+                        $flash_error = \Lang::get("error.account.have.not.confirmed");
                         return Redirect::to('login')->with('flash_error', $flash_error)->withInput();
                     }
 
@@ -117,10 +117,10 @@ class HomeController extends BaseController
                     return Redirect::to('v2/home');
                 }
 
-                $flash_error = \Lang::get("home.error.login.failed");
+                $flash_error = \Lang::get("error.login.failed");
             }
             else
-                $flash_error = \Lang::get("home.error.email.doesnt.exists");
+                $flash_error = \Lang::get("error.email.doesnt.exists");
 
             return Redirect::to('login')->with('flash_error', $flash_error)->withInput();
         }
