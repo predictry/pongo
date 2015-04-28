@@ -44,7 +44,8 @@ class Account extends Eloquent implements UserInterface, RemindableInterface
         'email'                 => 'required|email|unique:accounts',
         'password'              => 'required|min:8|confirmed',
         'password_confirmation' => 'required|min:8',
-        'plan_id'               => 'required|exists:plans,id'
+        'plan_id'               => 'required|exists:plans,id',
+        'pricing_method'        => "required|in:CPA,CPC"
     );
 
     public function setPasswordAttribute($password)
