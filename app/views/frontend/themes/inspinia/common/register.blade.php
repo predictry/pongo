@@ -29,7 +29,11 @@
             <?php echo Form::password('password_confirmation', array('class' => 'form-control', 'placeholder' => Lang::get("fields.confirm.password"), 'id' => 'password_confirmation', "tabindex" => 4)); ?>
             <span class="help-block">{{$errors->first('password_confirmation')}}</span>
         </div>
-        <?php echo Form::submit(Lang::get("fields.submit"), array('class' => 'btn btn-primary block full-width m-b', 'tabindex' => 4)); ?>
+        <div class="form-group {{$var = $errors->first('pricing_method')}} {{ ($var !== '') ? 'has-error' : ''}}">
+            <?php echo Form::select('pricing_method', $pricing_list, $pricing_method, array('class' => 'form-control', 'id' => 'pricing_method', 'placeholder' => 'Choose Pricing Method' , "tabindex" => 4)); ?>
+            <span class="help-block">{{$errors->first('pricing_method')}}</span>
+        </div>
+        <?php echo Form::submit(Lang::get("fields.submit"), array('class' => 'btn btn-primary block full-width m-b', 'tabindex' => 5)); ?>
         <p class="m-t"> 
             <small>
                 {{ Lang::get('home.info.pre.register_pref') }} 

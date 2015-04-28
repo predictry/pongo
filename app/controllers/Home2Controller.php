@@ -127,7 +127,19 @@ class Home2Controller extends BaseController
      */
     public function getRegister()
     {
-        return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.common.register', ['pageTitle' => \Lang::get("home.signup.now")]);
+        $pricing_method = \Input::get("pricing");
+
+        if (!empty($pricing_method) && (strtoupper($pricing_method) !== "CPA" && strtoupper($pricing_method) !== "CPC")) {
+            $pricing_method = "CPA";
+        }
+
+        $pricing_list = [
+            'choose' => 'Choose Pricing Method',
+            'CPA'    => 'CPA',
+            'CPC'    => 'CPC'
+        ];
+
+        return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.common.register', ['pageTitle' => \Lang::get("home.signup.now"), 'pricing_method' => strtoupper($pricing_method), 'pricing_list' => $pricing_list]);
     }
 
     /**
@@ -137,7 +149,7 @@ class Home2Controller extends BaseController
      */
     public function postRegister()
     {
-        $input = Input::only("name", "email", "password", "password_confirmation");
+        $input = Input::only("name", "email", "password", "password_confirmation", "pricing_method");
         $input = array_add($input, 'plan_id', 1);
 
         $validator = $this->account_repository->validate($input);
