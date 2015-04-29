@@ -24,6 +24,7 @@ return array(
     "site.url"                       => "Website URL",
     "site.business.name.placeholder" => "Google Inc",
     "site.business.name"             => "Business Name",
+    "start.free.trial.now"           => "Start my Free Trial Now",
 #buttons
     "submit"                         => "Submit",
     "submit.reset"                   => "Submit Reset"

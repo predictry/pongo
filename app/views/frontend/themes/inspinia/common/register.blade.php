@@ -29,11 +29,23 @@
             <?php echo Form::password('password_confirmation', array('class' => 'form-control', 'placeholder' => Lang::get("fields.confirm.password"), 'id' => 'password_confirmation', "tabindex" => 4)); ?>
             <span class="help-block">{{$errors->first('password_confirmation')}}</span>
         </div>
+        <div class="form-group {{$var = $errors->first('url')}} {{ ($var !== '') ? 'has-error' : ''}}">            
+            <?php echo Form::text('url', null, array('class' => 'form-control', 'placeholder' => 'Website URL', 'id' => 'url', "tabindex" => 5)); ?>
+            <span class="help-block">{{$errors->first('url')}}</span>
+        </div>
+        <div class="form-group {{$var = $errors->first('range_number_of_items')}} {{ ($var !== '') ? 'has-error' : ''}}">
+            <?php echo Form::select('range_number_of_items', $range_number_of_items, $selected_range_number_of_items, ['class' => 'form-control', 'id' => 'range_number_of_items', "tabindex" => 6]) ?>
+            <span class="help-block">{{$errors->first('range_number_of_items')}}</span>
+        </div>
+        <div class="form-group {{$var = $errors->first('industry_id')}} {{ ($var !== '') ? 'has-error' : ''}}">
+            <?php echo Form::select('industry_id', $industries, $selected_industry_id, ['class' => 'form-control', 'id' => 'industry_id', "tabindex" => 7]) ?>
+            <span class="help-block">{{$errors->first('industry_id')}}</span>
+        </div>
         <div class="form-group {{$var = $errors->first('pricing_method')}} {{ ($var !== '') ? 'has-error' : ''}}">
-            <?php echo Form::select('pricing_method', $pricing_list, $pricing_method, array('class' => 'form-control', 'id' => 'pricing_method', 'placeholder' => 'Choose Pricing Method' , "tabindex" => 4)); ?>
+            <?php echo Form::select('pricing_method', $pricing_list, $pricing_method, array('class' => 'form-control', 'id' => 'pricing_method', 'placeholder' => 'Choose Pricing Method' , "tabindex" => 8)); ?>
             <span class="help-block">{{$errors->first('pricing_method')}}</span>
         </div>
-        <?php echo Form::submit(Lang::get("fields.submit"), array('class' => 'btn btn-primary block full-width m-b', 'tabindex' => 5)); ?>
+        <?php echo Form::submit(Lang::get("fields.start.free.trial.now"), array('class' => 'btn btn-primary block full-width m-b', 'tabindex' => 9)); ?>
         <p class="m-t"> 
             <small>
                 {{ Lang::get('home.info.pre.register_pref') }} 

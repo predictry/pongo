@@ -145,8 +145,9 @@ class Sites2Controller extends BaseController
 
     public function getEdit($id)
     {
+        $site_category_list = SiteCategory::all()->lists("name", "id");
         $site = Site::find($id);
-        return View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.sites.form", array("site" => $site, "type" => "edit", 'pageTitle' => "Edit Site"));
+        return View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.sites.form", array("site" => $site, "type" => "edit", 'pageTitle' => "Edit Site", "site_category_list" => $site_category_list));
     }
 
     public function getDefault($id)
