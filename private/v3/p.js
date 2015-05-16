@@ -1070,6 +1070,25 @@ if (typeof Predictry !== 'object') {
                         generateSessionID(4) + generateSessionID(4) + generateSessionID(4);
             }
 
+
+             /**
+             * Call the callback
+             * 
+             */
+
+            function callCallback(callback, p){
+                if (isDefined(callback)) {
+                    if (isFunction(callback))
+                        callback(p);
+                    else if (isString(callback)) {
+                        var func = eval(callback);
+                        if (isFunction(func)) {
+                            func(p);
+                        }
+                    }
+                }
+            }
+
             /*
              * 
              * @param {string} url
@@ -1192,8 +1211,10 @@ if (typeof Predictry !== 'object') {
 
                             } else
                                 response = getJSON(url, callback);
-                        } else {
+                        } else if(isDefined(data.category)) { //json doesn't exist, get categories if exists
                             response = getPreComputedCategoryBasedRecommendedItems(data, callback);
+                        }else{ //json doesn't exist, just callback with undefined response
+                            callCallback(callback);
                         }
                     });
                 }
@@ -1674,6 +1695,7 @@ if (typeof Predictry !== 'object') {
                                 theme: ds.predictryTheme,
                                 title: ds.predictryTitle,
                                 currency: ds.predictryCurrency,
+                                category: ds.predictryCategory,
 //                                hide_title: ds.predictryHideTitle,
                                 hide_title: true,
                                 limit: ds.predictryLimit
