@@ -11,8 +11,9 @@ return array(
       | application. If disabled, a simple generic error page is shown.
       |
      */
-
-    'debug'     => $_ENV['DEBUG_MODE'],
+  
+    'debug' => true,
+    
     /*
       |--------------------------------------------------------------------------
       | Application URL
@@ -23,7 +24,7 @@ return array(
       | your application so that it is used when running Artisan tasks.
       |
      */
-    'url'       => $_ENV['URL'],
+    'url'       => 'http://pongo.dev',
     /*
       |--------------------------------------------------------------------------
       | Application Timezone
@@ -56,7 +57,8 @@ return array(
       | will not be safe. Please do this before deploying an application!
       |
      */
-    'key'       => $_ENV['ENCRYPTION_KEY'],
+	'key' => '214bd76c3c616e8b7c3c0d1dc139d008',
+    
     /*
       |--------------------------------------------------------------------------
       | Autoloaded Service Providers
@@ -95,6 +97,7 @@ return array(
         'Illuminate\View\ViewServiceProvider',
         'Illuminate\Workbench\WorkbenchServiceProvider',
         'Zizaco\Entrust\EntrustServiceProvider',
+        'Monashee\PhpSimpleHtmlDomParser\PhpSimpleHtmlDomParserServiceProvider'
     ),
     /*
       |--------------------------------------------------------------------------

@@ -54,8 +54,8 @@ jQuery(document).ready(function () {
 
 var loadBar;
 loadBar = loadBar || (function () {
-    var pleaseWaitDiv = $('<div class="modal fade" style="margin-top: 21%; overflow: hidden; z-index: 1060;" id="loadingModal">\n\
-<div class="modal-dialog"><div class="col-sm-offset-4 col-sm-4"><div class="progress progress-striped active"><div class="progress-bar"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;"><span class="sr-only"></span></div></div></div></div></div>');
+    var pleaseWaitDiv = $('<div class="modal fade" style="margin-top: 0%; overflow: hidden; z-index: 1060;" id="loadingModal">\n\
+<div class="modal-dialog"><div class="col-sm-offset-4 col-sm-4"><div class="progress progress-striped active"><div class="progress-bar"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%; height: 100vh;"><span class="sr-only"></span></div></div></div></div></div>');
     return {
         showPleaseWait: function () {
             pleaseWaitDiv.modal({
@@ -172,9 +172,27 @@ function checkIfActionImplemented(tenant_name, action_name) {
     });
 }
 
-function saveIntegrationConfiguration(tenant_name) {
-    //@TODO - Before save configuration, need to check if all the actions has been implemented.
-    //@TODO - Or maybe, allow them to only implement only some of the actions.
+function saveIntegrationConfiguration(tenant_name, api_key) {
+    
+  $.ajax({
+    url: site_url + "/check/config/",
+    type: 'POST',
+    data: { "t_name" : tenant_name, "t_key": api_key },
+    dataType: 'json',
+    success: function(response) {
+      if ( response.status == true ) {
+        alert("true");
+        saveItNow();
+      } else { 
+        alert("false") 
+      }
+    },
+    error: function(error) {
+      alert(error);
+    }
+  });
+  
+  function saveItNow() {
     $.ajax({
         url: site_url + "/sites/" + tenant_name + "/integration/submit",
         type: 'POST',
@@ -182,16 +200,20 @@ function saveIntegrationConfiguration(tenant_name) {
         dataType: 'json',
         success: function (response)
         {
+            alert('succeess');
             console.log(response);
             if (!response.error) {
                 window.location = response.data.redirect;
             }
-
             loadBar.hidePleaseWait();
         },
         error: function () {
-            alert('error!');
+          alert('error!');
         }
     });
+  }
 
+  function showUnimplementedThings() {
+    // if the validation fail this one will show the unimplemented things
+  };
 }

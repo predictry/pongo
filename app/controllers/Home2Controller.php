@@ -68,7 +68,7 @@ class Home2Controller extends BaseController {
             return Redirect::to('v2/home');
         }
 
-        return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.common.login', array("pageTitle" => \Lang::get("home.login")));
+        return View::make(getenv('FRONTEND_SKINS'). $this->theme . '.common.login', array("pageTitle" => \Lang::get("home.login")));
     }
 
     /**

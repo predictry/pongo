@@ -1,4 +1,4 @@
-@extends(getenv('FRONTEND_SKINS') . $theme . '.layouts.basic')
+@extends(getenv('FRONTEND_SKINS'). $theme . '.layouts.basic')
 @section('content')
 <div class="middle-box text-center loginscreen  animated fadeInDown">
     <div>

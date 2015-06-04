@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <div id="loginContainer">
-        <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
+        <div class="middle-box text-center loginscreen  animated fadeInDown">
             <div class="row">
                 @include('frontend.partials.notification')
                 <h2 class="text-center">Predictry</h2>

@@ -42,6 +42,8 @@ Route::pattern('item_id', '[A-Za-z0-9]+');
 Route::group(array('prefix' => 'v2', 'namespace' => 'App\Controllers'), function() {
     Route::get('login', 'Home2Controller@getLogin');
     Route::post('login/submit', 'Home2Controller@postLogin');
+    
+    Route::post('check/config/', 'Check@config');
 
     Route::get('register', 'Home2Controller@getRegister');
     Route::post('register/submit', 'Home2Controller@postRegister');

@@ -155,7 +155,7 @@
                                         </div>
                                     </div>
                                     <div class="clearfix ">
-                                        <a class="btn btn-primary pull-right" id="btn-data-collection-continue" onclick="saveIntegrationConfiguration('{{ $tenant_id }}')">Save Configurations</a>
+                                        <a class="btn btn-primary pull-right" id="btn-data-collection-continue" onclick="saveIntegrationConfiguration('{{ $tenant_id }}', '{{ $site->api_key }}')">Save Configurations</a>
                                     </div>
                                 </div><!-- copy the snipped -->
 

@@ -1425,7 +1425,9 @@ table.dataTable thead .sorting:after {
     position: fixed;
     z-index: 2000;
     top: 0px;
-    left: 220px;
+    /* 
+     * left: 220px;
+    */
     height: 2px;
     -webkit-transition: width 1s;
     -moz-transition: width 1s;
@@ -4722,7 +4724,7 @@ body.skin-3 {
 
 #page-wrapper.empty{
     margin-left: 0;
-    min-height:700px;
+    min-height:100vh;
 }
 
 #page-wrapper.empty > .footer{

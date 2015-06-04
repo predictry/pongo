@@ -36,10 +36,10 @@ return array(
         ),
         'sqs'        => array(
             'driver' => 'sqs',
-            'key'    => $_ENV['SQS_QUEUE_KEY'],
-            'secret' => $_ENV['SQS_QUEUE_SECRET'],
-            'queue'  => $_ENV['SQS_QUEUE_URL'],
-            'region' => $_ENV['SQS_QUEUE_REGION'],
+            'key'    => 'your-public-key',
+            'secret' => 'your-secret-key',
+            'queue'  => 'your-queue-url',
+            'region' => 'us-east-1',
         ),
         'iron'       => array(
             'driver'  => 'iron',

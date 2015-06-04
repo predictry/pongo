@@ -7,9 +7,9 @@
             <h2 class="text-center">{{ Lang::get('home.signup.now') }}</h2>
             <hr class="line">
             <p class="text-center small">
+            
                 {{ Lang::get('home.info.top.register_pref') }}
-                <a href='{{ URL::to('login') }}'>{{ Lang::get('home.login.now') }}</a>.
-
+                <a href='{{ URL::to('login') }}'>{{ Lang::get('home.login.now') }}</a>
             </p>
             {{ Form::open(array('url' => 'register/submit', 'class' => 'registerForm',  'role' => 'form', 'name' => 'registerForm')) }}
             <div class="form-group {{$var = $errors->first('name')}} {{ ($var !== '') ? 'has-error' : ''}}">
