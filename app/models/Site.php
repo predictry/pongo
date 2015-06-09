@@ -29,7 +29,7 @@ class Site extends \Eloquent
         "name"    => "Tenant ID",
         "url"     => "URL Address",
         "api_key" => "API Key",
-//        "api_secret" => "API Secret Key"
+//      "api_secret" => "API Secret Key"
     );
     public $rules               = array(
         "name" => "required|regex:/^[a-zA-Z]{1}/|alpha_num|max:32",

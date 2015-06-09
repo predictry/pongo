@@ -178,11 +178,8 @@ Route::group(array('prefix' => 'v2/admin', 'before' => 'auth|role.admin', 'names
     Route::get('sites/demo/{id}/view/item/{item_id}', ['as' => 'admin.sites.demo.{site_id}.view.item.{item_id}', 'uses' => 'DemoController@getItemDetail']);
 });
 
-/*
- * API Routing
- */
+/* API Routing */
 Route::group(array('prefix' => 'api', 'namespace' => 'App\Controllers\Api'), function() {
-
     //Allow from any origin
     if (isset($_SERVER['HTTP_ORIGIN'])) {
         header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
@@ -202,9 +199,8 @@ Route::group(array('prefix' => 'api', 'namespace' => 'App\Controllers\Api'), fun
 
     Route::group(array('prefix' => 'v1'), function() {
 
-        /**
-         * Registration End Point
-         * 
+        /* Registration End Point
+         
          * POST - api/v2/user (create new user)
          * POST - api/v2/user/{email} {get information of the user}
          */

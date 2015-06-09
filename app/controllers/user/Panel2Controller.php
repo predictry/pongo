@@ -18,8 +18,10 @@ use App\Controllers\BaseController,
     Cache,
     Guzzle\Service\Client,
     URL,
+    Response,
     View;
 
+    
 class Panel2Controller extends BaseController
 {
 
@@ -38,23 +40,25 @@ class Panel2Controller extends BaseController
 
     public function index($dt_range_group = "today", $dt_start = null, $dt_end = null)
     {
-        $client = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'tenants/' . \Session::get("active_site_name") . '/');
-
+        $client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'stat/');
+        $current_site = \Session::get("active_site_name");
+        
         $ranges   = Helper::getSelectedFilterDateRange($dt_range_group, $dt_start, $dt_end);
-        $dt_start = $ranges['dt_start'];
-        $dt_end   = $ranges['dt_end'];
+        /* $dt_start = $ranges['dt_start']; */
+        /* $dt_end   = $ranges['dt_end']; */
+        $dt_start = "20001";
+        $dt_end   = "10000";
 
         /*
          * Scenario
          * 1. Get pageviews
          */
         $cache_pageviews_stat = null; // Cache::pull("pageviews_{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}");
-
         if (is_null($cache_pageviews_stat)) {
-            $response     = $client->get("stats-summary/pageviews/{$dt_start}/{$dt_end}")->send();
+            $response     = $client->get("overview?tenantId=". $current_site . "&startDate=" . $dt_start. "&endDate=" . $dt_end)->send();
             $arr_response = $response->json();
-
-            $pageviews_regular_sum = (isset($arr_response['error']) && $arr_response['error']) ? false : array_get($arr_response, 'data.pageviews');
+            $pageviews_regular_sum = (isset($arr_response['error']) && $arr_response['error']) ? false : array_get($arr_response, 'data.pageview');
+            return $pageviews_regular_sum->json();
 
             $pageviews_stat = [
                 'overall'     => ($pageviews_regular_sum) ? $pageviews_regular_sum['overall'] : 0,
@@ -62,7 +66,7 @@ class Panel2Controller extends BaseController
                 'regular'     => ($pageviews_regular_sum) ? $pageviews_regular_sum['regular'] : 0
             ];
 
-            Cache::add("pageviews_{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $pageviews_stat, 14400);
+            /* Cache::add("pageviews_{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $pageviews_stat, 14400); */
         }
         else {
             $pageviews_stat = $cache_pageviews_stat;
@@ -120,7 +124,7 @@ class Panel2Controller extends BaseController
         $output = [
             'overviews'           => [
                 'total_pageviews'      => number_format($pageviews_stat['regular']),
-//                'total_uvs'            => number_format($n_session),
+                // 'total_uvs'            => number_format($n_session),
                 'total_uvs'            => number_format(1000),
                 'total_sales_amount'   => number_format($summary_sales['overall']),
                 'total_item_purchased' => number_format($summary_item_purchased['regular']),

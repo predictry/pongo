@@ -4,6 +4,7 @@ namespace App\Controllers\Api;
 
 use App\Models\Account,
     App\Pongo\Repository\AccountRepository,
+    App\Models\Site,
     Event,
     Input,
     Lang,
@@ -39,12 +40,18 @@ class AccountController extends \Controller
             if ($validator->passes()) {
                 $input   = Input::all();
                 $account = new Account();
-
+                $site    = new Site();
+  
+                // define the accounts' params
                 $account->name     = $input['name'];
                 $account->email    = $input['email'];
                 $account->password = $input['password'];
                 $account->plan_id  = $input['plan_id'];
 
+                // define the sites' params
+                $site->name       = $input['site_name'];
+                $site->url        = $input['site_url'];
+                
                 $this->repository->assignConfirmation($account);
 
                 if ($this->repository->saveAccount($account)) {
@@ -59,21 +66,22 @@ class AccountController extends \Controller
                         'message' => Lang::get('home.success.register')];
                 }
                 else
-                    $response = $this->_getErrorResponse("", 400, "", "Unable to store the data", "We are unable to process the data. Please try again.");
+                  $response = $this->_getErrorResponse(
+                    "", 400, "", "Unable to store the data", "We are unable to process the data. Please try again.");
             }
             else
                 $response = $this->_getErrorResponse('errorValidator', 400, "", $validator->messages()->first());
         }
         else
-            $response = $this->_getErrorResponse("errorValidator", 400, "", "We only accept JSON, but pizza sounds good.", "Error on data type. Ask your administrator.");
+          $response = $this->_getErrorResponse(
+            "errorValidator", 400, "", "We only accept JSON, but pizza sounds good.", "Error on data type. Ask your administrator.");
 
         return Response::json($response, $this->http_status);
     }
 
-    public function show($email)
+    public function show($email) 
     {
         $validator = Validator::make(['email' => $email], ['email' => 'required|email|exists:accounts,email']);
-
         if ($validator->passes()) {
             $account = Account:: where('email', $email)->first([ 'name', 'email', 'plan_id']);
             return Response::json([
@@ -82,7 +90,6 @@ class AccountController extends \Controller
                         'data'    => ['profile' => $account->toArray()]
             ]);
         }
-
         return Response::json($this->getErrorResponse('errorValidator', 200, '', $validator->messages()->first()));
     }
 
@@ -96,7 +103,6 @@ class AccountController extends \Controller
         );
 
         $client_message = $message        = "";
-
         switch ($error_key) {
             case "credentialMissing":
                 $message = "credential hasn't assigned or wrong";
