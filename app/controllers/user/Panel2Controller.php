@@ -11,8 +11,8 @@
 namespace App\Controllers\User;
 
 use App\Controllers\BaseController,
-    App\Models\Action,
-    App\Models\ActionInstance,
+    /* App\Models\Action,
+    App\Models\ActionInstance, */
     App\Pongo\Libraries\Helper,
     App\Pongo\Repository\PanelRepository,
     Cache,
@@ -46,78 +46,69 @@ class Panel2Controller extends BaseController
         $ranges   = Helper::getSelectedFilterDateRange($dt_range_group, $dt_start, $dt_end);
         /* $dt_start = $ranges['dt_start']; */
         /* $dt_end   = $ranges['dt_end']; */
-        $dt_start = "20001";
-        $dt_end   = "10000";
+        
+        $dt_start = "2015060120";
+        $dt_end   = "2015060222";
+        
+        $cache_pageviews_stat = null;
 
-        /*
-         * Scenario
-         * 1. Get pageviews
-         */
-        $cache_pageviews_stat = null; // Cache::pull("pageviews_{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}");
+        /* just a global response for dashboard */
+        $response     = $client->get("overview?tenantId=". $current_site . "&startDate=" . $dt_start. "&endDate=" . $dt_end)->send();
+
         if (is_null($cache_pageviews_stat)) {
-            $response     = $client->get("overview?tenantId=". $current_site . "&startDate=" . $dt_start. "&endDate=" . $dt_end)->send();
             $arr_response = $response->json();
-            $pageviews_regular_sum = (isset($arr_response['error']) && $arr_response['error']) ? false : array_get($arr_response, 'data.pageview');
-            return $pageviews_regular_sum->json();
-
+            $pageviews_regular_sum = (isset($arr_response['error']) && $arr_response['error']) ? false : array_get($arr_response, 'pageViews');
             $pageviews_stat = [
                 'overall'     => ($pageviews_regular_sum) ? $pageviews_regular_sum['overall'] : 0,
                 'recommended' => ($pageviews_regular_sum) ? $pageviews_regular_sum['recommended'] : 0,
                 'regular'     => ($pageviews_regular_sum) ? $pageviews_regular_sum['regular'] : 0
             ];
-
-            /* Cache::add("pageviews_{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $pageviews_stat, 14400); */
         }
         else {
             $pageviews_stat = $cache_pageviews_stat;
         }
 
-        $cache_summary_item_purchased = null; // Cache::pull("cache_summary_item_purchased _{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}");
+        $cache_summary_item_purchased = null; 
         if (is_null($cache_summary_item_purchased)) {
-            $response                   = $client->get("stats-summary/item-purchased/{$dt_start}/{$dt_end}")->send();
             $arr_response               = $response->json();
-            $item_purchased_regular_sum = (isset($arr_response['error']) && $arr_response['error']) ? false : array_get($arr_response, 'data.sum');
+            $item_purchased_regular_sum = (isset($arr_response['error']) && $arr_response['error']) ? false : array_get($arr_response, 'itemPurchased');
 
             $summary_item_purchased = [
                 'overall'     => ($item_purchased_regular_sum) ? $item_purchased_regular_sum['overall'] : 0,
                 'recommended' => ($item_purchased_regular_sum) ? $item_purchased_regular_sum['recommended'] : 0,
                 'regular'     => ($item_purchased_regular_sum) ? $item_purchased_regular_sum['regular'] : 0
             ];
-            Cache::add("cache_summary_item_purchased _{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $summary_item_purchased, 14400);
         }
-        else
-            $summary_item_purchased = $cache_summary_item_purchased;
+        else {
+          $summary_item_purchased = $cache_summary_item_purchased;
+        }
 
-        //4 Orders
-        /*
-         * 
-         */
-        $cache_n_orders = null; // Cache::pull("cache_n_orders_{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}");
+        $cache_n_orders = null;
         if (is_null($cache_n_orders)) {
-            $response     = $client->get("stats-summary/orders/{$dt_start}/{$dt_end}")->send();
             $arr_response = $response->json();
-            $n_orders     = (isset($arr_response['error']) && $arr_response['error']) ? 0 : array_get($arr_response, 'data.count');
-            Cache::add("cache_n_orders_{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $n_orders, 14400);
+            $n_orders     = (isset($arr_response['error']) && $arr_response['error']) ? 0 : array_get($arr_response, 'orders');
         }
-        else
-            $n_orders = $cache_n_orders;
+        else {
+            $n_orders = $cache_n_orders; 
+        }
 
-        $cache_summary_sales = null; // Cache::get("cache_summary_sales_{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}");
+
+        $cache_summary_sales = null;
         if (is_null($cache_summary_sales)) {
-            $response          = $client->get("stats-summary/sales-amount/{$dt_start}/{$dt_end}")->send();
             $arr_response      = $response->json();
-            $sales_regular_sum = (isset($arr_response['error']) && $arr_response['error']) ? 0 : array_get($arr_response, 'data.sum');
+            $sales_regular_sum = (isset($arr_response['error']) && $arr_response['error']) ? 0 : array_get($arr_response, 'salesAmount');
             $summary_sales     = [
                 'overall'     => ($sales_regular_sum) ? $sales_regular_sum['overall'] : 0,
                 'recommended' => ($sales_regular_sum) ? $sales_regular_sum['recommended'] : 0,
                 'regular'     => ($sales_regular_sum) ? $sales_regular_sum['regular'] : 0
             ];
-
-            Cache::add("cache_summary_sales_{$this->active_site_id}_{$dt_start->toDateString()}_{$dt_end->toDateString()}", $summary_sales, 14400);
         }
-        else
+        else {
             $summary_sales = $cache_summary_sales;
-
+        }
+        
+        
+        
         $output_top_items['top_purchased_items'] = [];
         $output_top_items['top_viewed_items']    = [];
 
@@ -134,8 +125,8 @@ class Panel2Controller extends BaseController
                 'conversion_rate'      => Helper::calcConversionRate($n_orders, $pageviews_stat['regular'])
             ],
             'dt_range'            => [
-                'start' => $dt_start->format("F d, Y"),
-                'end'   => $dt_end->format("F d, Y")
+                'start' => $dt_start,   // ->format("F d, Y"),
+                'end'   => $dt_end // format("F d, Y")
             ],
             'dt_start'            => $dt_start,
             'dt_end'              => $dt_end,

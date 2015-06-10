@@ -46,8 +46,6 @@ class Home2Controller extends BaseController {
             if (DateTime::createFromFormat('Y-m-d G:i:s', "2014-04-26 07:59:10") !== FALSE) {
                 $dt = new Carbon("2014-04-26 07:59:10");
                 var_dump($dt->timestamp);
-
-//                echo "it's a date";
             } else {
                 echo "it's not a date";
             }
@@ -150,7 +148,16 @@ class Home2Controller extends BaseController {
      * @return Response
      */
     public function postRegister() {
-        $input = Input::only("name", "email", "password", "password_confirmation", "pricing_method", "url", "range_number_of_items", "industry_id");
+      $input = Input::only(
+        "name", 
+        "email", 
+        "password", 
+        "password_confirmation", 
+        "pricing_method", 
+        "url", 
+        "range_number_of_items", 
+        "industry_id");
+      
         $input = array_add($input, 'plan_id', 1);
 
         $rules = array_merge(App\Models\Account::$rules, [

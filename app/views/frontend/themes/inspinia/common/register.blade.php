@@ -10,7 +10,7 @@
             </h1>
         </div>
         @include('frontend.partials.notification')
-        <h3>Welcome to Predictry</h3>
+        <h2 class="wl_predictry">Welcome to Predictry</h2>
         <p>Create account to see it in action.</p>
         {{ Form::open(array('url' => 'v2/register/submit', 'class' => 'registerForm',  'role' => 'form')) }}
         <div class="form-group {{$var = $errors->first('name')}} {{ ($var !== '') ? 'has-error' : ''}}">

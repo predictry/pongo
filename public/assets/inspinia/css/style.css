@@ -2721,7 +2721,7 @@ video {
     #page-wrapper {
         position: inherit;
         margin: 0 0 0 240px;
-        min-height: 1000px;
+        min-height: 100vh;
     }
 }
 .title-action {
@@ -2758,6 +2758,7 @@ ol.unstyled {
     padding: 10px 20px;
     position: absolute;
     right: 0;
+    bottom: 0px;
 }
 .footer.fixed_full {
     position: fixed;
@@ -4173,7 +4174,7 @@ body.skin-1 {
 .skin-1 .wrapper-content {
     padding: 30px 15px;
 }
-.skin-1 #page-wrapper {
+.skin-1 #page-wrapper#page-wrapper {
     background: #f4f6fa;
 }
 .skin-1 .ibox-title,
@@ -4471,7 +4472,7 @@ body.skin-3 {
     #page-wrapper {
         position: inherit;
         margin: 0 0 0 220px;
-        min-height: 1200px;
+        min-height: 100vh;
     }
     .navbar-static-side {
         z-index: 101;
@@ -4488,7 +4489,7 @@ body.skin-3 {
     #page-wrapper {
         position: inherit;
         margin: 0 0 0 0px;
-        min-height: 1000px;
+        min-height: 100vh;
     }
     .body-small .navbar-static-side {
         display: none;
@@ -4738,4 +4739,13 @@ body.skin-3 {
 
 div.manage div.table-responsive{
     min-height: 300px;
+}
+
+
+a:hover, a:active, a:focus, a {
+   outline: 0!important;
+}
+
+h2.wl_predictry {
+  text-transform: uppercase!important;
 }

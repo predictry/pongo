@@ -181,10 +181,9 @@ function saveIntegrationConfiguration(tenant_name, api_key) {
     dataType: 'json',
     success: function(response) {
       if ( response.status == true ) {
-        alert("true");
         saveItNow();
       } else { 
-        alert("false") 
+        console.log(response);
       }
     },
     error: function(error) {
@@ -200,20 +199,14 @@ function saveIntegrationConfiguration(tenant_name, api_key) {
         dataType: 'json',
         success: function (response)
         {
-            alert('succeess');
-            console.log(response);
             if (!response.error) {
                 window.location = response.data.redirect;
             }
             loadBar.hidePleaseWait();
         },
-        error: function () {
-          alert('error!');
+        error: function (error) {
+          console.log(error);
         }
     });
   }
-
-  function showUnimplementedThings() {
-    // if the validation fail this one will show the unimplemented things
-  };
 }
