@@ -5,7 +5,7 @@
         <div>
             <h1 class="logo-name">
                 <a href="#">
-                    <img src="{{asset("assets/img/logo.png")}}"/>
+                    <img class="login_logo register_logo" src="{{asset("assets/img/logo.png")}}"/>
                 </a>
             </h1>
         </div>

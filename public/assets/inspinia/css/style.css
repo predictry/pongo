@@ -4749,3 +4749,8 @@ a:hover, a:active, a:focus, a {
 h2.wl_predictry {
   text-transform: uppercase!important;
 }
+
+.login_logo { 
+  max-width: 200px;
+  height: auto;
+}

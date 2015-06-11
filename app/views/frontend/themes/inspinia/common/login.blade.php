@@ -29,6 +29,7 @@
         {{--<a class="btn btn-sm btn-white btn-block" href="<?php // echo URL::to('v2/register'); ?>">Create an account</a>--}}-->
         {{ Form::close() }}
         <p class="m-t"> <small>&copy; {{date('Y')}} Predictry. A <a href='http://www.vventures.asia'>V Ventures</a> company. <br/> <span class="cl-fade"> Made with <i class="fa fa-heart-o"></i> in KL</span></small> </p>
+        <a class="btn btn-sm btn-white btn-block" href="{{ URL::to('v2/register') }}">Register</a>
     </div>
 </div>
 @stop

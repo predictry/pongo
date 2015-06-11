@@ -170,8 +170,7 @@ class Sites2Controller extends BaseController
         $validator = Validator::make(['name' => $tenant_id], ['name' => 'required|exists:sites,name']);
         $site      = $this->repository->isBelongToHim($tenant_id);
         $data      = [];
-        if ($validator->passes() && $site) {
-
+        if ($validator->passes() && $site) { 
             $reco_js_url = asset('reco.js');
             $reco_js_url = str_replace("https", "", $reco_js_url);
             $reco_js_url = str_replace("http", "", $reco_js_url);
@@ -180,11 +179,12 @@ class Sites2Controller extends BaseController
             Session::set('active_site_id', $site->id);
 
             $site_category = Site::find($site_id)->siteCategory()->first();
-
+          
             if ($site_category) {
                 $site_category_name_slug = Str::slug($site_category->name, '_');
-                $json_path               = public_path() . '/data/' . $site_category_name_slug . '.json';
+                $json_path               = public_path() . '/data/' . $site_category_name_slug . '.json'; 
                 $data                    = json_decode(File::get($json_path));
+                // return Response::json($data->sections);
             }
 
             if (is_object($data) || count($data) > 0) {
@@ -210,9 +210,9 @@ class Sites2Controller extends BaseController
         $action_names        = Input::get("action_names");
         $excluded_properties = Input::get("excluded_properties");
 
-
         if (is_array($action_names)) {
-            foreach ($action_names as $action_name) {
+            $test_array = [];
+            foreach ($action_names as $action_name) { 
                 $action = Action::where('name', $action_name)->where('site_id', Session::get('active_site_id'))->first();
                 if ($action) {
                     $action_meta = ActionMeta::where('key', 'excluded_properties')->where('action_id', $action->id)->first();
@@ -239,13 +239,14 @@ class Sites2Controller extends BaseController
                     }
 
                     Session::flash('flash_message', 'Sucessfully updated.');
-                    return Response::json([
+                    return Response::json(array(
                                 "error" => false,
                                 "data"  => ['redirect' => url("v2/sites")]
-                    ]);
+                              ));
                 }
             }
-        }
+            return Response::json(array($test_array));
+        }  
     }
 
     public function getDataCollection($tenant_id)

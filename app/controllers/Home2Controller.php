@@ -110,11 +110,6 @@ class Home2Controller extends BaseController {
             return Redirect::back()->withInput()->withErrors($validator);
     }
 
-    /**
-     * Display register view.
-     * 
-     * @return Response
-     */
     public function getRegister() {
         $pricing_method = \Input::get("pricing");
 
@@ -142,11 +137,6 @@ class Home2Controller extends BaseController {
         return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.common.register', $output);
     }
 
-    /**
-     * Handle a POST request to register new account
-     * 
-     * @return Response
-     */
     public function postRegister() {
       $input = Input::only(
         "name", 
@@ -159,15 +149,28 @@ class Home2Controller extends BaseController {
         "industry_id");
       
         $input = array_add($input, 'plan_id', 1);
+        $site_host =  parse_url($input['url'])['host'];
+        $site_name = strtoupper(str_replace('.', '', $site_host));
+        
+        $input_site = array(
+          'name' => $site_name,
+          'url'  => $site_host
+        );
 
         $rules = array_merge(App\Models\Account::$rules, [
-            'url' => 'required|unique:sites,url',
             'range_number_of_items' => 'required|in:less_than_5k,5k_to_499k,500k_to_999k,more_than_1mil',
             'industry_id' => 'required|exists:industries,id'
         ]);
 
-        $validator = $this->account_repository->validate($input, $rules);
-        if ($validator->passes()) {
+        $site_rules = App\Models\Site::$rules;
+    
+        $account_validator = $this->account_repository->validate($input, $rules); 
+        $site_validator = $this->account_repository->siteValidate($input, $site_rules);
+        
+        // return Response::json(array('account' => $account_validator->passes(), 'site' => $account_validator->passes()));
+
+        if ( ($account_validator->passes()) && ($site_validator->passes()) ) {
+            //  return Response::json(array("blah" => "blood"));
             try {
                 // add necessary info for new account
                 $input = array_add($input, "confirmed", 1);
@@ -220,7 +223,7 @@ class Home2Controller extends BaseController {
                 return Redirect::to('v2/register')->withInput()->withErrors("We are unable to process the data. Please try again.");
             }
         } else
-            return Redirect::back()->withInput()->withErrors($validator);
+            return Redirect::back()->withInput()->withErrors($account_validator);
     }
 
     /**

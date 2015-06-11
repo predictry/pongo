@@ -12,13 +12,6 @@ use App\Models\Account,
     Session,
     Validator;
 
-/**
- * Author       : Rifki Yandhi
- * Date Created : Aug 27, 2014 10:28:31 AM
- * File         : AccountRepository.php
- * Copyright    : rifkiyandhi@gmail.com
- * Function     : 
- */
 class AccountRepository
 {
 
@@ -118,6 +111,12 @@ class AccountRepository
         return false;
     }
 
+
+    public function siteValidate($input, $rules = array()) {
+      $rules = count($rules) > 0 ? $rules : Site::$rules;
+      return Validator::make($input, $rules);
+    }
+
     public function assignUserRoleByEmail($email)
     {
         $user_role = \App\Models\Role::where('name', 'User')->first();
@@ -130,7 +129,6 @@ class AccountRepository
 
         return;
     }
-
 }
 
 /* End of file AccountRepository.php */	

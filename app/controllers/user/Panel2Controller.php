@@ -47,8 +47,14 @@ class Panel2Controller extends BaseController
         /* $dt_start = $ranges['dt_start']; */
         /* $dt_end   = $ranges['dt_end']; */
         
-        $dt_start = "2015060120";
-        $dt_end   = "2015060222";
+        $o_sd     = "20150601";
+        $o_ed     = "20150605";
+        $o_sh     = "01";
+        $o_eh     = "10";
+
+        $dt_start = $o_sd . $o_sh;
+        $dt_end   = $o_ed . $o_eh; 
+        
         
         $cache_pageviews_stat = null;
 
@@ -57,7 +63,7 @@ class Panel2Controller extends BaseController
 
         if (is_null($cache_pageviews_stat)) {
             $arr_response = $response->json();
-            $pageviews_regular_sum = (isset($arr_response['error']) && $arr_response['error']) ? false : array_get($arr_response, 'pageViews');
+            $pageviews_regular_sum = (isset($arr_response['error']) && $arr_response['error']) ? false : array_get($arr_response, 'pageView');
             $pageviews_stat = [
                 'overall'     => ($pageviews_regular_sum) ? $pageviews_regular_sum['overall'] : 0,
                 'recommended' => ($pageviews_regular_sum) ? $pageviews_regular_sum['recommended'] : 0,
@@ -96,7 +102,7 @@ class Panel2Controller extends BaseController
         $cache_summary_sales = null;
         if (is_null($cache_summary_sales)) {
             $arr_response      = $response->json();
-            $sales_regular_sum = (isset($arr_response['error']) && $arr_response['error']) ? 0 : array_get($arr_response, 'salesAmount');
+            $sales_regular_sum = (isset($arr_response['error']) && $arr_response['error']) ? 0 : array_get($arr_response, 'salesPerCart');
             $summary_sales     = [
                 'overall'     => ($sales_regular_sum) ? $sales_regular_sum['overall'] : 0,
                 'recommended' => ($sales_regular_sum) ? $sales_regular_sum['recommended'] : 0,
@@ -111,7 +117,9 @@ class Panel2Controller extends BaseController
         
         $output_top_items['top_purchased_items'] = [];
         $output_top_items['top_viewed_items']    = [];
-
+        
+        $tstart = strtotime("$o_sd");
+        $tend   = strtotime("$o_ed");
         $output = [
             'overviews'           => [
                 'total_pageviews'      => number_format($pageviews_stat['regular']),
@@ -121,12 +129,12 @@ class Panel2Controller extends BaseController
                 'total_item_purchased' => number_format($summary_item_purchased['regular']),
                 'total_orders'         => number_format($n_orders),
                 'total_item_per_cart'  => number_format(($n_orders) > 0 ? ($summary_item_purchased['regular'] / $n_orders) : 0, 2),
-                'total_sales_per_cart' => number_format(($n_orders) > 0 ? ($summary_sales['regular'] / $n_orders) : 0),
+                'total_sales_per_cart' => number_format(($summary_sales['regular'])),
                 'conversion_rate'      => Helper::calcConversionRate($n_orders, $pageviews_stat['regular'])
             ],
             'dt_range'            => [
-                'start' => $dt_start,   // ->format("F d, Y"),
-                'end'   => $dt_end // format("F d, Y")
+                'start' => date("F d, Y", $tstart),
+                'end'   => date("F d, Y", $tend)
             ],
             'dt_start'            => $dt_start,
             'dt_end'              => $dt_end,

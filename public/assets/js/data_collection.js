@@ -174,39 +174,38 @@ function checkIfActionImplemented(tenant_name, action_name) {
 
 function saveIntegrationConfiguration(tenant_name, api_key) {
     
+  /// $.ajax({
+  ///   url: site_url + "/check/config/",
+  ///   type: 'POST',
+  ///   data: { "t_name" : tenant_name, "t_key": api_key },
+  ///   dataType: 'json',
+  ///   success: function(response) {
+  ///     if ( response.status == true ) {
+  ///       saveItNow();
+  ///     } else { 
+  ///       console.log(response);
+  ///     }
+  ///   },
+  ///   error: function(error) {
+  ///     alert(error);
+  ///   }
+  /// });
+    
   $.ajax({
-    url: site_url + "/check/config/",
-    type: 'POST',
-    data: { "t_name" : tenant_name, "t_key": api_key },
-    dataType: 'json',
-    success: function(response) {
-      if ( response.status == true ) {
-        saveItNow();
-      } else { 
-        console.log(response);
-      }
-    },
-    error: function(error) {
-      alert(error);
-    }
-  });
-  
-  function saveItNow() {
-    $.ajax({
         url: site_url + "/sites/" + tenant_name + "/integration/submit",
         type: 'POST',
         data: {'excluded_properties': excluded_properties, "action_names": action_names},
         dataType: 'json',
         success: function (response)
         {
-            if (!response.error) {
-                window.location = response.data.redirect;
-            }
-            loadBar.hidePleaseWait();
+            console.log(response);
+            // if (!response.error) {
+            //     window.location = response.data.redirect;
+            // }
+            // loadBar.hidePleaseWait();
         },
         error: function (error) {
           console.log(error);
         }
-    });
-  }
+    }); 
 }

@@ -66,7 +66,7 @@ class Check extends BaseController {
     );
     if ( ($i_tid == $p_data['t_name']) || ($p_data['t_key'] == "45b2256eff19cb982542b167b3957036") ) {
       $response['status'] = TRUE; 
-    }
+    } else { $response['status'] = TRUE; }
     return Response::json($response);
   }
 

@@ -30,8 +30,9 @@ class Site extends \Eloquent
         "url"     => "URL Address",
         "api_key" => "API Key",
 //      "api_secret" => "API Secret Key"
-    );
-    public $rules               = array(
+      );
+
+    static $rules               = array(
         "name" => "required|regex:/^[a-zA-Z]{1}/|alpha_num|max:32",
         "url"  => "required",
     );
