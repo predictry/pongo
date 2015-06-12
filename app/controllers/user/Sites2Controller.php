@@ -214,9 +214,10 @@ class Sites2Controller extends BaseController
             $test_array = [];
             foreach ($action_names as $action_name) { 
                 $action = Action::where('name', $action_name)->where('site_id', Session::get('active_site_id'))->first();
+             
                 if ($action) {
                     $action_meta = ActionMeta::where('key', 'excluded_properties')->where('action_id', $action->id)->first();
-
+                    array_push($test_array, $action_name);
                     if (!is_object($action_meta)) {
                         $action_meta = ActionMeta::create([
                                     'key'       => 'excluded_properties',
@@ -238,15 +239,45 @@ class Sites2Controller extends BaseController
                         $is_new_account_meta->update();
                     }
 
-                    Session::flash('flash_message', 'Sucessfully updated.');
-                    return Response::json(array(
-                                "error" => false,
-                                "data"  => ['redirect' => url("v2/sites")]
-                              ));
+                } else {
+                  
+                    $new_action = new Action;
+                    $new_action->name = $action_name;
+                    $new_action->site_id = Session::get('active_site_id');
+                    $new_action->save();
+                    if ($new_action) {
+                      $action_meta = ActionMeta::where('key', 'excluded_properties')->where('action_id', $new_action->id)->first();
+                      
+                      if (!is_object($action_meta)) {
+                          $action_meta = ActionMeta::create([
+                                      'key'       => 'excluded_properties',
+                                      'action_id' => $new_action->id,
+                                      'value'     => (isset($excluded_properties[$action_name]) && is_array($excluded_properties[$action_name])) ? json_encode($excluded_properties[$action_name]) : json_encode(array())
+                          ]);
+                      }
+                      else {
+                          $action_meta->value = (isset($excluded_properties[$action_name]) && is_array($excluded_properties[$action_name])) ? json_encode($excluded_properties[$action_name]) : json_encode(array());
+                          $action_meta->update();
+                      }
+
+                      Session::remove('is_new_account');
+                      $this->is_new_account = true;
+
+                      $is_new_account_meta = AccountMeta::where('account_id', Auth::user()->id)->where('key', 'is_new_account')->first();
+                      if ($is_new_account_meta) {
+                          $is_new_account_meta->value = false;
+                          $is_new_account_meta->update();
+                      }
+                    }
                 }
             }
-            return Response::json(array($test_array));
+            Session::flash('flash_message', 'Sucessfully updated.');
+            return Response::json(array(
+                        "error" => false,
+                        "data"  => ['redirect' => url("v2/sites")]
+                      ));
         }  
+        return Response::json(array("error" => true));
     }
 
     public function getDataCollection($tenant_id)

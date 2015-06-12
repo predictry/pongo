@@ -199,10 +199,10 @@ function saveIntegrationConfiguration(tenant_name, api_key) {
         success: function (response)
         {
             console.log(response);
-            // if (!response.error) {
-            //     window.location = response.data.redirect;
-            // }
-            // loadBar.hidePleaseWait();
+            if (!response.error) {
+              window.location = response.data.redirect;
+            }
+            loadBar.hidePleaseWait();
         },
         error: function (error) {
           console.log(error);
