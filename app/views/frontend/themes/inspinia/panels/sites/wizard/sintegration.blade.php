@@ -14,15 +14,15 @@ HTML::script('assets/js/prism.js'))])
   <!-- Step One -->
   <div id="step_one" class="modular_step col-sm-12 col-xs-12 col-md-12 col-lg-12"> 
     <h2 class="step_head">STEP 1: GETTING STARTED (EMBED JS)</h2>
-    <p>To start tracking with the Predictry JavaScript library, just paste the following code into the page you want to track just before the <code>&lt;/head&gt;</code> tags. Make sure to change <strong><em>‘YOUR_API_KEY’</em></strong> and <strong><em>‘YOUR_TENANT_ID’</em></strong> accordingly that have been provided to you. </p>
-    <p>This snippet of code will load our library asynchronously on your page which doesn’t slow down the loading time of you page</p>
+    <p>To start tracking with the Predictry JavaScript library, just paste the following code into the page you want to track just before the <code>&lt;/head&gt;</code> tags.</p>
+    <p>This snippet of code will load our library asynchronously on your page which doesn’t slow down the loading time of you page.</p>
     <p>We create a variable called _predictry that will be available on any pages. You will use it to send any data to us.</p>
-    <p>Note: You need to include this on every page of your website.</p>
+    <p><strong>Note: You need to include this on every page of your website.</strong></p>
     
     <pre class="line-numbers prettyprint"><code class="language-javascript">&lt;script type=<span class="hljs-string">"text/javascript"</span>&gt;
         <span class="hljs-keyword">var</span> _predictry = _predictry || [];
         (<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> {</span>
-            _predictry.push([<span class="hljs-string">'setTenantId'</span>, <span class="hljs-string">"YOUR_TENANT_ID"</span>], [<span class="hljs-string">'setApiKey'</span>, <span class="hljs-string">"YOUR_API_KEY"</span>]);
+            _predictry.push([<span class="hljs-string">'setTenantId'</span>, <span class="hljs-string">"{{ $site->name }}"</span>], [<span class="hljs-string">'setApiKey'</span>, <span class="hljs-string">"{{ $site->api_key }}"</span>]);
             <span class="hljs-keyword">var</span> d = document, g = d.createElement(<span class="hljs-string">'script'</span>), s = d.getElementsByTagName(<span class="hljs-string">'script'</span>)[<span class="hljs-number">0</span>];
             g.type = <span class="hljs-string">'text/javascript'</span>;
             g.defer = <span class="hljs-literal">true</span>;
@@ -36,7 +36,7 @@ HTML::script('assets/js/prism.js'))])
     <!-- Second option *minified ver -->
     <p>If you prefer you can opt for a minified version</p>
     
-    <pre class="line-numbers prettyprint"><code class="language-javascript hljs "><span class="hljs-keyword">var</span> _predictry=_predictry||[];(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>_predictry.push([<span class="hljs-string">"setTenantId"</span>,<span class="hljs-string">"YOUR_TENANT_ID"</span>],[<span class="hljs-string">"setApiKey"</span>,<span class="hljs-string">"YOUR_API_KEY"</span>]);<span class="hljs-keyword">var</span> e=document,c=e.createElement(<span class="hljs-string">"script"</span>),b=e.getElementsByTagName(<span class="hljs-string">"script"</span>)[<span class="hljs-number">0</span>];c.type=<span class="hljs-string">"text/javascript"</span>;c.defer=<span class="hljs-literal">true</span>;c.async=<span class="hljs-literal">true</span>;c.src=<span class="hljs-string">"//d2gq0qsnoi5tbv.cloudfront.net/v3/p.min.js"</span>;b.parentNode.insertBefore(c,b)})();</code></pre>
+    <pre class="line-numbers prettyprint"><code class="language-javascript hljs "><span class="hljs-keyword">var</span> _predictry=_predictry||[];(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>_predictry.push([<span class="hljs-string">"setTenantId"</span>,<span class="hljs-string">"{{ $site->name }}"</span>],[<span class="hljs-string">"setApiKey"</span>,<span class="hljs-string">"{{ $site->api_key }}"</span>]);<span class="hljs-keyword">var</span> e=document,c=e.createElement(<span class="hljs-string">"script"</span>),b=e.getElementsByTagName(<span class="hljs-string">"script"</span>)[<span class="hljs-number">0</span>];c.type=<span class="hljs-string">"text/javascript"</span>;c.defer=<span class="hljs-literal">true</span>;c.async=<span class="hljs-literal">true</span>;c.src=<span class="hljs-string">"//d2gq0qsnoi5tbv.cloudfront.net/v3/p.min.js"</span>;b.parentNode.insertBefore(c,b)})();</code></pre>
     
     <div class="checkbox">
         <input id="step_one" type="checkbox" value="step_one" name="step_one"> 
@@ -204,7 +204,11 @@ HTML::script('assets/js/prism.js'))])
   </div>
   
   <div class="modular_step sint_save col-sm-12 col-xs-12 col-md-12 col-lg-12">
-    <button id="s_save" class="btn btn-primary btn-lg btn-block" onclick="saveintConfig('{{ $tenant_id }}', '{{ $site->api_key }}')">Save Configuration</button>
+    <a id="s_save" class="btn btn-primary btn-lg btn-block" onclick="saveintConfig('{{ $tenant_id }}', '{{ $site->api_key }}')">Save Configuration</a>
   </div>
 </div>
+
+<script type="text/javascript">
+  var action_names = <?php echo json_encode($action_names); ?>;
+</script>
 @stop

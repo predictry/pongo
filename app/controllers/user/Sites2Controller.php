@@ -188,13 +188,24 @@ class Sites2Controller extends BaseController
             }
 
             if (is_object($data) || count($data) > 0) {
+                $action_names = [];
+                foreach($data->sections as $section) {
+                    if(!$section->disabled) {
+                      $actions = $section->actions;
+                      
+                      foreach($actions as $action) {
+                        array_push($action_names, $action->name);
+                      }
+                    }
+                }
 
                 $output = [
                     'reco_js_url' => $reco_js_url,
                     'site'        => $site,
                     'data'        => $data,
                     'tenant_id'   => $tenant_id,
-                    'pageTitle'   => "Implementation Wizard"
+                    'pageTitle'   => "Implementation Wizard",
+                    'action_names' => $action_names
                 ];
                 return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.sites.wizard.sintegration', $output);
             }

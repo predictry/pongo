@@ -197,7 +197,7 @@ function saveintConfig(tenant_name, api_key) {
   $.ajax({
         url: site_url + "/sites/" + tenant_name + "/integration/submit",
         type: 'POST',
-        data: '',
+        data: {'excluded_properties': [], "action_names": action_names },
         dataType: 'json',
         success: function (response)
         {
