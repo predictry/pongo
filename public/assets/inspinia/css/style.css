@@ -4750,6 +4750,15 @@ h2.wl_predictry {
   text-transform: uppercase!important;
 }
 
+.sint_wrapper {
+  padding: 0px 5%;
+  padding-bottom: 50px;
+  background: #ffffff;
+}
+.sint_wrapper h1 {
+  text-transform: uppercase;
+}
+
 .login_logo { 
   max-width: 200px;
   height: auto;

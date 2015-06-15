@@ -4091,4 +4091,8 @@ body.skin-3 {
   min-height: 100vh;
 }
 
+.sint_wrapper {
+  padding: 0px 5%;
+}
+
 .pace { width: 100%; margin: 0px; }
