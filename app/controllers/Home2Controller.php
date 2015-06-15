@@ -151,7 +151,7 @@ class Home2Controller extends BaseController {
         $input = array_add($input, 'plan_id', 1);
 
         if(mb_substr($input['url'], 0, 4) !== 'http') 
-          $url = 'http://' . $host_name; 
+          $url = 'http://' . $input['url']; 
         
         $site_host =  parse_url($url)['host'];
         $site_name = strtoupper(str_replace('.', '', $site_host));
