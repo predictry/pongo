@@ -171,10 +171,9 @@ class Home2Controller extends BaseController {
         $account_validator = $this->account_repository->validate($input, $rules); 
         $site_validator = $this->account_repository->siteValidate($input, $site_rules);
         
-        // return Response::json(array('account' => $account_validator->passes(), 'site' => $account_validator->passes()));
+       
 
         if ( ($account_validator->passes()) && ($site_validator->passes()) ) {
-            //  return Response::json(array("blah" => "blood"));
             try {
                 // add necessary info for new account
                 $input = array_add($input, "confirmed", 1);
@@ -189,13 +188,13 @@ class Home2Controller extends BaseController {
                     'confirmation_code' => md5(microtime() . Config::get('app.key')),
                     'plan_id' => 1
                 ]); //create new instance
-
+        
                 if ($this->account_repository->saveAccount($account)) {
                     $this->account_repository->assignUserRoleByEmail($input['email']); //assign user role
                     //create site
                     $site_repository = new App\Pongo\Repository\SiteRepository();
-                    $site_id = $site_repository->createSiteBasedOnURL($account, $input['url'], $input['industry_id']);
-
+                    $site_id = $site_repository->createSiteBasedOnURL($account, $input['url'], 1);
+                     
                     //update business
                     if ($site_id) {
                         $parse_url = parse_url($input['url']);

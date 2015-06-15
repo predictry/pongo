@@ -204,13 +204,16 @@ class SiteRepository {
     }
 
     public function createSiteBasedOnURL($account, $url, $site_category_id = 1) {
-        $parse_url = parse_url($url);
+        if(mb_substr($url, 0, 4) !== 'http') 
+          $url_tp = 'http://' . $url; 
+
+        $parse_url = parse_url($url_tp);
 
         if (!empty($parse_url['host'])) {
             $host = $parse_url['host'];
 
             $site = new Site();
-            $site->url = $url;
+            $site->url = $url_tp;
             $site->api_key = $url;
             $site->api_secret = $url;
             $site->name = strtoupper(str_replace('.', '', $host));
