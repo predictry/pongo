@@ -4751,13 +4751,56 @@ h2.wl_predictry {
 }
 
 .sint_wrapper {
-  padding: 0px 5%;
+  padding: 0px 10%;
   padding-bottom: 50px;
   background: #ffffff;
 }
-.sint_wrapper h1 {
+.sint_wrapper h1,
+.sint_wrapper h2 
+{
   text-transform: uppercase;
+  font-weight: 700;
 }
+
+.sint_wrapper p {
+  font-size: 14px;
+  line-height: 20px;
+}
+.sint_wrapper
+.checkbox 
+label.checkbox_label {
+  text-transform: uppercase;
+  font-family: 'open sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.sint_wrapper
+input[type=checkbox] + label {
+  color: #ccc;
+  font-style: italic;
+  font-size: 15px;
+  margin-left: 0px;
+}
+
+input[type=checkbox] {
+  margin-left: 0px!important;
+}
+
+.sint_wrapper
+input[type=checkbox]:checked + label {
+  color: #f00;
+  font-style: normal;
+  margin-left: 0px;
+} 
+
+.sint_wrapper
+.sint_save {
+  margin: 20px 0px;
+}
+
+.sint_wrapper
+.sint_save button#s_save {
+  text-transform: uppercase;
+}  
 
 .login_logo { 
   max-width: 200px;

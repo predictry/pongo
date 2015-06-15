@@ -4,52 +4,52 @@ var excluded_properties = {};
 
 jQuery(document).ready(function () {
 
-    $('[id^=detail-]').hide();
-    $('.toggle').click(function () {
-        $input = $(this);
-        $target = $('#' + $input.attr('data-toggle'));
-        $target.slideToggle();
-    });
-    $('[data-toggle="tooltip"]').tooltip();
-
-    var navListItems = $('ul.setup-panel li a'),
-            allWells = $('.setup-content');
-
-    allWells.hide();
-
-    navListItems.click(function (e)
-    {
-        e.preventDefault();
-        var $target = $($(this).attr('href')),
-                $item = $(this).closest('li');
-
-        if (!$item.hasClass('disabled')) {
-            navListItems.closest('li').removeClass('active');
-            $item.addClass('active');
-            allWells.hide();
-            $target.show();
-        }
-    });
-
-    $('ul.setup-panel li.active a').trigger('click');
-
-    // Btn Embed Continue
-    $('#btn-embed-continue').on('click', function (e) {
-        $('ul.setup-panel li:eq(1)').removeClass('disabled');
-        $('ul.setup-panel li a[href="#step-data-collection"]').trigger('click');
-        $(this).remove();
-    });
-
-    // Btn Data Collection Continue
-//    $('#btn-data-collection-continue').on('click', function (e) {
+//    $('[id^=detail-]').hide();
+//    $('.toggle').click(function () {
+//        $input = $(this);
+//        $target = $('#' + $input.attr('data-toggle'));
+//        $target.slideToggle();
+//    });
+//    $('[data-toggle="tooltip"]').tooltip();
+//
+//    var navListItems = $('ul.setup-panel li a'),
+//            allWells = $('.setup-content');
+//
+//    allWells.hide();
+//
+//    navListItems.click(function (e)
+//    {
+//        e.preventDefault();
+//        var $target = $($(this).attr('href')),
+//                $item = $(this).closest('li');
+//
+//        if (!$item.hasClass('disabled')) {
+//            navListItems.closest('li').removeClass('active');
+//            $item.addClass('active');
+//            allWells.hide();
+//            $target.show();
+//        }
+//    });
+//
+//    $('ul.setup-panel li.active a').trigger('click');
+//
+//    // Btn Embed Continue
+//    $('#btn-embed-continue').on('click', function (e) {
 //        $('ul.setup-panel li:eq(1)').removeClass('disabled');
-//        $('ul.setup-panel li a[href="#data-collection"]').trigger('click');
+//        $('ul.setup-panel li a[href="#step-data-collection"]').trigger('click');
 //        $(this).remove();
 //    });
-
-    for (var i = 0; i < action_names.length; i++) {
-        excluded_properties[action_names[i]] = [];
-    }
+//
+//    // Btn Data Collection Continue
+////    $('#btn-data-collection-continue').on('click', function (e) {
+////        $('ul.setup-panel li:eq(1)').removeClass('disabled');
+////        $('ul.setup-panel li a[href="#data-collection"]').trigger('click');
+////        $(this).remove();
+////    });
+//
+//    for (var i = 0; i < action_names.length; i++) {
+//        excluded_properties[action_names[i]] = [];
+//    }
 });
 
 var loadBar;
@@ -173,24 +173,7 @@ function checkIfActionImplemented(tenant_name, action_name) {
 }
 
 function saveIntegrationConfiguration(tenant_name, api_key) {
-    
-  /// $.ajax({
-  ///   url: site_url + "/check/config/",
-  ///   type: 'POST',
-  ///   data: { "t_name" : tenant_name, "t_key": api_key },
-  ///   dataType: 'json',
-  ///   success: function(response) {
-  ///     if ( response.status == true ) {
-  ///       saveItNow();
-  ///     } else { 
-  ///       console.log(response);
-  ///     }
-  ///   },
-  ///   error: function(error) {
-  ///     alert(error);
-  ///   }
-  /// });
-    
+   
   $.ajax({
         url: site_url + "/sites/" + tenant_name + "/integration/submit",
         type: 'POST',
@@ -209,3 +192,24 @@ function saveIntegrationConfiguration(tenant_name, api_key) {
         }
     }); 
 }
+
+function saveintConfig(tenant_name, api_key) {
+  $.ajax({
+        url: site_url + "/sites/" + tenant_name + "/integration/submit",
+        type: 'POST',
+        data: '',
+        dataType: 'json',
+        success: function (response)
+        {
+            console.log(response);
+            if (!response.error) {
+              window.location = response.data.redirect;
+            }
+            loadBar.hidePleaseWait();
+        },
+        error: function (error) {
+          console.log(error);
+        }
+    }); 
+}
+

@@ -196,7 +196,7 @@ class Sites2Controller extends BaseController
                     'tenant_id'   => $tenant_id,
                     'pageTitle'   => "Implementation Wizard"
                 ];
-                return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.sites.wizard.implementation', $output);
+                return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.sites.wizard.sintegration', $output);
             }
             else
                 return Redirect::to('v2/sites')->with('flash_error', "Something error.");

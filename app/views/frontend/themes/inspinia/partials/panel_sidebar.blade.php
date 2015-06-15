@@ -21,20 +21,20 @@
                 </div>
             </li>
             <li class="<?php if ($ca === 'App\Controllers\User\Panel2Controller') echo 'active'; ?>">
-                <a href="<?php echo URL::to('v2/home'); ?>"><i class="fa fa-th-large"></i> <span class="nav-label">Dashboard </span> </a>
+                <a href="<?php echo URL::to('v2/home'); ?>"><i class="fa fa-th-list"></i> <span class="nav-label">Dashboard </span> </a>
             </li>
             <li class="<?php if ($ca === 'App\Controllers\User\Widgets2Controller' || $ca === 'App\Controllers\User\Filters2Controller' || $ca === 'App\Controllers\User\Rules2Controller') echo 'active'; ?>">
-                <a href="javascript:void(0);"><i class="fa fa-level-up"></i> <span class="nav-label">Recommendations </span><span class="fa arrow"></span> </a>
+                <a href="javascript:void(0);"><i class="fa fa-send-o"></i> <span class="nav-label">Recommendations </span><span class="fa arrow"></span> </a>
                 <ul class="nav nav-second-level">
-                    <li class="<?php if ($ca === 'App\Controllers\User\Widgets2Controller') echo 'active'; ?>"><a href="<?php echo URL::to('v2/widgets'); ?>">Widgets</a></li>
-                    <li class="<?php if ($ca === 'App\Controllers\User\Filters2Controller') echo 'active'; ?>"><a href="<?php echo URL::to('v2/filters'); ?>">Filters</a></li>
-                    <li class="<?php if ($ca === 'App\Controllers\User\Rules2Controller') echo 'active'; ?>"><a href="<?php echo URL::to('v2/rules'); ?>">Rule Sets</a></li>
-                    <li class="<?php if ($ca === 'App\Controllers\User\DemoController') echo 'active'; ?>"><a href="<?php echo URL::to('v2/demo'); ?>">Demo</a></li>
+                    <li class="<?php if ($ca === 'App\Controllers\User\Widgets2Controller') echo 'active'; ?>"><a href="<?php echo URL::to('v2/widgets'); ?>"><i class="fa fa-list-ul"></i> Widgets</a></li>
+                    <li class="<?php if ($ca === 'App\Controllers\User\Filters2Controller') echo 'active'; ?>"><a href="<?php echo URL::to('v2/filters'); ?>"><i class="fa fa-list-ul"></i> Filters</a></li>
+                    <li class="<?php if ($ca === 'App\Controllers\User\Rules2Controller') echo 'active'; ?>"><a href="<?php echo URL::to('v2/rules'); ?>"><i class="fa fa-list-ul"></i> Rule Sets</a></li>
+                    <li class="<?php if ($ca === 'App\Controllers\User\DemoController') echo 'active'; ?>"><a href="<?php echo URL::to('v2/demo'); ?>"><i class="fa fa-list-ul"></i> Demo</a></li>
                 </ul>
             </li>
 
             <li class="<?php if ($ca === 'App\Controllers\User\Items2Controller') echo 'active'; ?>">
-                <a href="<?php echo URL::to('v2/items'); ?>"><i class="fa fa-cube"></i> <span class="nav-label">Your Items </span> </a>
+                <a href="<?php echo URL::to('v2/items'); ?>"><i class="fa fa-cubes"></i> <span class="nav-label">Your Items </span> </a>
             </li>
         </ul>
 

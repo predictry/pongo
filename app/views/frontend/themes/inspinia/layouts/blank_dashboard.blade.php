@@ -18,6 +18,7 @@
         {{ HTML::style('assets/inspinia/font-awesome/css/font-awesome.min.css') }}
         {{ HTML::style('assets/inspinia/css/animate.css') }}
         {{ HTML::style('assets/inspinia/css/plugins/chosen/chosen.css') }}
+        {{ HTML::style('assets/css/prism.css') }}
         {{ HTML::style('assets/inspinia/css/style.css') }}
 
         @if(count($styles) > 0)

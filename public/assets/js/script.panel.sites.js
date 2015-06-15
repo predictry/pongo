@@ -1,5 +1,6 @@
 jQuery(document).ready(function () {
-
+    
+   
     var navListItems = $('ul.setup-panel li a'),
             allWells = $('.setup-content');
 

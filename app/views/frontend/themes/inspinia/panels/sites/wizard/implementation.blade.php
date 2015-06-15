@@ -1,6 +1,7 @@
 @extends(getenv('FRONTEND_SKINS') . $theme . '.layouts.blank_dashboard', ['scripts' => array(HTML::script('assets/js/script.helper.js'), HTML::script('assets/js/script.panel.sites.js'), HTML::script('assets/js/data_collection.js'))])
 @section('content')
 @include(getenv('FRONTEND_SKINS') . $theme . '.partials.page_heading_without_action', ['upper' => ['Sites' => 'v2/sites']])
+
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
         <div class="col-lg-12">
@@ -171,7 +172,6 @@
     </div>
 </div>
 <script type="text/javascript">
-
-                            var action_names = <?php echo json_encode($action_names); ?>;
+  var action_names = <?php echo json_encode($action_names); ?>;
 </script>
 @stop
