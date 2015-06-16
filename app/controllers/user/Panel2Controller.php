@@ -1,15 +1,6 @@
 <?php
 
-/**
- * Author       : Rifki Yandhi
- * Date Created : Jan 5, 2015 12:15:12 PM
- * File         : app/controllers/Panel2Controller.php
- * Copyright    : rifkiyandhi@gmail.com
- * Function     : 
- */
-
 namespace App\Controllers\User;
-
 use App\Controllers\BaseController,
     /* App\Models\Action,
     App\Models\ActionInstance, */
@@ -21,14 +12,11 @@ use App\Controllers\BaseController,
     Response,
     View;
 
-    
-class Panel2Controller extends BaseController
-{
+class Panel2Controller extends BaseController   {
 
     protected $panel_repository = null;
 
-    function __construct(PanelRepository $repository)
-    {
+    function __construct(PanelRepository $repository) {
         parent::__construct();
 
         $this->panel_repository                 = $repository;
@@ -38,14 +26,11 @@ class Panel2Controller extends BaseController
         View::share(array("ca" => get_class(), "custom_script" => $custom_script));
     }
 
-    public function index($dt_range_group = "today", $dt_start = null, $dt_end = null)
-    {
+    public function index($dt_range_group = "today", $dt_start = null, $dt_end = null)  {
         $client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'stat/');
         $current_site = \Session::get("active_site_name");
         
         $ranges   = Helper::getSelectedFilterDateRange($dt_range_group, $dt_start, $dt_end);
-        /* $dt_start = $ranges['dt_start']; */
-        /* $dt_end   = $ranges['dt_end']; */
         
         $o_sd     = "20150601";
         $o_ed     = "20150605";
@@ -60,19 +45,16 @@ class Panel2Controller extends BaseController
 
         /* just a global response for dashboard */
         $response     = $client->get("overview?tenantId=". $current_site . "&startDate=" . $dt_start. "&endDate=" . $dt_end)->send();
-
-        if (is_null($cache_pageviews_stat)) {
-            $arr_response = $response->json();
-            $pageviews_regular_sum = (isset($arr_response['error']) && $arr_response['error']) ? false : array_get($arr_response, 'pageView');
-            $pageviews_stat = [
-                'overall'     => ($pageviews_regular_sum) ? $pageviews_regular_sum['overall'] : 0,
-                'recommended' => ($pageviews_regular_sum) ? $pageviews_regular_sum['recommended'] : 0,
-                'regular'     => ($pageviews_regular_sum) ? $pageviews_regular_sum['regular'] : 0
-            ];
-        }
-        else {
-            $pageviews_stat = $cache_pageviews_stat;
-        }
+       
+        $arr_response = $response->json();
+        $pageviews_regular_sum = (isset($arr_response['error']) && $arr_response['error']) ? false : array_get($arr_response, 'pageView');
+        $pageviews_stat = [
+            'overall'     => ($pageviews_regular_sum) ? $pageviews_regular_sum['overall'] : 0,
+            'recommended' => ($pageviews_regular_sum) ? $pageviews_regular_sum['recommended'] : 0,
+            'regular'     => ($pageviews_regular_sum) ? $pageviews_regular_sum['regular'] : 0
+        ];
+    
+        
 
         $cache_summary_item_purchased = null; 
         if (is_null($cache_summary_item_purchased)) {
@@ -98,7 +80,6 @@ class Panel2Controller extends BaseController
             $n_orders = $cache_n_orders; 
         }
 
-
         $cache_summary_sales = null;
         if (is_null($cache_summary_sales)) {
             $arr_response      = $response->json();
@@ -113,11 +94,16 @@ class Panel2Controller extends BaseController
             $summary_sales = $cache_summary_sales;
         }
         
-        
-        
-        $output_top_items['top_purchased_items'] = [];
-        $output_top_items['top_viewed_items']    = [];
-        
+        $puchased_items = [];
+        $viewd_items = [];
+        $top_purchased_items = [
+          
+        ];
+
+        $top_viewed_items = [
+
+        ];
+
         $tstart = strtotime("$o_sd");
         $tend   = strtotime("$o_ed");
         $output = [
@@ -131,21 +117,20 @@ class Panel2Controller extends BaseController
                 'total_item_per_cart'  => number_format(($n_orders) > 0 ? ($summary_item_purchased['regular'] / $n_orders) : 0, 2),
                 'total_sales_per_cart' => number_format(($summary_sales['regular'])),
                 'conversion_rate'      => Helper::calcConversionRate($n_orders, $pageviews_stat['regular'])
-            ],
+              ],
+
             'dt_range'            => [
                 'start' => date("F d, Y", $tstart),
                 'end'   => date("F d, Y", $tend)
-            ],
+              ],
+
             'dt_start'            => $dt_start,
             'dt_end'              => $dt_end,
-            'top_purchased_items' => [],
-            'top_viewed_items'    => [],
+            'top_purchased_items' => $top_purchased_items,
+            'top_viewed_items'    => $top_viewed_items,
             'pageTitle'           => "Dashboard"
         ];
-        return \View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.dashboard', $output);
+        return \View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.dashboard', $output); 
     }
-
 }
 
-/* End of file Panel2Controller.php */
-/* Location: ./application/controllers/Panel2Controller.php */
