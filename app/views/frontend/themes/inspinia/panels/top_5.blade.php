@@ -28,7 +28,7 @@
                   <span class="line">
                     {{ $item['name'] }}</span>
                 </td>
-                <td>{{ $item['amount'] }}</td>
+                <td>{{ $item['score'] }}</td>
                 <td>{{ $item['url'] }}</td>
               </tr>     
             @endforeach

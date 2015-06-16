@@ -13,9 +13,7 @@ use App\Controllers\BaseController,
     View;
 
 class Panel2Controller extends BaseController   {
-
     protected $panel_repository = null;
-
     function __construct(PanelRepository $repository) {
         parent::__construct();
 
@@ -25,13 +23,12 @@ class Panel2Controller extends BaseController   {
         $custom_script = "var site_url = '" . URL::to('/') . "';";
         View::share(array("ca" => get_class(), "custom_script" => $custom_script));
     }
-
     public function index($dt_range_group = "today", $dt_start = null, $dt_end = null)  {
         $client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'stat/');
-        $current_site = \Session::get("active_site_name");
+        $top_client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'top/');
         
-        $ranges   = Helper::getSelectedFilterDateRange($dt_range_group, $dt_start, $dt_end);
-        
+        $current_site = \Session::get("active_site_name");    
+        $ranges   = Helper::getSelectedFilterDateRange($dt_range_group, $dt_start, $dt_end); 
         $o_sd     = "20150601";
         $o_ed     = "20150605";
         $o_sh     = "01";
@@ -93,16 +90,9 @@ class Panel2Controller extends BaseController   {
         else {
             $summary_sales = $cache_summary_sales;
         }
-        
-        $puchased_items = [];
-        $viewd_items = [];
-        $top_purchased_items = [
-          
-        ];
 
-        $top_viewed_items = [
-
-        ];
+        $top_purchased_items  = $top_client->get("sales")->send()->json();
+        $top_viewed_items     = $top_client->get("hits")->send()->json();
 
         $tstart = strtotime("$o_sd");
         $tend   = strtotime("$o_ed");
@@ -126,10 +116,11 @@ class Panel2Controller extends BaseController   {
 
             'dt_start'            => $dt_start,
             'dt_end'              => $dt_end,
-            'top_purchased_items' => $top_purchased_items,
-            'top_viewed_items'    => $top_viewed_items,
+            'top_purchased_items' => $top_purchased_items['items'],
+            'top_viewed_items'    => $top_viewed_items['items'],
             'pageTitle'           => "Dashboard"
         ];
+        
         return \View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.dashboard', $output); 
     }
 }
