@@ -376,3 +376,7 @@ circle.mg-points-mono {
 .mg-year-marker-small text {
     font-size: 0.6rem;
 }
+
+.ibox {
+  background-color: #ffffff;
+}

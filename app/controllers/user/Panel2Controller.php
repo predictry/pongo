@@ -14,6 +14,7 @@ use App\Controllers\BaseController,
 
 class Panel2Controller extends BaseController   {
     protected $panel_repository = null;
+    
     function __construct(PanelRepository $repository) {
         parent::__construct();
 
@@ -23,6 +24,7 @@ class Panel2Controller extends BaseController   {
         $custom_script = "var site_url = '" . URL::to('/') . "';";
         View::share(array("ca" => get_class(), "custom_script" => $custom_script));
     }
+
     public function index($dt_range_group = "today", $dt_start = null, $dt_end = null)  {
         $client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'stat/');
         $top_client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'top/');
@@ -120,8 +122,7 @@ class Panel2Controller extends BaseController   {
             'top_viewed_items'    => $top_viewed_items['items'],
             'pageTitle'           => "Dashboard"
         ];
-        
-        return \View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.dashboard', $output); 
+      return \View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.dashboard', $output); 
     }
 }
 

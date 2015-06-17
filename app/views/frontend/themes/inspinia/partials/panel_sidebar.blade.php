@@ -24,7 +24,7 @@
                 <a href="<?php echo URL::to('v2/home'); ?>"><i class="fa fa-th-list"></i> <span class="nav-label">Dashboard </span> </a>
             </li>
             <li class="<?php if ($ca === 'App\Controllers\User\Widgets2Controller' || $ca === 'App\Controllers\User\Filters2Controller' || $ca === 'App\Controllers\User\Rules2Controller') echo 'active'; ?>">
-                <a href="javascript:void(0);"><i class="fa fa-send-o"></i> <span class="nav-label">Recommendations </span><span class="fa arrow"></span> </a>
+                <a href="javascript:void(0);"><i class="fa fa-send-o"></i> <span class="nav-label">Recommendations </span></a>
                 <ul class="nav nav-second-level">
                     <li class="<?php if ($ca === 'App\Controllers\User\Widgets2Controller') echo 'active'; ?>"><a href="<?php echo URL::to('v2/widgets'); ?>"><i class="fa fa-list-ul"></i> Widgets</a></li>
                     <li class="<?php if ($ca === 'App\Controllers\User\Filters2Controller') echo 'active'; ?>"><a href="<?php echo URL::to('v2/filters'); ?>"><i class="fa fa-list-ul"></i> Filters</a></li>
