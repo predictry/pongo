@@ -6,7 +6,8 @@
   HTML::script('assets/js/highcharts.js'), 
   HTML::script('assets/js/bootstrap-datetimepicker.min.js'), 
   HTML::script('assets/js/script.helper.js'), 
-  HTML::script('assets/js/script.panel.filters.js'))
+  HTML::script('assets/js/script.panel.filters.js'),
+  HTML::script('assets/js/metricsgraphics.js'))
 ])
 @section('content')
 <!-- Content wrapper -->

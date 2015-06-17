@@ -1,4 +1,7 @@
-@include(getenv('FRONTEND_SKINS') . $theme . '.partials.header', array('styles' => array(HTML::style('assets/css/daterangepicker-bs3.css'), HTML::style('assets/css/bootstrap-datetimepicker.min.css'))))
+@include(getenv('FRONTEND_SKINS') . $theme . '.partials.header', array('styles' => array(
+HTML::style('assets/css/daterangepicker-bs3.css'), 
+HTML::style('assets/css/bootstrap-datetimepicker.min.css'),
+HTML::style('assets/css/metricsgraphics.css'), )))
 <div id="wrapper">
     @if(Session::get("active_site_id") !== null)
     @include(getenv('FRONTEND_SKINS') . $theme . '.partials.panel_sidebar')

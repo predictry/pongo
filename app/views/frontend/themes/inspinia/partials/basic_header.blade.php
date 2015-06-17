@@ -20,7 +20,7 @@
         {{ HTML::style('assets/inspinia/font-awesome/css/font-awesome.min.css') }}
         {{ HTML::style('assets/inspinia/css/animate.css') }}
         {{ HTML::style('assets/inspinia/css/style.css') }}
-
+        
         @if(count($styles) > 0)
 
         @foreach ($styles as $style)

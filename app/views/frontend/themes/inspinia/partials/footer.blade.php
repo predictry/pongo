@@ -7,7 +7,7 @@
 <!-- Custom and plugin javascript -->
 {{ HTML::script('assets/inspinia/js/inspinia.js') }}
 {{ HTML::script('assets/inspinia/js/plugins/pace/pace.min.js') }}
-
+{{ HTML::script('assets/js/d3.js') }}
 
 @if (count($scripts) > 0)
 

@@ -1,5 +1,4 @@
-<div class="ibox float-e-margins">
-    
+<div class="ibox float-e-margins"> 
     <div class="ibox-title">
         <h5>{{$tableHeader}} </h5>
         <div class="ibox-tools">
@@ -13,21 +12,17 @@
         <table class="table table-striped">
             <thead>
               <tr>
-                  <th>#</th>
+                  <th>#ID</th>
                   <th>Name</th>
                   <th>Amount</th>
                   <th>Url</th>
               </tr>
-            </thead>
-            
+            </thead>            
             <tbody> 
             @foreach($contents as $item)
               <tr>
                 <td>{{ $item['id'] }}</td>
-                <td>
-                  <span class="line">
-                    {{ $item['name'] }}</span>
-                </td>
+                <td><span class="line">{{ $item['name'] }}</span></td>
                 <td>{{ $item['score'] }}</td>
                 <td>{{ $item['url'] }}</td>
               </tr>     

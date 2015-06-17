@@ -29,13 +29,13 @@ class Panel2Controller extends BaseController   {
         
         $current_site = \Session::get("active_site_name");    
         $ranges   = Helper::getSelectedFilterDateRange($dt_range_group, $dt_start, $dt_end); 
-        $o_sd     = "20150601";
-        $o_ed     = "20150605";
-        $o_sh     = "01";
-        $o_eh     = "10";
-
-        $dt_start = $o_sd . $o_sh;
-        $dt_end   = $o_ed . $o_eh; 
+        
+        
+        $o_sd     = date("YmdH",strtotime($ranges['dt_start']));
+        $o_ed     = date("YmdH",strtotime($ranges['dt_end']));   
+        
+        $dt_start = $o_sd;
+        $dt_end   = $o_ed;
         
         
         $cache_pageviews_stat = null;
@@ -94,8 +94,8 @@ class Panel2Controller extends BaseController   {
         $top_purchased_items  = $top_client->get("sales")->send()->json();
         $top_viewed_items     = $top_client->get("hits")->send()->json();
 
-        $tstart = strtotime("$o_sd");
-        $tend   = strtotime("$o_ed");
+        $tstart = strtotime($ranges['dt_start']);
+        $tend   = strtotime($ranges['dt_end']);
         $output = [
             'overviews'           => [
                 'total_pageviews'      => number_format($pageviews_stat['regular']),
@@ -110,8 +110,8 @@ class Panel2Controller extends BaseController   {
               ],
 
             'dt_range'            => [
-                'start' => date("F d, Y", $tstart),
-                'end'   => date("F d, Y", $tend)
+                'start' => date("[H] F d, Y", $tstart),
+                'end'   => date("[H] F d, Y", $tend)
               ],
 
             'dt_start'            => $dt_start,
