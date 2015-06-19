@@ -89,7 +89,15 @@ class Panel2Controller extends BaseController   {
         else {
             $summary_sales = $cache_summary_sales;
         }
+  
+        $item_per_cart = (isset($arr_response['error']) && $arr_response['error']) ? 0 : array_get($arr_response, 'itemPerCart');
+        $summary_item_per_cart = [
+          'overall'     => ($item_per_cart) ? $item_per_cart['overall'] : 0,
+          'recommended' => ($item_per_cart) ? $item_per_cart['recommended'] : 0,
+          'regular'     => ($item_per_cart) ? $item_per_cart['regular'] : 0
+        ];
 
+        $conversionRate = (isset($arr_response['error']) && $arr_response['error']) ? 0 : array_get($arr_response, 'conversionRate'); 
         $top_purchased_items  = $top_client->get("sales")->send()->json();
         $top_viewed_items     = $top_client->get("hits")->send()->json();
 
@@ -97,15 +105,15 @@ class Panel2Controller extends BaseController   {
         $tend   = strtotime($ranges['dt_end']);
         $output = [
             'overviews'           => [
-                'total_pageviews'      => number_format($pageviews_stat['regular']),
+                'total_pageviews'      => number_format($pageviews_stat['overall']),
                 // 'total_uvs'            => number_format($n_session),
                 'total_uvs'            => number_format(1000),
                 'total_sales_amount'   => number_format($summary_sales['overall']),
-                'total_item_purchased' => number_format($summary_item_purchased['regular']),
+                'total_item_purchased' => number_format($summary_item_purchased['overall']),
                 'total_orders'         => number_format($n_orders),
-                'total_item_per_cart'  => number_format(($n_orders) > 0 ? ($summary_item_purchased['regular'] / $n_orders) : 0, 2),
-                'total_sales_per_cart' => number_format(($summary_sales['regular'])),
-                'conversion_rate'      => Helper::calcConversionRate($n_orders, $pageviews_stat['regular'])
+                'total_item_per_cart'  => number_format($summary_item_per_cart['overall']),
+                'total_sales_per_cart' => number_format($summary_sales['overall']),
+                'conversion_rate'      => number_format($conversionRate)
               ],
 
             'dt_range'            => [
