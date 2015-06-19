@@ -91,21 +91,34 @@ class Sites2Controller extends BaseController
 
     public function postCreate()
     {
-        $input               = Input::only("name", "url");
+        $input  = Input::only("url");
         $input['account_id'] = Auth::user()->id;
+        
+        if(mb_substr($input['url'], 0, 4) !== 'http') 
+          $url = 'http://' . $input['url']; 
 
+        $site_host =  parse_url($url)['host'];
+        $name = strtoupper(str_replace('.', '', $site_host));
+        $user_id = Auth::user()->id;
+
+        $site_input = [
+          'name' => $name,
+          'url'  => $url,
+          'account_id' => $user_id
+        ]; 
+        
         $site      = new Site();
-        $validator = Validator::make($input, $site->rules, array("regex" => "The name format should start with character. Ex. ABC123"));
-
+        
+        $validator = Validator::make($site_input, Site::$rules, array("regex" => "The name format should start with character. Ex. ABC123"));
+     
         if ($validator->passes()) {
-
             $salt = uniqid(mt_rand(), true);
 
-            $site->name             = $input['name'];
-            $site->api_key          = md5($input['url']);
-            $site->api_secret       = md5($input['url'] . $salt);
-            $site->account_id       = $input['account_id'];
-            $site->url              = $input['url'];
+            $site->name             = $site_input['name'];
+            $site->api_key          = md5($site_input['url']);
+            $site->api_secret       = md5($site_input['url'] . $salt);
+            $site->account_id       = $site_input['account_id'];
+            $site->url              = $site_input['url'];
             $site->site_category_id = SiteCategory::first()->id;
             $id                     = $site->save();
 
@@ -113,16 +126,15 @@ class Sites2Controller extends BaseController
             Event::fire("site.set_default_funnel_preferences", array($site));
 
             if (Request::ajax()) {
-                if ($id)
-                    return Response::json(array("status" => "success", "response" => "/home"));
-                else
-                    return Response::json(
-                                    array("status"   => "error",
-                                        "response" => \View::make("frontend.panels.sites.addform", array(
-                                            "flash_error" => "Inserting problem. Please check your inputs."
-                                        ))->render()));
-            }else {
-
+              if ($id) 
+                return Response::json(array("status" => "success", "response" => "/home"));
+              else
+                return Response::json(
+                array("status"   => "error",
+                    "response" => \View::make("frontend.panels.sites.addform", array(
+                        "flash_error" => "Inserting problem. Please check your inputs."
+                    ))->render()));
+            } else {
                 if ($id)
                     return \Redirect::to("v2/sites/{$site->name}/integration")->with("flash_message", "Successfully added new site.");
                 else

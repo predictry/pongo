@@ -1,12 +1,3 @@
-/**
- * Author       : Rifki Yandhi
- * Date Created : Aug 11, 2014 9:10:30 AM
- * Email        : rifkiyandhi@gmail.com 
- * Function     : Predictry JS SDK
- * Version      : 0.3.0
- * Revision     : 6
- */
-
 if (typeof _predictry !== 'object') {
     _predictry = [];
 }
@@ -1796,7 +1787,7 @@ if (typeof Predictry !== 'object') {
         }
 
         //INIT CALLS
-//        _predictry.push(['appendStyle']);
+        // _predictry.push(['appendStyle']);
         _predictry.push(['setSessionID']);
         _predictry.push(['setSessionBrowserID']);
         _predictry.push(['setSessionUserID']);

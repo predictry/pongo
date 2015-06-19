@@ -11,19 +11,11 @@
                 <div class="ibox-content">
                     @include('frontend.partials.notification')
                     <?php if ($type === "create") : ?>
-                        {{ Form::open(array('url' => 'sites/submit', 'class' => 'form-horizontal loginForm')) }}
+                        {{ Form::open(array('url' => 'v2/sites/submit', 'class' => 'form-horizontal loginForm')) }}
                     <?php elseif ($type === "edit") : ?>
                         {{ Form::model($site, array('route' => array('sites.update', $site->id), 'url' => 'sites/'.$site->id.'/edit', 'class' => 'form-horizontal siteForm')) }}
                     <?php endif; ?>
-                    <div class="form-group {{$var = $errors->first('name')}} {{ ($var !== '') ? 'has-error' : ''}}">
-                        <label for="name" class="col-sm-2 control-label">Tenant ID</label>
-                        <div class="col-sm-10">
-                            <?php echo Form::text('name', null, array('class' => 'form-control', 'placeholder' => 'TENANT_ID', 'id' => 'name')); ?>
-                            <span class="help-block">{{$errors->first('name')}}</span>
-                        </div>
-                    </div>
-                    <div class="hr-line-dashed"></div>
-
+                    
                     <div class="form-group {{$var = $errors->first('url')}} {{ ($var !== '') ? 'has-error' : ''}}">
                         <label for="email" class="col-sm-2 control-label">URL Address</label>
                         <div class="col-sm-10">

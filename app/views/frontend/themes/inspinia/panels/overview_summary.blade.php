@@ -1,5 +1,6 @@
 <div class="row overview_datacells">
-    <div class="col-lg-6 data_cell">
+    
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 data_cell">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
                 <!--<span class="label label-success pull-right">Pageviews</span>-->
@@ -14,7 +15,7 @@
         </div>
     </div>
 
-    <div class="col-lg-6">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 data_cell">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
                     <span class="label label-info pull-right">Annual</span>
@@ -29,7 +30,7 @@
             </div>
     </div>
 
-    <div class="col-lg-6">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 data_cell">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
                 <!--<span class="label label-primary pull-right">Today</span>-->
@@ -44,7 +45,7 @@
         </div>
     </div>
 
-    <div class="col-lg-6">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 data_cell">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
                 <!--<span class="label label-danger pull-right">Low value</span>-->
@@ -59,7 +60,7 @@
         </div>
     </div>
 
-    <div class="col-lg-6">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 data_cell">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
                 <!--<span class="label label-danger pull-right">Low value</span>-->
@@ -74,7 +75,7 @@
         </div>
     </div>
     
-    <div class="col-lg-6">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 data_cell">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
                 <!--<span class="label label-danger pull-right">Low value</span>-->
@@ -89,7 +90,7 @@
         </div>
     </div>
 
-    <div class="col-lg-6">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 data_cell">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
                 <h5>Sales Amount per Cart</h5>
@@ -103,7 +104,7 @@
         </div>
     </div>
  
-    <div class="col-lg-6">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
                 <h5>Items per Cart</h5>

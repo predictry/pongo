@@ -29,21 +29,18 @@ class Panel2Controller extends BaseController   {
         $client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'stat/');
         $top_client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'top/');
         
-        $current_site = \Session::get("active_site_name");    
+        // $current_site = \Session::get("active_site_name");    
+        $current_site = "BUKALAPAK";
         $ranges   = Helper::getSelectedFilterDateRange($dt_range_group, $dt_start, $dt_end); 
-        
         
         $o_sd     = date("YmdH",strtotime($ranges['dt_start']));
         $o_ed     = date("YmdH",strtotime($ranges['dt_end']));   
         
         $dt_start = $o_sd;
         $dt_end   = $o_ed;
-        
-        
-        $cache_pageviews_stat = null;
 
         /* just a global response for dashboard */
-        $response     = $client->get("overview?tenantId=". $current_site . "&startDate=" . $dt_start. "&endDate=" . $dt_end)->send();
+        $response     = $client->get("overview?tenantId=". $current_site . "&startDate=" . $dt_start . "&endDate=" . $dt_end)->send();
        
         $arr_response = $response->json();
         $pageviews_regular_sum = (isset($arr_response['error']) && $arr_response['error']) ? false : array_get($arr_response, 'pageView');

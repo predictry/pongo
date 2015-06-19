@@ -4739,7 +4739,8 @@ body.skin-3 {
 
 div.manage div.table-responsive{
     min-height: 300px;
-}
+    padding-bottom: 120px;
+  }
 
 
 a:hover, a:active, a:focus, a {
