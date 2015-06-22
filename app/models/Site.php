@@ -34,7 +34,7 @@ class Site extends \Eloquent
 
     static $rules               = array(
         "name" => "required|regex:/^[a-zA-Z]{1}/|alpha_num|max:32",
-        "url"  => "required",
+        "url"  => "required|unique:sites",
     );
 
     public function actions()
