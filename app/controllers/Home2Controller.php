@@ -155,9 +155,8 @@ class Home2Controller extends BaseController {
 
         $rules = array_merge(App\Models\Account::$rules, [
             'range_number_of_items' => 'required|in:less_than_5k,5k_to_499k,500k_to_999k,more_than_1mil',
-            'industry_id' => 'required|exists:industries,id'
         ]);
-
+        
         $site_rules = App\Models\Site::$rules;
     
         $account_validator = $this->account_repository->validate($input, $rules); 
