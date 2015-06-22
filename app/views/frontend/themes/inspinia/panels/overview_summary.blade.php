@@ -3,7 +3,6 @@
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 data_cell">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
-                <!--<span class="label label-success pull-right">Pageviews</span>-->
                 <h5>Pageviews</h5>
             </div>
             <div id="visualOne"></div>

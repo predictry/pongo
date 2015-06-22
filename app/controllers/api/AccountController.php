@@ -12,16 +12,8 @@ use App\Models\Account,
     Response,
     Validator;
 
-/**
- * Author       : Rifki Yandhi
- * Date Created : Oct 1, 2014 4:10:20 PM
- * File         : AccountController.php
- * Copyright    : rifkiyandhi@gmail.com
- * Function     : 
- */
 class AccountController extends \Controller
 {
-
     private $repository;
     private $http_status;
 
@@ -142,4 +134,4 @@ class AccountController extends \Controller
 
 }
 
-/* End of file AccountController.php */
+
