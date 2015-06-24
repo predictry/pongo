@@ -27,7 +27,7 @@ class Panel2Controller extends BaseController   {
         $client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'stat/');
         $top_client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'top/');
          
-        $current_site = "BUKALAPAK";
+        $current_site = "FAMILYNARA2014";
         $ranges   = Helper::getSelectedFilterDateRange($dt_range_group, $dt_start, $dt_end); 
         
         $o_sd     = date("YmdH",strtotime($ranges['dt_start']));
@@ -35,7 +35,8 @@ class Panel2Controller extends BaseController   {
         
         $dt_start = $o_sd;
         $dt_end   = $o_ed;
-
+        
+    
         /* just a global response for dashboard */
         $response     = $client->get("overview?tenantId=". $current_site . "&startDate=" . $dt_start . "&endDate=" . $dt_end)->send(); 
         $arr_response = $response->json();

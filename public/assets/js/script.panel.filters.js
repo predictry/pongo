@@ -30,7 +30,7 @@ jQuery(document).ready(function () {
         },
         startDate: moment(),
         endDate: moment(),
-        minDate: moment().subtract(32, 'days'),
+        minDate: moment().subtract(220, 'days'),
         maxDate: moment(),
         dateLimit: {month: 1},
         applyClass: 'btnApplyRange btn btn-primary btn-sm',

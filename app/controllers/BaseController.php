@@ -46,7 +46,7 @@ class BaseController extends \Controller
             //set default active site id
             $site_exists = false;
             if (Session::get("active_site_id") !== null) {
-                $this->active_site_id = Session::get("active_site_id");
+                $this->active_site_id = Session::get("active_site_id"); 
                 $site_exists          = Site::find($this->active_site_id)->count();
                 View::share(array("activeSiteName" => Session::get("active_site_name")));
             }

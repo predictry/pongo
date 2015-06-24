@@ -31,7 +31,7 @@ class PanelController extends AdminBaseController
         $ranges   = Helper::getSelectedFilterDateRange($dt_range_group, $dt_start, $dt_end);
         $dt_start = $ranges['dt_start'];
         $dt_end   = $ranges['dt_end'];
-
+  
         //list of sites
         $sites         = Site::all();
         $allowed_sites = null;

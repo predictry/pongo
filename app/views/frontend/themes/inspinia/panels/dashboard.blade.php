@@ -37,6 +37,5 @@
         </div>
     </div>
 
-</div>
-<!-- End of wrapper-content -->
+</div><!-- End of wrapper-content -->
 @stop

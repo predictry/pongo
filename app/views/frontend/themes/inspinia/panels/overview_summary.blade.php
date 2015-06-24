@@ -1,5 +1,4 @@
-<div class="row overview_datacells">
-    
+<div class="row overview_datacells">    
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 data_cell">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
@@ -116,5 +115,4 @@
             </div>
         </div>
     </div>
-
 </div>

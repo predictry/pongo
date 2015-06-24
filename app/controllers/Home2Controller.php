@@ -131,14 +131,14 @@ class Home2Controller extends BaseController {
 
     public function postRegister() {
       $input = Input::only(
-        "name", 
-        "email", 
-        "password", 
-        "password_confirmation", 
-        "pricing_method", 
-        "url", 
-        "range_number_of_items", 
-        "industry_id");
+                      "name", 
+                      "email", 
+                      "password", 
+                      "password_confirmation", 
+                      "pricing_method", 
+                      "url", 
+                      "range_number_of_items", 
+                      "industry_id");
       
         $input = array_add($input, 'plan_id', 1);
 
