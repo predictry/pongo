@@ -12,7 +12,32 @@ use App\Controllers\BaseController,
 
 class Panel2Controller extends BaseController   {
     protected $panel_repository = null;
-    
+    /* private funcion */
+    function isDomainAvailible($domain)
+       {
+               //check, if a valid url is provided
+               if(!filter_var($domain, FILTER_VALIDATE_URL))
+               {
+                       return false;
+               }
+
+               //initialize curl
+               $curlInit = curl_init($domain);
+               curl_setopt($curlInit,CURLOPT_CONNECTTIMEOUT,10);
+               curl_setopt($curlInit,CURLOPT_HEADER,true);
+               curl_setopt($curlInit,CURLOPT_NOBODY,true);
+               curl_setopt($curlInit,CURLOPT_RETURNTRANSFER,true);
+
+               //get answer
+               $response = curl_exec($curlInit);
+
+               curl_close($curlInit);
+
+               if ($response) return true;
+
+               return false;
+       }
+
     function __construct(PanelRepository $repository) {
         parent::__construct();
 
@@ -22,7 +47,7 @@ class Panel2Controller extends BaseController   {
         $custom_script = "var site_url = '" . URL::to('/') . "';";
         View::share(array("ca" => get_class(), "custom_script" => $custom_script));
     }
-
+    
     public function index($dt_range_group = "today", $dt_start = null, $dt_end = null)  {
         $client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'stat/');
         $top_client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'top/');
@@ -37,8 +62,10 @@ class Panel2Controller extends BaseController   {
         $dt_end   = $o_ed;
         
     
-        /* just a global response for dashboard */
         $response     = $client->get("overview?tenantId=". $current_site . "&startDate=" . $dt_start . "&endDate=" . $dt_end)->send(); 
+        $bucket_view  = $client->get("?tenantId=". $current_site . "&startDate=" . $dt_start . "&endDate=" . $dt_end . "&metric=VIEWS&interval=hour")->send(); 
+        
+        $arr_bucket_view = $bucket_view->json();
         $arr_response = $response->json();
 
         $pageviews_regular_sum = (isset($arr_response['error']) && $arr_response['error']) ? false : array_get($arr_response, 'pageView');
@@ -94,11 +121,11 @@ class Panel2Controller extends BaseController   {
         ];
 
         $conversionRate = (isset($arr_response['error']) && $arr_response['error']) ? 0 : array_get($arr_response, 'conversionRate'); 
-        $top_purchased_items  = $top_client->get("sales")->send()->json();
+        $top_purchased_items  = $top_client->get("sales")->send()->json(); 
         $top_viewed_items     = $top_client->get("hits")->send()->json();
-
         $tstart = strtotime($ranges['dt_start']);
         $tend   = strtotime($ranges['dt_end']);
+ 
         $output = [
             'overviews'           => [
                 'total_pageviews'      => number_format($pageviews_stat['overall']),
@@ -120,9 +147,12 @@ class Panel2Controller extends BaseController   {
             'dt_end'              => $dt_end,
             'top_purchased_items' => $top_purchased_items['items'],
             'top_viewed_items'    => $top_viewed_items['items'],
-            'pageTitle'           => "Dashboard"
+            'pageTitle'           => "Dashboard",
+
+            /* bucket data */
+            'bucket_view'         => $arr_bucket_view  
         ];
-      return \View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.dashboard', $output); 
+        return \View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.dashboard', $output); 
     }
 }
 

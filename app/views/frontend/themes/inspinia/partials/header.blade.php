@@ -20,6 +20,8 @@
         {{ HTML::style('assets/inspinia/css/animate.css') }}
         {{ HTML::style('assets/inspinia/css/plugins/chosen/chosen.css') }}
         {{ HTML::style('assets/inspinia/css/style.css') }}
+        {{ HTML::script('assets/js/d3.js') }}
+        {{ HTML::script('assets/js/metricsgraphics.js') }}
 
         @if(count($styles) > 0)
 
