@@ -73,20 +73,7 @@
         </div>
     </div>
     
-    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-        <div class="ibox float-e-margins">
-            <div class="ibox-title">
-                <h5>Items per Cart</h5>
-            </div>
-            <div id="mgItemsPerCart"></div>
-            <div class="ibox-content">
-                <h1 class="no-margins">{{ $overviews['total_item_per_cart'] }}</h1>
-                <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
-                <small>Average of items in the cart</small>
-            </div>
-        </div>
-    </div>
-    
+      
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 data_cell">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
@@ -98,6 +85,20 @@
                 <h1 class="no-margins">{{ number_format($overviews['conversion_rate'],2) }}%</h1>
                 <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
                 <small>(orders / pageviews) * 100</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Items per Cart</h5>
+            </div>
+            <div id="mgItemsPerCart"></div>
+            <div class="ibox-content">
+                <h1 class="no-margins">{{ $overviews['total_item_per_cart'] }}</h1>
+                <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
+                <small>Average of items in the cart</small>
             </div>
         </div>
     </div>
@@ -193,18 +194,4 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/ITEM_PURCHASED', function(data
     });
 });
 
-d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/ITEM_PER_CART', function(data) {
-    data = MG.convert.date(data, 'date','%Y-%m-%dT%H:%M:%S');
-    MG.data_graphic({
-        title: "",
-        description: "This is a simple line chart. You can remove the area portion by adding area: false to the arguments list.",
-        data: data,
-        width: 600,
-        height: 200,
-        right: 40,
-        target: document.getElementById('mgItemsPerCart'),
-        x_accessor: 'date',
-        y_accessor: 'value'
-    });
-});
 </script>
