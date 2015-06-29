@@ -119,7 +119,6 @@
 </div>
 
 <script type="text/javascript">
-
 d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS', function(data) { 
     data = MG.convert.date(data, 'date', '%Y-%m-%dT%H:%M:%S'); 
     MG.data_graphic({
@@ -208,5 +207,4 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/ITEM_PER_CART', function(data)
         y_accessor: 'value'
     });
 });
-
 </script>

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Controllers\User;
+
 use App\Controllers\BaseController,
     App\Pongo\Libraries\Helper,
     App\Pongo\Repository\PanelRepository,
@@ -16,28 +17,38 @@ class Panel2Controller extends BaseController   {
         parent::__construct();
         $this->panel_repository                 = $repository;
         $this->panel_repository->active_site_id = $this->active_site_id;
-        $custom_script = "var site_url = '" . URL::to('/') . "';";
+        $custom_script                          = "var site_url = '" . URL::to('/') . "';";
         View::share(array("ca" => get_class(), "custom_script" => $custom_script));
     }
     
     public function index($dt_range_group = "today", $dt_start = null, $dt_end = null)  {
         $client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'stat/');
         $top_client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'top/');
-         
-        $current_site = "FAMILYNARA2014";
+
+        // active_site_name
+        $current_site = \Session::get("active_site_name");
         $ranges   = Helper::getSelectedFilterDateRange($dt_range_group, $dt_start, $dt_end); 
         
+        // original time format
+        // comes from the url/: directly 
         $o_sd     = date("YmdH",strtotime($ranges['dt_start']));
         $o_ed     = date("YmdH",strtotime($ranges['dt_end']));   
-        
+  
+        // to show in view 
+        // with ISO format
         $dt_start = $o_sd;
         $dt_end   = $o_ed;
- 
+  
+        // get response from
+        // fisher numeric data
+        // fisher bucket data /_h
         $response     = $client->get("overview?tenantId=". $current_site . "&startDate=" . $dt_start . "&endDate=" . $dt_end)->send(); 
         $bucket_view  = $client->get("?tenantId=". $current_site . "&startDate=" . $dt_start . "&endDate=" . $dt_end . "&metric=VIEWS&interval=hour")->send(); 
         
         $top_purchased_items  = $top_client->get("sales")->send()->json(); 
         $top_viewed_items     = $top_client->get("hits")->send()->json();
+        
+        
         $tstart = strtotime($ranges['dt_start']);
         $tend   = strtotime($ranges['dt_end']);
 
@@ -110,7 +121,6 @@ class Panel2Controller extends BaseController   {
                   'total_sales_per_cart' => number_format($summary_sales['overall']),
                   'conversion_rate'      => number_format($conversionRate)
                 ],
-
               'dt_range'            => [
                   'start' => date("[H] F d, Y", $tstart),
                   'end'   => date("[H] F d, Y", $tend)
@@ -121,8 +131,6 @@ class Panel2Controller extends BaseController   {
               'top_purchased_items' => $top_purchased_items['items'],
               'top_viewed_items'    => $top_viewed_items['items'],
               'pageTitle'           => "Dashboard",
-
-              /* bucket data */
               'bucket_view'         => $arr_bucket_view  
           ];
           return \View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.dashboard', $output);  
