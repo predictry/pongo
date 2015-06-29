@@ -119,7 +119,7 @@ class Panel2Controller extends BaseController   {
                   'total_orders'         => number_format($n_orders),
                   'total_item_per_cart'  => number_format($summary_item_per_cart['overall']),
                   'total_sales_per_cart' => number_format($summary_sales['overall']),
-                  'conversion_rate'      => number_format($conversionRate)
+                  'conversion_rate'      => $conversionRate
                 ],
               'dt_range'            => [
                   'start' => date("[H] F d, Y", $tstart),

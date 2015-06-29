@@ -82,7 +82,7 @@
             </div>
             <div id="visualOne"></div>
             <div class="ibox-content">
-                <h1 class="no-margins">{{ number_format($overviews['conversion_rate'],2) }}%</h1>
+                <h1 class="no-margins">{{ number_format((($overviews['conversion_rate']) * 100), 4, '.','') }}%</h1>
                 <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
                 <small>(orders / pageviews) * 100</small>
             </div>
