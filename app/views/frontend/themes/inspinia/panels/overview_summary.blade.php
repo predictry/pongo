@@ -193,5 +193,4 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/ITEM_PURCHASED', function(data
         y_accessor: 'value'
     });
 });
-
 </script>
