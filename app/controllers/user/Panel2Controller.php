@@ -44,19 +44,20 @@ class Panel2Controller extends BaseController   {
         $response     = $client->get("overview?tenantId=". $current_site . "&startDate=" . $dt_start . "&endDate=" . $dt_end)->send(); 
         $bucket_view  = $client->get("?tenantId=". $current_site . "&startDate=" . $dt_start . "&endDate=" . $dt_end . "&metric=VIEWS&interval=hour")->send(); 
         
-        $top_purchased_items  = $top_client->get("sales")->send()->json(); 
-        $top_viewed_items     = $top_client->get("hits")->send()->json();
-
-        if ($top_purchased_items['error'])
+        $top_purchased_items  = $top_client->get("sales?tenantId=". $current_site . "&startDate=" . $dt_start . "&endDate=" .$dt_end)->send()->json(); 
+        $top_viewed_items  = $top_client->get("hits?tenantId=". $current_site . "&startDate=" . $dt_start . "&endDate=" .$dt_end)->send()->json(); 
+      
+        if (isset($top_purchased_items['error']))
           $tpi = [];
         else 
           $tpi = $top_purchased_items['items'];
 
-        if ($top_viewed_items['error'])
+        if (isset($top_viewed_items['error']))
           $tvi = [];
         else
           $tvi = $top_viewed_items['items'];
-        
+
+    
         $tstart = strtotime($ranges['dt_start']);
         $tend   = strtotime($ranges['dt_end']);
 
