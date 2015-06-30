@@ -28,11 +28,11 @@
     
     <div class="top_items_wrapper row">
       
-      <div class="col-md-6 col-xs-12 col-sm-12 col-lg-6">
+      <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12">
           @include(getenv('FRONTEND_SKINS') . $theme . '.panels.top_5', ['tableHeader' => 'Top 10 (Most Purchased Items)', 'contents' => $top_purchased_items])
         </div>
         
-      <div class="col-md-6 col-xs-12 col-sm-12 col-lg-6">
+      <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12">
             @include(getenv('FRONTEND_SKINS') . $theme . '.panels.top_5', ['tableHeader' => 'Top 10 (Most Viewed Items)', 'contents' => $top_viewed_items])
         </div>
     </div>

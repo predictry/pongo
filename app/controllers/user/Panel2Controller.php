@@ -46,7 +46,16 @@ class Panel2Controller extends BaseController   {
         
         $top_purchased_items  = $top_client->get("sales")->send()->json(); 
         $top_viewed_items     = $top_client->get("hits")->send()->json();
-        
+
+        if ($top_purchased_items['error'])
+          $tpi = [];
+        else 
+          $tpi = $top_purchased_items['items'];
+
+        if ($top_viewed_items['error'])
+          $tvi = [];
+        else
+          $tvi = $top_viewed_items['items'];
         
         $tstart = strtotime($ranges['dt_start']);
         $tend   = strtotime($ranges['dt_end']);
@@ -127,8 +136,8 @@ class Panel2Controller extends BaseController   {
 
               'dt_start'            => $dt_start,
               'dt_end'              => $dt_end,
-              'top_purchased_items' => $top_purchased_items['items'],
-              'top_viewed_items'    => $top_viewed_items['items'],
+              'top_purchased_items' => $tpi,
+              'top_viewed_items'    => $tvi,
               'pageTitle'           => "Dashboard",
               'bucket_view'         => $arr_bucket_view  
           ];
