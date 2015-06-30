@@ -23,9 +23,9 @@ class Panel2Controller extends BaseController   {
     public function index($dt_range_group = "today", $dt_start = null, $dt_end = null)  {
         $client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'stat/');
         $top_client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'top/');
-
+    
         // active_site_name
-        $current_site = \Session::get("active_site_name");
+        $current_site = strtolower(\Session::get("active_site_name"));   
         $ranges   = Helper::getSelectedFilterDateRange($dt_range_group, $dt_start, $dt_end); 
         
         // original time format
@@ -41,13 +41,12 @@ class Panel2Controller extends BaseController   {
         // get response from
         // fisher numeric data
         // fisher bucket data /_h
-        $response     = $client->get("overview?tenantId=". $current_site . "&startDate=" . $dt_start . "&endDate=" . $dt_end)->send(); 
+        $response     = $client->get("overview?tenantId=". $current_site . "&startDate=" . $dt_start . "&endDate=" . $dt_end)->send();  
         $bucket_view  = $client->get("?tenantId=". $current_site . "&startDate=" . $dt_start . "&endDate=" . $dt_end . "&metric=VIEWS&interval=hour")->send(); 
 
         // top views/sales items information 
         $top_purchased_items= $top_client->get("sales?tenantId=". $current_site. "&startDate=" . $dt_start . "&endDate=" . $dt_end)->send()->json(); 
         $top_viewed_items   = $top_client->get("hits?tenantId=". $current_site. "&startDate=" . $dt_start . "&endDate=" . $dt_end)->send()->json(); 
-        
         
         $tstart = strtotime($ranges['dt_start']);
         $tend   = strtotime($ranges['dt_end']);
