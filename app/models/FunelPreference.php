@@ -13,16 +13,16 @@ namespace App\Models;
 class FunelPreference extends \Eloquent
 {
 
-	/**
-	 * The database table used by the model.
-	 *
-	 * @var string
-	 */
-	protected $table = 'funel_preferences';
-	public $rules	 = array(
-		"name"		 => "required",
-		"action_id"	 => "required"
-	);
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    protected $table = 'funel_preferences';
+    public $rules    = array(
+        "name"      => "required",
+        "action_id" => "required"
+    );
 
 }
 

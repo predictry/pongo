@@ -13,28 +13,29 @@ namespace App\Models;
 class Item extends \Eloquent
 {
 
-	/**
-	 * The database table used by the model.
-	 *
-	 * @var string
-	 */
-	protected $table			 = 'items';
-	public $rules				 = array(
-		'identifier' => 'required',
-		'name'		 => 'required'
-	);
-	public $manage_table_header	 = array(
-		"identifier" => "Item ID",
-		"name"		 => "Name",
-		"type"		 => "Type",
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    protected $guarded          = array('id');
+    protected $table            = 'items';
+    public $rules               = array(
+        'identifier' => 'required',
+        'name'       => 'required'
+    );
+    public $manage_table_header = array(
+        "identifier" => "Item ID",
+        "name"       => "Name",
+        "type"       => "Type",
 //		"created_at" => "Date Created",
 //		"active"	 => "Activated"
-	);
+    );
 
-	public function item_metas()
-	{
-		return $this->hasMany("App\Models\ItemMeta");
-	}
+    public function item_metas()
+    {
+        return $this->hasMany("App\Models\ItemMeta");
+    }
 
 }
 

@@ -13,13 +13,18 @@ namespace App\Models;
 class WidgetRuleSet extends \Eloquent
 {
 
-	/**
-	 * The database table used by the model.
-	 *
-	 * @var string
-	 */
-	protected $table	 = 'widget_rule_sets';
-	public $timestamps	 = false;
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    protected $table   = 'widget_rule_sets';
+    public $timestamps = false;
+
+    public function rule_set()
+    {
+        return $this->belongsTo('App\Models\RuleSet', 'ruleset_id');
+    }
 
 }
 

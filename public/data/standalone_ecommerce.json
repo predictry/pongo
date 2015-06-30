@@ -1,0 +1,400 @@
+{
+    "name": "Standalone eCommerce",
+    "common": {
+        "actions": {
+            "entities": [
+                {
+                    "entity_name": "user",
+                    "type": "object",
+                    "compulsary": false,
+                    "properties": [
+                        {
+                            "field": "user_id",
+                            "type": "alpha_num",
+                            "compulsary": false
+                        },
+                        {
+                            "field": "email",
+                            "type": "email",
+                            "compulsary": false
+                        }
+                    ]
+                }
+            ],
+            "shared": [
+                "view_home_page",
+                "view_category_page",
+                "view",
+                "add_to_cart",
+                "buy",
+                "started_checkout",
+                "search"
+            ]
+        }
+    },
+    "sections": [
+        {
+            "name": "homepage",
+            "title": "Home Page",
+            "actions": [
+                {
+                    "name": "view_home_page",
+                    "entities": [
+                        {
+                            "entity_name": "action",
+                            "type": "object",
+                            "compulsary": false,
+                            "properties": [
+                                {
+                                    "field": "name",
+                                    "default_value": "view_home_page",
+                                    "type": "string",
+                                    "compulsary": true,
+                                    "info": "Action Name"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "disabled": true
+        },
+        {
+            "name": "category",
+            "title": "Category Page",
+            "actions": [
+                {
+                    "name": "view_category_page",
+                    "entities": [
+                        {
+                            "entity_name": "action",
+                            "type": "object",
+                            "compulsary": true,
+                            "properties": [
+                                {
+                                    "field": "name",
+                                    "default_value": "view_category_page",
+                                    "type": "string",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "category_id",
+                                    "type": "alpha_num",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "category",
+                                    "type": "string",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "sub_category",
+                                    "type": "string",
+                                    "compulsary": false
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "disabled": true
+        },
+        {
+            "name": "product",
+            "title": "Product Detail",
+            "actions": [
+                {
+                    "name": "view",
+                    "entities": [
+                        {
+                            "entity_name": "action",
+                            "type": "object",
+                            "compulsary": true,
+                            "properties": [
+                                {
+                                    "field": "name",
+                                    "default_value": "view",
+                                    "type": "string",
+                                    "compulsary": true,
+                                    "info": "Action Name"
+                                },
+                                {
+                                    "field": "rec",
+                                    "default_value": false,
+                                    "type": "boolean",
+                                    "compulsary": false,
+                                    "hidden": true
+                                }
+                            ]
+                        },
+                        {
+                            "entity_name": "items",
+                            "type": "array",
+                            "compulsary": true,
+                            "properties": [
+                                {
+                                    "field": "item_id",
+                                    "type": "alpha_num",
+                                    "compulsary": true,
+                                    "info": "Unique identifier of the item"
+                                },
+                                {
+                                    "field": "name",
+                                    "type": "alpha_num",
+                                    "compulsary": true,
+                                    "info": "Name of the item"
+                                },
+                                {
+                                    "field": "currency",
+                                    "type": "alpha_num",
+                                    "compulsary": true,
+                                    "info": "Currency of item price"
+                                },
+                                {
+                                    "field": "price",
+                                    "type": "double",
+                                    "compulsary": true,
+                                    "info": "Price of the item"
+                                },
+                                {
+                                    "field": "item_url",
+                                    "type": "url",
+                                    "compulsary": true,
+                                    "info": "Url of the item where accessable from user"
+                                },
+                                {
+                                    "field": "img_url",
+                                    "type": "url",
+                                    "compulsary": true,
+                                    "info": "Image url of displayed item"
+                                },
+                                {
+                                    "field": "is_on_sale",
+                                    "type": "boolean",
+                                    "compulsary": true,
+                                    "info": "Is item currently on sale?"
+                                },
+                                {
+                                    "field": "inventory_qty",
+                                    "type": "int",
+                                    "compulsary": true,
+                                    "info": "Current inventory qty"
+                                },
+                                {
+                                    "field": "description",
+                                    "type": "string",
+                                    "compulsary": false,
+                                    "info": "Detail description of the item"
+                                },
+                                {
+                                    "field": "short_description",
+                                    "type": "string",
+                                    "compulsary": false,
+                                    "info": "Short description of the item"
+                                },
+                                {
+                                    "field": "category",
+                                    "type": "string",
+                                    "compulsary": false,
+                                    "info": "Category of the item"
+                                },
+                                {
+                                    "field": "sub_category",
+                                    "type": "string",
+                                    "compulsary": false,
+                                    "info": "Sub category of the item"
+                                },
+                                {
+                                    "field": "tags",
+                                    "type": "list",
+                                    "compulsary": false,
+                                    "info": "Tags of the item"
+                                },
+                                {
+                                    "field": "brand",
+                                    "type": "string",
+                                    "compulsary": false,
+                                    "info": "Brand of the item"
+                                }
+                            ]
+                        }
+                    ],
+                    "info": "This action will be trigger when user viewing the product detail.",
+                    "disabled": false
+                },
+                {
+                    "name": "add_to_cart",
+                    "entities": [
+                        {
+                            "entity_name": "action",
+                            "type": "object",
+                            "compulsary": true,
+                            "properties": [
+                                {
+                                    "field": "name",
+                                    "default_value": "add_to_cart",
+                                    "type": "string",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "rec",
+                                    "default_value": false,
+                                    "type": "boolean",
+                                    "compulsary": false,
+                                    "hidden": true
+                                }
+                            ]
+                        },
+                        {
+                            "entity_name": "items",
+                            "type": "array",
+                            "compulsary": true,
+                            "properties": [
+                                {
+                                    "field": "item_id",
+                                    "type": "alpha_num",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "qty",
+                                    "type": "integer",
+                                    "compulsary": true
+                                }
+                            ]
+                        }
+                    ],
+                    "disabled": false
+                }
+            ],
+            "disabled": false
+        },
+        {
+            "name": "checkout",
+            "title": "Checkout",
+            "actions": [
+                {
+                    "name": "started_checkout",
+                    "entities": [
+                        {
+                            "entity_name": "action",
+                            "type": "object",
+                            "compulsary": true,
+                            "properties": [
+                                {
+                                    "field": "name",
+                                    "default_value": "started_checkout",
+                                    "type": "string",
+                                    "compulsary": true
+                                }
+                            ]
+                        },
+                        {
+                            "entity_name": "items",
+                            "type": "array",
+                            "compulsary": true,
+                            "properties": [
+                                {
+                                    "field": "item_id",
+                                    "type": "alpha_num",
+                                    "compulsary": true
+                                }
+                            ]
+                        }
+                    ],
+                    "disabled": false
+                }
+            ],
+            "disabled": false
+        },
+        {
+            "name": "thankyou",
+            "title": "Thank You",
+            "actions": [
+                {
+                    "name": "buy",
+                    "entities": [
+                        {
+                            "entity_name": "action",
+                            "type": "object",
+                            "compulsary": true,
+                            "properties": [
+                                {
+                                    "field": "name",
+                                    "default_value": "buy",
+                                    "type": "string",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "rec",
+                                    "default_value": false,
+                                    "type": "boolean",
+                                    "compulsary": false,
+                                    "hidden": true
+                                }
+                            ]
+                        },
+                        {
+                            "entity_name": "items",
+                            "type": "array",
+                            "compulsary": true,
+                            "properties": [
+                                {
+                                    "field": "item_id",
+                                    "type": "alpha_num",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "qty",
+                                    "type": "integer",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "sub_total",
+                                    "type": "double",
+                                    "compulsary": true
+                                }
+                            ]
+                        }
+                    ],
+                    "disabled": false
+                }
+            ],
+            "disabled": false
+        },
+        {
+            "name": "search",
+            "title": "Search",
+            "actions": [
+                {
+                    "name": "search",
+                    "entities": [
+                        {
+                            "entity_name": "action",
+                            "type": "object",
+                            "compulsary": true,
+                            "properties": [
+                                {
+                                    "field": "name",
+                                    "default_value": "search",
+                                    "type": "string",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "keywords",
+                                    "type": "string",
+                                    "compulsary": true
+                                },
+                                {
+                                    "field": "category",
+                                    "type": "string",
+                                    "compulsary": false
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "disabled": false
+        }
+    ]
+}

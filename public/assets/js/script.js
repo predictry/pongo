@@ -2,6 +2,7 @@ var numOfItems = 1;
 var indexOfItem = 1;
 var excludeOptionIDs = new Array();
 var indexes = new Array();
+var propertyMetas = new Array();
 indexes.push(1);
 
 /**
@@ -14,10 +15,10 @@ function getGraphData() {
         type: 'POST',
         data: filters,
         dataType: 'json',
-        success: function(data)
+        success: function (data)
         {
             if (data.status === "success") {
-                console.log(data);
+//                console.log(data);
 
                 highchart_categories_data = data.response.highchart_categories;
                 highchart_combination_graph_of_comparison = data.response.highchart_options_series;
@@ -81,7 +82,7 @@ function getGraphData() {
                 alert("something wrong");
             }
         },
-        error: function() {
+        error: function () {
             alert('error!');
         }
     });
@@ -133,7 +134,7 @@ function getGraphBarComparison(divelem, series_data) {
             shadow: false
         },
         tooltip: {
-            formatter: function() {
+            formatter: function () {
                 return '<b>' + this.x + '</b><br/>' +
                         this.series.name + ': ' + this.y;
             }
@@ -189,7 +190,7 @@ function getGraphLineComparison() {
  * get pie chart
  */
 function getGraphPie(divelem, chart_title, chart_data) {
-    $(function() {
+    $(function () {
         $('#' + divelem).highcharts({
             chart: {
                 plotBackgroundColor: null,
@@ -270,7 +271,7 @@ function getGraphPieWithText(divelem, chart_title, chart_data) {
             enabled: false
         }
     },
-    function(chart) { // on complete
+    function (chart) { // on complete
         var textX = chart.plotLeft + (chart.plotWidth * 0.5);
         var textY = chart.plotTop + (chart.plotHeight * 0.5);
 
@@ -283,47 +284,125 @@ function getGraphPieWithText(divelem, chart_title, chart_data) {
     });
 }
 
-function gatherSelectedOption(name)
-{
-    var values = [];
-    $("select[name='" + name + "[]'] option:selected").each(function() {
-        values.push(this.value);
-    });
-    return values;
-}
+function viewMetaDetail(id, propertyName, arrSelectedValue) {
+    var selectedPropertyKey = $("#propertyKey" + id).val();
+    var selectedType = $("#type" + id).val();
 
-function validateSelectedItem(selected, name)
-{
-    excludeOptionIDs = gatherSelectedOption(name);
-    console.log(excludeOptionIDs);
-    if (excludeOptionIDs.length > 1) {
-        var counter = 0;
-        for (var i = 0; i < excludeOptionIDs.length; i++) {
-            if (excludeOptionIDs[i] === selected)
-                counter += 1;
+    var metas = null;
 
-            if (counter === 2)
-            {
-                alert("This option already selected");
-                return false;
+    if (propertyMetas[propertyName] !== undefined) {
+        var divWrapper = $("#" + propertyName + "Wrapper" + id);
+        metas = propertyMetas[propertyName][selectedPropertyKey];
+        selectMetas = "<select class='form-control chosen-select' id='value" + id + "' name='value[]'>";
+
+        var strOptions = "";
+        for (var i = 0; i < metas.length; i++) {
+
+            //@todo values must be like locations.kuala_lumpur
+            var option_value = propertyName + "." + selectedType + "." + selectedPropertyKey + "." + metas[i].toLowerCase().replace(" ", "_");
+            strOptions += "<option value='" + option_value + "'";
+
+            if (arrSelectedValue !== undefined) {
+                if (option_value === arrSelectedValue)
+                    strOptions += "selected='selected'";
             }
+            else {
+                if (i === 0)
+                    strOptions += "selected='selected'";
+            }
+
+            strOptions += ">" + metas[i] + "</option>";
+        }
+        selectMetas += strOptions + "</select>";
+
+        var propertyMetaWrapper = $("#propertyMetaWrapper" + id);
+        if (propertyMetaWrapper.html() === undefined) {
+            selectMetas = "<div class='col-sm-6' id='propertyMetaWrapper" + id + "'>" + selectMetas + "</div>";
+            divWrapper.append(selectMetas);
+        } else {
+            propertyMetaWrapper.html(selectMetas);
         }
 
+        $(".chosen-select").chosen();
     }
-    return true;
 }
 
-function removeItem(id, name)
-{
-    $("#" + name + id).remove();
-    var index = indexes.indexOf(id);
+function getFilterType(id, val) {
+    var dd = $("#type" + id);
+    var input = $("#value" + id);
+    var inputDiv = input.parent();
+    var value = (val !== undefined) ? val : "";
 
-    if (index > -1)
-        indexes.splice(index, 1);
+    //when adding date input, it seems that the parent has changed. So need to go to parent parent
+    if ($("#inputDate" + id).val() !== undefined) {
+        inputDiv = $("#inputDate" + id).parent();
+    }
+
+    if ($("#propertyKeyWrapper" + id).val() !== undefined) {
+        inputDiv = $("#propertyKeyWrapper" + id).parent().parent();
+    }
+
+    switch (dd.val()) {
+        case "date":
+            var inputDate = "<div class='input-group date' id='inputDate" + id + "' data-date-format='YYYY-MM-DD hh:mm A'>"
+                    + "<input name='value[]' id='value" + id + "' type='text' class='form-control disabled' readonly='' value='" + value + "'/>"
+                    + "<span class='input-group-addon'><span class='glyphicon glyphicon-calendar'></span>"
+                    + "</span></div>";
+
+//            var inputDate = "<input class='form-control date' id='value" + id + "' name='value[]' type='text' data-date-format='YYYY-MM-DD hh:mm:ss A'/>";
+            inputDiv.html(inputDate);
+            input = $("#inputDate" + id);
+            input.datetimepicker();
+            break;
+
+        case "str":
+        case "list":
+            var inputStr = "<input class='form-control' id='value" + id + "' name='value[]' type='text' value='" + value + "'/>";
+            inputDiv.html(inputStr);
+            break;
+
+        case "location":
+
+            var propertyName = $("#action" + id).val();
+            $.ajax({
+                url: site_url + "/items/key/" + propertyName + "/metas",
+                type: 'GET',
+                data: {
+                    isDropDown: true,
+                    isView: true,
+                    id: id,
+                    val: value
+                },
+                dataType: 'json',
+                success: function (response)
+                {
+                    if (response.status === "success") {
+                        data = response.data;
+//                        var wrapperDiv = "<div class='row ' id='" + propertyName + "Wrapper" + id + "'><div class='col-sm-6' id='propertyKeyWrapper" + id + "'>";
+                        var wrapperDiv = "<div class='row ' id='" + propertyName + "Wrapper" + id + "'><div class='col-sm-12' id='propertyKeyWrapper" + id + "'>";
+                        wrapperDiv += response.view + "</div></div>";
+                        inputDiv.html(wrapperDiv);
+
+                        propertyMetas[propertyName] = response.data;
+//                        viewMetaDetail(id, propertyName, value);
+                        $(".chosen-select").chosen();
+                    }
+                },
+                error: function () {
+                    alert('error!');
+                }
+            });
+
+            break;
+
+        case "num":
+            var inputNum = "<input class='form-control' onkeydown='javascript:maskInputToNumeric()' value='" + value + "' id='value" + id + "' name='value[]' type='number'/>";
+            inputDiv.html(inputNum);
+            break;
+    }
 }
 
-function addItemRule(is_modal, container)
-{
+function addItemRule(is_modal, container) {
     var bool_is_modal = false;
     var div_container = "item_rules_container";
     var item_identifier = "#item";
@@ -359,7 +438,7 @@ function addItemRule(is_modal, container)
         type: 'GET',
         data: form_data,
         dataType: 'json',
-        success: function(data)
+        success: function (data)
         {
             if (data.status === "success") {
                 $("#" + div_container).append(data.response);
@@ -370,171 +449,20 @@ function addItemRule(is_modal, container)
                 $(type_identifier + indexOfItem).chosen();
                 $(item_identifier + indexOfItem).val("").trigger('chosen:updated');
 
-                $(item_identifier + indexOfItem).on('change', function(evt, params) {
+                $(item_identifier + indexOfItem).on('change', function (evt, params) {
                     if (!validateSelectedItem(params.selected, "item_id")) {
                         $(item_identifier + indexOfItem).val("").trigger('chosen:updated');
                     }
                 });
             }
         },
-        error: function() {
+        error: function () {
             alert('error!');
         }
     });
 }
 
-function editItemRule(obj, index) {
-    var form_data = {
-        obj: obj,
-        index: index,
-        is_ajax: 1
-    };
-
-    $.ajax({
-        url: site_url + "/rules/itemEdit",
-        type: 'GET',
-        data: form_data,
-        dataType: 'json',
-        success: function(data)
-        {
-            if (data.status === "success") {
-                $("#item_rules_container").append(data.response);
-                $(".chosen-select").chosen();
-                $("#item" + index).chosen();
-                $("#type" + index).chosen();
-                $("#item" + index).val(obj.item_id).trigger('chosen:updated');
-
-                $("#item" + index).on('change', function(evt, params) {
-                    if (!validateSelectedItem(params.selected, "item_id")) {
-                        $("#item" + index).val("").trigger('chosen:updated');
-                    }
-                });
-
-                indexOfItem = index;
-            }
-        },
-        error: function() {
-            alert('error!');
-        }
-    });
-}
-
-function addItemWidgetRuleset()
-{
-    var btn = $("a.btnAddItemWidgetRuleset");
-    btn.removeClass("btnAddItemWidgetRuleset btn-default").addClass("btnRemoveItemWidgetRuleset btn-danger").html("Remove");
-    btn.attr("onClick", "removeItem(" + indexOfItem + ", 'item_rule');");
-    indexOfItem += 1;
-
-    var form_data = {
-        index: indexOfItem,
-        is_ajax: 1
-    };
-
-    $.ajax({
-        url: site_url + "/widgets/item",
-        type: 'GET',
-        data: form_data,
-        dataType: 'json',
-        success: function(data)
-        {
-            if (data.status === "success") {
-                $("#item_rules_container").append(data.response);
-                $(".chosen-select").chosen();
-                numOfItems += 1;
-
-                $("#item" + indexOfItem).chosen();
-                $("#item" + indexOfItem).val("").trigger('chosen:updated');
-                $("#item" + indexOfItem).on('change', function(evt, params) {
-                    if (!validateSelectedItem(params.selected, "item_id")) {
-                        $("#item" + indexOfItem).val("").trigger('chosen:updated');
-                    }
-                });
-            }
-        },
-        error: function() {
-            alert('error!');
-        }
-    });
-
-}
-
-function editItemWidgetRuleset(obj, index)
-{
-    var form_data = {
-        obj: obj,
-        index: index,
-        is_ajax: 1
-    };
-
-    $.ajax({
-        url: site_url + "/widgets/itemEdit",
-        type: 'GET',
-        data: form_data,
-        dataType: 'json',
-        success: function(data)
-        {
-            if (data.status === "success") {
-                $("#item_rules_container").append(data.response);
-                $(".chosen-select").chosen();
-                $("#item" + index).chosen();
-                $("#type" + index).chosen();
-                $("#item" + index).val(obj.ruleset_id).trigger('chosen:updated');
-
-                $("#item" + index).on('change', function(evt, params) {
-                    if (!validateSelectedItem(params.selected, "item_id")) {
-                        $("#item" + index).val("").trigger('chosen:updated');
-                    }
-                });
-
-                indexOfItem = index;
-            }
-        },
-        error: function() {
-            alert('error!');
-        }
-    });
-}
-
-function editItemWidgetFilter(obj, index)
-{
-    var form_data = {
-        obj: obj,
-        index: index,
-        is_ajax: 1
-    };
-
-    $.ajax({
-        url: site_url + "/widgets/itemFilterEdit",
-        type: 'GET',
-        data: form_data,
-        dataType: 'json',
-        success: function(data)
-        {
-            if (data.status === "success") {
-                $("#item_filters_container").append(data.response);
-                $(".chosen-select").chosen();
-                $("#itemfilter" + index).chosen();
-                $("#type" + index).chosen();
-                $("#itemfilter" + index).val(obj.filter_id).trigger('chosen:updated');
-
-                $("#itemfilter" + index).on('change', function(evt, params) {
-                    if (!validateSelectedItem(params.selected, "item_id")) {
-                        $("#itemfilter" + index).val("").trigger('chosen:updated');
-                    }
-                });
-
-                indexOfItem = index;
-            }
-        },
-        error: function() {
-            alert('error!');
-        }
-    });
-}
-
-function addItemFunel()
-{
+function addItemFunel() {
     var btn = $("a.btnAddItem");
     btn.removeClass("btnAddItem btn-default").addClass("btnRemoveItem btn-danger").html("Remove");
     btn.attr("onClick", "removeItem(" + indexOfItem + ", 'item_funel');");
@@ -550,7 +478,7 @@ function addItemFunel()
         type: 'GET',
         data: form_data,
         dataType: 'json',
-        success: function(data)
+        success: function (data)
         {
             if (data.status === "success") {
                 $("#item_funel_action_container").append(data.response);
@@ -559,22 +487,19 @@ function addItemFunel()
                 $(".chosen-select").chosen();
                 $("#action" + indexOfItem).chosen();
 
-                $("#item_funel" + indexOfItem).on('change', function(evt, params) {
+                $("#item_funel" + indexOfItem).on('change', function (evt, params) {
                     if (!validateSelectedItem(params.selected, "action_id")) {
                         $("#action" + indexOfItem).val("").trigger('chosen:updated');
                     }
                 });
             }
         },
-        error: function() {
+        error: function () {
             alert('error!');
         }
     });
 }
 
-/**
- * Add Item Filter
- */
 function addItemFilter() {
     var btn = $('a.btnAddItem');
     btn.removeClass("btnAddItem btn-default").addClass("btnRemoveItem btn-danger").html("Remove");
@@ -591,33 +516,169 @@ function addItemFilter() {
         type: 'GET',
         data: form_data,
         dataType: 'json',
-        success: function(data)
+        success: function (data)
         {
             if (data.status === "success") {
                 $("#filter_item_container").append(data.response);
                 numOfItems += 1;
-
                 $(".chosen-select").chosen();
-                $("#action" + indexOfItem).chosen();
-
-                $("#item_funel" + indexOfItem).on('change', function(evt, params) {
-                    if (!validateSelectedItem(params.selected, "action_id")) {
-                        $("#action" + indexOfItem).val("").trigger('chosen:updated');
-                    }
-                });
             }
         },
-        error: function() {
+        error: function () {
             alert('error!');
         }
     });
 }
 
-/**
- * Edit Item Filter
- */
-function editItemFilter(obj, index)
-{
+function addItemWidgetRuleset() {
+    var btn = $("a.btnAddItemWidgetRuleset");
+    btn.removeClass("btnAddItemWidgetRuleset btn-default").addClass("btnRemoveItemWidgetRuleset btn-danger").html("Remove");
+    btn.attr("onClick", "removeItem(" + indexOfItem + ", 'item_rule');");
+    indexOfItem += 1;
+
+    var form_data = {
+        index: indexOfItem,
+        is_ajax: 1
+    };
+
+    $.ajax({
+        url: site_url + "/widgets/item",
+        type: 'GET',
+        data: form_data,
+        dataType: 'json',
+        success: function (data)
+        {
+            if (data.status === "success") {
+                $("#item_rules_container").append(data.response);
+                $(".chosen-select").chosen();
+                numOfItems += 1;
+
+                $("#item" + indexOfItem).chosen();
+                $("#item" + indexOfItem).val("").trigger('chosen:updated');
+                $("#item" + indexOfItem).on('change', function (evt, params) {
+                    if (!validateSelectedItem(params.selected, "item_id")) {
+                        $("#item" + indexOfItem).val("").trigger('chosen:updated');
+                    }
+                });
+            }
+        },
+        error: function () {
+            alert('error!');
+        }
+    });
+
+}
+
+function editItemRule(obj, index) {
+    var form_data = {
+        obj: obj,
+        index: index,
+        is_ajax: 1
+    };
+
+    $.ajax({
+        url: site_url + "/rules/itemEdit",
+        type: 'GET',
+        data: form_data,
+        dataType: 'json',
+        success: function (data)
+        {
+            if (data.status === "success") {
+                $("#item_rules_container").append(data.response);
+                $(".chosen-select").chosen();
+                $("#item" + index).chosen();
+                $("#type" + index).chosen();
+                $("#item" + index).val(obj.item_id).trigger('chosen:updated');
+
+                $("#item" + index).on('change', function (evt, params) {
+                    if (!validateSelectedItem(params.selected, "item_id")) {
+                        $("#item" + index).val("").trigger('chosen:updated');
+                    }
+                });
+
+                indexOfItem = index;
+            }
+        },
+        error: function () {
+            alert('error!');
+        }
+    });
+}
+
+function editItemWidgetRuleSet(obj, index) {
+    var form_data = {
+        obj: obj,
+        index: index,
+        is_ajax: 1
+    };
+
+    $.ajax({
+        url: site_url + "/widgets/itemEdit",
+        type: 'GET',
+        data: form_data,
+        dataType: 'json',
+        success: function (data)
+        {
+            if (data.status === "success") {
+                $("#item_rules_container").append(data.response);
+                $(".chosen-select").chosen();
+                $("#item" + index).chosen();
+                $("#type" + index).chosen();
+                $("#item" + index).val(obj.ruleset_id).trigger('chosen:updated');
+
+                $("#item" + index).on('change', function (evt, params) {
+                    if (!validateSelectedItem(params.selected, "item_id")) {
+                        $("#item" + index).val("").trigger('chosen:updated');
+                    }
+                });
+
+                indexOfItem = index;
+            }
+        },
+        error: function () {
+            alert('error!');
+        }
+    });
+}
+
+function editItemWidgetFilter(obj, index) {
+    var form_data = {
+        obj: obj,
+        index: index,
+        is_ajax: 1
+    };
+
+    $.ajax({
+        url: site_url + "/widgets/itemFilterEdit",
+        type: 'GET',
+        data: form_data,
+        dataType: 'json',
+        success: function (data)
+        {
+            if (data.status === "success") {
+                $("#item_filters_container").append(data.response);
+                $(".chosen-select").chosen();
+                $("#itemfilter" + index).chosen();
+                $("#type" + index).chosen();
+                $("#itemfilter" + index).val(obj.filter_id).trigger('chosen:updated');
+
+                $("#itemfilter" + index).on('change', function (evt, params) {
+                    if (!validateSelectedItem(params.selected, "item_id")) {
+                        $("#itemfilter" + index).val("").trigger('chosen:updated');
+                    }
+                });
+
+                indexOfItem = index;
+            }
+        },
+        error: function () {
+            alert('error!');
+        }
+    });
+}
+
+function editItemFilter(obj, index) {
+
     var form_data = {
         obj: obj,
         index: index,
@@ -629,25 +690,21 @@ function editItemFilter(obj, index)
         type: 'GET',
         data: form_data,
         dataType: 'json',
-        success: function(data)
+        success: function (data)
         {
             if (data.status === "success") {
                 $("#filter_item_container").append(data.response);
                 $(".chosen-select").chosen();
                 $("#action" + index).chosen();
                 $("#type" + index).chosen();
-                $("#item" + index).val(obj.ruleset_id).trigger('chosen:updated');
 
-                $("#item_funel" + index).on('change', function(evt, params) {
-                    if (!validateSelectedItem(params.selected, "action_id")) {
-                        $("#action" + index).val("").trigger('chosen:updated');
-                    }
-                });
-
-                indexOfItem = index;
+                var input = $("#value" + index);
+                getFilterType(index, input.val());
+                if (index >= indexOfItem)
+                    indexOfItem = index;
             }
         },
-        error: function() {
+        error: function () {
             alert('error!');
         }
     });
@@ -664,19 +721,74 @@ function setDefaultComparisonType(comparison_type) {
     return;
 }
 
+function gatherSelectedOption(name) {
+    var values = [];
+    $("select[name='" + name + "[]'] option:selected").each(function () {
+        values.push(this.value);
+    });
+    return values;
+}
+
+function validateSelectedItem(selected, name) {
+    excludeOptionIDs = gatherSelectedOption(name);
+    if (excludeOptionIDs.length > 1) {
+        var counter = 0;
+        for (var i = 0; i < excludeOptionIDs.length; i++) {
+            if (excludeOptionIDs[i] === selected)
+                counter += 1;
+
+            if (counter === 2)
+            {
+                alert("This option already selected");
+                return false;
+            }
+        }
+
+    }
+    return true;
+}
+
+function removeItem(id, name) {
+    $("#" + name + id).remove();
+    var index = indexes.indexOf(id);
+
+    if (index > -1)
+        indexes.splice(index, 1);
+}
+
+function maskInputToNumeric(e) {
+    var event = e || window.event
+
+    var key_code = event.keyCode;
+    var oElement = e ? e.target : window.event.srcElement;
+    if (!event.shiftKey && !event.ctrlKey && !event.altKey) {
+        if ((key_code > 47 && key_code < 58) ||
+                (key_code > 95 && key_code < 106)) {
+
+            if (key_code > 95)
+                key_code -= (95 - 47);
+            oElement.value = oElement.value;
+        } else if (key_code == 8) {
+            oElement.value = oElement.value;
+        } else if (key_code != 9) {
+            event.returnValue = false;
+        }
+    }
+}
+
 var loadBar;
-loadBar = loadBar || (function() {
+loadBar = loadBar || (function () {
     var pleaseWaitDiv = $('<div class="modal fade" style="margin-top: 21%; overflow: hidden; z-index: 1060;" id="loadingModal">\n\
 <div class="modal-dialog"><div class="col-sm-offset-4 col-sm-4"><div class="progress progress-striped active"><div class="progress-bar"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;"><span class="sr-only"></span></div></div></div></div></div>');
     return {
-        showPleaseWait: function() {
+        showPleaseWait: function () {
             pleaseWaitDiv.modal({
                 backdrop: 'static',
                 keyboard: false
             });
             $(".modal-backdrop").first().css("z-index", "1050");
         },
-        hidePleaseWait: function() {
+        hidePleaseWait: function () {
             pleaseWaitDiv.modal('hide');
             $(".modal-backdrop").first().css("z-index", "1040");
 
@@ -684,7 +796,8 @@ loadBar = loadBar || (function() {
     };
 })();
 
-jQuery(document).ready(function() {
+jQuery(document).ready(function () {
+
     $(".alert").alert();
     $('.dropdown-toggle').dropdown();
     $('.tt').tooltip();
@@ -712,30 +825,6 @@ jQuery(document).ready(function() {
         });
     }
 
-//    if (typeof graph_comparison_data !== 'undefined')
-//    {
-//        new Morris.Bar({
-//            element: 'comparisonGraph',
-//            data: graph_comparison_data,
-//            xkey: comparison_graph_x_keys,
-//            ykeys: comparison_graph_y_keys,
-//            stacked: bar_type,
-//            ymax: y_max,
-//            labels: comparison_labels,
-//            hideHover: true
-//        });
-//    }
-
-//    if (typeof donut_average_recommended_items_data !== 'undefined')
-//    {
-//        new Morris.Donut({
-//            element: 'averageRecommendedItemsDonut',
-//            data: donut_average_recommended_items_data,
-//            colors: ["#005dff", "#afafaf"]
-//        }).select(0);
-//    }
-
-
     //HIGHCHART GRAPH
     if (typeof highchart_pie_data !== 'undefined') {
         getGraphPie("comparisonDonut", "Total Regular Sales VS Sales from Recommended Items", highchart_pie_data);
@@ -750,11 +839,11 @@ jQuery(document).ready(function() {
         getGraphPie("averageRecommendedSalesDonut", "Average Cart Value with Recommended Items", highchart_average_recommended_sales_data);
     if (typeof highchart_series_data !== 'undefined') {
         getGraphBarComparison("highChartComparisonGraph", highchart_combination_graph_of_comparison);
-        $('div#graph_type.btn-group .btn').click(function() {
+        $('div#graph_type.btn-group .btn').click(function () {
             $(this).find('input:radio').attr('checked', true);
             var type = $(this).find('input[name=options]').val();
 
-            $('.options_graph_style').each(function() {
+            $('.options_graph_style').each(function () {
                 if ($(this).val() !== type)
                     $(this).attr('checked', false);
             });
@@ -772,7 +861,7 @@ jQuery(document).ready(function() {
     }
 
     //ACTION BINDING
-    $('div#range-type ul.dropdown-menu li a').click(function(e) {
+    $('div#range-type ul.dropdown-menu li a').click(function (e) {
         var $div = $(this).parent().parent().parent();
         var $btn = $div.find('.dropdown-toggle');
         $btn.html($(this).text() + ' <span class="caret"></span>');
@@ -781,35 +870,38 @@ jQuery(document).ready(function() {
         return false;
     });
 
-    $('a.btnViewModal').on('click', function(e) {
+    $('a.btnViewModal').on('click', function (e) {
         var target_modal = $(e.currentTarget).data('target');
         var remote_content = e.currentTarget.href;
 
         var modal = $(target_modal);
         var modalBody = $(target_modal + ' .modal-body');
         var e = 1;
-        modal.on('show.bs.modal', function() {
+        modal.on('show.bs.modal', function () {
             if (e)
                 modalBody.load(remote_content);
             e = 0;
         }).modal();
         return false;
     });
-    $('#viewModal').on('hidden.bs.modal', function() {
+    $('#viewModal').on('hidden.bs.modal', function () {
         $(this).removeData('bs.modal');
     });
 
     //initilize 1st item rule that appear first time
-    $("#item1").chosen();
-    $("#type1").chosen();
-    $("#action1").chosen();
-    $("#itemfilter1").chosen();
-    $('#item1').on('change', function(evt, params) {
+    ($("#item1").length > 0) ? $("#item1").chosen() : '';
+    ($("#type1").length > 0) ? $("#type1").chosen() : '';
+    ($("#action1").length > 0) ? $("#action1").chosen() : '';
+    ($("#itemfilter1").length > 0) ? $("#itemfilter1").chosen() : '';
+    ($(".multiple-chosen-select").length > 0) ? $(".multiple-chosen-select").chosen({no_results_text: "Oops, nothing found!"}) : '';
+    ($('#guideModal').length > 0) ? $("#guideModal").modal('show') : '';
+
+    $('#item1').on('change', function (evt, params) {
         if (!validateSelectedItem(params.selected)) {
             $('#item1').val("").trigger("chosen:updated");
         }
     });
-    $("#expiry_type").bind('change', function(e) {
+    $("#expiry_type").bind('change', function (e) {
         var valueSelected = this.value;
         var box = $("#expiry_value_box");
 
@@ -820,7 +912,7 @@ jQuery(document).ready(function() {
             dtpicker.find("input.form-control").attr("name", "expiry_value");
             dtpicker.removeClass("hide");
 
-            $(function() {
+            $(function () {
                 $('#datetimepicker').datetimepicker();
                 if (expiry_date !== '')
                     $('#datetimepicker').data("DateTimePicker").setDate(expiry_date);
@@ -838,14 +930,13 @@ jQuery(document).ready(function() {
                 box.find("input#expiry_value").val(0);
         }
     });
-    $("#datetimepicker").bind("dp.change", function() {
+    $("#datetimepicker").bind("dp.change", function () {
         var dt = $('#datetimepicker').data("DateTimePicker").getDate();
         $("#expiry_value_dt").val(dt);
 
     });
-    $("#expiry_type").change(function() {
+    $("#expiry_type").change(function () {
     }).trigger("change");
-    $(".multiple-chosen-select").chosen({no_results_text: "Oops, nothing found!"});
 
     //wizard
     var navListItems = $('ul.setup-panel li a'),
@@ -853,8 +944,7 @@ jQuery(document).ready(function() {
 
     allWells.hide();
 
-    navListItems.click(function(e)
-    {
+    navListItems.click(function (e) {
         e.preventDefault();
         var $target = $($(this).attr('href')),
                 $item = $(this).closest('li');
@@ -870,7 +960,7 @@ jQuery(document).ready(function() {
     $('ul.setup-panel li.active a').trigger('click');
 
     // WIZARD (PLACEMENT INFO) //
-    $('#btnWizardWidgetInfo').on('click', function(e) {
+    $('#btnWizardWidgetInfo').on('click', function (e) {
         e.preventDefault();
         var form = $(".wizardWidgetForm");
         $.ajax({
@@ -878,7 +968,7 @@ jQuery(document).ready(function() {
             type: 'POST',
             data: form.serialize(),
             dataType: 'json',
-            success: function(data)
+            success: function (data)
             {
                 if (data.status === "success") {
                     $('ul.setup-panel li:eq(1)').removeClass('disabled');
@@ -888,7 +978,7 @@ jQuery(document).ready(function() {
                     $(".wizardWidget").html(data.response);
                 }
             },
-            error: function() {
+            error: function () {
             }
         });
 
@@ -896,7 +986,7 @@ jQuery(document).ready(function() {
     });
 
     // WIZARD (RULESETS INFO) //
-    $("#btnWizardComplete").on("click", function(e) {
+    $("#btnWizardComplete").on("click", function (e) {
         //show loading
         var form = $(".wizardRulesetForm");
 
@@ -905,7 +995,7 @@ jQuery(document).ready(function() {
             type: 'POST',
             data: form.serialize(),
             dataType: 'json',
-            success: function(data)
+            success: function (data)
             {
                 if (data.status === "success") {
                     $('ul.setup-panel li:eq(2)').removeClass('disabled');
@@ -916,7 +1006,7 @@ jQuery(document).ready(function() {
                 }
                 //hide loading
             },
-            error: function() {
+            error: function () {
             }
         });
 
@@ -924,7 +1014,7 @@ jQuery(document).ready(function() {
     });
 
     //CHOSEN ACTION FOR TRACKING COMPARISON
-    $("#btnSubmitActionNonDefaultSelector").on("click", function(e) {
+    $("#btnSubmitActionNonDefaultSelector").on("click", function (e) {
         e.preventDefault();
         //show loading
         var form = $(".actionNoDefaultSelectorForm");
@@ -934,7 +1024,7 @@ jQuery(document).ready(function() {
             type: 'POST',
             data: form.serialize(),
             dataType: 'json',
-            success: function(data)
+            success: function (data)
             {
                 if (data.status === "success") {
                     window.location = site_url + data.response;
@@ -942,22 +1032,22 @@ jQuery(document).ready(function() {
                     $(".modal-body").html(data.response);
                 }
             },
-            error: function() {
+            error: function () {
             }
         });
 
         return;
     });
 
-    $("#funel_preference_id").change(function() {
+    $("#funel_preference_id").change(function () {
         $('#funelSelector').submit();
     });
 
-    $('div#type_options.btn-group .btn').click(function() {
+    $('div#type_options.btn-group .btn').click(function () {
         $(this).find('input:radio').attr('checked', true);
         var type = $(this).find('input[name=options]').val();
 
-        $('.options_trend').each(function() {
+        $('.options_trend').each(function () {
             if ($(this).val() !== type)
                 $(this).attr('checked', false);
         });
@@ -967,68 +1057,69 @@ jQuery(document).ready(function() {
             type: 'POST',
             data: {type: type},
             dataType: 'json',
-            success: function(data)
+            success: function (data)
             {
                 if (data.status === "success") {
                     $("#trendsContent").html(data.response);
                 }
             },
-            error: function() {
+            error: function () {
             }
         });
 
         return;
     });
 
+    /**
+     * Report Ranges
+     */
     $('#reportrange').daterangepicker({
         ranges: {
+            '7 Days Ago': [moment().subtract('days', 7), moment()],
             '31 Days Ago': [moment().subtract('days', 31), moment()],
             '36 Weeks Ago': [moment().subtract('weeks', 36), moment()],
             '12 Months Ago': [moment().subtract('months', 12), moment()]
         },
-        startDate: moment().subtract('days', 31),
+        startDate: moment().subtract('days', 7),
         endDate: moment(),
         maxDate: moment(),
         applyClass: 'btnApplyRange btn btn-primary btn-sm',
         cancelClass: 'btnCancelRange btn btn-default btn-sm pull-right'
-    },
-    function(start, end) {
+    }, function (start, end) {
         $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
     });
-    $('#reportrange').on('apply.daterangepicker', function(ev, picker) {
-        console.log(picker.startDate.format('YYYY-MM-DD'));
-        console.log(picker.endDate.format('YYYY-MM-DD'));
+    $('#reportrange').on('apply.daterangepicker', function (ev, picker) {
+//        console.log(picker.startDate.format('YYYY-MM-DD'));
+//        console.log(picker.endDate.format('YYYY-MM-DD'));
 //        console.log(site_url + "/home2/" + selected_comparison + "/range/" + type_by + "/" + picker.startDate.format('YYYY-MM-DD') + "/" + picker.endDate.format('YYYY-MM-DD'));
 //        window.location = site_url + "/home2/" + selected_comparison + "/range/" + type_by + "/" + picker.startDate.format('YYYY-MM-DD') + "/" + picker.endDate.format('YYYY-MM-DD');
 
     });
-
     $('#reportrange2').daterangepicker({
         ranges: {
+            '7 Days Ago': [moment().subtract('days', 7), moment()],
             '31 Days Ago': [moment().subtract('days', 31), moment()],
             '36 Weeks Ago': [moment().subtract('weeks', 36), moment()],
             '12 Months Ago': [moment().subtract('months', 12), moment()]
         },
-        startDate: moment().subtract('days', 31),
+        startDate: moment().subtract('days', 7),
         endDate: moment(),
         maxDate: moment(),
         applyClass: 'btnApplyRange btn btn-primary btn-sm',
         cancelClass: 'btnCancelRange btn btn-default btn-sm pull-right'
-    },
-    function(start, end) {
+    }, function (start, end) {
         filters.dt_start = start.format('YYYY-MM-DD');
         filters.dt_end = end.format('YYYY-MM-DD');
         $('#reportrange2 span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
     });
-    $('#reportrange2').on('apply.daterangepicker', function(ev, picker) {
+    $('#reportrange2').on('apply.daterangepicker', function (ev, picker) {
         filters.dt_start = picker.startDate.format('YYYY-MM-DD');
         filters.dt_end = picker.endDate.format('YYYY-MM-DD');
         getGraphData();
 //        console.log(picker.startDate.format('YYYY-MM-DD'));
 //        console.log(picker.endDate.format('YYYY-MM-DD'));
     });
-
-    $("#date_unit").bind('change', function(e) {
+    $("#date_unit").bind('change', function (e) {
         var valueSelected = this.value;
         filters.date_unit = valueSelected;
         getGraphData();

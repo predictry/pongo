@@ -12,6 +12,10 @@ body {
     border-bottom: 1px solid #eee;
 }
 
+.pt0{
+    padding-top: 0;
+}
+
 .mb0{
     margin-bottom: 0;
 }
@@ -26,6 +30,10 @@ body {
 
 .pt20{
     padding-top: 20px;
+}
+
+.pt40{
+    padding-top: 40px;
 }
 
 .pb10{
@@ -47,6 +55,10 @@ body {
 
 .cl-fade{
     color: #8A7E7E;
+}
+
+.tooltip-inner {
+    min-width: 150px; //the minimum width
 }
 
 #item_rules_container .chosen-container,
@@ -142,7 +154,7 @@ body {
     padding: 20px;
 }
 @media (min-width: 768px) {
-    .main {
+    .main, .setup-content {
         padding-right: 40px;
         padding-left: 40px;
     }
@@ -531,4 +543,119 @@ body {
 
 .daterangepicker th.month {
     width: auto;
+}
+
+.list-guide > a:hover{
+    cursor: pointer;
+}
+
+.pages .actions{
+    padding: 5px 0;
+}
+
+.pages .actions.nav > li > div > a{
+    color: #000;
+    display: block;
+
+}
+
+.pages .actions.nav > li > div:first-child{
+    padding: 6px 0 6px 30px;
+}
+.pages .actions.nav > li > div:first-child i{
+    padding-top: 0;
+}
+.pages .actions.nav > li > div:not(:first-child){
+    padding: 3px 0 0 10px;
+    cursor: help;
+}
+.pages .actions.nav > li > div:not(:first-child) i{
+    padding-top: 6px;
+    padding-right: 6px;
+}
+
+.pages .actions.nav > li > a:hover,
+.pages .actions.nav > li > a:focus{
+    background-color: transparent;
+}
+
+.panel-tabs {
+    position: relative;
+    bottom: 30px;
+    clear:both;
+    border-bottom: 1px solid transparent;
+}
+
+.panel-tabs > li {
+    float: left;
+    margin-bottom: -1px;
+}
+
+.panel-tabs > li > a {
+    margin-right: 2px;
+    margin-top: 5px;
+    line-height: .85;
+    border: 1px solid transparent;
+    border-radius: 4px 4px 0 0;
+    color: #ffffff;
+}
+
+.panel-tabs > li > a:hover {
+    border-color: transparent;
+    color: #ffffff;
+    background-color: transparent;
+}
+
+.panel-tabs > li.active > a,
+.panel-tabs > li.active > a:hover,
+.panel-tabs > li.active > a:focus {
+    color: #fff;
+    cursor: default;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    background-color: rgba(255,255,255, .23);
+    border-bottom-color: transparent;
+}
+
+#action_properties p{
+    /*    padding-top: 15px;*/
+}
+#action_properties{
+    /*padding-top: 0px;*/
+}
+
+#action_properties .list-group,
+.pages.list-group{
+    margin-bottom: 0;
+}
+
+.pages .list-group-item div.toggle{
+    cursor: pointer;
+}
+
+.property-wrap .checkbox{
+    margin-bottom: 0;
+}
+.property-wrap .info{
+    padding-left: 13px;
+}
+
+.property-wrap i{
+    margin-top: 13px;
+}
+.property-wrap i:hover{
+    cursor: help;
+}
+
+.pages i.fa{
+    padding-top: 5px;
+}
+
+.pages i.fa.action-received{
+    color: #8CC152;
+}
+
+.pages i.fa.action-not-received{
+    color: #c9302c;
 }

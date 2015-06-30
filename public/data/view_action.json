@@ -1,0 +1,32 @@
+{
+    "browser_id": "gnKG2f2ldLYAlFC",
+    "session_id": "2JhVZ29ZJfx5YNF",
+    "action": {
+        "name": "view"
+    },
+    "user": {
+        "user_id": "100",
+        "email": "user@email.com"
+    },
+    "items": [
+        {
+            "item_id": "2300",
+            "name": "Item name",
+            "price": "250.12",
+            "img_url": "http://www.predictry.com/123.png",
+            "item_url": "http://www.predictry.com/123",
+            "category": "Electronics",
+            "sub_category": ["Accessories", "Watches"],
+            "discount": "55%",
+            "description": "Description of the item",
+            "inventory_qty": 100,
+            "tags": ["iphone", "5s", "gold"],
+            "locations": {
+                "country": "Indonesia",
+                "city": "Jakarta"
+            },
+            "start_date": 1407921883,
+            "end_date": 1417921883
+        }
+    ]
+}

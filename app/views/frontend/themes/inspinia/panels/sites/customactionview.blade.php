@@ -1,0 +1,3 @@
+<li><a  href=" {{ URL::to( URL::current() . "/" . $id . "/default" ) }}" data-toggle="tooltip" data-placement="bottom" title="Set as default site">Set Default</a></li>
+<li><a  href=" {{ URL::to( URL::current() . "/" . $site_name . "/integration" ) }}" data-toggle="tooltip" data-placement="bottom" title="Integration Wizard">Integration</a></li>
+<li><a  href=" {{ URL::to( URL::current() . "/" . $site_name . "/business" ) }}" data-toggle="tooltip" data-placement="bottom" title="Edit business detail">Business</a></li>

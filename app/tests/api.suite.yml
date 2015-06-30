@@ -1,0 +1,8 @@
+class_name: ApiTester
+modules:
+    enabled: [Laravel4, REST, ApiHelper, Asserts, PhpBrowser]
+    config:
+        PhpBrowser:
+            url: http://dashboard.predictry.dev/
+        REST:
+            url: http://dashboard.predictry.dev/

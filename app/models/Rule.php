@@ -10,25 +10,31 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\SoftDeletingTrait;
+
 class Rule extends \Eloquent
 {
 
-	/**
-	 * The database table used by the model.
-	 *
-	 * @var string
-	 */
-	protected $table = 'rules';
-	public $rules	 = array(
-		"type"		 => "required",
-		"likelihood" => "required|numeric|min:0|max:100",
-		"item_id"	 => "required"
-	);
+    use SoftDeletingTrait;
 
-	public function ruleset()
-	{
-		return $this->belongsTo("App\Models\RuleSet", "id");
-	}
+    protected $dates = ['deleted_at'];
+
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    protected $table = 'rules';
+    public $rules    = array(
+        "type"       => "required",
+        "likelihood" => "required|numeric|min:0|max:100",
+        "item_id"    => "required"
+    );
+
+    public function ruleset()
+    {
+        return $this->belongsTo("App\Models\RuleSet", "id");
+    }
 
 }
 

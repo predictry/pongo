@@ -7,17 +7,19 @@
  * Copyright    : rifkiyandhi@gmail.com
  * Function     : 
  */
+
 namespace App\Models;
+
 class ActionInstanceMeta extends \Eloquent
 {
 
-	/**
-	 * The database table used by the model.
-	 *
-	 * @var string
-	 */
-	public $timestamps	 = false;
-	protected $table	 = 'action_instance_metas';
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    public $timestamps = false;
+    protected $table   = 'action_instance_metas';
 
 }
 
