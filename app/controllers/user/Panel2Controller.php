@@ -43,9 +43,10 @@ class Panel2Controller extends BaseController   {
         // fisher bucket data /_h
         $response     = $client->get("overview?tenantId=". $current_site . "&startDate=" . $dt_start . "&endDate=" . $dt_end)->send(); 
         $bucket_view  = $client->get("?tenantId=". $current_site . "&startDate=" . $dt_start . "&endDate=" . $dt_end . "&metric=VIEWS&interval=hour")->send(); 
-        
-        $top_purchased_items  = $top_client->get("sales")->send()->json(); 
-        $top_viewed_items     = $top_client->get("hits")->send()->json();
+
+        // top views/sales items information 
+        $top_purchased_items= $top_client->get("sales?tenantId=". $current_site. "&startDate=" . $dt_start . "&endDate=" . $dt_end)->send()->json(); 
+        $top_viewed_items   = $top_client->get("hits?tenantId=". $current_site. "&startDate=" . $dt_start . "&endDate=" . $dt_end)->send()->json(); 
         
         
         $tstart = strtotime($ranges['dt_start']);

@@ -25,4 +25,3 @@ Trivial: *Pongo* is the scientific name of orangutans.
 ## Documentation
 
 Documentation can be found on this link http://api.predictry.com/integration/
-

@@ -9,7 +9,8 @@
         "doctrine/dbal": "2.4.*",
         "aws/aws-sdk-php": "~2.7",
         "zizaco/entrust": "1.2.*@dev",
-        "monashee/php-simple-html-dom-parser": "dev-master"
+        "monashee/php-simple-html-dom-parser": "dev-master",
+        "guzzlehttp/guzzle": "^6.0"
     },
     "require-dev": {
         "way/generators": "2.*",
