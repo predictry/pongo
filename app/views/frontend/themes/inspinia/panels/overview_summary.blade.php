@@ -44,6 +44,21 @@
             </div>
         </div>
     </div>
+    
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 data_cell">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <!--<span class="label label-danger pull-right">Low value</span>-->
+                <h5>Conversion Rate</h5>
+            </div>
+            <div id="visualOne"></div>
+            <div class="ibox-content">
+                <h1 class="no-margins">{{ number_format((($overviews['conversion_rate']) * 100), 4, '.','') }}%</h1>
+                <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
+                <small>(orders / pageviews) * 100</small>
+            </div>
+        </div>
+    </div>
 
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 data_cell">
         <div class="ibox float-e-margins">
@@ -74,23 +89,7 @@
             </div>
         </div>
     </div>
-    
-      
-    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 data_cell">
-        <div class="ibox float-e-margins">
-            <div class="ibox-title">
-                <!--<span class="label label-danger pull-right">Low value</span>-->
-                <h5>Conversion Rate</h5>
-            </div>
-            <div id="visualOne"></div>
-            <div class="ibox-content">
-                <h1 class="no-margins">{{ number_format((($overviews['conversion_rate']) * 100), 4, '.','') }}%</h1>
-                <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
-                <small>(orders / pageviews) * 100</small>
-            </div>
-        </div>
-    </div>
-    
+     
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
@@ -125,7 +124,8 @@
 d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS', function(data) { 
     data = MG.convert.date(data, 'date', '%Y-%m-%dT%H:%M:%S'); 
     MG.data_graphic({
-        title: "",
+        animate_on_load: true,
+        y_extended_ticks: true,
         data: data,
         full_width: true,
         height: 200,
@@ -138,7 +138,8 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS', function(data) {
 d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/UNIQUE_VISITOR', function(data) {
     data = MG.convert.date(data, 'date','%Y-%m-%dT%H:%M:%S');
     MG.data_graphic({
-        title: "",
+        animate_on_load: true,
+        y_extended_ticks: true,
         description: "This is a simple line chart. You can remove the area portion by adding area: false to the arguments list.",
         data: data,
         full_width: true,
@@ -153,7 +154,8 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/UNIQUE_VISITOR', function(data
 d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT', function(data) {
     data = MG.convert.date(data, 'date','%Y-%m-%dT%H:%M:%S');
     MG.data_graphic({
-        title: "",
+        animate_on_load: true,
+        y_extended_ticks: true, 
         description: "This is a simple line chart. You can remove the area portion by adding area: false to the arguments list.",
         data: data,
         full_width: true,
@@ -167,7 +169,8 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT', function(data) 
 d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/ORDERS', function(data) {
     data = MG.convert.date(data, 'date','%Y-%m-%dT%H:%M:%S');
     MG.data_graphic({
-        title: "",
+        animate_on_load: true,
+        y_extended_ticks: true, 
         description: "This is a simple line chart. You can remove the area portion by adding area: false to the arguments list.",
         data: data,
         full_width: true,
@@ -182,7 +185,8 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/ORDERS', function(data) {
 d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/ITEM_PURCHASED', function(data) {
     data = MG.convert.date(data, 'date','%Y-%m-%dT%H:%M:%S');
     MG.data_graphic({
-        title: "",
+        animate_on_load: true,
+        y_extended_ticks: true, 
         description: "This is a simple line chart. You can remove the area portion by adding area: false to the arguments list.",
         data: data, 
         full_width: true,
