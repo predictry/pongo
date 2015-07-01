@@ -43,7 +43,6 @@ Route::filter('auth', function() {
         View::share(array("activeSiteName" => Session::get("active_site_name")));
     }
 
-
     $site_id   = $tenant_id = null;
     if (Session::get("active_site_id") === null && !$site_exists) {
         $site = App\Models\Site::where("account_id", Auth::user()->id)->get(array('id', 'name'))->first();

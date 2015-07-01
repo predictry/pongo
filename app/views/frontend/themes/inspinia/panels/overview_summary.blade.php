@@ -30,7 +30,7 @@
             </div>
     </div>
 
-    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 data_cell">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 data_cell">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
                 <!--<span class="label label-primary pull-right">Today</span>-->
@@ -127,7 +127,7 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS', function(data) {
     MG.data_graphic({
         title: "",
         data: data,
-        width: 600,
+        full_width: true,
         height: 200,
         right: 40,
         target: document.getElementById('mgViews'),
@@ -141,7 +141,7 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/UNIQUE_VISITOR', function(data
         title: "",
         description: "This is a simple line chart. You can remove the area portion by adding area: false to the arguments list.",
         data: data,
-        width: 600,
+        full_width: true,
         height: 200,
         right: 40,
         target: document.getElementById('mgUniqueVisitor'),
@@ -156,7 +156,7 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT', function(data) 
         title: "",
         description: "This is a simple line chart. You can remove the area portion by adding area: false to the arguments list.",
         data: data,
-        width: 600,
+        full_width: true,
         height: 200,
         right: 40,
         target: document.getElementById('mgSalesAmount'),
@@ -170,7 +170,7 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/ORDERS', function(data) {
         title: "",
         description: "This is a simple line chart. You can remove the area portion by adding area: false to the arguments list.",
         data: data,
-        width: 600,
+        full_width: true,
         height: 200,
         right: 40,
         target: document.getElementById('mgOrders'),
@@ -184,8 +184,8 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/ITEM_PURCHASED', function(data
     MG.data_graphic({
         title: "",
         description: "This is a simple line chart. You can remove the area portion by adding area: false to the arguments list.",
-        data: data,
-        width: 600,
+        data: data, 
+        full_width: true,
         height: 200,
         right: 40,
         target: document.getElementById('mgItemsPurchased'),
