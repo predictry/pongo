@@ -320,10 +320,8 @@ class Home2Controller extends BaseController {
 
     public function bucket($start, $end , $action, $interval= "hour") {
       $client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'stat/');
-      $current_site =  "FAMILYNARA2014";
-      
+      $current_site =   \Session::get("active_site_name"); 
       $response = $client->get("?tenantId=". $current_site . "&startDate=" . $start . "&endDate=" . $end . "&metric=". $action . "&interval=". $interval)->send(); 
-
       return $response->json();
     }
 

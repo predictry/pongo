@@ -126,12 +126,10 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS', function(data) {
     data = MG.convert.date(data, 'date', '%Y-%m-%dT%H:%M:%S'); 
     MG.data_graphic({
         title: "",
-        description: "This is a simple line chart. You can remove the area portion by adding area: false to the arguments list.",
         data: data,
         width: 600,
         height: 200,
         right: 40,
-        missing_is_hidden: true,
         target: document.getElementById('mgViews'),
         x_accessor: 'date',
         y_accessor: 'value'
