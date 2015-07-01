@@ -50,7 +50,7 @@
                                             <ul class="dropdown-menu">
                                                 @if ($edit) <li><a href="{{URL::to( URL::current() . "/" . $o->id . "/edit" ) }}"  data-toggle="tooltip" data-placement="bottom" title="{{Lang::get('panel.edit')}}">{{Lang::get('panel.edit')}}</a></li> @endif
                                                 @if ($view) <li><a class="btnViewModal" data-toggle="modal" id="btnViewModal{{ $o->id }}" data-target="#viewModal" data-id="{{ $o->id }}" href=" {{ URL::to( URL::current() . "/" . $o->id . "/view" ) }}" data-toggle="tooltip" data-placement="bottom" title="{{Lang::get('panel.view')}}" >{{Lang::get('panel.view')}}</a></li> @endif
-                                                @if ($delete) <li><a type="submit" onclick="return confirm('{{Lang::get('panel.remove.confirm')}}');" href="{{ URL::to( URL::current() . "/" . $o->id . "/delete" )  }}"  data-toggle="tooltip" data-placement="bottom" title="{{Lang::get('panel.remove')}}">{{Lang::get('panel.remove')}}</a></li> @endif
+                                                 <li><a type="submit" onclick="return confirm('{{Lang::get('panel.remove.confirm')}}');" href="{{ URL::to( URL::current() . "/" . $o->id . "/delete" )  }}"  data-toggle="tooltip" data-placement="bottom" title="{{Lang::get('panel.remove')}}">{{Lang::get('panel.remove')}}</a></li>
                                                 @if ($custom_action)
                                                 @include($custom_action_view, array('id' => $o->id, 'site_name' => isset($o->name) ? $o->name: ''))
                                                 @endif

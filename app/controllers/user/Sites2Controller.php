@@ -89,6 +89,14 @@ class Sites2Controller extends BaseController
                     "site_category_list" => $site_category_list));
     }
 
+    public function getDelete($id) {
+      $site = Site::find($id);
+      $site->delete();
+
+      Session::flash('message', 'Successfully deleted your site!'); 
+      return Redirect::to('v2/sites')->with("flash_message", "Successfully delete the site.");
+    }
+
     public function postCreate()
     {
         $input  = Input::only("url");
