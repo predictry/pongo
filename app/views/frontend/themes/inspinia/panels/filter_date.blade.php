@@ -5,9 +5,6 @@
                 <button class="btn btn-primary btn-xs"><i class="fa fa-calendar fa-sm"></i> <span><?php echo $dt_range['start']; ?> - <?php echo $dt_range['end']; ?></span> <b class="caret"></b></button> 
             </div>
         </div>
-        <!--<div class="form-group">-->
-            <?php // echo Form::select('date_unit', array("day" => "Day", "week" => "Week", "month" => "	Month"), "day", array("class" => "form-control input-xs", "id" => "date_unit")); ?>
-        <!--</div>-->
     </div>
 </div>
 <div class="clearfix mb10"></div>

@@ -46,7 +46,8 @@ class Panel2Controller extends BaseController   {
         
         $top_purchased_items  = $top_client->get("sales?tenantId=". $current_site . "&startDate=" . $dt_start . "&endDate=" .$dt_end)->send()->json(); 
         $top_viewed_items  = $top_client->get("hits?tenantId=". $current_site . "&startDate=" . $dt_start . "&endDate=" .$dt_end)->send()->json(); 
-      
+
+        // check the error index
         if (isset($top_purchased_items['error']))
           $tpi = [];
         else 
@@ -56,7 +57,7 @@ class Panel2Controller extends BaseController   {
           $tvi = [];
         else
           $tvi = $top_viewed_items['items'];
-
+        //end check error
     
         $tstart = strtotime($ranges['dt_start']);
         $tend   = strtotime($ranges['dt_end']);
