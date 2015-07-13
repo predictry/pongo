@@ -113,14 +113,15 @@ class Home2Controller extends BaseController {
         }
 
         $pricing_list = [
-            'choose' => 'Choose Pricing Method',
-            'CPA' => 'CPA',
-            'CPC' => 'CPC'
+            'choose' => 'Choose Preferred Pricing Model',
+            'CPA' => 'CPA – % of retail price only if product is sold by Predictry',
+            'CPC' => 'CPC – Charged by # of  recommended item clicks',
+            'FREE' => 'I can’t decide now, just give me my FREE trial'
         ];
 
         $industries = App\Models\Industry::all()->lists("name", "id");
         $output = [
-            'range_number_of_items' => ['choose' => 'Select range total of SKUs', 'less_than_5k' => '< 5000', '5k_to_499k' => '5k to 499k', '500k_to_999k' => '500k to 999k', 'more_than_1mil' => '> 1mil'],
+            'range_number_of_items' => ['choose' => 'Select the range of SKUs/listings on site', 'less_than_5k' => '< 5000', '5k_to_499k' => '5k to 499k', '500k_to_999k' => '500k to 999k', 'more_than_1mil' => '> 1mil'],
             'selected_range_number_of_items' => '0_to_500',
             'selected_industry_id' => 1,
             'pricing_list' => $pricing_list,

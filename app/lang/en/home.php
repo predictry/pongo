@@ -18,7 +18,7 @@ return array(
     "login.now"                        => "Login here",
     "info.pre.register_pref"           => "By clicking register, you agree to the ",
     "terms.and.conditions"             => "Terms and Conditions",
-    "info.pre.register_suf"            => " including our Cookie Use.",
+    "info.pre.register_suf"            => ".",
     "signup.now"                       => "Signup Now",
     "success.register"                 => "You have sucessfully registered. Please login.",
     "success.confirmation.correct"     => "Well done!. You've been confirmed to be part of us.",
