@@ -7,7 +7,7 @@
  * Function     : 
  */
 return array(
-    "email.doesnt.exists"        => "Email doesn't exists.",
+    "email.doesnt.exists"        => "The email you have entered doesn’t exist. Please try again.",
     "login.failed"               => "Your email/password combination was incorrect.",
     "email.doesnt.exists"        => "Email you have entered doesn't exists.",
     "account.have.not.confirmed" => "Account have not confirmed yet. Please check the email that we have send to you earlier.",

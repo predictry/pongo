@@ -147,7 +147,9 @@ class Home2Controller extends BaseController {
 
         if(mb_substr($input['url'], 0, 4) !== 'http') 
           $url = 'http://' . $input['url']; 
-        
+        else 
+          $url = $input['url'];
+
         $site_host =  parse_url($url)['host'];
         $site_name = strtoupper(str_replace('.', '', $site_host));
         
@@ -163,7 +165,7 @@ class Home2Controller extends BaseController {
         $site_rules = App\Models\Site::$rules;
     
         $account_validator = $this->account_repository->validate($input, $rules); 
-        $site_validator = $this->account_repository->siteValidate($input, $site_rules);
+        $site_validator = $this->account_repository->siteValidate($input_site, $site_rules);
         
        
 
@@ -220,7 +222,11 @@ class Home2Controller extends BaseController {
                 return Redirect::to('v2/register')->withInput()->withErrors("We are unable to process the data. Please try again.");
             }
         } else
-            return Redirect::back()->withInput()->withErrors($account_validator);
+          $valudation_message = array_merge_recursive( 
+            $account_validator->messages()->toArray(), 
+            $site_validator->messages()->toArray()
+          );
+            return Redirect::back()->withInput()->withErrors($valudation_message);
     }
 
     /**

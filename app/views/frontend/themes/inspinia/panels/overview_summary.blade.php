@@ -6,10 +6,19 @@
             </div>
             <div id="mgViews"></div>
             <div class="ibox-content">
+              <div class="left">
                 <h1 class="no-margins">{{ $overviews['total_pageviews'] }}</h1>
                 <!-- <div class="stat-percent font-bold text-success">98% <i class="fa fa-bolt"></i></div>
                 -->
                 <small>total view actions received</small>
+              </div>
+              
+              <div class="right">
+                <h1 class="no-margins">{{ $overviews['total_pageviews'] }}</h1>
+                <!-- <div class="stat-percent font-bold text-success">98% <i class="fa fa-bolt"></i></div>
+                -->
+                <small>recommended view actions received</small>
+              </div>
             </div>
         </div>
     </div>
@@ -17,16 +26,26 @@
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 data_cell">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-               
                     <h5>Unique Visitors</h5>
                 </div>
+
                 <div id="mgUniqueVisitor"></div>
+
                 <div class="ibox-content">
+                  <div class="left">                
                     <h1 class="no-margins">{{ $overviews['total_uvs'] }}</h1>
                     <!-- <div class="stat-percent font-bold text-info">20% <i class="fa fa-level-up"></i></div>
                     -->
                     <small>Determine by number of sessions</small>
-                </div>
+                  </div>
+                
+                  <div class="right">
+                    <h1 class="no-margins">{{ $overviews['total_uvs'] }}</h1>
+                    <!-- <div class="stat-percent font-bold text-info">20% <i class="fa fa-level-up"></i></div>
+                    -->
+                    <small>Recommended Unique Visitors</small> 
+                  </div>
+              </div>
             </div>
     </div>
 

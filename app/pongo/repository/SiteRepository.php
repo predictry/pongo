@@ -102,8 +102,8 @@ class SiteRepository {
     public function validateUniqueUrl($url) {
         $url_validator = Validator::make(['url' => $url], ['url' => 'unique:sites,url']);
 
-        if ($url_validator->passes()) {
-            return true;
+        if ($url_validator->passes()) { 
+          return true;
         } else
             return $url_validator;
     }

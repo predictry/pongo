@@ -10,8 +10,7 @@
             </h1>
         </div>
         @include('frontend.partials.notification')
-        <h2 class="wl_predictry">Welcome to Predictry</h2>
-        <p>Create account to see it in action.</p>
+        <h2 class="wl_predictry">Welcome back to Predictry</h2>
         {{ Form::open(array('url' => 'v2/login/submit', 'class' => 'm-t', 'autocomplete' => 'off', 'role' => 'form')) }}
         <div class="form-group {{$var = $errors->first('email')}} {{ ($var !== '') ? 'has-error' : ''}}">
             <?php echo Form::text('email', '', array('class' => 'form-control', 'placeholder' => Lang::get("fields.email.address"), 'id' => 'email')); ?>

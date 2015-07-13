@@ -4807,3 +4807,17 @@ input[type=checkbox]:checked + label {
   max-width: 200px;
   height: auto;
 }
+.ibox-content {
+  width: 100%;
+  height: auto;
+  display: inline-block;
+
+}
+.ibox-content .left {
+  float: left;  
+}
+
+.ibox-content .right {
+  float: right;
+}
+

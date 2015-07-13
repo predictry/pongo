@@ -30,7 +30,7 @@
             <span class="help-block">{{$errors->first('password_confirmation')}}</span>
         </div>
         <div class="form-group {{$var = $errors->first('url')}} {{ ($var !== '') ? 'has-error' : ''}}">            
-            <?php echo Form::text('url', null, array('class' => 'form-control', 'placeholder' => 'Website URL', 'id' => 'url', "tabindex" => 5)); ?>
+            <?php echo Form::url('url', null, array('class' => 'form-control', 'placeholder' => 'Website URL', 'id' => 'url', "tabindex" => 5)); ?>
             <span class="help-block">{{$errors->first('url')}}</span>
         </div>
         <div class="form-group {{$var = $errors->first('range_number_of_items')}} {{ ($var !== '') ? 'has-error' : ''}}">

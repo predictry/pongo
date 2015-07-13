@@ -158,4 +158,3 @@ class Panel2Controller extends BaseController   {
         }
     }
 }
-
