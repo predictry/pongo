@@ -205,7 +205,9 @@ class SiteRepository {
 
     public function createSiteBasedOnURL($account, $url, $site_category_id = 1) {
         if(mb_substr($url, 0, 4) !== 'http') 
-          $url_tp = 'http://' . $url; 
+          $url_tp = 'http://' . $url;   
+        else
+          $url_tp = $ur;
 
         $parse_url = parse_url($url_tp);
 

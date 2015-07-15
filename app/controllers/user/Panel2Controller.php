@@ -92,7 +92,12 @@ class Panel2Controller extends BaseController   {
           $cache_n_orders = null;
           if (is_null($cache_n_orders)) {
               $arr_response = $response->json();
-              $n_orders     = (isset($arr_response['error']) && $arr_response['error']) ? 0 : array_get($arr_response, 'orders');
+              $n_orders_sum= (isset($arr_response['error']) && $arr_response['error']) ? 0 : array_get($arr_response, 'orders');
+              $n_orders = [
+                  'overall'     => ($n_orders_sum) ? $n_orders_sum['overall'] : 0,
+                  'recommended' => ($n_orders_sum) ? $n_orders_sum['recommended'] : 0,
+                  'regular'     => ($n_orders_sum) ? $n_orders_sum['regular'] : 0
+              ];
           }
           else {
               $n_orders = $cache_n_orders; 
@@ -126,7 +131,7 @@ class Panel2Controller extends BaseController   {
                   'total_uvs'            => number_format($uniqueVisitor['overall']),
                   'total_sales_amount'   => number_format($summary_sales['overall']),
                   'total_item_purchased' => number_format($summary_item_purchased['overall']),
-                  'total_orders'         => number_format($n_orders),
+                  'total_orders'         => number_format($n_orders['overall']),
                   'total_item_per_cart'  => number_format($summary_item_per_cart['overall']),
                   'total_sales_per_cart' => number_format($summary_sales['overall']),
                   'conversion_rate'      => $conversionRate
