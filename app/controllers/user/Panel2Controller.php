@@ -124,8 +124,13 @@ class Panel2Controller extends BaseController   {
             'regular'     => ($item_per_cart) ? $item_per_cart['regular'] : 0
           ];
 
-          $conversionRate = (isset($arr_response['error']) && $arr_response['error']) ? 0 : array_get($arr_response, 'conversionRate');  
-          $output = [
+          $conversionRate_sum = (isset($arr_response['error']) && $arr_response['error']) ? 0 : array_get($arr_response, 'conversionRate');  
+       	  $conversionRate = [
+            'overall'     => ($conversionRate_sum) ? $conversionRate_sum['overall'] : 0,
+            'recommended' => ($conversionRate_sum) ? $conversionRate_sum['recommended'] : 0,
+            'regular'     => ($conversionRate_sum) ? $conversionRate_sum['regular'] : 0
+	  ];
+	  $output = [
               'overviews'           => [
                   'total_pageviews'      => number_format($pageviews_stat['overall']),
                   'total_uvs'            => number_format($uniqueVisitor['overall']),
@@ -134,7 +139,7 @@ class Panel2Controller extends BaseController   {
                   'total_orders'         => number_format($n_orders['overall']),
                   'total_item_per_cart'  => number_format($summary_item_per_cart['overall']),
                   'total_sales_per_cart' => number_format($summary_sales['overall']),
-                  'conversion_rate'      => $conversionRate
+                  'conversion_rate'      => $conversionRate['overall']
                 ],
               'dt_range'            => [
                   'start' => date("[H] F d, Y", $tstart),

@@ -51,7 +51,7 @@ return array(
 			'host'     => 'localhost',
 			'database' => 'pongo',
 			'username' => 'pongo',
-			'password' => 'pongo',
+			'password' => 'nerdb0rn',
 			'charset'  => 'utf8',
 			'prefix'   => '',
 			'schema'   => 'public',
