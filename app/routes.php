@@ -53,7 +53,7 @@ Route::group(array('prefix' => 'v2', 'namespace' => 'App\Controllers'), function
 
     Route::get('password/reset/{token}', 'Home2Controller@getReset');
     Route::post('password/reset/submit', 'Home2Controller@postReset'); 
-    Route::get('bucket/{start}/{end}/{view}', 'Home2Controller@bucket');
+    Route::get('bucket/{start}/{end}/{view}/{interval}/{value}', 'Home2Controller@bucket');
     Route::get('verify/{confirmation_code}', 'Home2Controller@getConfirmation');
 });
 

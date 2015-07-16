@@ -325,10 +325,10 @@ class Home2Controller extends BaseController {
         return Redirect::to('v2/password/reset/' . $token)->withInput()->withErrors($validator);
     }
 
-    public function bucket($start, $end , $action, $interval= "hour") {
+    public function bucket($start, $end , $action, $interval, $value ="overall") {
       $client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'stat/');
       $current_site =   \Session::get("active_site_name"); 
-      $response = $client->get("?tenantId=". $current_site . "&startDate=" . $start . "&endDate=" . $end . "&metric=". $action . "&interval=". $interval)->send(); 
+      $response = $client->get("?tenantId=". $current_site . "&startDate=" . $start . "&endDate=" . $end . "&metric=". $action . "&interval=" .$interval . "&valueType=" . $value)->send(); 
       return $response->json();
     }
 

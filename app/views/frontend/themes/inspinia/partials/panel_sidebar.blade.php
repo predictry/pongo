@@ -23,7 +23,7 @@
             <li class="<?php if ($ca === 'App\Controllers\User\Panel2Controller') echo 'active'; ?>">
                 <a href="<?php echo URL::to('v2/home'); ?>"><i class="fa fa-th-list"></i> <span class="nav-label">Dashboard </span> </a>
             </li>
-            <li class="<?php if ($ca === 'App\Controllers\User\Widgets2Controller' || $ca === 'App\Controllers\User\Filters2Controller' || $ca === 'App\Controllers\User\Rules2Controller') echo 'active'; ?>">
+            <!--<li class="<?php if ($ca === 'App\Controllers\User\Widgets2Controller' || $ca === 'App\Controllers\User\Filters2Controller' || $ca === 'App\Controllers\User\Rules2Controller') echo 'active'; ?>">
                 <a href="javascript:void(0);"><i class="fa fa-send-o"></i> <span class="nav-label">Recommendations </span></a>
                 <ul class="nav nav-second-level">
                     <li class="<?php if ($ca === 'App\Controllers\User\Widgets2Controller') echo 'active'; ?>"><a href="<?php echo URL::to('v2/widgets'); ?>"><i class="fa fa-list-ul"></i> Widgets</a></li>
@@ -35,7 +35,7 @@
 
             <li class="<?php if ($ca === 'App\Controllers\User\Items2Controller') echo 'active'; ?>">
                 <a href="<?php echo URL::to('v2/items'); ?>"><i class="fa fa-cubes"></i> <span class="nav-label">Your Items </span> </a>
-            </li>
+            </li> -->
         </ul>
 
     </div>

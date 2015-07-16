@@ -4,7 +4,9 @@
             <div class="ibox-title">
                 <h5>Pageviews</h5>
             </div>
+            <div id="mgViewsRecommended"></div>     
             <div id="mgViews"></div>
+        
             <div class="ibox-content">
               <div class="left">
                 <h1 class="no-margins">{{ $overviews['total_pageviews'] }}</h1>
@@ -28,7 +30,8 @@
                 <div class="ibox-title">
                     <h5>Unique Visitors</h5>
                 </div>
-
+                
+                <div id="mgUniqueVisitorRecommended"></div>
                 <div id="mgUniqueVisitor"></div>
 
                 <div class="ibox-content">
@@ -55,6 +58,7 @@
                 <!--<span class="label label-primary pull-right">Today</span>-->
                 <h5>Sales Amount</h5>
             </div>
+            <div id="mgOrdersRecommended"></div>
             <div id="mgSalesAmount"></div>
             <div class="ibox-content">
               <div class="left">
@@ -163,27 +167,49 @@
 </div>
 
 <script type="text/javascript">
-d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS', function(data) { 
+d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/hour/OVERALL', function(data) { 
     data = MG.convert.date(data, 'date', '%Y-%m-%dT%H:%M:%S'); 
     MG.data_graphic({
+        title: "Overall",
         animate_on_load: true,
         y_extended_ticks: true,
         data: data,
         full_width: true,
         height: 200,
         right: 40,
+        area: false,
         target: document.getElementById('mgViews'),
         x_accessor: 'date',
         y_accessor: 'value'
     });
 });
-d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/UNIQUE_VISITOR', function(data) {
-    data = MG.convert.date(data, 'date','%Y-%m-%dT%H:%M:%S');
+
+d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/hour/RECOMMENDED', function(data) { 
+    data = MG.convert.date(data, 'date', '%Y-%m-%dT%H:%M:%S'); 
     MG.data_graphic({
+        title: "Recommended",
         animate_on_load: true,
         y_extended_ticks: true,
-        description: "This is a simple line chart. You can remove the area portion by adding area: false to the arguments list.",
         data: data,
+        full_width: true,
+        height: 200,
+        right: 40,
+        area: false,
+        target: document.getElementById('mgViewsRecommended'),
+        x_accessor: 'date',
+        y_accessor: 'value'
+    });
+});
+
+d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/UNIQUE_VISITOR/hour/OVERALL', function(data) {
+    data = MG.convert.date(data, 'date','%Y-%m-%dT%H:%M:%S');
+    MG.data_graphic({
+        title: "Overall", 
+        animate_on_load: true,
+        y_extended_ticks: true,
+ 
+        data: data,
+        area: false,
         full_width: true,
         height: 200,
         right: 40,
@@ -193,12 +219,29 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/UNIQUE_VISITOR', function(data
     });
 });
 
-d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT', function(data) {
+d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/UNIQUE_VISITOR/hour/RECOMMENDED', function(data) {
     data = MG.convert.date(data, 'date','%Y-%m-%dT%H:%M:%S');
     MG.data_graphic({
+        title: "Recommended", 
         animate_on_load: true,
-        y_extended_ticks: true, 
-        description: "This is a simple line chart. You can remove the area portion by adding area: false to the arguments list.",
+        y_extended_ticks: true,
+    
+        data: data,
+        area: false,
+        full_width: true,
+        height: 200,
+        right: 40,
+        target: document.getElementById('mgUniqueVisitorRecommended'),
+        x_accessor: 'date',
+        y_accessor: 'value'
+    });
+});
+
+d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT/day/OVERALL', function(data) {
+    data = MG.convert.date(data, 'date','%Y-%m-%dT%H:%M:%S');
+    MG.data_graphic({
+        title: "Overall",
+        animate_on_load: true, 
         data: data,
         full_width: true,
         height: 200,
@@ -208,12 +251,28 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT', function(data) 
         y_accessor: 'value'
     });
 });
-d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/ORDERS', function(data) {
+
+d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT/day/OVERALL', function(data) {
     data = MG.convert.date(data, 'date','%Y-%m-%dT%H:%M:%S');
     MG.data_graphic({
+        title: "Recommended",
+        animate_on_load: true,    
+        data: data,
+        full_width: true,
+        height: 200,
+        right: 40,
+        target: document.getElementById('mgSalesAmountRecommended'),
+        x_accessor: 'date',
+        y_accessor: 'value'
+    });
+});
+
+d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/ORDERS/day/OVERALL', function(data) {
+    data = MG.convert.date(data, 'date','%Y-%m-%dT%H:%M:%S');
+    MG.data_graphic({
+        title: "Overall",
         animate_on_load: true,
         y_extended_ticks: true, 
-        description: "This is a simple line chart. You can remove the area portion by adding area: false to the arguments list.",
         data: data,
         full_width: true,
         height: 200,
@@ -224,12 +283,28 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/ORDERS', function(data) {
     });
 });
 
-d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/ITEM_PURCHASED', function(data) {
+d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/ORDERS/day/RECOMMENDED', function(data) {
     data = MG.convert.date(data, 'date','%Y-%m-%dT%H:%M:%S');
     MG.data_graphic({
+        title: "Recommended",
         animate_on_load: true,
         y_extended_ticks: true, 
-        description: "This is a simple line chart. You can remove the area portion by adding area: false to the arguments list.",
+        data: data,
+        full_width: true,
+        height: 200,
+        right: 40,
+        target: document.getElementById('mgOrdersRecommended'),
+        x_accessor: 'date',
+        y_accessor: 'value'
+    });
+});
+
+d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/ITEM_PURCHASED/hour/OVERALL', function(data) {
+    data = MG.convert.date(data, 'date','%Y-%m-%dT%H:%M:%S');
+    MG.data_graphic({
+        title: "Overall",
+        animate_on_load: true,
+        y_extended_ticks: true, 
         data: data, 
         full_width: true,
         height: 200,
