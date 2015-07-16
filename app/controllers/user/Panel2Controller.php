@@ -133,10 +133,20 @@ class Panel2Controller extends BaseController   {
 	  $output = [
               'overviews'           => [
                   'total_pageviews'      => number_format($pageviews_stat['overall']),
+                  'total_pageviews_recommended' => number_format($pageviews_stat['recommended']),
+                  
                   'total_uvs'            => number_format($uniqueVisitor['overall']),
+                  'total_uvs_recommended' => number_format($uniqueVisitor['recommended']),
+                  
                   'total_sales_amount'   => number_format($summary_sales['overall']),
+                  'total_sales_recommended' => number_format($summary_sales['recommended']),
+
                   'total_item_purchased' => number_format($summary_item_purchased['overall']),
+                  'total_item_purchased_recommended' => number_format($summary_item_purchased['recommended']),
+
                   'total_orders'         => number_format($n_orders['overall']),
+                  'total_orders_recommended' => number_format($n_orders['recommended']),
+
                   'total_item_per_cart'  => number_format($summary_item_per_cart['overall']),
                   'total_sales_per_cart' => number_format($summary_sales['overall']),
                   'conversion_rate'      => $conversionRate['overall']

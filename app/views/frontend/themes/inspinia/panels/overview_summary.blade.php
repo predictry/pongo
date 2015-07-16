@@ -14,7 +14,7 @@
               </div>
               
               <div class="right">
-                <h1 class="no-margins">{{ $overviews['total_pageviews'] }}</h1>
+                <h1 class="no-margins">{{ $overviews['total_pageviews_recommended'] }}</h1>
                 <!-- <div class="stat-percent font-bold text-success">98% <i class="fa fa-bolt"></i></div>
                 -->
                 <small>recommended view actions received</small>
@@ -40,7 +40,7 @@
                   </div>
                 
                   <div class="right">
-                    <h1 class="no-margins">{{ $overviews['total_uvs'] }}</h1>
+                    <h1 class="no-margins">{{ $overviews['total_uvs_recommended'] }}</h1>
                     <!-- <div class="stat-percent font-bold text-info">20% <i class="fa fa-level-up"></i></div>
                     -->
                     <small>Recommended Unique Visitors</small> 
@@ -57,9 +57,18 @@
             </div>
             <div id="mgSalesAmount"></div>
             <div class="ibox-content">
+              <div class="left">
                 <h1 class="no-margins">{{ $overviews['total_sales_amount'] }}</h1>
                 <!--<div class="stat-percent font-bold text-navy">44% <i class="fa fa-level-up"></i></div>-->
                 <small>Taken from regular sales total</small>
+              </div>
+              <div class="right">
+                <h1 class="no-margins">{{ $overviews['total_sales_recommended'] }}</h1>
+                <!--<div class="stat-percent font-bold text-navy">44% <i class="fa fa-level-up"></i></div>-->
+                <small>Recommended sales total</small>
+              </div>
+
+        
             </div>
         </div>
     </div>
@@ -87,9 +96,16 @@
             </div>
             <div id="mgOrders"></div>
             <div class="ibox-content">
+              <div class="left">
                 <h1 class="no-margins">{{ $overviews['total_orders'] }}</h1>
                 <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
                 <small>Total of orders</small>
+              </div>
+              <div class="right">
+                <h1 class="no-margins">{{ $overviews['total_orders_recommended'] }}</h1>
+                <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
+                <small>Recommended Orders</small> 
+              </div>
             </div>
         </div>
     </div>
@@ -102,9 +118,16 @@
             </div>
             <div id="mgItemsPurchased"></div>
             <div class="ibox-content">
+              <div class="left">
                 <h1 class="no-margins">{{ $overviews['total_item_purchased'] }}</h1>
                 <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
                 <small>Total of items purchased</small>
+              </div>
+              <div class="right">
+                <h1 class="no-margins">{{ $overviews['total_item_purchased_recommended'] }}</h1>
+                <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
+                <small>Recommended items purchased</small>
+              </div>
             </div>
         </div>
     </div>
