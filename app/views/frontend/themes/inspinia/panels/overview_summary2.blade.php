@@ -105,12 +105,12 @@
             <div id="mgSalesAmount"></div>
             <div class="ibox-content">
               <div class="left">
-                <h1 class="no-margins">{{ $overviews['total_sales_amount'] }}</h1>
+                <h1 class="no-margins">{{ number_format($overviews['total_sales_amount']) }}</h1>
                 <!--<div class="stat-percent font-bold text-navy">44% <i class="fa fa-level-up"></i></div>-->
                 <small>Taken from regular sales total</small>
               </div>
               <div class="right">
-                <h1 class="no-margins">{{ $overviews['total_sales_recommended'] }}</h1>
+                <h1 class="no-margins">{{ number_format($overviews['total_sales_recommended']) }}</h1>
                 <!--<div class="stat-percent font-bold text-navy">44% <i class="fa fa-level-up"></i></div>-->
                 <small>Recommended sales total</small>
               </div>
@@ -147,7 +147,9 @@
 <script type="text/javascript">
 document.addEventListener('DOMContentLoaded', function(){ 
 d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/hour/OVERALL', function(data) { 
-    data = MG.convert.date(data, 'date', '%Y-%m-%dT%H:%M:%S'); 
+    for (var i = 0; i < data.length; i++) {
+        data[i] = MG.convert.date(data[i], 'date', '%Y-%m-%dT%H:%M:%S');
+    }   
     MG.data_graphic({
         animate_on_load: true,
         y_extended_ticks: true,
@@ -157,6 +159,7 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/hour/OVERALL', function(
         right: 40,
         area: false,
         target: document.getElementById('mgViews'),
+        legend: ['Overall','Regular','Recommended'],
         x_accessor: 'date',
         y_accessor: 'value',
         x_label: 'date',
@@ -197,7 +200,9 @@ var traffic_chart = document.getElementById("traffic_chart").getContext("2d");
 var new_traffic_chart = new Chart(traffic_chart).Doughnut(traffic_data, traffic_data_options);
 
 d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/UNIQUE_VISITOR/hour/OVERALL', function(data) {
-    data = MG.convert.date(data, 'date','%Y-%m-%dT%H:%M:%S');
+    for (var i = 0; i < data.length; i++) {
+        data[i] = MG.convert.date(data[i], 'date', '%Y-%m-%dT%H:%M:%S');
+    }   
     MG.data_graphic({
         animate_on_load: true,
         y_extended_ticks: true, 
@@ -207,6 +212,7 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/UNIQUE_VISITOR/hour/OVERALL', 
         height: 300,
         right: 40,
         target: document.getElementById('mgUniqueVisitor'),
+        legend: ['Overall','Regular','Recommended'],
         x_accessor: 'date',
         y_accessor: 'value'
     });
@@ -245,7 +251,9 @@ var new_unique_chart = new Chart(unique_chart).Doughnut(unique_data, unique_data
 
 
 d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT/day/OVERALL', function(data) {
-    data = MG.convert.date(data, 'date','%Y-%m-%dT%H:%M:%S');
+    for (var i = 0; i < data.length; i++) {
+          data[i] = MG.convert.date(data[i], 'date', '%Y-%m-%dT%H:%M:%S');
+    }   
     MG.data_graphic({
         animate_on_load: true, 
         data: data,
@@ -253,6 +261,7 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT/day/OVERALL', fun
         height: 300,
         right: 40,
         target: document.getElementById('mgSalesAmount'),
+        legend: ['Overall','Regular','Recommended'],
         x_accessor: 'date',
         y_accessor: 'value'
     });

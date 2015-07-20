@@ -4829,9 +4829,10 @@ input[type=checkbox]:checked + label {
 }
 
 .pie_container p.boots_no {
+  font-family: 'open sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 3em;
   padding: 10px 30px;
-  font-weight: bold;
+  font-weight: normal;
   text-align: right;
   margin-top: 20px;
 }
