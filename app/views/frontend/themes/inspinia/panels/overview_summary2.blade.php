@@ -162,8 +162,6 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/hour/OVERALL', function(
         legend: ['Overall','Regular','Recommended'],
         x_accessor: 'date',
         y_accessor: 'value',
-        x_label: 'date',
-        y_label: 'value'
     });
 });
 
