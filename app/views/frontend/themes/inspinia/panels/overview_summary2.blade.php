@@ -37,8 +37,11 @@
           <div>
             <canvas id="traffic_chart" style="display: inline-block; width: 100%;"></canvas>
           </div>
-
-          <p class="boots_no">{{ sprintf("%.2f", ($overviews['total_pageviews_recommended'] / $overviews['total_pageviews'] ) * 100) }} %<i class="fa fa-level-up"></i></p>
+          @if ($overviews['total_pageviews'] > 0 ) 
+            <p class="boots_no">{{ sprintf("%.2f", ($overviews['total_pageviews_recommended'] / $overviews['total_pageviews'] ) * 100) }} %<i class="fa fa-level-up"></i></p>
+          @else
+            <p class="boots_no">No Data</p>
+          @endif
         </div>
       </div>
     </div>
@@ -82,8 +85,11 @@
           <div>
             <canvas id="unique_chart" style="display: inline-block; width: 100%;"></canvas>
           </div>
-
-          <p class="boots_no">{{ sprintf("%.2f", ($overviews['total_uvs_recommended'] / $overviews['total_uvs'] ) * 100) }} % <i class="fa fa-level-up"></i></p>
+          @if ($overviews['total_uvs'] > 0 ) 
+            <p class="boots_no">{{ sprintf("%.2f", ($overviews['total_uvs_recommended'] / $overviews['total_uvs'] ) * 100) }} % <i class="fa fa-level-up"></i></p>
+          @else
+            <p class="boots_no">No data</p>
+          @endif
         </div>
       </div>
     </div>
@@ -126,8 +132,11 @@
           <div>
             <canvas id="order_chart" style="display: inline-block; width: 100%;"></canvas>
           </div>
-
-          <p class="boots_no">{{ sprintf("%.2f", ($overviews['total_sales_recommended'] / $overviews['total_sales_amount'] ) * 100) }} % <i class="fa fa-level-up"></i></p>
+          @if ($overviews['total_sales_amount'] > 0 ) 
+            <p class="boots_no">{{ sprintf("%.2f", ($overviews['total_sales_recommended'] / $overviews['total_sales_amount'] ) * 100) }} % <i class="fa fa-level-up"></i></p>
+          @else
+            <p class="boots_no">No Data</p>
+          @endif
         </div>
       </div>
     </div>
