@@ -4821,3 +4821,18 @@ input[type=checkbox]:checked + label {
   float: right;
 }
 
+
+.pie_container {
+  padding: 50px 0px;
+  display: inline-block;
+  height: 395px;
+}
+
+.pie_container p.boots_no {
+  font-size: 3em;
+  padding: 10px 30px;
+  font-weight: bold;
+  text-align: right;
+  margin-top: 20px;
+}
+

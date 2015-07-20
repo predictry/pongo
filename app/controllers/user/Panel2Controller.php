@@ -132,11 +132,11 @@ class Panel2Controller extends BaseController   {
 	  ];
 	  $output = [
               'overviews'           => [
-                  'total_pageviews'      => number_format($pageviews_stat['overall']),
-                  'total_pageviews_recommended' => number_format($pageviews_stat['recommended']),
+                  'total_pageviews'             => $pageviews_stat['overall'],
+                  'total_pageviews_recommended' => $pageviews_stat['recommended'],
                   
-                  'total_uvs'            => number_format($uniqueVisitor['overall']),
-                  'total_uvs_recommended' => number_format($uniqueVisitor['recommended']),
+                  'total_uvs'                   => $uniqueVisitor['overall'],
+                  'total_uvs_recommended'       => $uniqueVisitor['recommended'],
                   
                   'total_sales_amount'   => number_format($summary_sales['overall']),
                   'total_sales_recommended' => number_format($summary_sales['recommended']),
@@ -163,7 +163,7 @@ class Panel2Controller extends BaseController   {
               'pageTitle'           => "Dashboard",
               'bucket_view'         => $arr_bucket_view  
           ];
-          return \View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.dashboard', $output);  
+          return \View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.dashboard2', $output);  
         } 
         else 
         {
