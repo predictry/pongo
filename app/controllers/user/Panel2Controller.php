@@ -141,8 +141,8 @@ class Panel2Controller extends BaseController   {
                   'total_sales_amount'          => $summary_sales['overall'],
                   'total_sales_recommended'     => $summary_sales['recommended'],
 
-                  'total_item_purchased' => number_format($summary_item_purchased['overall']),
-                  'total_item_purchased_recommended' => number_format($summary_item_purchased['recommended']),
+                  'total_item_purchased'        => $summary_item_purchased['overall'],
+                  'total_item_purchased_recommended' => $summary_item_purchased['recommended'],
 
                   'total_orders'         => number_format($n_orders['overall']),
                   'total_orders_recommended' => number_format($n_orders['recommended']),

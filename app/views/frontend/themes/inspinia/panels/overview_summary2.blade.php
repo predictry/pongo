@@ -1,6 +1,5 @@
-<div class="row overview_datacells">    
-    
-    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 data_cell">
+<div class="row overview_datacells">     
+  <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 data_cell">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
                 <h5>Pageviews</h5>
@@ -34,11 +33,13 @@
         </div>
   
         <div class="ibox-content pie_container">
+          <!--
           <div>
             <canvas id="traffic_chart" style="display: inline-block; width: 100%;"></canvas>
           </div>
+          -->
           @if ($overviews['total_pageviews'] > 0 ) 
-            <p class="boots_no">{{ sprintf("%.2f", ($overviews['total_pageviews_recommended'] / $overviews['total_pageviews'] ) * 100) }} %<i class="fa fa-level-up"></i></p>
+            <p class="boots_no">{{ sprintf("%.2f", ($overviews['total_pageviews_recommended'] / $overviews['total_pageviews'] ) * 100) }} %</p>
           @else
             <p class="boots_no">No Data</p>
           @endif
@@ -82,11 +83,13 @@
         </div>
   
         <div class="ibox-content pie_container">
+          <!--
           <div>
             <canvas id="unique_chart" style="display: inline-block; width: 100%;"></canvas>
           </div>
+          -->
           @if ($overviews['total_uvs'] > 0 ) 
-            <p class="boots_no">{{ sprintf("%.2f", ($overviews['total_uvs_recommended'] / $overviews['total_uvs'] ) * 100) }} % <i class="fa fa-level-up"></i></p>
+            <p class="boots_no">{{ sprintf("%.2f", ($overviews['total_uvs_recommended'] / $overviews['total_uvs'] ) * 100) }} % </p>
           @else
             <p class="boots_no">No data</p>
           @endif
@@ -125,15 +128,17 @@
       <div class="ibox float-e-margins">
         
         <div class="ibox-title">
-          <p>Sale Boots</p>
+          <p>Sale Boost</p>
         </div>
   
         <div class="ibox-content pie_container">
+          <!--
           <div>
             <canvas id="order_chart" style="display: inline-block; width: 100%;"></canvas>
           </div>
+          -->
           @if ($overviews['total_sales_amount'] > 0 ) 
-            <p class="boots_no">{{ sprintf("%.2f", ($overviews['total_sales_recommended'] / $overviews['total_sales_amount'] ) * 100) }} % <i class="fa fa-level-up"></i></p>
+            <p class="boots_no">{{ sprintf("%.2f", ($overviews['total_sales_recommended'] / $overviews['total_sales_amount'] ) * 100) }} % </p>
           @else
             <p class="boots_no">No Data</p>
           @endif
@@ -141,15 +146,63 @@
       </div>
     </div>
 
+
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 data_cell">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <!--<span class="label label-primary pull-right">Today</span>-->
+                <h5>Items Purchased</h5>
+            </div>
+            <div id="mgItemsPurchased"></div>
+            <div class="ibox-content">
+              <div class="left">
+                <h1 class="no-margins">{{ number_format($overviews['total_item_purchased']) }}</h1>
+                <!--<div class="stat-percent font-bold text-navy">44% <i class="fa fa-level-up"></i></div>-->
+                <small>Total of items purchased</small>
+              </div>
+              <div class="right">
+                <h1 class="no-margins">{{ number_format($overviews['total_item_purchased_recommended']) }}</h1>
+                <!--<div class="stat-percent font-bold text-navy">44% <i class="fa fa-level-up"></i></div>-->
+                <small>Recommended items purchased</small>
+              </div> 
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 pie_chart">
+      <div class="ibox float-e-margins">
+        
+        <div class="ibox-title">
+          <p>Purchased Boost/p>
+        </div>
+  
+        <div class="ibox-content pie_container">
+          <!--
+          <div>
+            <canvas id="order_chart" style="display: inline-block; width: 100%;"></canvas>
+          </div>
+          -->
+          @if ($overviews['total_sales_amount'] > 0 ) 
+            <p class="boots_no">{{ sprintf("%.2f", ($overviews['total_item_purchased_recommended'] / $overviews['total_item_purchased'] ) * 100) }} % </p>
+          @else
+            <p class="boots_no">No Data</p>
+          @endif
+        </div>
+      </div>
+    </div>
+
+
 </div>
 
 
 <script type="text/javascript">
 document.addEventListener('DOMContentLoaded', function(){ 
-d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/hour/OVERALL', function(data) { 
+d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/day/OVERALL', function(data) { 
     for (var i = 0; i < data.length; i++) {
         data[i] = MG.convert.date(data[i], 'date', '%Y-%m-%dT%H:%M:%S');
     }   
+    
     MG.data_graphic({
         animate_on_load: true,
         y_extended_ticks: true,
@@ -157,11 +210,12 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/hour/OVERALL', function(
         full_width: true,
         height: 300,
         right: 40,
-        area: false,
+        area: true,
+        interpolate: 'basic',
         target: document.getElementById('mgViews'),
-        legend: ['Overall','Regular','Recommended'],
         x_accessor: 'date',
         y_accessor: 'value',
+        x_extended_ticks: true
     });
 });
 
@@ -194,25 +248,28 @@ var traffic_data_options = {
   responsive: true
 }; 
 
-var traffic_chart = document.getElementById("traffic_chart").getContext("2d");
-var new_traffic_chart = new Chart(traffic_chart).Doughnut(traffic_data, traffic_data_options);
+// var traffic_chart = document.getElementById("traffic_chart").getContext("2d");
+// var new_traffic_chart = new Chart(traffic_chart).Doughnut(traffic_data, traffic_data_options);
 
-d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/UNIQUE_VISITOR/hour/OVERALL', function(data) {
+d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/UNIQUE_VISITOR/day/OVERALL', function(data) {
     for (var i = 0; i < data.length; i++) {
         data[i] = MG.convert.date(data[i], 'date', '%Y-%m-%dT%H:%M:%S');
     }   
     MG.data_graphic({
         animate_on_load: true,
         y_extended_ticks: true, 
+        interpolate: 'basic',
         data: data,
         area: false,
         full_width: true,
         height: 300,
+        area: true,
         right: 40,
         target: document.getElementById('mgUniqueVisitor'),
-        legend: ['Overall','Regular','Recommended'],
+        legend: ['Overall','Regular'],
         x_accessor: 'date',
-        y_accessor: 'value'
+        y_accessor: 'value',
+        x_extended_ticks: true
     });
 });
 
@@ -244,8 +301,8 @@ var unique_data_options = {
   responsive: true
 }; 
 
-var unique_chart = document.getElementById("unique_chart").getContext("2d");
-var new_unique_chart = new Chart(unique_chart).Doughnut(unique_data, unique_data_options);
+// var unique_chart = document.getElementById("unique_chart").getContext("2d");
+// var new_unique_chart = new Chart(unique_chart).Doughnut(unique_data, unique_data_options);
 
 
 d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT/day/OVERALL', function(data) {
@@ -254,14 +311,17 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT/day/OVERALL', fun
     }   
     MG.data_graphic({
         animate_on_load: true, 
+        interpolate: 'basic',
         data: data,
         full_width: true,
         height: 300,
+        area: true,
         right: 40,
         target: document.getElementById('mgSalesAmount'),
-        legend: ['Overall','Regular','Recommended'],
+        legend: ['Overall','Regular'],
         x_accessor: 'date',
-        y_accessor: 'value'
+        y_accessor: 'value',
+        x_extended_ticks: true
     });
 });
 
@@ -294,8 +354,29 @@ var order_data_options = {
   responsive: true
 }; 
 
-var order_chart = document.getElementById("order_chart").getContext("2d");
-var new_order_chart = new Chart(order_chart).Doughnut(order_data, order_data_options);
+// var order_chart = document.getElementById("order_chart").getContext("2d");
+// var new_order_chart = new Chart(order_chart).Doughnut(order_data, order_data_options);
+
+
+d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/ITEM_PURCHASED/day/OVERALL', function(data) {
+    for (var i = 0; i < data.length; i++) {
+          data[i] = MG.convert.date(data[i], 'date', '%Y-%m-%dT%H:%M:%S');
+          console.log(data[i]);
+    }  
+    MG.data_graphic({
+        animate_on_load: true,
+        y_extended_ticks: true, 
+        data: data, 
+        full_width: true,
+        interpolate: 'basic',
+        height: 200,
+        right: 40,
+        target: document.getElementById('mgItemsPurchased'),
+        x_accessor: 'date',
+        y_accessor: 'value',
+        x_extended_ticks: true
+    });
+});
 
 });
 </script>
