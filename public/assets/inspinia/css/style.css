@@ -4828,12 +4828,16 @@ input[type=checkbox]:checked + label {
   height: 395px;
 }
 
-.pie_container p.boots_no {
-  font-family: 'open sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: 5em;
-  padding: 10px 30px;
-  font-weight: normal;
+.pie_container h1 {
   text-align: right;
-  margin-top: 20px;
+  margin: 10px 20px;
+  font-size: 3em;
+}
+
+p.boots_no {
+  font-family: 'open sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: normal;
+  text-align: left;
+  color: red;
 }
 

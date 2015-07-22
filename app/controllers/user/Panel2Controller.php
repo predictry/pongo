@@ -103,6 +103,15 @@ class Panel2Controller extends BaseController   {
               $n_orders = $cache_n_orders; 
           }
 
+          $arr_response = $response->json();
+          $salesAmountParse = (isset($arr_response['error']) && $arr_response['error']) ? 0 : array_get($arr_response, 'salesAmount');
+
+          $salesAmount = [
+            'overall'     => ($salesAmountParse) ? $salesAmountParse['overall'] : 0,
+            'recommended' => ($salesAmountParse) ? $salesAmountParse['recommended'] : 0,
+            'regular'     => ($salesAmountParse) ? $salesAmountParse['regular'] : 0
+          ];
+
           $cache_summary_sales = null;
           if (is_null($cache_summary_sales)) {
               $arr_response      = $response->json();
@@ -138,19 +147,20 @@ class Panel2Controller extends BaseController   {
                   'total_uvs'                   => $uniqueVisitor['overall'],
                   'total_uvs_recommended'       => $uniqueVisitor['recommended'],
                   
-                  'total_sales_amount'          => $summary_sales['overall'],
-                  'total_sales_recommended'     => $summary_sales['recommended'],
+                  'total_sales_amount'          => $salesAmount['overall'],
+                  'total_sales_recommended'     => $salesAmount['recommended'],
 
-                  'total_item_purchased'        => $summary_item_purchased['overall'],
-                  'total_item_purchased_recommended' => $summary_item_purchased['recommended'],
+                  'total_item_purchased'              => $summary_item_purchased['overall'],
+                  'total_item_purchased_recommended'  => $summary_item_purchased['recommended'],
 
-                  'total_orders'         => number_format($n_orders['overall']),
-                  'total_orders_recommended' => number_format($n_orders['recommended']),
+                  'total_orders'                => $n_orders['overall'],
+                  'total_orders_recommended'    => $n_orders['recommended'],
 
-                  'total_item_per_cart'  => number_format($summary_item_per_cart['overall']),
-                  'total_sales_per_cart' => number_format($summary_sales['overall']),
-                  'conversion_rate'      => $conversionRate['overall']
+                  'total_item_per_cart'         => $summary_item_per_cart['overall'],
+                  'total_sales_per_cart'        => $summary_sales['overall'],
+                  'conversion_rate'             => $conversionRate['overall']
                 ],
+
               'dt_range'            => [
                   'start' => date("[H] F d, Y", $tstart),
                   'end'   => date("[H] F d, Y", $tend)
@@ -167,9 +177,6 @@ class Panel2Controller extends BaseController   {
         } 
         else 
         {
-          /* if there is some error with requesting to API */
-          /* show this */
-          
           $output = [
             'message' => "Seems Like there is no logs recieved from your site"
           ];
