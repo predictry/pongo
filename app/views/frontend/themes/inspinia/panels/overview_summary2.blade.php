@@ -99,7 +99,7 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="col-md-12 no_margin">
     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 data_cell">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
@@ -322,7 +322,6 @@ var order_data_options = {
 d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/ITEM_PURCHASED/day/OVERALL', function(data) {
     for (var i = 0; i < data.length; i++) {
           data[i] = MG.convert.date(data[i], 'date', '%Y-%m-%dT%H:%M:%S');
-          console.log(data[i]);
     }  
     MG.data_graphic({
         animate_on_load: true,
