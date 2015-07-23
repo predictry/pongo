@@ -20,7 +20,7 @@ class Panel2Controller extends BaseController   {
         View::share(array("ca" => get_class(), "custom_script" => $custom_script));
     }
     
-    public function index($dt_range_group = "today", $dt_start = null, $dt_end = null)  {
+    public function index($dt_range_group = "31_days_ago", $dt_start = null, $dt_end = null)  {
         $client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'stat/');
         $top_client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'top/');
 
