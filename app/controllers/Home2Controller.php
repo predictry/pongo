@@ -331,5 +331,4 @@ class Home2Controller extends BaseController {
       $response = $client->get("?tenantId=". $current_site . "&startDate=" . $start . "&endDate=" . $end . "&metric=". $action . "&interval=" .$interval . "&valueType=" . $value)->send(); 
       return $response->json();
     }
-
 }

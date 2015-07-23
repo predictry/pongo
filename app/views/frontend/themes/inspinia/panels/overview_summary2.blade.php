@@ -4,8 +4,8 @@
             <div class="ibox-title">
                 <h5>Pageviews</h5>
             </div>
-            <div id="mgViewsRecommended"></div>     
-            <div id="mgViews"></div>
+          
+            <canvas id="mgViews"></canvas>
         
             <div class="ibox-content">
               <div class="left">
@@ -36,8 +36,7 @@
                 <!--<span class="label label-primary pull-right">Today</span>-->
                 <h5>Sales Amount</h5>
             </div>
-            <div id="mgOrdersRecommended"></div>
-            <div id="mgSalesAmount"></div>
+            <canvas id="mgSalesAmount"></canvas>
             <div class="ibox-content">
               <div class="left">
                 <h1 class="no-margins">{{ number_format($overviews['total_sales_amount']) }}</h1>
@@ -65,7 +64,7 @@
                 <!--<span class="label label-primary pull-right">Today</span>-->
                 <h5>Items Purchased</h5>
             </div>
-            <div id="mgItemsPurchased"></div>
+            <canvas id="mgItemsPurchased"></canvas>
             <div class="ibox-content">
               <div class="left">
                 <h1 class="no-margins">{{ number_format($overviews['total_item_purchased']) }}</h1>
@@ -161,27 +160,6 @@
 
 <script type="text/javascript">
 document.addEventListener('DOMContentLoaded', function(){ 
-d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/day/OVERALL', function(data) { 
-    for (var i = 0; i < data.length; i++) {
-        data[i] = MG.convert.date(data[i], 'date', '%Y-%m-%dT%H:%M:%S');
-    }   
-    
-    MG.data_graphic({
-        animate_on_load: true,
-        y_extended_ticks: true,
-        data: data,
-        full_width: true,
-        height: 300,
-        right: 40,
-        area: true,
-        interpolate: 'basic',
-        target: document.getElementById('mgViews'),
-        x_accessor: 'date',
-        y_accessor: 'value',
-        x_extended_ticks: true
-    });
-});
-
 
 var ef_data = [
   {
@@ -198,7 +176,6 @@ var ef_data = [
     label: "Total Items Purchased from Recommendation"
   }
 ];
-
 var ef_options = {
   segmentShowStroke: true,
   segmentStrokeColor: "#fff",
@@ -210,132 +187,221 @@ var ef_options = {
   animateScale: false,
   responsive: true
 }; 
-
 var ef_piechart         = document.getElementById("ef_piechart").getContext("2d");
 var new_ef_piechart     = new Chart(ef_piechart).Doughnut(ef_data, ef_options);
 
-d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/UNIQUE_VISITOR/day/OVERALL', function(data) {
+d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/day/OVERALL', function(data) { 
+
     for (var i = 0; i < data.length; i++) {
-        data[i] = MG.convert.date(data[i], 'date', '%Y-%m-%dT%H:%M:%S');
+          data[i] = MG.convert.date(data[i], 'date', '%Y-%m-%dT%H:%M:%S');
+          for ( var j=0; j < data[i].length ; j++) {
+            data[i][j].date = data[i][j].date.toDateString();
+          } 
     }   
-    MG.data_graphic({
-        animate_on_load: true,
-        y_extended_ticks: true, 
-        interpolate: 'basic',
-        data: data,
-        area: false,
-        full_width: true,
-        height: 300,
-        area: true,
-        right: 40,
-        target: document.getElementById('mgUniqueVisitor'),
-        x_accessor: 'date',
-        y_accessor: 'value',
-        x_extended_ticks: true
-    });
+
+    console.log(data);
+
+    var date_array = [];
+    var value_array = [];
+    var value_array_recommended = [];
+
+    for (var i=0; i< data.length; i++) {
+      for ( var j=0; j <data[i].length ; j++) {  
+        if ( i == 0 ) { 
+          date_array.push(data[i][j].date);   
+          value_array.push(data[i][j].value);
+        } else {
+          value_array_recommended.push(data[i][j].value);
+        } 
+      }
+    }
+
+    var lineData = {
+        labels: date_array,
+        datasets: [
+            {
+                label: "Overall",
+                fillColor: "rgba(220,220,220,0.5)",
+                strokeColor: "rgba(220,220,220,1)",
+                pointColor: "rgba(220,220,220,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(220,220,220,1)",
+                data: value_array
+            },
+            {
+                label: "Recommended",
+                fillColor: "rgba(26,179,148,0.5)",
+                strokeColor: "rgba(26,179,148,0.8)",
+                highlightFill: "rgba(26,179,148,0.75)",
+                highlightStroke: "rgba(26,179,148,1)",
+                data: value_array_recommended
+
+            },
+
+        ]
+    };
+
+    var lineOptions = {
+        scaleShowGridLines: true,
+        scaleGridLineColor: "rgba(0,0,0,.05)",
+        scaleGridLineWidth: 1,
+        bezierCurve: true,
+        bezierCurveTension: 0.4,
+        pointDot: true,
+        pointDotRadius: 4,
+        pointDotStrokeWidth: 1,
+        pointHitDetectionRadius: 20,
+        datasetStroke: true,
+        datasetStrokeWidth: 2,
+        datasetFill: true,
+        responsive: true,
+    };
+
+    var ctx = document.getElementById("mgViews").getContext("2d");
+    var myNewChart = new Chart(ctx).Line(lineData, lineOptions);
+
 });
-
-var unique_data = [
-  {
-    value: {{ $overviews['total_uvs'] }} ,   
-    color: "#a3e1d4",
-    highlight: "#1ab394",
-    label: "Overall"
-  },
-  
-  {
-    value: {{ $overviews['total_uvs_recommended'] }},
-    color: "#dedede",
-    highlight: "#1ab394",
-    label: "Recommended"
-  }
-];
-
-var unique_data_options = {
-  segmentShowStroke: true,
-  segmentStrokeColor: "#fff",
-  segmentStrokeWidth: 2,
-  percentageInnerCutout: 45, // This is 0 for Pie charts
-  animationSteps: 100,
-  animationEasing: "easeOutBounce",
-  animateRotate: true,
-  animateScale: false,
-  responsive: true
-}; 
-
-// var unique_chart = document.getElementById("unique_chart").getContext("2d");
-// var new_unique_chart = new Chart(unique_chart).Doughnut(unique_data, unique_data_options);
-
 
 d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT/day/OVERALL', function(data) {
     for (var i = 0; i < data.length; i++) {
           data[i] = MG.convert.date(data[i], 'date', '%Y-%m-%dT%H:%M:%S');
+          for ( var j=0; j < data[i].length ; j++) {
+            data[i][j].date = data[i][j].date.toDateString();
+          } 
     }   
-    MG.data_graphic({
-        animate_on_load: true, 
-        interpolate: 'basic',
-        data: data,
-        full_width: true,
-        height: 300,
-        area: true,
-        right: 40,
-        target: document.getElementById('mgSalesAmount'),
-        x_accessor: 'date',
-        y_accessor: 'value',
-        x_extended_ticks: true
-    });
+
+    var date_array = [];
+    var value_array = [];
+    var value_array_recommended = [];
+
+    for (var i=0; i< data.length; i++) {
+      for ( var j=0; j <data[i].length ; j++) {  
+        if ( i == 0 ) { 
+          date_array.push(data[i][j].date);   
+          value_array.push(data[i][j].value);
+        } else {
+          value_array_recommended.push(data[i][j].value);
+        } 
+      }
+    }
+ 
+    var lineData = {
+        labels: date_array,
+        datasets: [
+            {
+                label: "Overall",
+                fillColor: "rgba(220,220,220,0.5)",
+                strokeColor: "rgba(220,220,220,1)",
+                pointColor: "rgba(220,220,220,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(220,220,220,1)",
+                data: value_array
+            },
+            {
+                label: "Recommended",
+                fillColor: "rgba(26,179,148,0.5)",
+                strokeColor: "rgba(26,179,148,0.8)",
+                highlightFill: "rgba(26,179,148,0.75)",
+                highlightStroke: "rgba(26,179,148,1)",
+                data: value_array_recommended
+
+            },
+
+        ]
+    };
+
+    var lineOptions = {
+        scaleShowGridLines: true,
+        scaleGridLineColor: "rgba(0,0,0,.05)",
+        scaleGridLineWidth: 1,
+        bezierCurve: true,
+        bezierCurveTension: 0.4,
+        pointDot: true,
+        pointDotRadius: 4,
+        pointDotStrokeWidth: 1,
+        pointHitDetectionRadius: 20,
+        datasetStroke: true,
+        datasetStrokeWidth: 2,
+        datasetFill: true,
+        responsive: true,
+    };
+
+    var ctx = document.getElementById("mgSalesAmount").getContext("2d");
+    var myNewChart = new Chart(ctx).Line(lineData, lineOptions);
+
 });
 
 
-var order_data = [
-  {
-    value: {{ $overviews['total_sales_amount'] }} ,   
-    color: "#a3e1d4",
-    highlight: "#1ab394",
-    label: "Overall"
-  },
-  
-  {
-    value: {{ $overviews['total_sales_recommended'] }},
-    color: "#dedede",
-    highlight: "#1ab394",
-    label: "Recommended"
-  }
-];
-
-var order_data_options = {
-  segmentShowStroke: true,
-  segmentStrokeColor: "#fff",
-  segmentStrokeWidth: 2,
-  percentageInnerCutout: 45, // This is 0 for Pie charts
-  animationSteps: 100,
-  animationEasing: "easeOutBounce",
-  animateRotate: true,
-  animateScale: false,
-  responsive: true
-}; 
-
-// var order_chart = document.getElementById("order_chart").getContext("2d");
-// var new_order_chart = new Chart(order_chart).Doughnut(order_data, order_data_options);
-
-
 d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/ITEM_PURCHASED/day/OVERALL', function(data) {
+
     for (var i = 0; i < data.length; i++) {
           data[i] = MG.convert.date(data[i], 'date', '%Y-%m-%dT%H:%M:%S');
-    }  
-    MG.data_graphic({
-        animate_on_load: true,
-        y_extended_ticks: true, 
-        data: data, 
-        full_width: true,
-        interpolate: 'basic',
-        height: 200,
-        right: 40,
-        target: document.getElementById('mgItemsPurchased'),
-        x_accessor: 'date',
-        y_accessor: 'value',
-        x_extended_ticks: true
-    });
+          for ( var j=0; j < data[i].length ; j++) {
+            data[i][j].date = data[i][j].date.toDateString();
+          } 
+    }   
+
+    var date_array = [];
+    var value_array = [];
+    var value_array_recommended = [];
+
+    for (var i=0; i< data.length; i++) {
+      for ( var j=0; j <data[i].length ; j++) {  
+        if ( i == 0 ) { 
+          date_array.push(data[i][j].date);   
+          value_array.push(data[i][j].value);
+        } else {
+          value_array_recommended.push(data[i][j].value);
+        } 
+      }
+    }
+ 
+    var lineData = {
+        labels: date_array,
+        datasets: [
+            {
+                label: "Overall",
+                fillColor: "rgba(220,220,220,0.5)",
+                strokeColor: "rgba(220,220,220,1)",
+                pointColor: "rgba(220,220,220,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(220,220,220,1)",
+                data: value_array
+            },
+            {
+                label: "Recommended",
+                fillColor: "rgba(26,179,148,0.5)",
+                strokeColor: "rgba(26,179,148,0.8)",
+                highlightFill: "rgba(26,179,148,0.75)",
+                highlightStroke: "rgba(26,179,148,1)",
+                data: value_array_recommended
+
+            },
+
+        ]
+    };
+
+    var lineOptions = {
+        scaleShowGridLines: true,
+        scaleGridLineColor: "rgba(0,0,0,.05)",
+        scaleGridLineWidth: 1,
+        bezierCurve: true,
+        bezierCurveTension: 0.4,
+        pointDot: true,
+        pointDotRadius: 4,
+        pointDotStrokeWidth: 1,
+        pointHitDetectionRadius: 20,
+        datasetStroke: true,
+        datasetStrokeWidth: 2,
+        datasetFill: true,
+        responsive: true,
+    };
+
+    var ctx = document.getElementById("mgItemsPurchased").getContext("2d");
+    var myNewChart = new Chart(ctx).Line(lineData, lineOptions);
 });
 
 });
