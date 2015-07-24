@@ -5,7 +5,7 @@
         <h1 class="mb20">Welcome to Predictry.</h1>
         <div class="row mb20">
             <div class="col-xs-offset-3 col-xs-6">
-                <p style="line-height: 24px;">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Reiciendis, cumque soluta fugit ullam officia rem possimus modi! Inventore, esse soluta repellendus minus deleniti totam molestiae minima nemo voluptatibus tenetur incidunt?</p>
+                <p style="line-height: 24px;">Add your website so that we can start tracking and processing recommendations</p>
             </div>
         </div>
     </div>
