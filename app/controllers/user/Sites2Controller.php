@@ -82,7 +82,7 @@ class Sites2Controller extends BaseController
 
     public function getCreate()
     {
-        $site_category_list = SiteCategory::all()->lists("name", "id");
+        $site_category_list = Industry::all()->lists("name", "id");
         return View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.sites.form", array(
                     "type"               => "create",
                     "pageTitle"          => \Lang::get("panel.add.new.site"),
@@ -97,13 +97,18 @@ class Sites2Controller extends BaseController
       return Redirect::to('v2/sites')->with("flash_message", "Successfully delete the site.");
     }
 
+
+
+
     public function postCreate()
     {
         $input  = Input::only("url");
         $input['account_id'] = Auth::user()->id;
-        
+
         if(mb_substr($input['url'], 0, 4) !== 'http') 
           $url = 'http://' . $input['url']; 
+        else 
+          $url = $input['url'];
 
         $site_host =  parse_url($url)['host'];
         $name = strtoupper(str_replace('.', '', $site_host));
@@ -127,7 +132,7 @@ class Sites2Controller extends BaseController
             $site->api_secret       = md5($site_input['url'] . $salt);
             $site->account_id       = $site_input['account_id'];
             $site->url              = $site_input['url'];
-            $site->site_category_id = SiteCategory::first()->id;
+            $site->site_category_id = SiteCategory::find(Input::get('site_category_id'));
             $id                     = $site->save();
 
             Event::fire("site.set_default_actions", array($site));
@@ -414,7 +419,7 @@ class Sites2Controller extends BaseController
 
     public function getSiteWizard()
     {
-        $site_category_list = SiteCategory::all()->lists("name", "id");
+        $site_category_list = Industry::all()->lists("name", "id");
 
         $output = array(
             "pageTitle"    => "Create your first site",
