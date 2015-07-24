@@ -207,7 +207,7 @@ class SiteRepository {
         if(mb_substr($url, 0, 4) !== 'http') 
           $url_tp = 'http://' . $url;   
         else
-          $url_tp = $ur;
+          $url_tp = $url;
 
         $parse_url = parse_url($url_tp);
 

@@ -67,9 +67,9 @@
             <canvas id="mgItemsPurchased"></canvas>
             <div class="ibox-content">
               <div class="left">
-                <h1 class="no-margins">{{ number_format($overviews['total_item_purchased']) }}</h1>
+                <h1 class="no-margins">{{ number_format($overviews['total_item_purchased']) }} / {{ number_format($overviews['unique_item_purchased']) }}</h1>
                 <!--<div class="stat-percent font-bold text-navy">44% <i class="fa fa-level-up"></i></div>-->
-                <small>Total of items purchased</small>
+                <small>Total of items purchased / Unique Items Purchased</small>
               </div>
               <div class="right">
                 <h1 class="no-margins">{{ number_format($overviews['total_item_purchased_recommended']) }}</h1>

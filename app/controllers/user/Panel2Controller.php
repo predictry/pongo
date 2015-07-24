@@ -133,6 +133,8 @@ class Panel2Controller extends BaseController   {
             'regular'     => ($item_per_cart) ? $item_per_cart['regular'] : 0
           ];
 
+          $unique_item_purchased_sum = (isset($arr_response['error']) && $arr_response['error']) ? 0 : array_get($arr_response, 'uniqueItemPurchased');
+
           $conversionRate_sum = (isset($arr_response['error']) && $arr_response['error']) ? 0 : array_get($arr_response, 'conversionRate');  
        	  $conversionRate = [
             'overall'     => ($conversionRate_sum) ? $conversionRate_sum['overall'] : 0,
@@ -152,6 +154,7 @@ class Panel2Controller extends BaseController   {
 
                   'total_item_purchased'              => $summary_item_purchased['overall'],
                   'total_item_purchased_recommended'  => $summary_item_purchased['recommended'],
+                  'unique_item_purchased'       => $unique_item_purchased_sum['overall'],
 
                   'total_orders'                => $n_orders['overall'],
                   'total_orders_recommended'    => $n_orders['recommended'],
