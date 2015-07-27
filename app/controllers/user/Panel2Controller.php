@@ -144,6 +144,7 @@ class Panel2Controller extends BaseController   {
 	  $output = [
               'overviews'           => [
                   'total_pageviews'             => $pageviews_stat['overall'],
+                  'total_pageviews_regular'     => $pageviews_stat['regular'],
                   'total_pageviews_recommended' => $pageviews_stat['recommended'],
                   
                   'total_uvs'                   => $uniqueVisitor['overall'],
