@@ -140,8 +140,11 @@ class Panel2Controller extends BaseController   {
             'overall'     => ($conversionRate_sum) ? $conversionRate_sum['overall'] : 0,
             'recommended' => ($conversionRate_sum) ? $conversionRate_sum['recommended'] : 0,
             'regular'     => ($conversionRate_sum) ? $conversionRate_sum['regular'] : 0
-	  ];
-	  $output = [
+	        ];
+
+          $cartBoost = (isset($arr_response['error']) && $arr_response['error']) ? 0 : array_get($arr_response, 'cartBoost');
+
+          $output = [
               'overviews'           => [
                   'total_pageviews'             => $pageviews_stat['overall'],
                   'total_pageviews_regular'     => $pageviews_stat['regular'],
@@ -162,7 +165,8 @@ class Panel2Controller extends BaseController   {
 
                   'total_item_per_cart'         => $summary_item_per_cart['overall'],
                   'total_sales_per_cart'        => $summary_sales['overall'],
-                  'conversion_rate'             => $conversionRate['overall']
+                  'conversion_rate'             => $conversionRate['overall'],
+                  'cartBoost'                   => $cartBoost
                 ],
 
               'dt_range'            => [

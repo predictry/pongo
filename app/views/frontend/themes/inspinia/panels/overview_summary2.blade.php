@@ -35,7 +35,7 @@
             </div>
             <div id="visualOne"></div>
             <div class="ibox-content">
-                <h1 class="no-margins">{{ number_format($overviews['conversion_rate']) }}</h1>
+                <h1 class="no-margins">{{ number_format($overviews['cartBoost']) }}</h1>
                 <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
                 <small>Boosts to average cart</small>
             </div>
