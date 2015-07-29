@@ -3,13 +3,14 @@
     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 data_cell">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
-                <h5>Sales Amount per Cart</h5>
+                <h5>Total Sales</h5>
+                <span class="label label-success pull-right">total</span>
             </div>
             <div id="visualOne"></div>
             <div class="ibox-content">
-                <h1 class="no-margins">{{ number_format($overviews['total_sales_per_cart']) }} <i class="fa fa-money"></i></h1>
+                <h1 class="no-margins">{{ number_format($overviews['total_sales_per_cart']) }} $</h1>
                 <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
-                <small>Average sales amount per cart</small>
+                <small>Overall sales in currency</small>
             </div>
         </div>
     </div>
@@ -17,7 +18,8 @@
     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
-                <h5>Items per Cart</h5>
+                <h5>Sales Contribution</h5>
+                <span class="label label-info pull-right">Percentage %</span>
             </div>
             <div id="mgItemsPerCart"></div>
             <div class="ibox-content">
@@ -28,46 +30,49 @@
         </div>
     </div>
     
-    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 data_cell">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 data_cell">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
-                <h5>Cart Boost</h5>
+                <h5>Page Views</h5>
+                <span class="label label-primary pull-right">Overall vs Recommended</span>
             </div>
             <div id="visualOne"></div>
             <div class="ibox-content">
-                <h1 class="no-margins">{{ number_format($overviews['cartBoost']) }}</h1>
-                <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
-                <small>Boosts to average cart</small>
+              <div class="row">
+                <div class="col-md-6">
+                  <h1 class="no-margins">{{ number_format($overviews['total_pageviews'] - $overviews['total_pageviews_recommended']) }}</h1>
+                  <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
+                  <small>Regular Page Views</small>
+                </div>
+
+                <div class="col-md-6">
+                  <h1 class="no-margins">{{ number_format($overviews['total_pageviews_recommended']) }}</h1>
+                  <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
+                  <small>Recommended Page Views</small> 
+                </div>
+              </div>
             </div>
         </div>
     </div>
 
-    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
-        <div class="ibox float-e-margins">
-            <div class="ibox-title">
-                <h5>Here is Something</h5>
-            </div>
-            <div id="mgItemsPerCart"></div>
-            <div class="ibox-content">
-                <h1 class="no-margins">{{ number_format($overviews['total_item_per_cart']) }}</h1>
-                <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
-                <small>Average of items in the cart</small>
-            </div>
-        </div>
-    </div>
-    </div>
+    </div><!-- end of first row -->
   
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 data_cell">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
                 <!--<span class="label label-primary pull-right">Today</span>-->
                 <h5>Sales Amount</h5>
+                <div class="ibox-tools">
+                  <a class="collapse-link">
+                      <i class="fa fa-chevron-up"></i>
+                  </a>
+                </div>
             </div>
-            <canvas id="mgSalesAmount"></canvas>
+        
             <div class="ibox-content">
+              <div id="mgSalesAmount" style="min-width: 310px; height: 400px; margin: 0 auto"></div> 
               <div class="left">
-                <h1 class="no-margins">{{ number_format($overviews['total_sales_amount']) }} <i class="fa fa-money"></i></h1>
-                <!--<div class="stat-percent font-bold text-navy">44% <i class="fa fa-level-up"></i></div>-->
+                <h1 class="no-margins">{{ number_format($overviews['total_sales_amount']) }} $</h1>
                 <small>Taken from regular sales total</small>
               </div>
               <div class="right">
@@ -85,15 +90,20 @@
         </div>
     </div>
     
-    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 data_cell">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 data_cell">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
                 <h5>Pageviews</h5>
+              <div class="ibox-tools">
+                  <a class="collapse-link">
+                      <i class="fa fa-chevron-up"></i>
+                  </a>
+              </div>
             </div>
           
-            <canvas id="mgViews"></canvas>
-         
+ 
             <div class="ibox-content">
+              <div id="mgViews" style="min-width: 310px; height: 400px; margin: 0 auto"></div> 
               <div class="left">
                 <h1 class="no-margins">{{ number_format($overviews['total_pageviews']) }}</h1>
                 <!-- <div class="stat-percent font-bold text-success">98% <i class="fa fa-bolt"></i></div>
@@ -107,7 +117,7 @@
                 -->
                 <small>recommended view actions received</small>
                 @if ($overviews['total_pageviews'] > 0 )  
-                  <p class="boots_no green">{{ sprintf("%.2f", ($overviews['total_pageviews_recommended'] / $overviews['total_pageviews'] ) * 100) }} % boost</p> 
+                  <p class="boots_no green" style="color: green;">{{ sprintf("%.2f", ($overviews['total_pageviews_recommended'] / $overviews['total_pageviews'] ) * 100) }} % boost</p> 
                 @else
                   <p class="boots_no">No Data</p>
                 @endif
@@ -115,35 +125,48 @@
             </div>
         </div>
     </div>
-     
 
-    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 data_cell">
-        <div class="ibox float-e-margins">
-            <div class="ibox-title">
-                <!--<span class="label label-primary pull-right">Today</span>-->
-                <h5>Items Purchased</h5>
+    
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 data_cell">
+
+      <div class="ibox float-e-margins">
+
+
+        <div class="ibox-content">
+          <div class="row">
+
+            <div class="col-md-6">
+              <h1 class="no-margins" style="color: green;">{{ number_format($overviews['total_pageviews_recommended']) }}</h1>
+              <small>Page views recommended</small><br /><br />
+              
+              <h1 class="no-margins">{{ number_format($overviews['total_sales_recommended']) }}</h1>
+              <small>Recommended sales total</small><br /><br />
+ 
+              @if ($overviews['total_pageviews'] > 0 )  
+                <h1 class="no-margins" style="color: green;">{{ sprintf("%.2f", ($overviews['total_pageviews_recommended'] / $overviews['total_pageviews'] ) * 100) }} % boost</h1> 
+              @else
+                <h1 class="boots_no">No Data</h1>
+              @endif
+              <small>Page View Boosts</small>    
             </div>
-            <canvas id="mgItemsPurchased"></canvas>
-            <div class="ibox-content">
-              <div class="left">
-                <h1 class="no-margins">{{ number_format($overviews['total_item_purchased']) }} / {{ number_format($overviews['unique_item_purchased']) }}</h1>
-                <!--<div class="stat-percent font-bold text-navy">44% <i class="fa fa-level-up"></i></div>-->
-                <small>Total of items purchased / Unique Items Purchased</small>
-              </div>
-              <div class="right">
-                <h1 class="no-margins">{{ number_format($overviews['total_item_purchased_recommended']) }}</h1>
-                <!--<div class="stat-percent font-bold text-navy">44% <i class="fa fa-level-up"></i></div>-->
-                <small>Recommended items purchased</small>
-                @if ($overviews['total_sales_amount'] > 0 ) 
-                  <p class="boots_no">{{ sprintf("%.2f", ($overviews['total_item_purchased_recommended'] / $overviews['total_item_purchased'] ) * 100) }} % </p>
-                @else
-                  <p class="boots_no">No Data</p>
-                @endif
-              </div> 
+            
+            <div class="col-md-6">
+              <h1>Your customers who interact with recommendations spend about $100 more than users who don't</h1><br />
+              @if ($overviews['total_sales_amount'] > 0 ) 
+                <h1 class="no-margins" style="color: green;">{{ sprintf("%.2f", ($overviews['total_sales_recommended'] / $overviews['total_sales_amount'] ) * 100) }} % boost</h1>
+              @else
+                <h1 class="no-margins">No Data</h1>
+              @endif
+              <small>Sales Boosts</small>
             </div>
+          
+          </div>
+        
         </div>
-    </div>
 
+      </div>
+
+    </div>
 </div>
 
 
@@ -294,9 +317,57 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/day/OVERALL', function(d
         multiTooltipTemplate: "<%= datasetLabel %> - <%= value %>" 
     }
 
+  $('#mgViews').highcharts({
+        chart: {
+            type: 'area'
+        },
+        title: {
+            text: 'Recommended Vs Regular Sales'
+        },
+        subtitle: {
+            text: ''
+        },
+        xAxis: {
+            categories: date_array,
+            tickmarkPlacement: 'on',
+            title: {
+                enabled: false
+            }
+        },
+        yAxis: {
+            title: {
+                text: 'Page Views'
+            },
+            labels: {
+                formatter: function () {
+                    return this.value / 1000;
+                }
+            }
+        },
+        tooltip: {
+            shared: true,
+            valueSuffix: ' millions'
+        },
+        plotOptions: {
+            area: {
+                stacking: 'normal',
+                lineColor: '#666666',
+                lineWidth: 1,
+                marker: {
+                    lineWidth: 1,
+                    lineColor: '#666666'
+                }
+            }
+        },
+        series: [{
+            name: 'Regular Views',
+            data: value_array
+        }, {
+            name: 'Recommended Views',
+            data: value_array_recommended
+        }]
+    });
 
-    var ctx = document.getElementById("mgViews").getContext("2d");
-    var myNewChart = new Chart(ctx).Bar(barData, barOptions);
 });
 
 d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT/day/OVERALL', function(data) {
@@ -410,9 +481,60 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT/day/OVERALL', fun
     }
 
 
-    var ctx = document.getElementById("mgSalesAmount").getContext("2d");
-    var myNewChart = new Chart(ctx).Bar(barData, barOptions);
+    // var ctx = document.getElementById("mgSalesAmount").getContext("2d");
+    // var myNewChart = new Chart(ctx).Bar(barData, barOptions);
 
+
+    $('#mgSalesAmount').highcharts({
+        chart: {
+            type: 'area'
+        },
+        title: {
+            text: 'Recommended Vs Regular Sales'
+        },
+        subtitle: {
+            text: ''
+        },
+        xAxis: {
+            categories: date_array,
+            tickmarkPlacement: 'on',
+            title: {
+                enabled: false
+            }
+        },
+        yAxis: {
+            title: {
+                text: 'Sales Money'
+            },
+            labels: {
+                formatter: function () {
+                    return this.value / 1000;
+                }
+            }
+        },
+        tooltip: {
+            shared: true,
+            valueSuffix: ' millions'
+        },
+        plotOptions: {
+            area: {
+                stacking: 'normal',
+                lineColor: '#666666',
+                lineWidth: 1,
+                marker: {
+                    lineWidth: 1,
+                    lineColor: '#666666'
+                }
+            }
+        },
+        series: [{
+            name: 'Regular Sales',
+            data: value_array
+        }, {
+            name: 'Recommended Sales',
+            data: value_array_recommended
+        }]
+    });
 });
 
 
@@ -527,8 +649,8 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/ITEM_PURCHASED/day/OVERALL', f
     }
 
 
-    var ctx = document.getElementById("mgItemsPurchased").getContext("2d");
-    var myNewChart = new Chart(ctx).Bar(barData, barOptions);
+    // var ctx = document.getElementById("mgItemsPurchased").getContext("2d");
+    // var myNewChart = new Chart(ctx).Bar(barData, barOptions);
 
 });
 
