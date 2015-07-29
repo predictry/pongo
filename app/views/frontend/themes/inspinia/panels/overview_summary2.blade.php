@@ -312,7 +312,7 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/day/OVERALL', function(d
             type: 'area'
         },
         title: {
-            text: 'Recommended Vs Regular Sales'
+            text: 'Recommended Vs Regular Page Views'
         },
         subtitle: {
             text: ''
@@ -352,7 +352,8 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/day/OVERALL', function(d
         series: [{
             name: 'Regular Views',
             data: value_array
-        }, {
+        }, 
+        {
             name: 'Recommended Views',
             data: value_array_recommended
         }]
