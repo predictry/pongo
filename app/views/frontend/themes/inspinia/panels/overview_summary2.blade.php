@@ -346,7 +346,7 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/day/OVERALL', function(d
         },
         tooltip: {
             shared: true,
-            valueSuffix: ' millions'
+            valueSuffix: ' thousands'
         },
         plotOptions: {
             area: {
@@ -514,7 +514,7 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT/day/OVERALL', fun
         },
         tooltip: {
             shared: true,
-            valueSuffix: ' millions'
+            valueSuffix: ' thousands'
         },
         plotOptions: {
             area: {
