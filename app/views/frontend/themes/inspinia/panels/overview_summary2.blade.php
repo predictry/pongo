@@ -9,7 +9,6 @@
             <div id="visualOne"></div>
             <div class="ibox-content">
                 <h1 class="no-margins">{{ number_format($overviews['total_sales_per_cart']) }} $</h1>
-                <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
                 <small>Overall sales in currency</small>
             </div>
         </div>
@@ -24,7 +23,6 @@
             <div id="mgItemsPerCart"></div>
             <div class="ibox-content">
                 <h1 class="no-margins">{{ number_format($overviews['total_item_per_cart']) }}</h1>
-                <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
                 <small>Average number of items in the cart</small>
             </div>
         </div>
@@ -41,13 +39,11 @@
               <div class="row">
                 <div class="col-md-6">
                   <h1 class="no-margins">{{ number_format($overviews['total_pageviews'] - $overviews['total_pageviews_recommended']) }}</h1>
-                  <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
                   <small>Regular Page Views</small>
                 </div>
 
                 <div class="col-md-6">
                   <h1 class="no-margins">{{ number_format($overviews['total_pageviews_recommended']) }}</h1>
-                  <!--<div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>-->
                   <small>Recommended Page Views</small> 
                 </div>
               </div>
@@ -60,7 +56,6 @@
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 data_cell">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
-                <!--<span class="label label-primary pull-right">Today</span>-->
                 <h5>Sales Amount</h5>
                 <div class="ibox-tools">
                   <a class="collapse-link">
@@ -77,7 +72,6 @@
               </div>
               <div class="right">
                 <h1 class="no-margins">{{ number_format($overviews['total_sales_recommended']) }}</h1>
-                <!--<div class="stat-percent font-bold text-navy">44% <i class="fa fa-level-up"></i></div>-->
                 <small>Recommended sales total</small>
                 @if ($overviews['total_sales_amount'] > 0 ) 
                   <p class="boots_no">{{ sprintf("%.2f", ($overviews['total_sales_recommended'] / $overviews['total_sales_amount'] ) * 100) }} % boost</p>
@@ -106,15 +100,11 @@
               <div id="mgViews" style="min-width: 310px; height: 400px; margin: 0 auto"></div> 
               <div class="left">
                 <h1 class="no-margins">{{ number_format($overviews['total_pageviews']) }}</h1>
-                <!-- <div class="stat-percent font-bold text-success">98% <i class="fa fa-bolt"></i></div>
-                -->
                 <small>total view actions received</small>
               </div>
               
               <div class="right">
                 <h1 class="no-margins">{{ number_format($overviews['total_pageviews_recommended']) }}</h1>
-                <!-- <div class="stat-percent font-bold text-success">98% <i class="fa fa-bolt"></i></div>
-                -->
                 <small>recommended view actions received</small>
                 @if ($overviews['total_pageviews'] > 0 )  
                   <p class="boots_no green" style="color: green;">{{ sprintf("%.2f", ($overviews['total_pageviews_recommended'] / $overviews['total_pageviews'] ) * 100) }} % boost</p> 
@@ -346,7 +336,7 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/day/OVERALL', function(d
         },
         tooltip: {
             shared: true,
-            valueSuffix: ' thousands'
+            valueSuffix: ''
         },
         plotOptions: {
             area: {
@@ -514,7 +504,7 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT/day/OVERALL', fun
         },
         tooltip: {
             shared: true,
-            valueSuffix: ' thousands'
+            valueSuffix: ''
         },
         plotOptions: {
             area: {
