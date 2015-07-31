@@ -9,7 +9,7 @@
             <div id="visualOne"></div>
             <div class="ibox-content">
                 <h1 class="no-margins">{{ number_format($overviews['total_sales_per_cart']) }} $</h1>
-                <small>Overall sales in currency</small>
+                <small>Overall sales in local currency</small>
             </div>
         </div>
     </div>
