@@ -4,11 +4,10 @@
         <div class="ibox float-e-margins">
             <div class="ibox-title">
                 <h5>Total Sales</h5>
-                <span class="label label-success pull-right">total</span>
             </div>
             <div id="visualOne"></div>
             <div class="ibox-content">
-                <h1 class="no-margins">{{ number_format($overviews['total_sales_per_cart']) }} $</h1>
+                <h1 class="no-margins">{{ number_format($overviews['total_sales_per_cart']) }}</h1>
                 <small>Overall sales in local currency</small>
             </div>
         </div>
@@ -17,8 +16,7 @@
     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
-                <h5>Sales Contribution</h5>
-                <span class="label label-info pull-right">Percentage %</span>
+                <h5>Sales Lift</h5> 
             </div>
             <div id="mgItemsPerCart"></div>
             <div class="ibox-content">
@@ -85,39 +83,6 @@
     </div>
     
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 data_cell">
-        <div class="ibox float-e-margins">
-            <div class="ibox-title">
-                <h5>Pageviews</h5>
-              <div class="ibox-tools">
-                  <a class="collapse-link">
-                      <i class="fa fa-chevron-up"></i>
-                  </a>
-              </div>
-            </div>
-          
- 
-            <div class="ibox-content">
-              <div id="mgViews" style="min-width: 310px; height: 400px; margin: 0 auto"></div> 
-              <div class="left">
-                <h1 class="no-margins">{{ number_format($overviews['total_pageviews']) }}</h1>
-                <small>total view actions received</small>
-              </div>
-              
-              <div class="right">
-                <h1 class="no-margins">{{ number_format($overviews['total_pageviews_recommended']) }}</h1>
-                <small>recommended view actions received</small>
-                @if ($overviews['total_pageviews'] > 0 )  
-                  <p class="boots_no green" style="color: green;">{{ sprintf("%.2f", ($overviews['total_pageviews_recommended'] / $overviews['total_pageviews'] ) * 100) }} % boost</p> 
-                @else
-                  <p class="boots_no">No Data</p>
-                @endif
-              </div>
-            </div>
-        </div>
-    </div>
-
-    
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 data_cell">
 
       <div class="ibox float-e-margins">
 
@@ -157,6 +122,40 @@
       </div>
 
     </div>
+
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 data_cell">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Pageviews</h5>
+              <div class="ibox-tools">
+                  <a class="collapse-link">
+                      <i class="fa fa-chevron-up"></i>
+                  </a>
+              </div>
+            </div>
+          
+ 
+            <div class="ibox-content">
+              <div id="mgViews" style="min-width: 310px; height: 400px; margin: 0 auto"></div> 
+              <div class="left">
+                <h1 class="no-margins">{{ number_format($overviews['total_pageviews']) }}</h1>
+                <small>total view actions received</small>
+              </div>
+              
+              <div class="right">
+                <h1 class="no-margins">{{ number_format($overviews['total_pageviews_recommended']) }}</h1>
+                <small>recommended view actions received</small>
+                @if ($overviews['total_pageviews'] > 0 )  
+                  <p class="boots_no green" style="color: green;">{{ sprintf("%.2f", ($overviews['total_pageviews_recommended'] / $overviews['total_pageviews'] ) * 100) }} % boost</p> 
+                @else
+                  <p class="boots_no">No Data</p>
+                @endif
+              </div>
+            </div>
+        </div>
+    </div>
+
+    
 </div>
 
 
