@@ -317,6 +317,9 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/day/OVERALL', function(d
         subtitle: {
             text: ''
         },
+        credits: {
+            enabled: false
+        },
         xAxis: {
             categories: date_array,
             tickmarkPlacement: 'on',
@@ -485,6 +488,9 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT/day/OVERALL', fun
         },
         subtitle: {
             text: ''
+        },
+        credits: {
+            enabled: false
         },
         xAxis: {
             categories: date_array,
