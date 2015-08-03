@@ -170,8 +170,8 @@ class Panel2Controller extends BaseController   {
                 ],
 
               'dt_range'            => [
-                  'start' => date("[H] F d, Y", $tstart),
-                  'end'   => date("[H] F d, Y", $tend)
+                  'start' => date("F d, Y", $tstart),
+                  'end'   => date("F d, Y", $tend)
                 ],
 
               'dt_start'            => $dt_start,

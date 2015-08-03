@@ -7,9 +7,9 @@
             </div>
             <div id="visualOne"></div>
             <div class="ibox-content">
-                <h1 class="no-margins">{{ number_format($overviews['total_sales_per_cart']) }}</h1>
-                <!-- remove description for currency 
-                  <small>Overall sales in local currency</small> -->
+                <h1 class="no-margins">{{ number_format($overviews['total_sales_amount']) }}</h1>
+              
+                  <small>Overall sales in local currency</small>
             </div>
         </div>
     </div>
@@ -21,9 +21,16 @@
             </div>
             <div id="mgItemsPerCart"></div>
             <div class="ibox-content">
-                <h1 class="no-margins">{{ number_format($overviews['total_item_per_cart']) }}</h1>
-                <!-- remove description for items 
-                  <small>Average number of items in the cart</small> -->
+              <div class="left">
+               <div id="saleChart" style="width: 50px; height: 50px; margin: 0 auto"></div>  
+            
+               
+              </div>
+
+              <div class="right">
+                <h1 class="no-margins">{{ number_format($overviews['total_sales_recommended']) }}</h1>
+                <small>Sales from rec</small>
+              </div>
             </div>
         </div>
     </div>
@@ -32,21 +39,21 @@
         <div class="ibox float-e-margins">
             <div class="ibox-title">
                 <h5>Page Views</h5>
-                <span class="label label-primary pull-right">Overall vs Recommended</span>
+                <span class="label label-warning pull-right">Regular vs Recommended</span>
             </div>
             <div id="visualOne"></div>
             <div class="ibox-content">
               <div class="row">
                 <div class="col-md-6">
                   <h1 class="no-margins">{{ number_format($overviews['total_pageviews'] - $overviews['total_pageviews_recommended']) }}</h1>
-                  <!--
-                    <small>Regular Page Views</small> -->
+                
+                    <small>Regular Page Views</small> 
                 </div>
 
                 <div class="col-md-6">
                   <h1 class="no-margins">{{ number_format($overviews['total_pageviews_recommended']) }}</h1>
-                  <!-- 
-                    <small>Recommended Page Views</small> -->
+                
+                    <small>Page Views from rec</small>
                 </div>
               </div>
             </div>
@@ -58,7 +65,7 @@
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 data_cell">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
-                <h5>Sales Amount</h5>
+                <h5>Sales</h5>
                 <div class="ibox-tools">
                   <a class="collapse-link">
                       <i class="fa fa-chevron-up"></i>
@@ -73,31 +80,29 @@
 
                 <div class="col-md-3">
                   <div class="left">
-                    <h1 class="no-margins">{{ number_format($overviews['total_sales_amount']) }} $</h1>
-                    <small>Taken from regular sales total</small>
-                    
+                    <h1 class="no-margins">{{ number_format($overviews['total_sales_amount']) }}</h1>
+                    <small>Total Sales</small>
+                    <br /><br />
                     <h1 class="no-margins">{{ number_format($overviews['total_sales_recommended']) }}</h1>
-                    <small>Recommended sales total</small>
-                    @if ($overviews['total_sales_amount'] > 0 ) 
-                      <p class="boots_no">{{ sprintf("%.2f", ($overviews['total_sales_recommended'] / $overviews['total_sales_amount'] ) * 100) }} % boost</p>
-                    @else
-                      <p class="boots_no">No Data</p>
-                    @endif
+                    <small>Recommended sales total</small> <br /><br />
+
+                    <h1 class="no-margins">{{ number_format($overviews['total_orders_recommended']) }}</h1>
+                    <small>Recommended Orders</small>
                   </div>
                 </div>
               </div><!-- end of row -->
 
               <div class="row">
 
-                
-                <div class="col-md-12">
-                  <h1>Your customers who interact with recommendations spend about $100 more than users who don't</h1><br />
-                  @if ($overviews['total_sales_amount'] > 0 ) 
-                    <h1 class="no-margins" style="color: green;">{{ sprintf("%.2f", ($overviews['total_sales_recommended'] / $overviews['total_sales_amount'] ) * 100) }} % boost</h1>
-                  @else
-                    <h1 class="no-margins">No Data</h1>
-                  @endif
-                  <small>Sales Boosts</small>
+                <div class="well" style="margin: 40px 30px 0px 30px; vertical-align: baseline;">
+                  <i style="font-size: 3em; margin-right: 30px; float: left; color: rgba(124,181,236,1);" class="fa fa-shopping-cart"></i> 
+                  <h2 style="margin-top: 10px; font-size: 1.5em; text-align: left;">Your customers who interact with recommendations spend about <span class="label label-primary" style="font-size: 1em;">$100</span> more than users who don't</h2><br />
+                </div>        
+
+
+                <div class="well" style="margin: 40px 30px 0px 30px; vertical-align: baseline;">
+                  <i style="font-size: 3em; margin-right: 30px; float: left; color: red;" class="fa fa-heart-o"></i> 
+                  <h2 style="margin-top: 10px; font-size: 1.5em; text-align: left;">Your customers who interact with recommendations buy about <span class="label label-primary" style="font-size: 1em;">2</span> more items than users who don't</h2><br />
                 </div>        
               </div><!-- end of row -->
 
@@ -124,31 +129,17 @@
                 <div class="col-md-3">
                   <div class="left">
                     <h1 class="no-margins">{{ number_format($overviews['total_pageviews']) }}</h1>
-                    <small>total view actions received</small>
+                    <small>total view actions received</small><br /><br />
                     
                     <h1 class="no-margins">{{ number_format($overviews['total_pageviews_recommended']) }}</h1>
-                    <small>recommended view actions received</small>
+                    <small>recommended view actions received</small><br /><br />
                     @if ($overviews['total_pageviews'] > 0 )  
-                      <p class="boots_no green" style="color: green;">{{ sprintf("%.2f", ($overviews['total_pageviews_recommended'] / $overviews['total_pageviews'] ) * 100) }} % boost</p> 
+                      <h1 class="boots_no no-margin green" style="color: green;">{{ sprintf("%.2f", ($overviews['total_pageviews_recommended'] / $overviews['total_pageviews'] ) * 100) }} % lift</h1> 
                     @else
                       <p class="boots_no">No Data</p>
                     @endif
                   </div>
                 </div>
-              </div><!-- end of row -->
-
-              <div class="row">
-
-                
-                <div class="col-md-12">
-                  <h1>Your customers who interact with recommendations spend about $100 more than users who don't</h1><br />
-                  @if ($overviews['total_sales_amount'] > 0 ) 
-                    <h1 class="no-margins" style="color: green;">{{ sprintf("%.2f", ($overviews['total_sales_recommended'] / $overviews['total_sales_amount'] ) * 100) }} % boost</h1>
-                  @else
-                    <h1 class="no-margins">No Data</h1>
-                  @endif
-                  <small>Sales Boosts</small>
-                </div>        
               </div><!-- end of row -->
 
             </div>
@@ -354,15 +345,17 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/day/OVERALL', function(d
         },
         series: [{
             name: 'Regular Views',
-            data: value_array
+            data: value_array,
+            visible: false
         }, 
         {
             name: 'Recommended Views',
             data: value_array_recommended
         }]
     });
-
+    
 });
+
 
 d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT/day/OVERALL', function(data) {
     var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -527,7 +520,8 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT/day/OVERALL', fun
         },
         series: [{
             name: 'Regular Sales',
-            data: value_array
+            data: value_array,
+            visible: false
         }, {
             name: 'Recommended Sales',
             data: value_array_recommended
@@ -535,6 +529,59 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT/day/OVERALL', fun
     });
 });
 
+// pie chart for sale attribute
+
+$('#saleChart').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie',
+            margin: [0, 0, 0, 0],
+            spacingTop: 0,
+            spacingBottom: 0,
+            spacingLeft: 0,
+            spacingRight: 0
+        },
+        credits: {
+            enabled: false
+        },
+        exporting: { enabled: false },
+        title: {
+            text: false
+        },
+        tooltip: { enabled: false },
+        plotOptions: {
+            pie: {
+                size:'100%',
+                dataLabels: {
+                  enabled: false
+                },
+                allowPointSelect: false,
+                cursor: false,
+                dataLabels: {
+                    enabled: false,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                }
+            }
+        },
+        series: [{
+            name: "Brands",
+            colorByPoint: true,
+            data: [{
+                name: "Total Sales Amount",
+                y: {{ $overviews['total_sales_amount'] }}
+            },
+            { 
+                name: "Total Sales Recommended",
+                y: {{ $overviews['total_sales_recommended'] }}
+            } 
+            ]
+        }]
+});
 
 d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/ITEM_PURCHASED/day/OVERALL', function(data) {
     var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
