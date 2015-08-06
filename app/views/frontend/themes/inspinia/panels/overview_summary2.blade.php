@@ -88,8 +88,11 @@
 
                     <h1 class="no-margins">{{ number_format($overviews['total_orders_recommended']) }}</h1>
                     <small>Recommended Orders</small>
-
-                    <h1 style="color:green;">{{ ( $overviews['total_sales_recommended'] / $overviews['total_sales_amount'] ) * 100 }} % lift</h1>
+                    @if ($overviews['totaL_sales_amount'] > 0 )  
+                      <h1 style="color:green;">{{ ( $overviews['total_sales_recommended'] / $overviews['total_sales_amount'] ) * 100 }} % lift</h1>
+                    @else
+                      <h1 style="color:green;">Pending Metrics</h1>
+                    @endif
                   </div>
                 </div>
               </div><!-- end of row -->
