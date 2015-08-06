@@ -88,8 +88,6 @@
 
                     <h1 class="no-margins">{{ number_format($overviews['total_orders_recommended']) }}</h1>
                     <small>Recommended Orders</small>
-
-                    <h1 style="color:green;">{{ ( $overviews['total_sales_recommended'] / $overviews['total_sales_amount'] ) * 100 }} % lift</h1>
                   </div>
                 </div>
               </div><!-- end of row -->
@@ -98,7 +96,7 @@
 
                 <div class="well" style="margin: 40px 30px 0px 30px; vertical-align: baseline;">
                   <i style="font-size: 3em; margin-right: 30px; float: left; color: rgba(124,181,236,1);" class="fa fa-shopping-cart"></i> 
-                  <h2 style="margin-top: 10px; font-size: 1.5em; text-align: left;">Your customers who interact with recommendations spend about <span class="label label-primary" style="font-size: 1em;">$112</span> more than users who don't</h2><br />
+                  <h2 style="margin-top: 10px; font-size: 1.5em; text-align: left;">Your customers who interact with recommendations spend about <span class="label label-primary" style="font-size: 1em;">$100</span> more than users who don't</h2><br />
                 </div>        
 
 
@@ -136,7 +134,7 @@
                     <h1 class="no-margins">{{ number_format($overviews['total_pageviews_recommended']) }}</h1>
                     <small>recommended view actions received</small><br /><br />
                     @if ($overviews['total_pageviews'] > 0 )  
-                      <h1 class="boots_no no-margin green" style="color: green;">{{ sprintf("%.2f", ($overviews['total_pageviews_recommended'] / $overviews['total_pageviews'] ) * 100) }} % lift</h1>
+                      <h1 class="boots_no no-margin green" style="color: green;">{{ sprintf("%.2f", ($overviews['total_pageviews_recommended'] / $overviews['total_pageviews'] ) * 100) }} % lift</h1> 
                     @else
                       <p class="boots_no">No Data</p>
                     @endif
@@ -154,6 +152,35 @@
 
 <script type="text/javascript">
 document.addEventListener('DOMContentLoaded', function(){ 
+
+var ef_data = [
+  {
+    value: {{ $overviews['total_pageviews_recommended'] }},
+    color: "#a3e1d4",
+    highlight: "#1ab394",
+    label: "Total Page Views Recommended"
+  },
+  
+  {
+    value: {{ $overviews['total_item_purchased_recommended'] }},
+    color: "#dedede",
+    highlight: "#1ab394",
+    label: "Total Items Purchased from Recommendation"
+  }
+];
+var ef_options = {
+  segmentShowStroke: true,
+  segmentStrokeColor: "#fff",
+  segmentStrokeWidth: 2,
+  percentageInnerCutout: 45, // This is 0 for Pie charts
+  animationSteps: 100,
+  animationEasing: "easeOutBounce",
+  animateRotate: true,
+  animateScale: false,
+  responsive: true
+}; 
+// var ef_piechart         = document.getElementById("ef_piechart").getContext("2d");
+// var new_ef_piechart     = new Chart(ef_piechart).Doughnut(ef_data, ef_options);
 
 d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/day/OVERALL', function(data) { 
     var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -272,7 +299,7 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/day/OVERALL', function(d
 
   $('#mgViews').highcharts({
         chart: {
-            type: 'column'
+            type: 'area'
         },
         title: {
             text: 'Recommended Vs Regular Page Views'
@@ -306,7 +333,7 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/day/OVERALL', function(d
             valueSuffix: ''
         },
         plotOptions: {
-            column: {
+            area: {
                 stacking: 'normal',
                 lineColor: '#666666',
                 lineWidth: 1,
@@ -318,7 +345,8 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/day/OVERALL', function(d
         },
         series: [{
             name: 'Regular Views',
-            data: value_array
+            data: value_array,
+            visible: false
         }, 
         {
             name: 'Recommended Views',
@@ -467,7 +495,7 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT/day/OVERALL', fun
         exporting: { enabled: false },
         yAxis: {
             title: {
-                text: 'Sales'
+                text: 'Sales Money'
             },
             labels: {
                 formatter: function () {
@@ -485,18 +513,18 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT/day/OVERALL', fun
                 lineColor: '#666666',
                 lineWidth: 1,
                 marker: {
-                    enabled: false,
-                    lineWidth: 0,
+                    lineWidth: 1,
                     lineColor: '#666666'
                 }
             }
         },
         series: [{
             name: 'Regular Sales',
-            data: value_array
+            data: value_array,
+            visible: false
         }, {
             name: 'Recommended Sales',
-            data: value_array
+            data: value_array_recommended
         }]
     });
 });
@@ -545,11 +573,11 @@ $('#saleChart').highcharts({
             colorByPoint: true,
             data: [{
                 name: "Total Sales Amount",
-                y: 9808131
+                y: {{ $overviews['total_sales_amount'] }}
             },
             { 
                 name: "Total Sales Recommended",
-                y: 1138691
+                y: {{ $overviews['total_sales_recommended'] }}
             } 
             ]
         }]
