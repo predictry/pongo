@@ -122,7 +122,6 @@ if (typeof Predictry !== 'object') {
             var i, f, parameter_array;
             for (i = 0; i < arguments.length; i += 1) {
                 parameter_array = arguments[i];
-                /** let see what would comes out of this **/
                 console.log(parameter_array);
 
                 f = parameter_array.shift();
@@ -483,7 +482,7 @@ if (typeof Predictry !== 'object') {
         /* end of Gui */
 
         /**
-         * Predictry Executor class
+         * Predictry Executor Class
          * 
          * @param {string} tenant_id
          * @param {string} api_key
@@ -841,7 +840,7 @@ if (typeof Predictry !== 'object') {
 
             /**
              * Create an object from a string
-             *
+             * @description unused function :3
              * @param {string} response
              * @returns {object}
              */
@@ -988,28 +987,6 @@ if (typeof Predictry !== 'object') {
                 }
                 var value = JSON.stringify(cartSession);
                 setCookie(getCookieName("cart"), value, config_session_cookie_timeout, config_cookie_path);
-            }
-
-            /**
-             * Update View Item Session
-             * 
-             * @param {string} item_id
-             * @returns {void}
-             */
-            function setItemIntoViewSession(item_id) {
-                var viewSession = eval("(" + getCookie(getCookieName("view")) + ")");
-                if (isDefined(viewSession) && isObject(viewSession))
-                    var viewItemIDs = viewSession.v;
-                else {
-                    setViewSessionCookie();
-                    viewSession = eval("(" + getCookie(getCookieName("view")) + ")");
-                }
-
-                if (isDefined(viewItemIDs) && (item_id !== undefined && !inArray(item_id, viewItemIDs))) {
-                    viewSession.v.push(item_id);
-                }
-                var value = JSON.stringify(viewSession);
-                setCookie(getCookieName("view"), value, config_tracking_session_cookie_timeout, config_cookie_path);
             }
 
             /**
@@ -1413,6 +1390,8 @@ if (typeof Predictry !== 'object') {
 
             /**
              * Prepare data
+             * @description append default params for
+             *                every request
              * @param {object} data
              * @returns {object}
              */
@@ -1467,7 +1446,6 @@ if (typeof Predictry !== 'object') {
                 if (isDefined(data.action.name))
                 {
                     if (data.action.name === "view" && data.items.length === 1) {
-
                         //check if the viewed item is from reco or not
                         if (isDefined(tracking_params.algo) && (tracking_params.algo !== "") && isDefined(data.action)) {
                             data.action.rec = true;
@@ -1502,12 +1480,122 @@ if (typeof Predictry !== 'object') {
                 }
             }
 
+            /**
+             * Update View Item Session
+             *
+             * @param {string} item_id
+             * @returns {void}
+             */
+            function setItemIntoViewSession(item_id) {
+                var viewSession = eval("(" + getCookie(getCookieName("view")) + ")");
+                if (isDefined(viewSession) && isObject(viewSession))
+                    var viewItemIDs = viewSession.v;
+                else {
+                    setViewSessionCookie();
+                    viewSession = eval("(" + getCookie(getCookieName("view")) + ")");
+                }
+
+                if (isDefined(viewItemIDs) && (item_id !== undefined && !inArray(item_id, viewItemIDs))) {
+                    viewSession.v.push(item_id);
+                }
+                var value = JSON.stringify(viewSession);
+                setCookie(getCookieName("view"), value, config_tracking_session_cookie_timeout, config_cookie_path);
+            }
+
+
+            /**
+             * setRecentlyViewedSessionCookie
+             * @description set the recently viewed item cookies
+             *               if there was none
+             * @param {object} item_object
+             */
+            function setRecentlyViewedSessionCookie(item_object) {
+                if (!isDefined(item_object) || !isObject(item_object))
+                    var item_object = {v: []};
+
+                console.log(item_object);
+                var value = JSON.stringify(item_object);
+                setCookie(getCookieName("recentlyViewedItems"), value, config_tracking_session_cookie_timeout, config_cookie_path);
+                return item_object;
+            }
+
+            /**
+             * Push this item id into view session
+             * @params (object) data
+             */
+            function setItemIntoRecentlyViewedSession(data) {
+                var recentlyViewed = eval("("+ getCookie(getCookieName("recentlyViewed")) +")");
+                if (isDefined(recentlyViewed) && isObject(recentlyViewed))
+                {
+                    var recentlyViewedItems = recentlyViewed.v;
+                    console.log(recentlyViewedItems);
+                }
+                else {
+                    // create cookie for recently viewed items with
+                    // newly viewed item objects
+                    setRecentlyViewedSessionCookie(data);
+                }
+            }
+
+
+            /**
+             * setRecentlyViewedItemId
+             * @description set the recently viewed item id cookies
+             *               if there was none
+             * @param {object} id
+             */
+            function setRecentlyViewedItemIdSession(id) {
+                if (!isDefined(id) || !isObject(id))
+                    var id = {v: []};
+
+                console.log(id);
+                var value = JSON.stringify(id);
+                setCookie(getCookieName("recentlyViewedItemIds"), value, config_tracking_session_cookie_timeout, config_cookie_path);
+                return id;
+            }
+
+            /**
+             * setRecentlyViewedItemId
+             * @description to track the items id for
+             *                  checking the unique id
+             * @params (object) id
+             */
+            function setRecentlyViewedItemId(id) {
+                var recentlyIds  = eval("("+ getCookie(getCookieName("recentlyIds")) +")");
+                if (isDefined(recentlyIds) && isObject(recentlyIds))
+                {
+                    var recentlyViewedIds = recentlyIds.v;
+                    console.log(recentlyViewedIds);
+                }
+                else
+                {
+                    // create cookie for recently viewed item ids
+                    // and check if the id was already there or not
+                    setRecentlyViewedItemIdSession(id);
+                }
+
+            }
+
+
+            /**
+             * Track (data)
+             * @param data
+             */
             function trackView(data) {
 
                 //if data.action.rec is true store it into cookie
                 if (isDefined(data.action) && isDefined(data.action.rec))
                     setItemIntoViewSession(data.items[0].item_id);
 
+                // add the whole item object into cookie
+                setItemIntoRecentlyViewedSession(data.items[0]);
+
+                // also create another cookie to keep track unique items
+                // by their IDs
+                setRecentlyViewedItemId(data.items[0].item_id);
+
+                // fireup the payload then
+                // view.gif?*parmas
                 sendImage(data);
             }
 
@@ -1814,6 +1902,7 @@ if (typeof Predictry !== 'object') {
         _predictry.push(['getPredictryParams', document.location.search]);
 
         async_executor = new Executor(window_alias.PE_tenantId, window_alias.PE_apiKey);
+
         var execute_first = {setTenantId: 1, setApiKey: 1, setSessionID: 1, setSessionBrowserID: 1, setSessionUserID: 1, setSessionCart: 1, setSessionView: 1, getPredictryParams: 1};
         var method_name;
 
