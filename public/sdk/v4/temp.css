@@ -1,0 +1,75 @@
+ins.predictryRecent {
+    text-decoration: none;
+}
+
+.predictryRecent{
+    width: auto;
+    overflow: hidden;
+    display: block;
+}
+.predictryRecent .pry-header{
+    border-bottom: 1px solid #CCC;
+    margin-bottom: 10px;
+}
+.predictryRecent .pry-header h3{
+}
+
+.predictryRecent .pry-content{
+    margin-top: 10px;
+}
+
+.predictryRecent ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: inherit;
+}
+
+.predictryRecent li.pry-column{
+    display: inline-block;
+    vertical-align: top;
+    min-width: 50px;
+    max-width: 180px;
+    margin-right: 15px;
+    margin-bottom: 20px;
+}
+
+.predictryRecent li.pry-column:last-child{
+    margin-left: 0;
+}
+
+.predictryRecent li.pry-column div.pry-thumb > a > img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.predictryRecent li.pry-column div.pry-item-wrapper > div.pry-desc,
+.predictryRecent li.pry-column div.pry-item-wrapper > div.pry-price{
+    margin-top: 10px;
+}
+
+.predictryRecent li.pry-column div.pry-item-wrapper > div.pry-desc > a{
+    display: inline-block;
+    color: #000;
+    text-decoration: none;
+}
+
+.predictryRecent div.pry-footer{
+    text-align: right;
+    border-bottom: 1px solid #CCC;
+}
+.predictryRecent div.pry-footer a{
+    color: #000;
+    text-decoration: none;
+}
+.predictryRecent div.pry-footer a > span.powered{
+    font-size: 10px;
+    color: #000;
+    font-weight: normal;
+    display: inline;
+}
+
+.predictryRecent span.powered{
+    text-decoration: none;
+}

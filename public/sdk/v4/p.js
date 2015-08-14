@@ -123,7 +123,6 @@ if (typeof Predictry !== 'object') {
             for (i = 0; i < arguments.length; i += 1) {
                 parameter_array = arguments[i];
                 console.log(parameter_array);
-
                 f = parameter_array.shift();
                 if (isString(f)) {
                     try {
@@ -506,6 +505,7 @@ if (typeof Predictry !== 'object') {
 
             var
                     predictry_nodes = {},
+                    predictryRecent = {},
                     widgets = [],
                     is_lookup_widget = false;
 
@@ -668,8 +668,8 @@ if (typeof Predictry !== 'object') {
 
             }
 
-            /*
-             * 
+            /**
+             * drawAsyncThumbListRecommendation
              * @param {element} elem
              * @param {array} item_ids
              * @param {string} params
@@ -1057,7 +1057,7 @@ if (typeof Predictry !== 'object') {
             }
 
 
-             /**
+            /**
              * Call the callback
              * 
              */
@@ -1481,10 +1481,9 @@ if (typeof Predictry !== 'object') {
             }
 
             /**
-             * Update View Item Session
-             *
+             * setItemIntoViewSession(item_id)
+             * @description add item id into view session
              * @param {string} item_id
-             * @returns {void}
              */
             function setItemIntoViewSession(item_id) {
                 var viewSession = eval("(" + getCookie(getCookieName("view")) + ")");
@@ -1513,8 +1512,14 @@ if (typeof Predictry !== 'object') {
                 if (!isDefined(item_object) || !isObject(item_object))
                     var item_object = {v: []};
 
-                console.log(item_object);
-                var value = JSON.stringify(item_object);
+                // create a temp array
+                // to wrap the incoming
+                // item objects
+                var new_array = [];
+                new_array.push(item_object);
+
+                // stringify and set it inside cookie value
+                var value = JSON.stringify(new_array);
                 setCookie(getCookieName("recentlyViewedItems"), value, config_tracking_session_cookie_timeout, config_cookie_path);
                 return item_object;
             }
@@ -1523,12 +1528,20 @@ if (typeof Predictry !== 'object') {
              * Push this item id into view session
              * @params (object) data
              */
-            function setItemIntoRecentlyViewedSession(data) {
-                var recentlyViewed = eval("("+ getCookie(getCookieName("recentlyViewed")) +")");
-                if (isDefined(recentlyViewed) && isObject(recentlyViewed))
+            function addItemIntoRecentlyViewedSession(data) {
+                var recentlyViewedItems = eval("("+ getCookie(getCookieName("recentlyViewedItems")) +")");
+                if (isDefined(recentlyViewedItems) && isObject(recentlyViewedItems))
                 {
-                    var recentlyViewedItems = recentlyViewed.v;
-                    console.log(recentlyViewedItems);
+                    var items = recentlyViewedItems;
+                    // get the current items in stored
+                    // and push the new items
+                    items.push(data);
+
+                    // make it stringify to reset cookie with
+                    // new value
+                    var value = JSON.stringify(items);
+                    setCookie(getCookieName("recentlyViewedItems"), value, config_tracking_session_cookie_timeout, config_cookie_path);
+                    console.log(items);
                 }
                 else {
                     // create cookie for recently viewed items with
@@ -1537,62 +1550,160 @@ if (typeof Predictry !== 'object') {
                 }
             }
 
-
             /**
-             * setRecentlyViewedItemId
+             * setRecentlyViewedItemIdCookie
              * @description set the recently viewed item id cookies
              *               if there was none
              * @param {object} id
              */
-            function setRecentlyViewedItemIdSession(id) {
+            function setRecentlyViewedItemIdCookie(id) {
                 if (!isDefined(id) || !isObject(id))
                     var id = {v: []};
 
-                console.log(id);
+                // write something to explain the below
                 var value = JSON.stringify(id);
                 setCookie(getCookieName("recentlyViewedItemIds"), value, config_tracking_session_cookie_timeout, config_cookie_path);
                 return id;
             }
 
             /**
-             * setRecentlyViewedItemId
+             * addRecentlyViewedItemId
              * @description to track the items id for
              *                  checking the unique id
              * @params (object) id
              */
-            function setRecentlyViewedItemId(id) {
-                var recentlyIds  = eval("("+ getCookie(getCookieName("recentlyIds")) +")");
-                if (isDefined(recentlyIds) && isObject(recentlyIds))
-                {
+            function addRecentlyViewedItemId(id) {
+                var recentlyIds  = eval("("+ getCookie(getCookieName("recentlyViewedItemIds")) +")");
+                if (isDefined(recentlyIds) && isObject(recentlyIds)) {
                     var recentlyViewedIds = recentlyIds.v;
-                    console.log(recentlyViewedIds);
+                    console.log("Current Item id array" + recentlyViewedIds);
+                    if (!inArray(id, recentlyViewedIds))
+                    {
+                        console.log("Oh there is no " + id + " inside current array " + recentlyViewedIds);
+                        // ok can't find id
+                        // so push it to the array
+                        recentlyViewedIds.push(id);
+
+                        // make that array into a string
+                        var value = JSON.stringify(recentlyIds);
+                        setCookie(getCookieName("recentlyViewedItemIds"), value, config_tracking_session_cookie_timeout, config_cookie_path);
+                    } else {
+                        console.log("Item id " + id + " is already here");
+                    }
                 }
                 else
                 {
+
                     // create cookie for recently viewed item ids
                     // and check if the id was already there or not
-                    setRecentlyViewedItemIdSession(id);
+                    setRecentlyViewedItemIdCookie(id);
                 }
 
             }
 
+            /**
+             * checkItemId(id)
+             * @description check if the item_id is
+             *                 already in item_id_cookie or not
+             * @params (string) id
+             * @return (boolean)
+             */
+            function checkItemId(id) {
+                var recentlyIds = eval ("("+getCookie(getCookieName("recentlyViewedItemIds")) +")");
+                if (isDefined(recentlyIds) && isObject(recentlyIds))
+                {
+                    var itemIds = recentlyIds.v;
+
+                    // return true if the id is
+                    // already inside the array
+                    return inArray(id, itemIds) ?  true : false;
+                }
+                else {
+                    setRecentlyViewedItemIdCookie(id);
+                    return false;
+                }
+            }
+
+
+            /**
+             *  showRecentlyViewedItems
+             *  @description get the list of items
+             *                  from stored cookies and show it
+             */
+            function showRecentlyViewedItems(id) {
+                var recentlyViewedItems = eval("("+ getCookie(getCookieName("recentlyViewedItems")) +")");
+                predictryRecent = document.querySelectorAll(".predictryRecent")[0];
+
+                var r_head      = document.createElement("h2");
+                r_head.className= "title";
+                r_head.innerHTML= "Recently Viewed Items";
+
+                var ul_obj      = document.createElement("ul");
+                ul_obj.className    = "pryRecent pry-content";
+
+                predictryRecent.appendChild(r_head);
+
+                predictryRecent.appendChild(ul_obj);
+                var i = 0;
+                [].forEach.call(recentlyViewedItems, function(item) {
+                    console.log(item.item_id);
+                    if (item.item_id != id) {
+                        var p = document.createElement("p");
+                        var li_obj = document.createElement("li");
+                        li_obj.className = "pry-column pry-recIdx-" + (i + 1) + " pry-odd";
+                        var div_obj = document.createElement("div");
+                        div_obj.className = "pry-item-wrapper";
+                        var thumb_obj = document.createElement("div");
+                        thumb_obj.className = "pry-thumb";
+                        var thumb_a = document.createElement("a");
+                        thumb_a.href = item.item_url;
+                        var thumb_img = document.createElement("img");
+                        thumb_img.src = item.img_url;
+
+
+                        ul_obj.appendChild(li_obj);
+
+                        li_obj.appendChild(div_obj);
+
+                        div_obj.appendChild(thumb_obj);
+
+                        thumb_obj.appendChild(thumb_a);
+
+                        thumb_a.appendChild(thumb_img);
+                        console.log(i);
+
+                    }
+                    i++;
+                });
+            }
 
             /**
              * Track (data)
              * @param data
              */
             function trackView(data) {
-
                 //if data.action.rec is true store it into cookie
                 if (isDefined(data.action) && isDefined(data.action.rec))
                     setItemIntoViewSession(data.items[0].item_id);
 
-                // add the whole item object into cookie
-                setItemIntoRecentlyViewedSession(data.items[0]);
+                // display recently viewed items
+                // before adding current item into cookie
+                showRecentlyViewedItems(data.items[0].item_id);
 
-                // also create another cookie to keep track unique items
-                // by their IDs
-                setRecentlyViewedItemId(data.items[0].item_id);
+                // add the whole item object into cookie
+                // only if the items is not there inside
+                // itemIds array
+                if (!checkItemId(data.items[0].item_id)) {
+                    console.log("Ok id is not here");
+                    addItemIntoRecentlyViewedSession(data.items[0]);
+
+                    // also create another cookie to keep track unique items
+                    // by their IDs
+                    console.log("Adding item_id into item_id array");
+                    addRecentlyViewedItemId(data.items[0].item_id);
+                } else {
+                    console.log("Item Details for " + data.items[0].item_id + " is already here");
+                }
 
                 // fireup the payload then
                 // view.gif?*parmas
@@ -1669,13 +1780,14 @@ if (typeof Predictry !== 'object') {
                 track(data);
             }
 
-            /************************************************************
-             * Constructor
-             ************************************************************/
+            // getRecentItems
+            function getRecentItems() {
+                console.log("I am getting recent items.");
+            }
 
-            /************************************************************
+            /**
              * Public data methods
-             ************************************************************/
+             */
 
             return {
                 setTenantId: function (id) {
@@ -1783,6 +1895,7 @@ if (typeof Predictry !== 'object') {
                 getWidget: function () {
                     if (!is_lookup_widget) {
                         predictry_nodes = document.querySelectorAll(".predictry");
+
                         [].forEach.call(predictry_nodes, function (elem) {
                             var i = 0, ds = elem.dataset;
                             var params = {
@@ -1793,10 +1906,10 @@ if (typeof Predictry !== 'object') {
                                 title: ds.predictryTitle,
                                 currency: ds.predictryCurrency,
                                 category: ds.predictryCategory,
-//                                hide_title: ds.predictryHideTitle,
                                 hide_title: true,
                                 limit: ds.predictryLimit
                             };
+
 
                             if (ds.predictryCallback === undefined) {
                                 _predictry.push(['getPreComputedRecommendedItems', params, function (responseText) {
@@ -1839,6 +1952,7 @@ if (typeof Predictry !== 'object') {
                     }
                 },
                 track: track,
+                getRecentItems: getRecentItems,
                 drawList: drawTextListRecommendation,
                 drawAsyncList: drawAsyncTextListRecommendation,
                 drawAsyncThumb: drawAsyncThumbListRecommendation,
