@@ -1,4 +1,32 @@
-if (typeof _predictry !== 'object') {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: p.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: p.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>if (typeof _predictry !== 'object') {
     _predictry = [];
 }
 
@@ -84,7 +112,7 @@ if (typeof Predictry !== 'object') {
             http.onreadystatechange = function () {
                 var exists = false;
                 if (http.readyState === 4) {
-                    if (http.status != 404 && http.status != 403) {
+                    if (http.status != 404 &amp;&amp; http.status != 403) {
                         exists = true;
                     }
 
@@ -120,7 +148,7 @@ if (typeof Predictry !== 'object') {
          */
         function apply() {
             var i, f, parameter_array;
-            for (i = 0; i < arguments.length; i += 1) {
+            for (i = 0; i &lt; arguments.length; i += 1) {
                 parameter_array = arguments[i];
                 f = parameter_array.shift();
                 if (isString(f)) {
@@ -211,7 +239,7 @@ if (typeof Predictry !== 'object') {
          * Extract parameter from URL
          */
         function getParameter(url, name) {
-            var regex_search = "[\\?&#]" + name + "=([^&#]*)";
+            var regex_search = "[\\?&amp;#]" + name + "=([^&amp;#]*)";
             var regex = new RegExp(regex_search);
             var results = regex.exec(url);
             return results ? decode_wrapper(results[1]) : '';
@@ -263,7 +291,7 @@ if (typeof Predictry !== 'object') {
                         buildUrl(v, k) :
                         encodeURIComponent(k) + "=" + encodeURIComponent(v));
             }
-            return str.join("&");
+            return str.join("&amp;");
         }
 
         /**
@@ -275,7 +303,7 @@ if (typeof Predictry !== 'object') {
          */
         function inArray(needle, haystack) {
             var length = haystack.length;
-            for (var i = 0; i < length; i++)
+            for (var i = 0; i &lt; length; i++)
             {
                 if (haystack[i] === needle)
                     return true;
@@ -327,16 +355,16 @@ if (typeof Predictry !== 'object') {
 
             if (urlParts.length > 1)
             {
-                var parameters = urlParts[1].split("&");
-                for (var i = 0; (i < parameters.length); i++)
+                var parameters = urlParts[1].split("&amp;");
+                for (var i = 0; (i &lt; parameters.length); i++)
                 {
                     var parameterParts = parameters[i].split("=");
-                    if (!(replaceDuplicates && parameterParts[0] == parameterName))
+                    if (!(replaceDuplicates &amp;&amp; parameterParts[0] == parameterName))
                     {
                         if (newQueryString == "")
                             newQueryString = "?";
                         else
-                            newQueryString += "&";
+                            newQueryString += "&amp;";
                         newQueryString += parameterParts[0] + "=" + (parameterParts[1] ? parameterParts[1] : '');
                     }
                 }
@@ -345,10 +373,10 @@ if (typeof Predictry !== 'object') {
                 newQueryString = "?";
 
             if (atStart) {
-                newQueryString = '?' + parameterName + "=" + parameterValue + (newQueryString.length > 1 ? '&' + newQueryString.substring(1) : '');
+                newQueryString = '?' + parameterName + "=" + parameterValue + (newQueryString.length > 1 ? '&amp;' + newQueryString.substring(1) : '');
             } else {
-                if (newQueryString !== "" && newQueryString != '?')
-                    newQueryString += "&";
+                if (newQueryString !== "" &amp;&amp; newQueryString != '?')
+                    newQueryString += "&amp;";
                 newQueryString += parameterName + "=" + (parameterValue ? parameterValue : '');
             }
             return urlParts[0] + newQueryString + urlhash;
@@ -374,7 +402,7 @@ if (typeof Predictry !== 'object') {
 
             if (Object.prototype.toString.call(data) === '[object Array]') {
 
-                for (var ik = 0; ik < data.length; ik++) {
+                for (var ik = 0; ik &lt; data.length; ik++) {
                     map.push(mapJSONToUriParams(data[ik], encode, prefix + "[" + ik + "]", call + 1));
                 }
 
@@ -397,14 +425,14 @@ if (typeof Predictry !== 'object') {
                 map.push(prefix + "=" + encodeURIComponent(data));
             }
 
-            if (call == 0 && encode == true) {
+            if (call == 0 &amp;&amp; encode == true) {
 
-                for (var i = 0; i < map.length; i++) {
+                for (var i = 0; i &lt; map.length; i++) {
                     map[i] = encodeURIComponent(map[i]);
                 }
             }
 
-            return map.join("&");
+            return map.join("&amp;");
         }
 
         function mapObjectKey(key, value, object) {
@@ -412,7 +440,7 @@ if (typeof Predictry !== 'object') {
             var indexOfObjectSep = key.indexOf(":");
             var indexOfArray = key.indexOf("[");
 
-            if ((indexOfObjectSep > -1 && indexOfObjectSep < indexOfArray) || (indexOfObjectSep > -1 && indexOfArray === -1)) {
+            if ((indexOfObjectSep > -1 &amp;&amp; indexOfObjectSep &lt; indexOfArray) || (indexOfObjectSep > -1 &amp;&amp; indexOfArray === -1)) {
 
                 var extractedKey = key.substr(0, indexOfObjectSep);
                 var remainingKey = key.substr(indexOfObjectSep + 1);
@@ -427,7 +455,7 @@ if (typeof Predictry !== 'object') {
                     return mapObjectKey(remainingKey, value, object[extractedKey]);
                 }
 
-            } else if ((indexOfArray > -1 && indexOfArray < indexOfObjectSep) || (indexOfArray > -1 && indexOfObjectSep === -1)) {
+            } else if ((indexOfArray > -1 &amp;&amp; indexOfArray &lt; indexOfObjectSep) || (indexOfArray > -1 &amp;&amp; indexOfObjectSep === -1)) {
 
                 var extractedKey = key.substr(0, indexOfArray);
                 var remainingKey = key.substr(key.indexOf("]") + 1);
@@ -459,13 +487,13 @@ if (typeof Predictry !== 'object') {
             object = typeof object !== 'undefined' ? object : {};
 
             if (call === 0) {
-                data = decodeURIComponent(data).split("&");
+                data = decodeURIComponent(data).split("&amp;");
 
                 for (var key in data) {
                     data[key] = decodeURI(data[key]);
                 }
 
-                for (var i = 0; i < data.length; i++) {
+                for (var i = 0; i &lt; data.length; i++) {
                     mapUriParamsToJSON(data[i], object, call + 1);
                 }
             } else {
@@ -588,7 +616,7 @@ if (typeof Predictry !== 'object') {
                 var returnValue = "";
                 var i = 0;
 
-                for (var x = 0; x < length; x++) {
+                for (var x = 0; x &lt; length; x++) {
                     i = Math.floor(Math.random() * 62);
                     returnValue += chars.charAt(i);
                 }
@@ -620,16 +648,16 @@ if (typeof Predictry !== 'object') {
                     var listString = "";
                     // display recommendations in the DIV layer 'recommendation'
                     if (items.length > 0) {
-                        listString = "<ul style='width: 100%;'>";
+                        listString = "&lt;ul style='width: 100%;'>";
 
-                        for (var x = 0; x < items.length; x++) {
+                        for (var x = 0; x &lt; items.length; x++) {
                             listString +=
-                                    "<li style='list-style: none; float: left; padding-left: 10px; padding-right: 10px; width: 160px; '>"
-                                    + "<img src=\"" + items[x].img_url + "\" style='clear: both; display: block; margin-right: auto; margin-left: auto; width: 150px;'>"
-                                    + "<a href=\"" + items[x].item_url + "\">" + items[x].name + "</a>"
-                                    + "</li>";
+                                    "&lt;li style='list-style: none; float: left; padding-left: 10px; padding-right: 10px; width: 160px; '>"
+                                    + "&lt;img src=\"" + items[x].img_url + "\" style='clear: both; display: block; margin-right: auto; margin-left: auto; width: 150px;'>"
+                                    + "&lt;a href=\"" + items[x].item_url + "\">" + items[x].name + "&lt;/a>"
+                                    + "&lt;/li>";
                         }
-                        elem.innerHTML += listString + "</ul>";
+                        elem.innerHTML += listString + "&lt;/ul>";
                     }
                 }
             }
@@ -650,14 +678,14 @@ if (typeof Predictry !== 'object') {
                     if (item_ids.length > 0) {
                         var predictryList = document.createElement("ul");
                         elem.appendChild(predictryList);
-                        for (var i = 0; i < item_ids.length; i++) {
+                        for (var i = 0; i &lt; item_ids.length; i++) {
                             var s3_data_tenant_item_path = config_s3_data_items_path.replace("{tenant}", tenant_id);
                             var url = config_s3_resource_url + s3_data_tenant_item_path + item_ids[i] + config_default_s3_resource_ext;
                             getJSON(url, function (response) {
                                 if (isDefined(response)) {
                                     var obj = JSON.parse(response);
                                     var node = document.createElement("li");
-                                    node.innerHTML = "<a href=\"product.php?" + obj.id + "\">" + obj.name + "</a>";
+                                    node.innerHTML = "&lt;a href=\"product.php?" + obj.id + "\">" + obj.name + "&lt;/a>";
                                     predictryList.appendChild(node);
                                 }
                             });
@@ -681,29 +709,29 @@ if (typeof Predictry !== 'object') {
                         item_ids = new Array(item_ids);
                     }
 
-                    if (isDefined(item_ids.length) && item_ids.length > 0) {
+                    if (isDefined(item_ids.length) &amp;&amp; item_ids.length > 0) {
                         var params_tmp = params;
-                        var len = (isDefined(params_tmp.limit) && (params_tmp.limit !== "") && (item_ids.length > params_tmp.limit)) ? params_tmp.limit : item_ids.length;
+                        var len = (isDefined(params_tmp.limit) &amp;&amp; (params_tmp.limit !== "") &amp;&amp; (item_ids.length > params_tmp.limit)) ? params_tmp.limit : item_ids.length;
                         var random_ids = [];
                         var params = {
                             id: (isDefined(params_tmp.item_id)) ? params_tmp.item_id : 0,
                             len: len,
-                            algo: (isDefined(algo) && algo !== "") ? algo : ''
+                            algo: (isDefined(algo) &amp;&amp; algo !== "") ? algo : ''
                         };
 
                         var s3_data_tenant_item_path = config_s3_data_items_path.replace("{tenant}", tenant_id);
                         var predictryList = document.createElement("ul");
                         predictryList.className = config_cls_prefix + "content";
 
-                        for (var i = 0; i < len; i++) {
+                        for (var i = 0; i &lt; len; i++) {
                             var item_id = 0;
 
-                            if (isDefined(params_tmp.limit) && (item_ids.length > params_tmp.limit)) {
+                            if (isDefined(params_tmp.limit) &amp;&amp; (item_ids.length > params_tmp.limit)) {
                                 item_id = item_ids[Math.floor(Math.random() * item_ids.length)]; //random id
                             } else
                                 item_id = item_ids[i];
 
-                            if (item_id && !inArray(item_id, random_ids)) {
+                            if (item_id &amp;&amp; !inArray(item_id, random_ids)) {
                                 var url = config_s3_resource_url + s3_data_tenant_item_path + item_id + config_default_s3_resource_ext;
                                 getJSON(url, function (responseText) {
                                     if (isDefined(responseText)) {
@@ -747,7 +775,7 @@ if (typeof Predictry !== 'object') {
              * @returns {elem}
              */
             function createThumbRecoNode(response, seq, params, price_currency) {
-                if (isDefined(response) && isObject(response)) {
+                if (isDefined(response) &amp;&amp; isObject(response)) {
                     var cls_li_prefix_id = config_cls_prefix + "recIdx";
                     var cls_odd = (seq % 2 === 1) ? config_cls_prefix + "odd" : config_cls_prefix + "even";
 
@@ -769,29 +797,29 @@ if (typeof Predictry !== 'object') {
                     var adj_item_url = response.item_url;
 
                     for (var prop in params) {
-                        if (params.hasOwnProperty(prop) && (params[prop] !== 0) && (params[prop] !== '')) {
+                        if (params.hasOwnProperty(prop) &amp;&amp; (params[prop] !== 0) &amp;&amp; (params[prop] !== '')) {
                             adj_item_url = addParameter(adj_item_url, config_prefix_param + prop, params[prop]);
                         }
                     }
                     adj_item_url = addParameter(adj_item_url, config_prefix_param + 'seq', seq);
-                    if (isDefined(response.id) && (response.id !== ""))
+                    if (isDefined(response.id) &amp;&amp; (response.id !== ""))
                         adj_item_url = addParameter(adj_item_url, config_prefix_param + 'tid', response.id); //add target id
 
                     var str_thumbs = "";
-                    str_thumbs += "<a href='" + adj_item_url + "' target='_self' title='" + response.name + "'" + ">";
-                    str_thumbs += "<img src='" + response.img_url + "'/>";
-                    str_thumbs += "</a>";
+                    str_thumbs += "&lt;a href='" + adj_item_url + "' target='_self' title='" + response.name + "'" + ">";
+                    str_thumbs += "&lt;img src='" + response.img_url + "'/>";
+                    str_thumbs += "&lt;/a>";
                     div_thumb.innerHTML = str_thumbs;
 
                     var str_desc = "";
-                    str_desc += "<a href='" + adj_item_url + "' target='_self' title='" + response.name + "'" + ">";
-                    str_desc += "<span class='name'>" + response.name + "</span>";
-                    str_desc += "</a>";
+                    str_desc += "&lt;a href='" + adj_item_url + "' target='_self' title='" + response.name + "'" + ">";
+                    str_desc += "&lt;span class='name'>" + response.name + "&lt;/span>";
+                    str_desc += "&lt;/a>";
                     div_description.innerHTML = str_desc;
 
                     var str_price = "";
-                    str_price += "<span class='priceCurrency'>" + price_currency + "</span>";
-                    str_price += "<span class='price'>" + response.price + "</span>";
+                    str_price += "&lt;span class='priceCurrency'>" + price_currency + "&lt;/span>";
+                    str_price += "&lt;span class='price'>" + response.price + "&lt;/span>";
                     div_price.innerHTML = str_price;
 
                     div_item_wrapper.appendChild(div_thumb);
@@ -816,7 +844,7 @@ if (typeof Predictry !== 'object') {
                 var div = document.createElement("div");
                 div.className = config_cls_prefix + "header";
 
-                var str = "<h3>" + text + "</h3>";
+                var str = "&lt;h3>" + text + "&lt;/h3>";
                 div.innerHTML = str;
 
                 return div;
@@ -831,7 +859,7 @@ if (typeof Predictry !== 'object') {
             function createFooterDiv(text) {
                 var div = document.createElement("div");
                 div.className = config_cls_prefix + "footer";
-                var str = "<a href='http://www.predictry.com' target='_blank'><span class='powered'>" + text + "</span></a>";
+                var str = "&lt;a href='http://www.predictry.com' target='_blank'>&lt;span class='powered'>" + text + "&lt;/span>&lt;/a>";
                 div.innerHTML = str;
 
                 return div;
@@ -981,7 +1009,7 @@ if (typeof Predictry !== 'object') {
             function setItemIntoCartSession(item_id) {
                 var cartSession = eval("(" + getCookie(getCookieName("cart")) + ")");
                 var cartItemIDs = cartSession.c; //array
-                if (isDefined(cartItemIDs) && (item_id !== undefined && !inArray(item_id, cartItemIDs))) {
+                if (isDefined(cartItemIDs) &amp;&amp; (item_id !== undefined &amp;&amp; !inArray(item_id, cartItemIDs))) {
                     cartSession.c.push(item_id);
                 }
                 var value = JSON.stringify(cartSession);
@@ -1036,7 +1064,7 @@ if (typeof Predictry !== 'object') {
                 if (session === undefined)
                     session = setSessionCookieId();
 
-                if (isDefined(cartSession) && isObject(cartSession) && isDefined(cartSession.cart_id) && cartSession.cart_id !== -1) {
+                if (isDefined(cartSession) &amp;&amp; isObject(cartSession) &amp;&amp; isDefined(cartSession.cart_id) &amp;&amp; cartSession.cart_id !== -1) {
                     return cartSession.cart_id;
                 }
                 return cart_id;
@@ -1084,7 +1112,7 @@ if (typeof Predictry !== 'object') {
                 var http = new XMLHttpRequest();
                 http.open('get', url, true);
                 http.onreadystatechange = function () {
-                    if (http.readyState == 4 && http.status == 200) {
+                    if (http.readyState == 4 &amp;&amp; http.status == 200) {
                         if (isDefined(callback)) {
                             if (isFunction(callback))
                                 callback(http.responseText);
@@ -1101,7 +1129,7 @@ if (typeof Predictry !== 'object') {
                         var myArr = JSON.parse(http.responseText);
                         return myArr;
                     }
-                    else if (http.readyState == 4 && http.status == 403) {
+                    else if (http.readyState == 4 &amp;&amp; http.status == 403) {
                         if (isDefined(callback)) {
                             if (isFunction(callback))
                                 callback(false);
@@ -1155,7 +1183,7 @@ if (typeof Predictry !== 'object') {
 
                                     if (isDefined(response)) {
                                         var obj = JSON.parse(response);
-                                        if (typeof obj === 'object' && isDefined(obj.items)) {
+                                        if (typeof obj === 'object' &amp;&amp; isDefined(obj.items)) {
                                             var item_ids = obj.items;
                                             var new_item_ids = [];
 
@@ -1163,7 +1191,7 @@ if (typeof Predictry !== 'object') {
 
                                                 //no input source for A/B testing in the moment, so just grab random(limit)
                                                 if (item_ids.length > data.limit) {
-                                                    for (var i = 0; i < data.limit; i++) {
+                                                    for (var i = 0; i &lt; data.limit; i++) {
                                                         var item_id = 0;
                                                         if (item_ids.length > data.limit) {
                                                             item_id = item_ids[Math.floor(Math.random() * item_ids.length)]; //random id
@@ -1216,7 +1244,7 @@ if (typeof Predictry !== 'object') {
 
                 getItemDetail(data.item_id, function (responseText) {
                     var response = JSON.parse(responseText);
-                    if (isObject(response) && isDefined(response.category) && (response.category !== "")) {
+                    if (isObject(response) &amp;&amp; isDefined(response.category) &amp;&amp; (response.category !== "")) {
                         var s3_data_tenant_category_items_path = config_s3_data_category_items_path.replace("{tenant}", tenant_id);
                         isUrlExists(config_s3_resource_url + s3_data_tenant_category_items_path + response.category + config_default_s3_resource_ext, function (is_exists) {
                             if (is_exists) {
@@ -1303,7 +1331,7 @@ if (typeof Predictry !== 'object') {
                         algo: (getParameter(uri, config_prefix_param + "algo") !== "") ? (getParameter(uri, config_prefix_param + "algo")) : '' //Algo
                     };
 
-                    if ((tracking_params.id !== -1) && (tracking_params.tid !== -1) && (tracking_params.algo !== "")) {
+                    if ((tracking_params.id !== -1) &amp;&amp; (tracking_params.tid !== -1) &amp;&amp; (tracking_params.algo !== "")) {
                         trackDeleteItem(tracking_params.tid);
                     }
                 }
@@ -1381,7 +1409,7 @@ if (typeof Predictry !== 'object') {
              * @returns {void}
              */
             function sendImage(data, callback) {
-                if (isDefined(data) && isObject(data) && isDefined(data.action) && isDefined(data.action.name)) {
+                if (isDefined(data) &amp;&amp; isObject(data) &amp;&amp; isDefined(data.action) &amp;&amp; isDefined(data.action.name)) {
                     var queries = mapJSONToUriParams(data);
                     getImage(data.action.name, queries, callback);
                 }
@@ -1411,15 +1439,15 @@ if (typeof Predictry !== 'object') {
             function prepareRecoRequestData(reco_data) {
                 var widget_id, item_id, user_id;
 
-                if (isDefined(reco_data) && isDefined(reco_data.widget_id))
+                if (isDefined(reco_data) &amp;&amp; isDefined(reco_data.widget_id))
                     widget_id = reco_data.widget_id;
 
-                if (isDefined(reco_data) && isDefined(reco_data.item_id) && reco_data.item_id !== "")
+                if (isDefined(reco_data) &amp;&amp; isDefined(reco_data.item_id) &amp;&amp; reco_data.item_id !== "")
                     item_id = reco_data.item_id;
                 else
                     item_id = 0;
 
-                if (isDefined(reco_data) && isDefined(reco_data.user_id) && reco_data.user_id !== "")
+                if (isDefined(reco_data) &amp;&amp; isDefined(reco_data.user_id) &amp;&amp; reco_data.user_id !== "")
                     user_id = reco_data.user_id;
                 else
                     user_id = 0;
@@ -1444,13 +1472,13 @@ if (typeof Predictry !== 'object') {
 
                 if (isDefined(data.action.name))
                 {
-                    if (data.action.name === "view" && data.items.length === 1) {
+                    if (data.action.name === "view" &amp;&amp; data.items.length === 1) {
                         //check if the viewed item is from reco or not
-                        if (isDefined(tracking_params.algo) && (tracking_params.algo !== "") && isDefined(data.action)) {
+                        if (isDefined(tracking_params.algo) &amp;&amp; (tracking_params.algo !== "") &amp;&amp; isDefined(data.action)) {
                             data.action.rec = true;
                             data.action.ori = tracking_params;
                         }
-                        else if (isDefined(tracking_params.algo) && (tracking_params.algo !== "") && !isDefined(data.action))
+                        else if (isDefined(tracking_params.algo) &amp;&amp; (tracking_params.algo !== "") &amp;&amp; !isDefined(data.action))
                             data.action = {rec: true, ori: tracking_params};
 
                         trackView(data);
@@ -1461,11 +1489,11 @@ if (typeof Predictry !== 'object') {
                     }
                     else if (data.action.name === "add_to_cart") {
                         //check if the viewed item is from reco or not
-                        if (isDefined(tracking_params.algo) && (tracking_params.algo !== "") && isDefined(data.action)) {
+                        if (isDefined(tracking_params.algo) &amp;&amp; (tracking_params.algo !== "") &amp;&amp; isDefined(data.action)) {
                             data.action.rec = true;
                             data.action.ori = tracking_params;
                         }
-                        else if (isDefined(tracking_params.algo) && (tracking_params.algo !== "") && !isDefined(data.action))
+                        else if (isDefined(tracking_params.algo) &amp;&amp; (tracking_params.algo !== "") &amp;&amp; !isDefined(data.action))
                             data.action = {rec: true, ori: tracking_params};
 
                         trackAddToCart(data);
@@ -1473,7 +1501,7 @@ if (typeof Predictry !== 'object') {
                     else if (data.action.name === "started_checkout" || data.action.name === "started_payment") {
                         trackBulk(data);
                     }
-                    else if (data.action.name === "buy" && data.items.length >= 1) {
+                    else if (data.action.name === "buy" &amp;&amp; data.items.length >= 1) {
                         trackBuy(data);
                         deleteCookies();
                     }
@@ -1490,14 +1518,14 @@ if (typeof Predictry !== 'object') {
              */
             function setItemIntoViewSession(item_id) {
                 var viewSession = eval("(" + getCookie(getCookieName("view")) + ")");
-                if (isDefined(viewSession) && isObject(viewSession))
+                if (isDefined(viewSession) &amp;&amp; isObject(viewSession))
                     var viewItemIDs = viewSession.v;
                 else {
                     setViewSessionCookie();
                     viewSession = eval("(" + getCookie(getCookieName("view")) + ")");
                 }
 
-                if (isDefined(viewItemIDs) && (item_id !== undefined && !inArray(item_id, viewItemIDs))) {
+                if (isDefined(viewItemIDs) &amp;&amp; (item_id !== undefined &amp;&amp; !inArray(item_id, viewItemIDs))) {
                     viewSession.v.push(item_id);
                 }
                 var value = JSON.stringify(viewSession);
@@ -1545,7 +1573,7 @@ if (typeof Predictry !== 'object') {
             function addItemIntoRecentlyViewedSession(data) {
                 var recentlyViewedItems = eval("("+ getCookie(getCookieName("recentlyViewedItems")) +")");
 
-                if (isDefined(recentlyViewedItems) && isObject(recentlyViewedItems))
+                if (isDefined(recentlyViewedItems) &amp;&amp; isObject(recentlyViewedItems))
                 {
                     var items = recentlyViewedItems;
                     // get the current items in stored
@@ -1588,7 +1616,7 @@ if (typeof Predictry !== 'object') {
              */
             function addRecentlyViewedItemId(id) {
                 var recentlyIds  = eval("("+ getCookie(getCookieName("recentlyViewedItemIds")) +")");
-                if (isDefined(recentlyIds) && isObject(recentlyIds)) {
+                if (isDefined(recentlyIds) &amp;&amp; isObject(recentlyIds)) {
                     var recentlyViewedIds = recentlyIds.v;
                     if (!inArray(id, recentlyViewedIds))
                     {
@@ -1619,7 +1647,7 @@ if (typeof Predictry !== 'object') {
              */
             function checkItemId(id) {
                 var recentlyIds = eval ("("+getCookie(getCookieName("recentlyViewedItemIds")) +")");
-                if (isDefined(recentlyIds) && isObject(recentlyIds))
+                if (isDefined(recentlyIds) &amp;&amp; isObject(recentlyIds))
                 {
                     var itemIds = recentlyIds.v;
 
@@ -1650,7 +1678,7 @@ if (typeof Predictry !== 'object') {
                     var ul_obj = document.createElement("ul");
                     ul_obj.className = "pryRecent pry-content";
 
-                    if ( (recentlyViewedItems.length > 0) && (!inArray(id, recentlyViewedItems)) )
+                    if ( (recentlyViewedItems.length > 0) &amp;&amp; (!inArray(id, recentlyViewedItems)) )
                         predictryRecent.appendChild(r_head);
 
                     predictryRecent.appendChild(ul_obj);
@@ -1712,7 +1740,7 @@ if (typeof Predictry !== 'object') {
              */
             function trackView(data) {
                 //if data.action.rec is true store it into cookie
-                if (isDefined(data.action) && isDefined(data.action.rec))
+                if (isDefined(data.action) &amp;&amp; isDefined(data.action.rec))
                     setItemIntoViewSession(data.items[0].item_id);
 
                 // display recently viewed items
@@ -1740,10 +1768,10 @@ if (typeof Predictry !== 'object') {
              *                  recently viewed items
              * @return {object} recentlyItemsCallback
              */
-            function recentlyItemsCallback(callback) {
+            function recentlyItemsCallback() {
                 var recentlyViewedItems = eval("(" + getCookie(getCookieName("recentlyViewedItems")) + ")");
                 // return this object
-                callback(recentlyViewedItems);
+                return recentlyViewedItems;
             }
 
             /**
@@ -1763,16 +1791,16 @@ if (typeof Predictry !== 'object') {
                 var viewSession = eval("(" + getCookie(getCookieName("view")) + ")");
                 var viewItemIDs = viewSession.v;
 
-                for (var i = 0; i < data.items.length; i++)
+                for (var i = 0; i &lt; data.items.length; i++)
                 {
                     for (var key in data.items[i])
                     {
                         var item_id = data.items[i][key];
-                        if (key === "item_id" && isDefined(cartItemIDs) && (cartItemIDs.length > 0)) {
+                        if (key === "item_id" &amp;&amp; isDefined(cartItemIDs) &amp;&amp; (cartItemIDs.length > 0)) {
                             if (inArray(item_id, cartItemIDs))
                                 data.items[i].rec = true;
                         }
-                        else if (key === "item_id" && isDefined(viewItemIDs) && (viewItemIDs.length > 0)) {
+                        else if (key === "item_id" &amp;&amp; isDefined(viewItemIDs) &amp;&amp; (viewItemIDs.length > 0)) {
                             if (inArray(item_id, viewItemIDs))
                                 data.items[i].rec = true;
                         }
@@ -1783,7 +1811,7 @@ if (typeof Predictry !== 'object') {
             }
 
             function trackAddToCart(data) {
-                if (isDefined(data.action) && isDefined(data.action.rec))
+                if (isDefined(data.action) &amp;&amp; isDefined(data.action.rec))
                     setItemIntoCartSession(data.items[0].item_id);
 
                 sendImage(data);
@@ -1796,12 +1824,12 @@ if (typeof Predictry !== 'object') {
                 var cartSession = eval("(" + getCookie(getCookieName("cart")) + ")");
                 var cartItemIDs = cartSession.c;
 
-                for (var i = 0; i < data.items.length; i++)
+                for (var i = 0; i &lt; data.items.length; i++)
                 {
                     for (var key in data.items[i])
                     {
                         var item_id = data.items[i][key];
-                        if (key === "item_id" && isDefined(cartItemIDs) && (cartItemIDs.length > 0) && inArray(item_id, cartItemIDs))
+                        if (key === "item_id" &amp;&amp; isDefined(cartItemIDs) &amp;&amp; (cartItemIDs.length > 0) &amp;&amp; inArray(item_id, cartItemIDs))
                             data.items[i].rec = true;
                     }
                 }
@@ -1924,7 +1952,7 @@ if (typeof Predictry !== 'object') {
                             var data = {item_id: ds.predictryItemId, user_id: ds.predictryUserId, widget_id: ds.predictryWidgetId};
                             if (ds.predictryCallback === undefined) {
                                 _predictry.push(['getRecommendedItems', data, function (response) {
-                                        if (response !== undefined && i === 0) {
+                                        if (response !== undefined &amp;&amp; i === 0) {
                                             var obj = JSON.parse(response);
                                             if (typeof obj === 'object') {
                                                 widgets.push({widget_id: ds.predictryWidgetId, response: obj.data.items});
@@ -1947,6 +1975,7 @@ if (typeof Predictry !== 'object') {
                 getWidget: function () {
                     if (!is_lookup_widget) {
                         predictry_nodes = document.querySelectorAll(".predictry");
+
                         [].forEach.call(predictry_nodes, function (elem) {
                             var i = 0, ds = elem.dataset;
                             var params = {
@@ -1964,13 +1993,13 @@ if (typeof Predictry !== 'object') {
 
                             if (ds.predictryCallback === undefined) {
                                 _predictry.push(['getPreComputedRecommendedItems', params, function (responseText) {
-                                        if (responseText !== undefined && i === 0) {
+                                        if (responseText !== undefined &amp;&amp; i === 0) {
                                             var obj = JSON.parse(responseText);
-                                            if (isObject(obj) && isDefined(obj.items)) {
+                                            if (isObject(obj) &amp;&amp; isDefined(obj.items)) {
                                                 if (obj.items.length === 0) {
                                                     _predictry.push(['getPreComputedCategoryBasedRecommendedItems', params, function (responseText2) {
                                                             var obj_category_items = JSON.parse(responseText2);
-                                                            if (isObject(obj_category_items) && isDefined(obj_category_items.items)) {
+                                                            if (isObject(obj_category_items) &amp;&amp; isDefined(obj_category_items.items)) {
                                                                 widgets.push({widget_id: ds.predictryWidgetId, response: obj_category_items});
                                                                 _predictry.push(['drawAsyncThumb', elem, obj_category_items.items, params, 'cat']);
                                                             }
@@ -1985,7 +2014,7 @@ if (typeof Predictry !== 'object') {
                                             else {
                                                 _predictry.push(['getPreComputedCategoryBasedRecommendedItems', params, function (responseText2) {
                                                         var obj_category_items = JSON.parse(responseText2);
-                                                        if (isObject(obj_category_items) && isDefined(obj_category_items.items)) {
+                                                        if (isObject(obj_category_items) &amp;&amp; isDefined(obj_category_items.items)) {
                                                             widgets.push({widget_id: ds.predictryWidgetId, response: obj_category_items});
                                                             _predictry.push(['drawAsyncThumb', elem, obj_category_items.items, params, 'cat']);
                                                         }
@@ -2010,10 +2039,10 @@ if (typeof Predictry !== 'object') {
                 removeItem: function (id) {
                     if (isDefined(id)){
                         data = {
-                            action: {
-                                name: "delete_item"
-                            },
-                            items: [id]
+                            action: {name: 'delete_item'},
+                            items: [
+                                {item_id: id}
+                            ]
                         };
                         track(data);
                     } else {
@@ -2021,7 +2050,7 @@ if (typeof Predictry !== 'object') {
                     }
                 },
                 updateItem: function (data) {
-                    if (isDefined(data) && isObject(data)) {
+                    if (isDefined(data) &amp;&amp; isObject(data)) {
                         if (isDefined(data.item)) {
                             config_request_content_type = "application/json; charset=utf-8";
                             config_request_method = "PUT";
@@ -2031,7 +2060,7 @@ if (typeof Predictry !== 'object') {
                     return;
                 },
                 addItem: function (data) {
-                    if (isDefined(data) && isObject(data)) {
+                    if (isDefined(data) &amp;&amp; isObject(data)) {
                         if (isDefined(data.item)) {
                             config_request_content_type = "application/json; charset=utf-8";
                             return sendRequest(config_api_url + config_api_resources[2], data, true, null, true);
@@ -2048,9 +2077,7 @@ if (typeof Predictry !== 'object') {
                 is_lookup_widget: is_lookup_widget,
                 predictry_nodes: predictry_nodes,
                 widgets: widgets,
-                recentlyViewed: function (callback) {
-                    recentlyItemsCallback(callback);
-                },
+                recentlyViewed: recentlyItemsCallback,
                 getConfig: getConfig
             };
         }
@@ -2068,7 +2095,7 @@ if (typeof Predictry !== 'object') {
         _predictry.push(['setSessionUserID']);
         _predictry.push(['setSessionCart']);
         _predictry.push(['setSessionView']);
-        _predictry.push(['recentlyViewed',  recoCallback]);
+        _predictry.push(['getConfig']);
         _predictry.push(['getPredictryParams', document.location.search]);
 
         async_executor = new Executor(window_alias.PE_tenantId, window_alias.PE_apiKey);
@@ -2076,7 +2103,7 @@ if (typeof Predictry !== 'object') {
         var execute_first = {setTenantId: 1, setApiKey: 1, setSessionID: 1, setSessionBrowserID: 1, setSessionUserID: 1, setSessionCart: 1, setSessionView: 1, getPredictryParams: 1};
         var method_name;
 
-        for (iterator = 0; iterator < _predictry.length; iterator++) {
+        for (iterator = 0; iterator &lt; _predictry.length; iterator++) {
             method_name = _predictry[iterator][0];
 
             if (execute_first[method_name]) {
@@ -2084,7 +2111,7 @@ if (typeof Predictry !== 'object') {
                 delete _predictry[iterator];
 
                 if (execute_first[method_name] > 1) {
-                    if (console !== undefined && console && console.error) {
+                    if (console !== undefined &amp;&amp; console &amp;&amp; console.error) {
                         console.error('The method ' + method_name + ' is registered more than once in "_predictry" variable. Only the last call has an effect.');
                     }
                 }
@@ -2093,7 +2120,7 @@ if (typeof Predictry !== 'object') {
         }
 
         // apply the queue of actions
-        for (iterator = 0; iterator < _predictry.length; iterator++) {
+        for (iterator = 0; iterator &lt; _predictry.length; iterator++) {
             if (_predictry[iterator]) {
                 apply(_predictry[iterator]);
             }
@@ -2114,7 +2141,7 @@ if (typeof Predictry !== 'object') {
             }
         };
 
-        if (typeof define === 'function' && define.amd) {
+        if (typeof define === 'function' &amp;&amp; define.amd) {
             define('predictry', [], function () {
                 return Predictry;
             });
@@ -2128,3 +2155,26 @@ if (typeof Predictry !== 'object') {
 if (typeof predict !== 'object') {
     predict = Predictry.getAsyncExecutor();
 }
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Mon Aug 17 2015 16:09:41 GMT+0800 (MYT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
