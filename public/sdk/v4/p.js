@@ -1454,6 +1454,10 @@ if (typeof Predictry !== 'object') {
 
                         trackView(data);
                     }
+                    else if (data.action.name == "delete_item") {
+                        // send to delete_item.gif
+                        sendImage(data);
+                    }
                     else if (data.action.name === "add_to_cart") {
                         //check if the viewed item is from reco or not
                         if (isDefined(tracking_params.algo) && (tracking_params.algo !== "") && isDefined(data.action)) {
@@ -1499,6 +1503,17 @@ if (typeof Predictry !== 'object') {
                 setCookie(getCookieName("view"), value, config_tracking_session_cookie_timeout, config_cookie_path);
             }
 
+            /** lengthInUtf8Bytes
+             * @description mesure the byte of a given string
+             * @param str
+             * @returns {*}
+             */
+            function lengthInUtf8Bytes(str) {
+                // Matches only the 10.. bytes that are non-initial characters in a multi-byte sequence.
+                // returns the byte length of an utf8 string
+                var m = encodeURIComponent(str).match(/%[89ABab]/g);
+                return str.length + (m ? m.length : 0);
+            }
 
             /**
              * setRecentlyViewedSessionCookie
@@ -1528,12 +1543,13 @@ if (typeof Predictry !== 'object') {
              */
             function addItemIntoRecentlyViewedSession(data) {
                 var recentlyViewedItems = eval("("+ getCookie(getCookieName("recentlyViewedItems")) +")");
+
                 if (isDefined(recentlyViewedItems) && isObject(recentlyViewedItems))
                 {
                     var items = recentlyViewedItems;
                     // get the current items in stored
                     // and push the new items
-                    items.push(data);
+                    items.push(data)
 
                     // make it stringify to reset cookie with
                     // new value
@@ -1573,18 +1589,11 @@ if (typeof Predictry !== 'object') {
                 var recentlyIds  = eval("("+ getCookie(getCookieName("recentlyViewedItemIds")) +")");
                 if (isDefined(recentlyIds) && isObject(recentlyIds)) {
                     var recentlyViewedIds = recentlyIds.v;
-                    console.log("Current Item id array" + recentlyViewedIds);
                     if (!inArray(id, recentlyViewedIds))
                     {
-                        if (recentlyViewedIds.length > 6) {
-                            // remove the first array element of that shit
-                            var shiftted = recentlyViewedIds.shift();
-                            recentlyViewedIds.push(id);
-                        } else {
-                            // ok can't find id
-                            // so push it to the array
-                            recentlyViewedIds.push(id);
-                        }
+                        // ok can't find id
+                        // so push it to the array
+                        recentlyViewedIds.push(id);
 
                         // make that array into a string
                         var value = JSON.stringify(recentlyIds);
@@ -1690,8 +1699,6 @@ if (typeof Predictry !== 'object') {
 
                             desc_a.appendChild(desc_head);
 
-                            console.log(i);
-
                         }
                         i++;
                     });
@@ -1734,7 +1741,7 @@ if (typeof Predictry !== 'object') {
              */
             function recentlyItemsCallback() {
                 var recentlyViewedItems = eval("(" + getCookie(getCookieName("recentlyViewedItems")) + ")");
-                console.log(recentlyViewedItems);
+                // return this object
                 return recentlyViewedItems;
             }
 
@@ -1990,7 +1997,7 @@ if (typeof Predictry !== 'object') {
                 drawAsyncList: drawAsyncTextListRecommendation,
                 drawAsyncThumb: drawAsyncThumbListRecommendation,
                 removeItem: function (id) {
-                    if (isDefined(id)) {
+                    if (isDefined(id)){
                         data = {
                             action: {name: 'delete_item'},
                             items: [
