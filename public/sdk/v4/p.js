@@ -122,7 +122,6 @@ if (typeof Predictry !== 'object') {
             var i, f, parameter_array;
             for (i = 0; i < arguments.length; i += 1) {
                 parameter_array = arguments[i];
-                console.log(parameter_array);
                 f = parameter_array.shift();
                 if (isString(f)) {
                     try {
@@ -1085,7 +1084,6 @@ if (typeof Predictry !== 'object') {
                 var http = new XMLHttpRequest();
                 http.open('get', url, true);
                 http.onreadystatechange = function () {
-//                    console.log(http.readyState + "|" + http.status + " > " + url + " = " + http.responseText);
                     if (http.readyState == 4 && http.status == 200) {
                         if (isDefined(callback)) {
                             if (isFunction(callback))
@@ -1541,7 +1539,6 @@ if (typeof Predictry !== 'object') {
                     // new value
                     var value = JSON.stringify(items);
                     setCookie(getCookieName("recentlyViewedItems"), value, config_tracking_session_cookie_timeout, config_cookie_path);
-                    console.log(items);
                 }
                 else {
                     // create cookie for recently viewed items with
@@ -1579,21 +1576,23 @@ if (typeof Predictry !== 'object') {
                     console.log("Current Item id array" + recentlyViewedIds);
                     if (!inArray(id, recentlyViewedIds))
                     {
-                        console.log("Oh there is no " + id + " inside current array " + recentlyViewedIds);
-                        // ok can't find id
-                        // so push it to the array
-                        recentlyViewedIds.push(id);
+                        if (recentlyViewedIds.length > 6) {
+                            // remove the first array element of that shit
+                            var shiftted = recentlyViewedIds.shift();
+                            recentlyViewedIds.push(id);
+                        } else {
+                            // ok can't find id
+                            // so push it to the array
+                            recentlyViewedIds.push(id);
+                        }
 
                         // make that array into a string
                         var value = JSON.stringify(recentlyIds);
                         setCookie(getCookieName("recentlyViewedItemIds"), value, config_tracking_session_cookie_timeout, config_cookie_path);
-                    } else {
-                        console.log("Item id " + id + " is already here");
                     }
                 }
                 else
                 {
-
                     // create cookie for recently viewed item ids
                     // and check if the id was already there or not
                     setRecentlyViewedItemIdCookie(id);
@@ -1631,50 +1630,72 @@ if (typeof Predictry !== 'object') {
              *                  from stored cookies and show it
              */
             function showRecentlyViewedItems(id) {
-                var recentlyViewedItems = eval("("+ getCookie(getCookieName("recentlyViewedItems")) +")");
-                predictryRecent = document.querySelectorAll(".predictryRecent")[0];
+                var recentlyViewedItems = eval("(" + getCookie(getCookieName("recentlyViewedItems")) + ")");
+                if (predictryRecent = document.querySelectorAll(".predictryRecent")[0]) {
+                    var predictryRecent = document.querySelectorAll(".predictryRecent")[0];
+                    var r_head = document.createElement("h2");
+                    r_head.className = "title";
+                    r_head.innerHTML = "Recently Viewed Items";
 
-                var r_head      = document.createElement("h2");
-                r_head.className= "title";
-                r_head.innerHTML= "Recently Viewed Items";
+                    var ul_obj = document.createElement("ul");
+                    ul_obj.className = "pryRecent pry-content";
 
-                var ul_obj      = document.createElement("ul");
-                ul_obj.className    = "pryRecent pry-content";
+                    if ( (recentlyViewedItems.length > 0) && (!inArray(id, recentlyViewedItems)) )
+                        predictryRecent.appendChild(r_head);
 
-                predictryRecent.appendChild(r_head);
+                    predictryRecent.appendChild(ul_obj);
+                    var i = 0;
+                    [].forEach.call(recentlyViewedItems, function(item) {
+                        console.log(item.item_id);
+                        if (item.item_id != id) {
+                            var p = document.createElement("p");
+                            var li_obj = document.createElement("li");
+                            li_obj.className = "pry-column pry-recIdx-" + (i + 1) + " pry-odd";
 
-                predictryRecent.appendChild(ul_obj);
-                var i = 0;
-                [].forEach.call(recentlyViewedItems, function(item) {
-                    console.log(item.item_id);
-                    if (item.item_id != id) {
-                        var p = document.createElement("p");
-                        var li_obj = document.createElement("li");
-                        li_obj.className = "pry-column pry-recIdx-" + (i + 1) + " pry-odd";
-                        var div_obj = document.createElement("div");
-                        div_obj.className = "pry-item-wrapper";
-                        var thumb_obj = document.createElement("div");
-                        thumb_obj.className = "pry-thumb";
-                        var thumb_a = document.createElement("a");
-                        thumb_a.href = item.item_url;
-                        var thumb_img = document.createElement("img");
-                        thumb_img.src = item.img_url;
+                            var div_obj = document.createElement("div");
+                            div_obj.className = "pry-item-wrapper";
 
+                            var thumb_obj = document.createElement("div");
+                            thumb_obj.className = "pry-thumb";
 
-                        ul_obj.appendChild(li_obj);
+                            var thumb_a = document.createElement("a");
+                            thumb_a.href = item.item_url;
 
-                        li_obj.appendChild(div_obj);
+                            var thumb_img = document.createElement("img");
+                            thumb_img.src = item.img_url;
 
-                        div_obj.appendChild(thumb_obj);
+                            var desc_obj = document.createElement("div");
+                            desc_obj.className = "pry-desc";
 
-                        thumb_obj.appendChild(thumb_a);
+                            var desc_a = document.createElement("a");
+                            desc_a.href = item.item_url;
 
-                        thumb_a.appendChild(thumb_img);
-                        console.log(i);
+                            var desc_head = document.createElement("span");
+                            desc_head.className = "name";
+                            desc_head.innerHTML= item.name;
 
-                    }
-                    i++;
-                });
+                            ul_obj.appendChild(li_obj);
+
+                            li_obj.appendChild(div_obj);
+
+                            div_obj.appendChild(thumb_obj);
+
+                            thumb_obj.appendChild(thumb_a);
+
+                            thumb_a.appendChild(thumb_img);
+
+                            div_obj.appendChild(desc_obj);
+
+                            desc_obj.appendChild(desc_a);
+
+                            desc_a.appendChild(desc_head);
+
+                            console.log(i);
+
+                        }
+                        i++;
+                    });
+                }
             }
 
             /**
@@ -1694,15 +1715,11 @@ if (typeof Predictry !== 'object') {
                 // only if the items is not there inside
                 // itemIds array
                 if (!checkItemId(data.items[0].item_id)) {
-                    console.log("Ok id is not here");
                     addItemIntoRecentlyViewedSession(data.items[0]);
 
                     // also create another cookie to keep track unique items
                     // by their IDs
-                    console.log("Adding item_id into item_id array");
                     addRecentlyViewedItemId(data.items[0].item_id);
-                } else {
-                    console.log("Item Details for " + data.items[0].item_id + " is already here");
                 }
 
                 // fireup the payload then
@@ -1710,6 +1727,22 @@ if (typeof Predictry !== 'object') {
                 sendImage(data);
             }
 
+            /** recentlyItemsCallback
+             * @description give out an arry of
+             *                  recently viewed items
+             * @return {object} recentlyItemsCallback
+             */
+            function recentlyItemsCallback() {
+                var recentlyViewedItems = eval("(" + getCookie(getCookieName("recentlyViewedItems")) + ")");
+                console.log(recentlyViewedItems);
+                return recentlyViewedItems;
+            }
+
+            /**
+             * trackBuy(data)
+             * @description track buy action dom
+             * @param data
+             */
             function trackBuy(data) {
                 if (!isDefined(data) || !isObject(data))
                     return;
@@ -1996,7 +2029,8 @@ if (typeof Predictry !== 'object') {
                 widget_instance_id: widget_instance_id,
                 is_lookup_widget: is_lookup_widget,
                 predictry_nodes: predictry_nodes,
-                widgets: widgets
+                widgets: widgets,
+                recentlyViewed: recentlyItemsCallback
             };
         }
 
