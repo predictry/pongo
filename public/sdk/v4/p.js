@@ -527,6 +527,7 @@ if (typeof Predictry !== 'object') {
                     config_default_actions = ["view", "add_to_cart", "buy", "started_checkout", "started_payment", "check_delete_item", "delete_item", "custom"],
                     config_session_cookie_timeout = 63072000000, // 2 years
                     config_tracking_session_cookie_timeout = 1200000, //20 minutes
+                    config_recently_session_cookie_timeout = 2592000000, // 30 days
                     config_do_not_track = false,
                     config_s3_data_recommendation_path = "data/tenants/{tenant}/recommendations/",
                     config_s3_data_items_path = "data/tenants/{tenant}/items/",
@@ -1532,7 +1533,7 @@ if (typeof Predictry !== 'object') {
 
                 // stringify and set it inside cookie value
                 var value = JSON.stringify(new_array);
-                setCookie(getCookieName("recentlyViewedItems"), value, config_tracking_session_cookie_timeout, config_cookie_path);
+                setCookie(getCookieName("recentlyViewedItems"), value, config_recently_session_cookie_timeout, config_cookie_path);
                 return item_object;
             }
 
@@ -1553,7 +1554,7 @@ if (typeof Predictry !== 'object') {
                     // make it stringify to reset cookie with
                     // new value
                     var value = JSON.stringify(items);
-                    setCookie(getCookieName("recentlyViewedItems"), value, config_tracking_session_cookie_timeout, config_cookie_path);
+                    setCookie(getCookieName("recentlyViewedItems"), value, config_recently_session_cookie_timeout, config_cookie_path);
                 }
                 else {
                     // create cookie for recently viewed items with
@@ -1574,7 +1575,7 @@ if (typeof Predictry !== 'object') {
 
                 // write something to explain the below
                 var value = JSON.stringify(id);
-                setCookie(getCookieName("recentlyViewedItemIds"), value, config_tracking_session_cookie_timeout, config_cookie_path);
+                setCookie(getCookieName("recentlyViewedItemIds"), value, config_recently_session_cookie_timeout, config_cookie_path);
                 return id;
             }
 
@@ -1596,7 +1597,7 @@ if (typeof Predictry !== 'object') {
 
                         // make that array into a string
                         var value = JSON.stringify(recentlyIds);
-                        setCookie(getCookieName("recentlyViewedItemIds"), value, config_tracking_session_cookie_timeout, config_cookie_path);
+                        setCookie(getCookieName("recentlyViewedItemIds"), value, config_recently_session_cookie_timeout, config_cookie_path);
                     }
                 }
                 else
