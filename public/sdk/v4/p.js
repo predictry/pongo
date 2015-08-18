@@ -1656,7 +1656,6 @@ if (typeof Predictry !== 'object') {
                     predictryRecent.appendChild(ul_obj);
                     var i = 0;
                     [].forEach.call(recentlyViewedItems, function(item) {
-                        console.log(item.item_id);
                         if (item.item_id != id) {
                             var p = document.createElement("p");
                             var li_obj = document.createElement("li");
@@ -1819,11 +1818,6 @@ if (typeof Predictry !== 'object') {
                 };
 
                 track(data);
-            }
-
-            // getRecentItems
-            function getRecentItems() {
-                console.log("I am getting recent items.");
             }
 
             /** getDynamicConfig
@@ -2003,7 +1997,6 @@ if (typeof Predictry !== 'object') {
                     }
                 },
                 track: track,
-                getRecentItems: getRecentItems,
                 drawList: drawTextListRecommendation,
                 drawAsyncList: drawAsyncTextListRecommendation,
                 drawAsyncThumb: drawAsyncThumbListRecommendation,
@@ -2013,7 +2006,7 @@ if (typeof Predictry !== 'object') {
                             action: {
                                 name: "delete_item"
                             },
-                            items: [id]
+                            items: id
                         };
                         track(data);
                     } else {
@@ -2068,7 +2061,6 @@ if (typeof Predictry !== 'object') {
         _predictry.push(['setSessionUserID']);
         _predictry.push(['setSessionCart']);
         _predictry.push(['setSessionView']);
-        _predictry.push(['recentlyViewed',  recoCallback]);
         _predictry.push(['getPredictryParams', document.location.search]);
 
         async_executor = new Executor(window_alias.PE_tenantId, window_alias.PE_apiKey);
