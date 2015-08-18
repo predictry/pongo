@@ -534,7 +534,9 @@ if (typeof Predictry !== 'object') {
                     config_s3_data_category_items_path = "data/tenants/{tenant}/categories/",
                     config_default_s3_resource_ext = ".json",
                     config_cls_prefix = "pry-",
-                    config_prefix_param = "p_";
+                    config_prefix_param = "p_",
+                    config_fisher_endpoint = "http://119.81.208.244:8090/fisher/items"
+                ;
 
             var recent_response;
             var recent_xhr = null;
@@ -1432,7 +1434,28 @@ if (typeof Predictry !== 'object') {
 
             }
 
-            function track(data) {
+            function sendDeleteToFisher(data) {
+                var idString ="";
+                for ( var i = 0; i < data.items.length; i++) {
+                    idString += data.items[i];
+                    if (i !== data.items.length - 1) {
+                        idString += ",";
+                    }
+                }
+
+                var payLoad = config_fisher_endpoint + "/" + data.tenant_id + "/" + idString;
+
+                var http = new XMLHttpRequest();
+                http.open('DELETE', payLoad, true);
+                http.onreadystatechange = function() {
+                    if(http.readyState == 4 && http.status == 200) {
+                        console.log(http.responseText);
+                    }
+                };
+                http.send();
+            }
+
+            function track(data, realtime) {
                 if (!isDefined(data) || !isObject(data))
                     return;
 
@@ -1456,7 +1479,12 @@ if (typeof Predictry !== 'object') {
                     }
                     else if (data.action.name == "delete_item") {
                         // send to delete_item.gif
-                        sendImage(data);
+                        if (isDefined(realtime)) {
+                            sendDeleteToFisher(data);
+                        } else {
+                            sendImage(data);
+                        }
+
                     }
                     else if (data.action.name === "add_to_cart") {
                         //check if the viewed item is from reco or not
@@ -1999,15 +2027,28 @@ if (typeof Predictry !== 'object') {
                 drawList: drawTextListRecommendation,
                 drawAsyncList: drawAsyncTextListRecommendation,
                 drawAsyncThumb: drawAsyncThumbListRecommendation,
-                removeItem: function (id) {
+                removeItem: function (id, realtime) {
                     if (isDefined(id)){
-                        data = {
-                            action: {
-                                name: "delete_item"
-                            },
-                            items: id
-                        };
-                        track(data);
+                        if (realtime) {
+                            data = {
+                                action: {
+                                    name: "delete_item",
+                                    realtime: true
+                                },
+                                items: id
+                            };
+                        }
+                        else {
+                            console.log("here");
+                                data = {
+                                    action: {
+                                        name: "delete_item"
+                                    },
+
+                                    items: id
+                                };
+                        }
+                        track(data, realtime);
                     } else {
                         return;
                     }
