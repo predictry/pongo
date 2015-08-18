@@ -1016,9 +1016,9 @@ if (typeof Predictry !== 'object') {
             }
 
             /**
-             * Get Session Cart
-             * 
-             * @returns {object|Number|_L14.Executor.setCartSessionCookie.c_obj}
+             * getSessionCart 
+             * @description get the current cart items
+             *              from cookies
              */
             function getSessionCart() {
                 var val = getCookie(getCookieName("cart"));
@@ -1055,12 +1055,10 @@ if (typeof Predictry !== 'object') {
                         generateSessionID(4) + generateSessionID(4) + generateSessionID(4);
             }
 
-
             /**
              * Call the callback
              * 
              */
-
             function callCallback(callback, p){
                 if (isDefined(callback)) {
                     if (isFunction(callback))
