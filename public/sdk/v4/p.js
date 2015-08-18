@@ -1481,10 +1481,8 @@ if (typeof Predictry !== 'object') {
                         // send to delete_item.gif
                         if (isDefined(realtime)) {
                             sendDeleteToFisher(data);
-                        } else {
-                            sendImage(data);
                         }
-
+                        sendImage(data);
                     }
                     else if (data.action.name === "add_to_cart") {
                         //check if the viewed item is from reco or not
