@@ -1682,8 +1682,8 @@ if (typeof Predictry !== 'object') {
              */
             function showRecentlyViewedItems(id) {
                 var recentlyViewedItems = eval("(" + getCookie(getCookieName("recentlyViewedItems")) + ")");
-                if (predictryRecent = document.querySelectorAll(".predictryRecent")[0]) {
-                    var predictryRecent = document.querySelectorAll(".predictryRecent")[0];
+                if (predictryRecent = document.querySelectorAll(".predictry-recent")[0]) {
+                    var predictryRecent = document.querySelectorAll(".predictry-recent")[0];
                     var r_head = document.createElement("h2");
                     r_head.className = "title";
                     r_head.innerHTML = "Recently Viewed Items";
