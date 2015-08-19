@@ -354,16 +354,25 @@ if (typeof Predictry !== 'object') {
             return urlParts[0] + newQueryString + urlhash;
         }
 
-        /*
-         * guidj@bitbucket
+        /**
+         * decodeUriParam()
+         * @param value
+         * @returns {{key: string, value: string}}
          */
-
         function decodeUriParam(value) {
             var values = value.split("=");
 
             return {"key": decodeURIComponent(values[0]), "value": decodeURIComponent(values[1])};
         }
 
+        /**
+         * mapJSONToUriParams
+         * @param data
+         * @param encode
+         * @param prefix
+         * @param call
+         * @returns {string}
+         */
         function mapJSONToUriParams(data, encode, prefix, call) {
 
             prefix = typeof prefix !== 'undefined' ? prefix : "";
@@ -407,6 +416,13 @@ if (typeof Predictry !== 'object') {
             return map.join("&");
         }
 
+        /**
+         * mapObjectKey
+         * @param key
+         * @param value
+         * @param object
+         * @returns {*}
+         */
         function mapObjectKey(key, value, object) {
 
             var indexOfObjectSep = key.indexOf(":");
@@ -453,6 +469,13 @@ if (typeof Predictry !== 'object') {
             }
         }
 
+        /**
+         *
+         * @param data
+         * @param object
+         * @param call
+         * @returns {*}
+         */
         function mapUriParamsToJSON(data, object, call) {
 
             call = typeof call !== 'undefined' ? call : 0;
@@ -535,7 +558,9 @@ if (typeof Predictry !== 'object') {
                     config_default_s3_resource_ext = ".json",
                     config_cls_prefix = "pry-",
                     config_prefix_param = "p_",
-                    config_fisher_endpoint = "http://119.81.208.244:8090/fisher/items"
+                    config_fisher_endpoint = "http://119.81.208.244:8090/fisher/items",
+                    config_widget_type = [ "similar", "oivt", "oipt", "duo"],
+                    config_typed_titles = { similar: "Similar Items", oivt: "Viewed also viewed", oipt: "Bought also bought", duo: "Both" }
                 ;
 
             var recent_response;
@@ -562,8 +587,9 @@ if (typeof Predictry !== 'object') {
                 head.appendChild(s);
             }
 
-            /*
-             * Does browser have cookies enabled (for this site)?
+            /**
+             *
+             * @returns {*}
              */
             function hasCookies() {
                 if (config_cookie_disabled) {
@@ -734,7 +760,9 @@ if (typeof Predictry !== 'object') {
                             }
 
                             elem.appendChild(predictryList);
-                            elem.appendChild(createFooterDiv("by Predictry"));
+                            if (!params_tmp.typed) {
+                                elem.appendChild(createFooterDiv("by Predictry"));
+                            }
                         }
                     }
 
@@ -1529,18 +1557,6 @@ if (typeof Predictry !== 'object') {
                 setCookie(getCookieName("view"), value, config_tracking_session_cookie_timeout, config_cookie_path);
             }
 
-            /** lengthInUtf8Bytes
-             * @description mesure the byte of a given string
-             * @param str
-             * @returns {*}
-             */
-            function lengthInUtf8Bytes(str) {
-                // Matches only the 10.. bytes that are non-initial characters in a multi-byte sequence.
-                // returns the byte length of an utf8 string
-                var m = encodeURIComponent(str).match(/%[89ABab]/g);
-                return str.length + (m ? m.length : 0);
-            }
-
             /**
              * setRecentlyViewedSessionCookie
              * @description set the recently viewed item cookies
@@ -1857,6 +1873,70 @@ if (typeof Predictry !== 'object') {
             }
 
             /**
+             * checkPredictryType(typename)
+             * @param typename
+             * @returns {boolean}
+             */
+            function checkPredictryType(typename) {
+                var dom = document.querySelectorAll(".predictry-" + typename)[0];
+                return dom ? true : false;
+            }
+
+            function getItems(item_id, typename, callback) {
+                var s3_data_tenant_recommendation_path = config_s3_data_recommendation_path.replace("{tenant}", tenant_id);
+                var end_point = config_s3_resource_url + s3_data_tenant_recommendation_path + typename + "/" + item_id + ".json";
+
+                var http = new XMLHttpRequest();
+                var item_ids = [];
+
+                http.open("GET", end_point, true);
+                http.onreadystatechange=function()
+                {
+                    if (http.readyState==4 && http.status==200)
+                    {
+                        item_ids = JSON.parse(http.responseText).items;
+                        console.log(item_ids);
+                        callback(item_ids);
+                    }
+                }
+                http.send();
+                return item_ids;
+            }
+
+            function loadItems(ele, item_ids, params){
+                drawAsyncThumbListRecommendation(ele, item_ids, params);
+            }
+
+            function showTypedItems(typename) {
+                var ele = document.querySelectorAll(".predictry-" + typename)[0];
+                var item_id = ele.attributes['data-predictry-item-id'].value;
+                var params = {
+                    limit: ele.attributes['data-predictry-limit'].value,
+                    typed: typename,
+                    title: config_typed_titles[typename]
+                };
+
+                var load = function (items) {
+                    console.log("loaded");
+                    loadItems(ele, items, params, typename);
+                }
+                getItems(item_id, typename, load);
+            }
+
+            /**
+             * checkWidget
+             * @description check the widget tpyes are on dom
+             *                  and if it is, show them
+             */
+            function checkWidget() {
+                [].forEach.call(config_widget_type , function(typename) {
+                    if (checkPredictryType(typename)) {
+                        showTypedItems(typename);
+                    }
+                });
+            }
+
+            /**
              * Public data methods
              */
 
@@ -2082,7 +2162,8 @@ if (typeof Predictry !== 'object') {
                 recentlyViewed: function (callback) {
                     recentlyItemsCallback(callback);
                 },
-                getConfig: getConfig
+                getConfig: getConfig,
+                checkWidget: checkWidget
             };
         }
 
@@ -2099,6 +2180,7 @@ if (typeof Predictry !== 'object') {
         _predictry.push(['setSessionUserID']);
         _predictry.push(['setSessionCart']);
         _predictry.push(['setSessionView']);
+        _predictry.push(['checkWidget']);
         _predictry.push(['getPredictryParams', document.location.search]);
 
         async_executor = new Executor(window_alias.PE_tenantId, window_alias.PE_apiKey);
