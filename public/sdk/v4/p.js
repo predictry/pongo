@@ -512,7 +512,8 @@ if (typeof Predictry !== 'object') {
         function Executor(tenant_id, api_key) {
             var
                     tenant_id = tenant_id,
-                    api_key = api_key;
+                    api_key = api_key,
+                    baseURL;
 
             var
                     response = {},
@@ -524,10 +525,8 @@ if (typeof Predictry !== 'object') {
                     temp_cart_id = -1,
                     tracking_params = null;
 
-
             var
                     predictry_nodes = {},
-                    predictryRecent = {},
                     widgets = [],
                     is_lookup_widget = false;
 
@@ -737,6 +736,9 @@ if (typeof Predictry !== 'object') {
                                 getJSON(url, function (responseText) {
                                     if (isDefined(responseText)) {
                                         var response = JSON.parse(responseText);
+                                        if (baseURL) {
+                                            response.img_url = baseURL+ response.img_url;
+                                        }
                                         if (isObject(response)) {
                                             var node = createThumbRecoNode(response, draw_reco_seq, params, params_tmp.currency);
                                             predictryList.appendChild(node);
@@ -2163,7 +2165,10 @@ if (typeof Predictry !== 'object') {
                     recentlyItemsCallback(callback);
                 },
                 getConfig: getConfig,
-                checkWidget: checkWidget
+                checkWidget: checkWidget,
+                setBaseURL: function(url) {
+                    baseURL = url;
+                }
             };
         }
 
