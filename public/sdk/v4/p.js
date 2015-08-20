@@ -1594,18 +1594,31 @@ if (typeof Predictry !== 'object') {
                 var getItems = eval(localStorage.getItem("recentlyViewedItems"));
                 if (getItems == null)
                 {
-                    console.log("setting local storage");
                     setRecentlyViewedSessionCookie(data);
                 }
                 else {
                     var items = getItems;
                     items.push(data);
-                    console.log(items);
                     var value = JSON.stringify(items);
                     localStorage.setItem("recentlyViewedItems", value);
                 }
             }
 
+
+
+            function removeItemDetails(id) {
+                var recentlyItems = eval(localStorage.getItem("recentlyViewedItems"));
+                var temp_items = [];
+                [].forEach.call(recentlyItems, function(item) {
+                    if ((item.item_id) !== id) {
+                        temp_items.push(item);
+                    }
+                });
+                var value = JSON.stringify(temp_items);
+                localStorage.setItem("recentlyViewedItems", value);
+
+
+            }
             /**
              * setRecentlyViewedItemIdCookie
              * @description set the recently viewed item id cookies
@@ -1667,7 +1680,6 @@ if (typeof Predictry !== 'object') {
                     var itemIds = recentlyIds.v;
 
                     if (inArray(id, itemIds)) {
-
                         return true;
                     } else {
                         return false;
@@ -1686,71 +1698,73 @@ if (typeof Predictry !== 'object') {
              *                  from stored cookies and show it
              */
             function showRecentlyViewedItems(id) {
-                var recentlyViewedItems = eval(localStorage.getItem("recentlyViewedItems"));
-                console.log(recentlyViewedItems);
-                if (predictryRecent = document.querySelectorAll(".predictry-recent")[0]) {
-                    var predictryRecent = document.querySelectorAll(".predictry-recent")[0];
-                    var r_head = document.createElement("h2");
-                    r_head.className = "title";
-                    r_head.innerHTML = "Recently Viewed Items";
+                if (eval(localStorage.getItem("recentlyViewedItems"))) {
+                    var recentlyViewedItems = eval(localStorage.getItem("recentlyViewedItems"));
+                    if (predictryRecent = document.querySelectorAll(".predictry-recent")[0]) {
+                        var predictryRecent = document.querySelectorAll(".predictry-recent")[0];
+                        var r_head = document.createElement("h2");
+                        r_head.className = "title";
+                        r_head.innerHTML = "Recently Viewed Items";
 
-                    var ul_obj = document.createElement("ul");
-                    ul_obj.className = "pryRecent pry-content";
+                        var ul_obj = document.createElement("ul");
+                        ul_obj.className = "pryRecent pry-content";
 
-                    if ( (recentlyViewedItems.length > 0) && (!inArray(id, recentlyViewedItems)) )
-                        predictryRecent.appendChild(r_head);
+                        if ( (recentlyViewedItems.length > 0) && (!inArray(id, recentlyViewedItems)) )
+                            predictryRecent.appendChild(r_head);
 
-                    predictryRecent.appendChild(ul_obj);
-                    var i = 0;
-                    [].forEach.call(recentlyViewedItems, function(item) {
-                        if (item.item_id != id) {
-                            var p = document.createElement("p");
-                            var li_obj = document.createElement("li");
-                            li_obj.className = "pry-column pry-recIdx-" + (i + 1) + " pry-odd";
+                        predictryRecent.appendChild(ul_obj);
+                        var i = 0;
+                        [].forEach.call(recentlyViewedItems, function(item) {
+                            if (item.item_id != id) {
+                                var p = document.createElement("p");
+                                var li_obj = document.createElement("li");
+                                li_obj.className = "pry-column pry-recIdx-" + (i + 1) + " pry-odd";
 
-                            var div_obj = document.createElement("div");
-                            div_obj.className = "pry-item-wrapper";
+                                var div_obj = document.createElement("div");
+                                div_obj.className = "pry-item-wrapper";
 
-                            var thumb_obj = document.createElement("div");
-                            thumb_obj.className = "pry-thumb";
+                                var thumb_obj = document.createElement("div");
+                                thumb_obj.className = "pry-thumb";
 
-                            var thumb_a = document.createElement("a");
-                            thumb_a.href = item.item_url;
+                                var thumb_a = document.createElement("a");
+                                thumb_a.href = item.item_url;
 
-                            var thumb_img = document.createElement("img");
-                            thumb_img.src = item.img_url;
+                                var thumb_img = document.createElement("img");
+                                thumb_img.src = item.img_url;
 
-                            var desc_obj = document.createElement("div");
-                            desc_obj.className = "pry-desc";
+                                var desc_obj = document.createElement("div");
+                                desc_obj.className = "pry-desc";
 
-                            var desc_a = document.createElement("a");
-                            desc_a.href = item.item_url;
+                                var desc_a = document.createElement("a");
+                                desc_a.href = item.item_url;
 
-                            var desc_head = document.createElement("span");
-                            desc_head.className = "name";
-                            desc_head.innerHTML= item.name;
+                                var desc_head = document.createElement("span");
+                                desc_head.className = "name";
+                                desc_head.innerHTML= item.name;
 
-                            ul_obj.appendChild(li_obj);
+                                ul_obj.appendChild(li_obj);
 
-                            li_obj.appendChild(div_obj);
+                                li_obj.appendChild(div_obj);
 
-                            div_obj.appendChild(thumb_obj);
+                                div_obj.appendChild(thumb_obj);
 
-                            thumb_obj.appendChild(thumb_a);
+                                thumb_obj.appendChild(thumb_a);
 
-                            thumb_a.appendChild(thumb_img);
+                                thumb_a.appendChild(thumb_img);
 
-                            div_obj.appendChild(desc_obj);
+                                div_obj.appendChild(desc_obj);
 
-                            desc_obj.appendChild(desc_a);
+                                desc_obj.appendChild(desc_a);
 
-                            desc_a.appendChild(desc_head);
+                                desc_a.appendChild(desc_head);
 
-                        }
-                        i++;
-                    });
+                            }
+                            i++;
+                        });
+                    }
                 }
             }
+
 
             /**
              * Track (data)
@@ -1771,10 +1785,15 @@ if (typeof Predictry !== 'object') {
                 if (!checkItemId(data.items[0].item_id)) {
                     addItemIntoRecentlyViewedSession(data.items[0]);
 
-
                     // also create another cookie to keep track unique items
                     // by their IDs
                     addRecentlyViewedItemId(data.items[0].item_id);
+                } else {
+                    // remove the old details
+                    removeItemDetails(data.items[0].item_id);
+
+                    // add new details
+                    addItemIntoRecentlyViewedSession(data.items[0]);
                 }
 
                 // fireup the payload then
