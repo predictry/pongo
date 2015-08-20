@@ -1909,23 +1909,40 @@ if (typeof Predictry !== 'object') {
             }
 
             function getItems(item_id, typename, callback) {
-                var s3_data_tenant_recommendation_path = config_s3_data_recommendation_path.replace("{tenant}", tenant_id);
-                var end_point = config_s3_resource_url + s3_data_tenant_recommendation_path + typename + "/" + item_id + ".json";
+                if (typename == 'similar') {
 
-                var http = new XMLHttpRequest();
-                var item_ids = [];
+                    var end_point = config_fisher_endpoint + "/" + tenant_id + "/related/" + item_id ;
 
-                http.open("GET", end_point, true);
-                http.onreadystatechange=function()
-                {
-                    if (http.readyState==4 && http.status==200)
-                    {
-                        item_ids = JSON.parse(http.responseText).items;
-                        callback(item_ids);
+                    var http = new XMLHttpRequest();
+                    var item_ids = [];
+
+                    http.open("GET", end_point, true);
+                    http.onreadystatechange = function () {
+                        if (http.readyState == 4 && http.status == 200) {
+                            item_ids = JSON.parse(http.responseText).items;
+                            callback(item_ids);
+                        }
                     }
+                    http.send();
+                    return item_ids;
+                } else {
+
+                    var s3_data_tenant_recommendation_path = config_s3_data_recommendation_path.replace("{tenant}", tenant_id);
+                    var end_point = config_s3_resource_url + s3_data_tenant_recommendation_path + typename + "/" + item_id + ".json";
+
+                    var http = new XMLHttpRequest();
+                    var item_ids = [];
+
+                    http.open("GET", end_point, true);
+                    http.onreadystatechange = function () {
+                        if (http.readyState == 4 && http.status == 200) {
+                            item_ids = JSON.parse(http.responseText).items;
+                            callback(item_ids);
+                        }
+                    }
+                    http.send();
+                    return item_ids;
                 }
-                http.send();
-                return item_ids;
             }
 
             function loadItems(ele, item_ids, params){
