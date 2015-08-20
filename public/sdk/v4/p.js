@@ -737,8 +737,14 @@ if (typeof Predictry !== 'object') {
                                     if (isDefined(responseText)) {
                                         var response = JSON.parse(responseText);
                                         if (baseURL) {
-                                            response.img_url = baseURL+ response.img_url;
+                                            if (response.img_url.slice(0,4) !== "http") {
+                                               response.img_url = baseURL+ response.img_url;
+                                            }
+                                            if (response.item_url.slice(0,4) !== "http") {
+                                               response.item_url= baseURL+ response.item_url;
+                                            }
                                         }
+
                                         if (isObject(response)) {
                                             var node = createThumbRecoNode(response, draw_reco_seq, params, params_tmp.currency);
                                             predictryList.appendChild(node);
