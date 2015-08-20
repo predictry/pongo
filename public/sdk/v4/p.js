@@ -1577,8 +1577,7 @@ if (typeof Predictry !== 'object') {
 
                 // stringify and set it inside cookie value
                 var value = JSON.stringify(new_array);
-                setCookie(getCookieName("recentlyViewedItems"), value, config_recently_session_cookie_timeout, config_cookie_path);
-                return item_object;
+                localStorage.setItem("recentlyViewedItems", value);
             }
 
             /**
@@ -1586,24 +1585,18 @@ if (typeof Predictry !== 'object') {
              * @params (object) data
              */
             function addItemIntoRecentlyViewedSession(data) {
-                var recentlyViewedItems = eval("("+ getCookie(getCookieName("recentlyViewedItems")) +")");
-
-                if (isDefined(recentlyViewedItems) && isObject(recentlyViewedItems))
+                var getItems = eval(localStorage.getItem("recentlyViewedItems"));
+                if (getItems == null)
                 {
-                    var items = recentlyViewedItems;
-                    // get the current items in stored
-                    // and push the new items
-                    items.push(data)
-
-                    // make it stringify to reset cookie with
-                    // new value
-                    var value = JSON.stringify(items);
-                    setCookie(getCookieName("recentlyViewedItems"), value, config_recently_session_cookie_timeout, config_cookie_path);
+                    console.log("setting local storage");
+                    setRecentlyViewedSessionCookie(data);
                 }
                 else {
-                    // create cookie for recently viewed items with
-                    // newly viewed item objects
-                    setRecentlyViewedSessionCookie(data);
+                    var items = getItems;
+                    items.push(data);
+                    console.log(items);
+                    var value = JSON.stringify(items);
+                    localStorage.setItem("recentlyViewedItems", value);
                 }
             }
 
@@ -1653,6 +1646,7 @@ if (typeof Predictry !== 'object') {
 
             }
 
+
             /**
              * checkItemId(id)
              * @description check if the item_id is
@@ -1666,9 +1660,12 @@ if (typeof Predictry !== 'object') {
                 {
                     var itemIds = recentlyIds.v;
 
-                    // return true if the id is
-                    // already inside the array
-                    return inArray(id, itemIds) ?  true : false;
+                    if (inArray(id, itemIds)) {
+
+                        return true;
+                    } else {
+                        return false;
+                    }
                 }
                 else {
                     setRecentlyViewedItemIdCookie(id);
@@ -1683,7 +1680,8 @@ if (typeof Predictry !== 'object') {
              *                  from stored cookies and show it
              */
             function showRecentlyViewedItems(id) {
-                var recentlyViewedItems = eval("(" + getCookie(getCookieName("recentlyViewedItems")) + ")");
+                var recentlyViewedItems = eval(localStorage.getItem("recentlyViewedItems"));
+                console.log(recentlyViewedItems);
                 if (predictryRecent = document.querySelectorAll(".predictry-recent")[0]) {
                     var predictryRecent = document.querySelectorAll(".predictry-recent")[0];
                     var r_head = document.createElement("h2");
@@ -1766,6 +1764,7 @@ if (typeof Predictry !== 'object') {
                 // itemIds array
                 if (!checkItemId(data.items[0].item_id)) {
                     addItemIntoRecentlyViewedSession(data.items[0]);
+
 
                     // also create another cookie to keep track unique items
                     // by their IDs
@@ -1897,7 +1896,6 @@ if (typeof Predictry !== 'object') {
                     if (http.readyState==4 && http.status==200)
                     {
                         item_ids = JSON.parse(http.responseText).items;
-                        console.log(item_ids);
                         callback(item_ids);
                     }
                 }
@@ -1919,7 +1917,6 @@ if (typeof Predictry !== 'object') {
                 };
 
                 var load = function (items) {
-                    console.log("loaded");
                     loadItems(ele, items, params, typename);
                 }
                 getItems(item_id, typename, load);
