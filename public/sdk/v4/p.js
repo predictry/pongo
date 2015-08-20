@@ -1604,8 +1604,10 @@ if (typeof Predictry !== 'object') {
                 }
             }
 
-
-
+            /**
+             *
+             * @param id
+             */
             function removeItemDetails(id) {
                 var recentlyItems = eval(localStorage.getItem("recentlyViewedItems"));
                 var temp_items = [];
@@ -1619,6 +1621,7 @@ if (typeof Predictry !== 'object') {
 
 
             }
+
             /**
              * setRecentlyViewedItemIdCookie
              * @description set the recently viewed item id cookies
@@ -1665,7 +1668,6 @@ if (typeof Predictry !== 'object') {
 
             }
 
-
             /**
              * checkItemId(id)
              * @description check if the item_id is
@@ -1690,7 +1692,6 @@ if (typeof Predictry !== 'object') {
                     return false;
                 }
             }
-
 
             /**
              *  showRecentlyViewedItems
@@ -1765,7 +1766,6 @@ if (typeof Predictry !== 'object') {
                 }
             }
 
-
             /**
              * Track (data)
              * @param data
@@ -1807,7 +1807,7 @@ if (typeof Predictry !== 'object') {
              * @return {object} recentlyItemsCallback
              */
             function recentlyItemsCallback(callback) {
-                var recentlyViewedItems = eval("(" + getCookie(getCookieName("recentlyViewedItems")) + ")");
+                var recentlyViewedItems = eval(localStorage.getItem("recentlyViewedItems"));
                 // return this object
                 callback(recentlyViewedItems);
             }
