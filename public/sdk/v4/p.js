@@ -1806,10 +1806,20 @@ if (typeof Predictry !== 'object') {
              *                  recently viewed items
              * @return {object} recentlyItemsCallback
              */
-            function recentlyItemsCallback(callback) {
+            function recentlyItemsCallback(callback, max) {
                 var recentlyViewedItems = eval(localStorage.getItem("recentlyViewedItems"));
-                // return this object
-                callback(recentlyViewedItems);
+                if (max) {
+                    var limitedItems = [];
+                    for (var i = 0; i < max; i++) {
+                        if (recentlyViewedItems[i]) {
+                            limitedItems.push(recentlyViewedItems[i]);
+                        }
+                    }
+                    callback(limitedItems);
+                } else {
+                    // return this object
+                    callback(recentlyViewedItems);
+                }
             }
 
             /**
@@ -2200,8 +2210,8 @@ if (typeof Predictry !== 'object') {
                 is_lookup_widget: is_lookup_widget,
                 predictry_nodes: predictry_nodes,
                 widgets: widgets,
-                recentlyViewed: function (callback) {
-                    recentlyItemsCallback(callback);
+                recentlyViewed: function (callback, max) {
+                    recentlyItemsCallback(callback, max);
                 },
                 getConfig: getConfig,
                 checkWidget: checkWidget,
