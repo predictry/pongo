@@ -15,9 +15,9 @@ describe('Array', function() {
 
 describe('ViewData', function() {
   jsdom();
-  describe('#trac[data]', function() {
+  describe('#track[data]', function() {
     if('should return this when the value is this', function() {
-
+            assert.equal(true, [1,2,3])
     });
   });
 });

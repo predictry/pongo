@@ -225,6 +225,20 @@ if (typeof Predictry !== 'object') {
         }
 
         /**
+         *
+         * @param arr
+         * @param item
+         */
+        function removeEle(arr, item) {
+            for(var i = arr.length; i--;) {
+                if(arr[i] === item) {
+                    arr.splice(i, 1);
+                }
+            }
+            return arr;
+        }
+
+        /**
          * Extend object
          * 
          * @param {type} options
@@ -559,6 +573,7 @@ if (typeof Predictry !== 'object') {
                     config_prefix_param = "p_",
                     config_fisher_endpoint = "http://119.81.208.244:8090/fisher/items",
                     config_widget_type = [ "similar", "oivt", "oipt", "duo"],
+                    config_recent_limit = 20,
                     config_typed_titles = { similar: "Similar Items", oivt: "Viewed also viewed", oipt: "Bought also bought", duo: "Both" }
                 ;
 
@@ -1470,6 +1485,10 @@ if (typeof Predictry !== 'object') {
 
             }
 
+            /**
+             *
+             * @param data
+             */
             function sendDeleteToFisher(data) {
                 var idString ="";
                 for ( var i = 0; i < data.items.length; i++) {
@@ -1491,6 +1510,11 @@ if (typeof Predictry !== 'object') {
                 http.send();
             }
 
+            /**
+             *
+             * @param data
+             * @param realtime
+             */
             function track(data, realtime) {
                 if (!isDefined(data) || !isObject(data))
                     return;
@@ -1783,6 +1807,18 @@ if (typeof Predictry !== 'object') {
                 // only if the items is not there inside
                 // itemIds array
                 if (!checkItemId(data.items[0].item_id)) {
+                    var recentlyItems = eval(localStorage.getItem("recentlyViewedItems"));
+                    var recentlyIds   = eval ("("+getCookie(getCookieName("recentlyViewedItemIds")) +")");
+                    if ( recentlyItems !== null ) {
+                        if(recentlyItems.length == config_recent_limit ) {
+                            var id = recentlyItems[0].item_id;
+                            recentlyItems.shift();
+                            localStorage.setItem(recentlyItems);
+                            var updatedRecentIds = removeEle(recentlyIds, id);
+                            var value = JSON.stringify(updatedRecentIds);
+                            setCookie(getCookieName("recentlyViewedItemIds"), value, config_recently_session_cookie_timeout, config_cookie_path);
+                        }
+                    }
                     addItemIntoRecentlyViewedSession(data.items[0]);
 
                     // also create another cookie to keep track unique items
@@ -1858,6 +1894,10 @@ if (typeof Predictry !== 'object') {
                 sendImage(data);
             }
 
+            /**
+             *
+             * @param data
+             */
             function trackAddToCart(data) {
                 if (isDefined(data.action) && isDefined(data.action.rec))
                     setItemIntoCartSession(data.items[0].item_id);
@@ -1865,6 +1905,10 @@ if (typeof Predictry !== 'object') {
                 sendImage(data);
             }
 
+            /**
+             *
+             * @param data
+             */
             function trackBulk(data) {
                 if (!isDefined(data) || !isObject(data))
                     return;
@@ -1885,6 +1929,10 @@ if (typeof Predictry !== 'object') {
                 sendImage(data);
             }
 
+            /**
+             *
+             * @param item_id
+             */
             function trackDeleteItem(item_id) {
 
                 var data = {
@@ -1918,6 +1966,13 @@ if (typeof Predictry !== 'object') {
                 return dom ? true : false;
             }
 
+            /**
+             *
+             * @param item_id
+             * @param typename
+             * @param callback
+             * @returns {Array}
+             */
             function getItems(item_id, typename, callback) {
                 if (typename == 'similar') {
 
@@ -1955,10 +2010,20 @@ if (typeof Predictry !== 'object') {
                 }
             }
 
+            /**
+             *
+             * @param ele
+             * @param item_ids
+             * @param params
+             */
             function loadItems(ele, item_ids, params){
                 drawAsyncThumbListRecommendation(ele, item_ids, params);
             }
 
+            /**
+             *
+             * @param typename
+             */
             function showTypedItems(typename) {
                 var ele = document.querySelectorAll(".predictry-" + typename)[0];
                 var item_id = ele.attributes['data-predictry-item-id'].value;
@@ -1986,10 +2051,6 @@ if (typeof Predictry !== 'object') {
                     }
                 });
             }
-
-            /**
-             * Public data methods
-             */
 
             return {
                 setTenantId: function (id) {
@@ -2168,7 +2229,6 @@ if (typeof Predictry !== 'object') {
                             };
                         }
                         else {
-                            console.log("here");
                                 data = {
                                     action: {
                                         name: "delete_item"
