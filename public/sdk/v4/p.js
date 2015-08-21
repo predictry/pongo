@@ -2219,6 +2219,13 @@ if (typeof Predictry !== 'object') {
                 drawAsyncThumb: drawAsyncThumbListRecommendation,
                 removeItem: function (id, realtime) {
                     if (isDefined(id)){
+                        if ( typeof(id) == "string") {
+                            var temp_array = [];
+                            temp_array.push(id);
+                            id = temp_array;
+                        }
+
+                        console.log(id);
                         if (realtime) {
                             data = {
                                 action: {
