@@ -1859,6 +1859,35 @@ if (typeof Predictry !== 'object') {
             }
 
             /**
+             *
+             * @param item_id
+             * @param typename
+             * @param callback
+             */
+            function viewedAlsoViewed(item_id, typename, callback) {
+                function items(data) {
+                    if (isDefined(data) && isObject(data)) {
+                        var items = [];
+                        [].forEach.call(data, function(item_id) {
+                            var s3_data_tenant_item_path = config_s3_data_items_path.replace("{tenant}", tenant_id);
+                            var url = config_s3_resource_url + s3_data_tenant_item_path + item_id + config_default_s3_resource_ext;
+                            getJSON(url, function(response) {
+
+                                if (isDefined(response)) {
+                                    var obj = JSON.parse(response);
+                                    items.push(obj);
+                                    if (items.length == data.length) {
+                                        callback(items);
+                                    }
+                                }
+                            })
+                        });
+                    }
+                }
+                getItems(item_id, typename , items);
+            }
+
+            /**
              * trackBuy(data)
              * @description track buy action dom
              * @param data
@@ -2018,6 +2047,7 @@ if (typeof Predictry !== 'object') {
             function loadItems(ele, item_ids, params){
                 drawAsyncThumbListRecommendation(ele, item_ids, params);
             }
+
 
             /**
              *
@@ -2223,8 +2253,6 @@ if (typeof Predictry !== 'object') {
                             temp_array.push(id);
                             id = temp_array;
                         }
-
-                        console.log(id);
                         if (realtime) {
                             data = {
                                 action: {
@@ -2278,6 +2306,9 @@ if (typeof Predictry !== 'object') {
                 widgets: widgets,
                 recentlyViewed: function (callback, max) {
                     recentlyItemsCallback(callback, max);
+                },
+                typedCallback: function (item_id, typename , callback) {
+                    viewedAlsoViewed(item_id, typename, callback);
                 },
                 getConfig: getConfig,
                 checkWidget: checkWidget,
