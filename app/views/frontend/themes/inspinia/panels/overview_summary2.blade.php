@@ -98,17 +98,17 @@
               </div><!-- end of row -->
 
               <div class="row">
-
+                <!--
                 <div class="well" style="margin: 40px 30px 0px 30px; vertical-align: baseline;">
                   <i style="font-size: 3em; margin-right: 30px; float: left; color: rgba(124,181,236,1);" class="fa fa-shopping-cart"></i> 
                   <h2 style="margin-top: 10px; font-size: 1.5em; text-align: left;">Your customers who interact with recommendations spend about <span class="label label-primary" style="font-size: 1em;">$112</span> more than users who don't</h2><br />
                 </div>        
 
-
+               
                 <div class="well" style="margin: 40px 30px 0px 30px; vertical-align: baseline;">
                   <i style="font-size: 3em; margin-right: 30px; float: left; color: red;" class="fa fa-heart-o"></i> 
                   <h2 style="margin-top: 10px; font-size: 1.5em; text-align: left;">Your customers who interact with recommendations buy about <span class="label label-primary" style="font-size: 1em;">2</span> more items than users who don't</h2><br />
-                </div>        
+                </div>      -->
               </div><!-- end of row -->
 
             </div>
@@ -499,7 +499,7 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT/day/OVERALL', fun
             data: value_array
         }, {
             name: 'Recommended Sales',
-            data: value_array
+            data: value_array_recommended
         }]
     });
 });
@@ -548,11 +548,11 @@ $('#saleChart').highcharts({
             colorByPoint: true,
             data: [{
                 name: "Total Sales Amount",
-                y: 9808131
+                y: {{ $overviews['total_sales_amount'] }} 
             },
             { 
                 name: "Total Sales Recommended",
-                y: 1138691
+                y: {{ $overviews['total_sales_recommended'] }}
             } 
             ]
         }]

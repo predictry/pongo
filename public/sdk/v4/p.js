@@ -1991,7 +1991,6 @@ if (typeof Predictry !== 'object') {
                     http.send();
                     return item_ids;
                 } else {
-
                     var s3_data_tenant_recommendation_path = config_s3_data_recommendation_path.replace("{tenant}", tenant_id);
                     var end_point = config_s3_resource_url + s3_data_tenant_recommendation_path + typename + "/" + item_id + ".json";
 
