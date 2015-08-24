@@ -168,7 +168,7 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/day/OVERALL', function(d
             var d   = data[i][j].date.getDate();
             var m   = data[i][j].date.getMonth(); 
             var sm  = monthNames[m];
-            var cs  = d + ' ,' + sm;
+            var cs  = d + ' ' + sm;
             data[i][j].date = cs;
           } 
     }   
@@ -342,7 +342,7 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT/day/OVERALL', fun
             var d   = data[i][j].date.getDate();
             var m   = data[i][j].date.getMonth(); 
             var sm  = monthNames[m];
-            var cs  = d + ' ,' + sm;
+            var cs  = d + ' ' + sm;
             data[i][j].date = cs;
           } 
     }   
