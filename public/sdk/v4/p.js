@@ -1864,7 +1864,7 @@ if (typeof Predictry !== 'object') {
              * @param typename
              * @param callback
              */
-            function viewedAlsoViewed(item_id, typename, callback) {
+            function typedUniversalCallback(item_id, typename, callback) {
                 function items(data) {
                     if (isDefined(data) && isObject(data)) {
                         var items = [];
@@ -1879,9 +1879,18 @@ if (typeof Predictry !== 'object') {
                                     if (items.length == data.length) {
                                         callback(items);
                                     }
+                                } else {
+                                    var err_obj = { error: "There is no item details on server for item_id: " + item_id + " yet." }
+                                    items.push(err_obj);
+                                    if (items.length == data.length) {
+                                        callback(items);
+                                    }
                                 }
                             })
                         });
+                    } else {
+                        var err_obj = { error: "There is no data for " + typename + " yet."};
+                        callback(err_obj)
                     }
                 }
                 getItems(item_id, typename , items);
@@ -2308,7 +2317,7 @@ if (typeof Predictry !== 'object') {
                     recentlyItemsCallback(callback, max);
                 },
                 typedCallback: function (item_id, typename , callback) {
-                    viewedAlsoViewed(item_id, typename, callback);
+                    typedUniversalCallback(item_id, typename, callback);
                 },
                 getConfig: getConfig,
                 checkWidget: checkWidget,
