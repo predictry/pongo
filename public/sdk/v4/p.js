@@ -2316,7 +2316,7 @@ if (typeof Predictry !== 'object') {
                 recentlyViewed: function (callback, max) {
                     recentlyItemsCallback(callback, max);
                 },
-                typedCallback: function (item_id, typename , callback) {
+                getRec: function (item_id, typename , callback) {
                     typedUniversalCallback(item_id, typename, callback);
                 },
                 getConfig: getConfig,
