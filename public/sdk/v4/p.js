@@ -1761,7 +1761,7 @@ if (typeof Predictry !== 'object') {
                 // only if the items is not there inside
                 // itemIds array
                 if (checkItemId(data.items[0].item_id)) {
-                    console.log("Item is already here");
+
                     removeItemDetails(data.items[0].item_id);
 
                     // add new details
@@ -1769,7 +1769,7 @@ if (typeof Predictry !== 'object') {
                     // also create another cookie to keep track unique items
                     // by their IDs
                 } else {
-                    console.log("Items is not here.");
+
                     var recentlyItems = eval(localStorage.getItem("recentlyViewedItems"));
                     if ( recentlyItems !== null ) {
                         if(recentlyItems.length == config_recent_limit) {
