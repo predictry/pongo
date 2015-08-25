@@ -1622,7 +1622,7 @@ if (typeof Predictry !== 'object') {
                 }
                 else {
                     var items = getItems;
-                    items.push(data);
+                    items.unshift(data);
                     var value = JSON.stringify(items);
                     localStorage.setItem("recentlyViewedItems", value);
                 }
@@ -1635,61 +1635,16 @@ if (typeof Predictry !== 'object') {
             function removeItemDetails(id) {
                 var recentlyItems = eval(localStorage.getItem("recentlyViewedItems"));
                 var temp_items = [];
-                [].forEach.call(recentlyItems, function(item) {
-                    if ((item.item_id) !== id) {
-                        temp_items.push(item);
-                    }
-                });
-                var value = JSON.stringify(temp_items);
-                localStorage.setItem("recentlyViewedItems", value);
 
-
-            }
-
-            /**
-             * setRecentlyViewedItemIdCookie
-             * @description set the recently viewed item id cookies
-             *               if there was none
-             * @param {object} id
-             */
-            function setRecentlyViewedItemIdCookie(id) {
-                if (!isDefined(id) || !isObject(id))
-                    var id = {v: []};
-
-                // write something to explain the below
-                var value = JSON.stringify(id);
-                setCookie(getCookieName("recentlyViewedItemIds"), value, config_recently_session_cookie_timeout, config_cookie_path);
-                return id;
-            }
-
-            /**
-             * addRecentlyViewedItemId
-             * @description to track the items id for
-             *                  checking the unique id
-             * @params (object) id
-             */
-            function addRecentlyViewedItemId(id) {
-                var recentlyIds  = eval("("+ getCookie(getCookieName("recentlyViewedItemIds")) +")");
-                if (isDefined(recentlyIds) && isObject(recentlyIds)) {
-                    var recentlyViewedIds = recentlyIds.v;
-                    if (!inArray(id, recentlyViewedIds))
-                    {
-                        // ok can't find id
-                        // so push it to the array
-                        recentlyViewedIds.push(id);
-
-                        // make that array into a string
-                        var value = JSON.stringify(recentlyIds);
-                        setCookie(getCookieName("recentlyViewedItemIds"), value, config_recently_session_cookie_timeout, config_cookie_path);
-                    }
+                if (recentlyItems !== null) {
+                    [].forEach.call(recentlyItems, function(item) {
+                        if ((item.item_id) !== id) {
+                            temp_items.push(item);
+                        }
+                    });
+                    var value = JSON.stringify(temp_items);
+                    localStorage.setItem("recentlyViewedItems", value);
                 }
-                else
-                {
-                    // create cookie for recently viewed item ids
-                    // and check if the id was already there or not
-                    setRecentlyViewedItemIdCookie(id);
-                }
-
             }
 
             /**
@@ -1700,21 +1655,19 @@ if (typeof Predictry !== 'object') {
              * @return (boolean)
              */
             function checkItemId(id) {
-                var recentlyIds = eval ("("+getCookie(getCookieName("recentlyViewedItemIds")) +")");
-                if (isDefined(recentlyIds) && isObject(recentlyIds))
+                var recentlyItems = eval(localStorage.getItem("recentlyViewedItems"));
+                var out = 0;
+                if (recentlyItems !== null)
                 {
-                    var itemIds = recentlyIds.v;
+                    [].forEach.call(recentlyItems, function(item)
+                    {
 
-                    if (inArray(id, itemIds)) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                        if(item.item_id == id) {
+                            out = 1;
+                        }
+                    });
                 }
-                else {
-                    setRecentlyViewedItemIdCookie(id);
-                    return false;
-                }
+                return out;
             }
 
             /**
@@ -1803,33 +1756,34 @@ if (typeof Predictry !== 'object') {
                 // before adding current item into cookie
                 showRecentlyViewedItems(data.items[0].item_id);
 
+
                 // add the whole item object into cookie
                 // only if the items is not there inside
                 // itemIds array
-                if (!checkItemId(data.items[0].item_id)) {
-                    var recentlyItems = eval(localStorage.getItem("recentlyViewedItems"));
-                    var recentlyIds   = eval ("("+getCookie(getCookieName("recentlyViewedItemIds")) +")");
-                    if ( recentlyItems !== null ) {
-                        if(recentlyItems.length == config_recent_limit ) {
-                            var id = recentlyItems[0].item_id;
-                            recentlyItems.shift();
-                            localStorage.setItem(recentlyItems);
-                            var updatedRecentIds = removeEle(recentlyIds, id);
-                            var value = JSON.stringify(updatedRecentIds);
-                            setCookie(getCookieName("recentlyViewedItemIds"), value, config_recently_session_cookie_timeout, config_cookie_path);
-                        }
-                    }
-                    addItemIntoRecentlyViewedSession(data.items[0]);
-
-                    // also create another cookie to keep track unique items
-                    // by their IDs
-                    addRecentlyViewedItemId(data.items[0].item_id);
-                } else {
-                    // remove the old details
+                if (checkItemId(data.items[0].item_id)) {
+                    console.log("Item is already here");
                     removeItemDetails(data.items[0].item_id);
 
                     // add new details
                     addItemIntoRecentlyViewedSession(data.items[0]);
+                    // also create another cookie to keep track unique items
+                    // by their IDs
+                } else {
+                    console.log("Items is not here.");
+                    var recentlyItems = eval(localStorage.getItem("recentlyViewedItems"));
+                    if ( recentlyItems !== null ) {
+                        if(recentlyItems.length == config_recent_limit) {
+                            recentlyItems.pop();
+                            recentlyItems.unshift(data.items[0]);
+                            var value = JSON.stringify(recentlyItems);
+                            localStorage.setItem("recentlyViewedItems",value);
+                        } else {
+                            addItemIntoRecentlyViewedSession(data.items[0]);
+                        }
+
+                    } else {
+                        addItemIntoRecentlyViewedSession(data.items[0]);
+                    }
                 }
 
                 // fireup the payload then
