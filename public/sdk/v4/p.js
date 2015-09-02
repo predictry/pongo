@@ -559,8 +559,8 @@ if (typeof Predictry !== 'object') {
                     config_api_url = "https://api.predictry.com/",
                     config_cf_trackings_url = "https://d1j642hg7oh3vx.cloudfront.net/",
                     config_s3_resource_url = "https://s3-ap-southeast-1.amazonaws.com/predictry/",
-                    config_api_resources = ["actions", "users", "items", "carts", "cartlogs", "recommendation"],
-                    config_default_actions = ["view", "add_to_cart", "buy", "started_checkout", "started_payment", "check_delete_item", "delete_item", "custom"],
+                    config_api_resources = ["actions", "users", "items", "carts", "cartlogs", "recommendation", "bookmark"],
+                    config_default_actions = ["view", "add_to_cart", "buy", "started_checkout", "started_payment", "check_delete_item", "delete_item", "custom", "bookmark"],
                     config_session_cookie_timeout = 63072000000, // 2 years
                     config_tracking_session_cookie_timeout = 1200000, //20 minutes
                     config_recently_session_cookie_timeout = 2592000000, // 30 days
@@ -1419,6 +1419,7 @@ if (typeof Predictry !== 'object') {
                     if (!isDefined(isImage)) {
                         sendXmlHttpRequest(url, data, async, callback);
                         return recent_response;
+
                     } else {
                         var queries = mapJSONToUriParams(data);
                         getImage(data.action.name, queries, callback);
@@ -2045,6 +2046,14 @@ if (typeof Predictry !== 'object') {
             }
 
             return {
+                bookmark: function(data){
+                    if (isDefined(data) && isObject(data)) {
+                        if (isDefined(data.items)) {
+                            config_request_content_type = "application/json; charset=utf-8";
+                            sendRequest(config_api_url + config_api_resources[6], data, true, null, true);
+                        }
+                    }
+                },
                 setTenantId: function (id) {
                     tenant_id = id;
                 },
