@@ -1820,6 +1820,7 @@ if (typeof Predictry !== 'object') {
              * @param callback
              */
             function typedUniversalCallback(item_id, typename, callback) {
+                var recommended_item_id = item_id;
                 function items(data) {
                     if (isDefined(data) && isObject(data)) {
                         var items = [];
@@ -1830,7 +1831,7 @@ if (typeof Predictry !== 'object') {
                                 if (isDefined(response)) {
                                     var len = (isDefined(data.length) && (data.length !== "")) ? data.length : 0;
                                     var params = {
-                                        id: (isDefined(item_id)) ? item_id : 0,
+                                        id: (isDefined(recommended_item_id)) ? recommended_item_id : 0,
                                         len: len,
                                         algo: (isDefined(typename) && typename !== "") ? typename : ''
                                     };
@@ -1847,7 +1848,6 @@ if (typeof Predictry !== 'object') {
                                     items.push(obj);
                                     if (items.length == data.length) {
                                         callback(items);
-                                        console.log(items);
                                     }
                                 } else {
                                     var err_obj = { error: "There is no item details on server for item_id: " + item_id + " yet." }
@@ -2311,6 +2311,10 @@ if (typeof Predictry !== 'object') {
             };
         }
 
+        function callBack(data) {
+
+        }
+
         //INIT CALLS
         // _predictry.push(['appendStyle']);
         _predictry.push(['setSessionID']);
@@ -2319,6 +2323,7 @@ if (typeof Predictry !== 'object') {
         _predictry.push(['setSessionCart']);
         _predictry.push(['setSessionView']);
         _predictry.push(['checkWidget']);
+        _predictry.push(['getRec', 70, 'oipt', callBack])
         _predictry.push(['getPredictryParams', document.location.search]);
 
         async_executor = new Executor(window_alias.PE_tenantId, window_alias.PE_apiKey);
