@@ -1859,7 +1859,7 @@ if (typeof Predictry !== 'object') {
                             })
                         });
                     } else {
-                        var err_obj = { error: "There is no data for " + typename + " yet."};
+                        var err_obj = undefined; //This allows the client to detect if there's no recommendations with if(response != undefined)
                         callback(err_obj)
                     }
                 }
@@ -1982,34 +1982,44 @@ if (typeof Predictry !== 'object') {
              * @returns {Array}
              */
             function getItems(item_id, typename, callback) {
+                var item_ids = [];
                 if (typename == 'similar') {
 
                     var end_point = config_fisher_endpoint + "/" + tenant_id + "/related/" + item_id ;
-
                     var http = new XMLHttpRequest();
-                    var item_ids = [];
-
                     http.open("GET", end_point, true);
                     http.onreadystatechange = function () {
-                        if (http.readyState == 4 && http.status == 200) {
-                            item_ids = JSON.parse(http.responseText).items;
-                            callback(item_ids);
+                        if (http.readyState == 4){
+                            if(http.status == 200 && http.responseText.length > 0) {
+                                item_ids = JSON.parse(http.responseText).items;
+                                callback(item_ids);
+                            }else{
+                                callback(undefined);
+                            }
+                            
                         }
                     }
+                    
                     http.send();
                     return item_ids;
+
                 } else {
+
                     var s3_data_tenant_recommendation_path = config_s3_data_recommendation_path.replace("{tenant}", tenant_id);
                     var end_point = config_s3_resource_url + s3_data_tenant_recommendation_path + typename + "/" + item_id + ".json";
 
                     var http = new XMLHttpRequest();
-                    var item_ids = [];
 
                     http.open("GET", end_point, true);
                     http.onreadystatechange = function () {
-                        if (http.readyState == 4 && http.status == 200) {
-                            item_ids = JSON.parse(http.responseText).items;
-                            callback(item_ids);
+                        if (http.readyState == 4){
+                            if(http.status == 200 && http.responseText.length > 0) {
+                                item_ids = JSON.parse(http.responseText).items;
+                                callback(item_ids);
+                            }else{
+                                callback(undefined);
+                            }
+                            
                         }
                     }
                     http.send();
@@ -2323,7 +2333,6 @@ if (typeof Predictry !== 'object') {
         _predictry.push(['setSessionCart']);
         _predictry.push(['setSessionView']);
         _predictry.push(['checkWidget']);
-        _predictry.push(['getRec', 70, 'oipt', callBack])
         _predictry.push(['getPredictryParams', document.location.search]);
 
         async_executor = new Executor(window_alias.PE_tenantId, window_alias.PE_apiKey);
