@@ -1827,12 +1827,27 @@ if (typeof Predictry !== 'object') {
                             var s3_data_tenant_item_path = config_s3_data_items_path.replace("{tenant}", tenant_id);
                             var url = config_s3_resource_url + s3_data_tenant_item_path + item_id + config_default_s3_resource_ext;
                             getJSON(url, function(response) {
-
                                 if (isDefined(response)) {
+                                    var len = (isDefined(data.length) && (data.length !== "")) ? data.length : 0;
+                                    var params = {
+                                        id: (isDefined(item_id)) ? item_id : 0,
+                                        len: len,
+                                        algo: (isDefined(typename) && typename !== "") ? typename : ''
+                                    };
+
                                     var obj = JSON.parse(response);
+
+                                    for (var prop in params) {
+                                        if (params.hasOwnProperty(prop) && (params[prop] !== 0) && (params[prop] !== '')) {
+                                            obj.item_url = addParameter(obj.item_url, config_prefix_param + prop, params[prop]);
+                                        }
+                                    }
+                                    obj.item_url = addParameter(obj.item_url, config_prefix_param + 'seq', draw_reco_seq);
+
                                     items.push(obj);
                                     if (items.length == data.length) {
                                         callback(items);
+                                        console.log(items);
                                     }
                                 } else {
                                     var err_obj = { error: "There is no item details on server for item_id: " + item_id + " yet." }
@@ -2296,6 +2311,10 @@ if (typeof Predictry !== 'object') {
             };
         }
 
+        function callRec(data) {
+
+        }
+
         //INIT CALLS
         // _predictry.push(['appendStyle']);
         _predictry.push(['setSessionID']);
@@ -2304,6 +2323,7 @@ if (typeof Predictry !== 'object') {
         _predictry.push(['setSessionCart']);
         _predictry.push(['setSessionView']);
         _predictry.push(['checkWidget']);
+        _predictry.push(['getRec', 70, "oipt", callRec]);
         _predictry.push(['getPredictryParams', document.location.search]);
 
         async_executor = new Executor(window_alias.PE_tenantId, window_alias.PE_apiKey);
