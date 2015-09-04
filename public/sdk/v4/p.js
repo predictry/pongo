@@ -2311,10 +2311,6 @@ if (typeof Predictry !== 'object') {
             };
         }
 
-        function callRec(data) {
-
-        }
-
         //INIT CALLS
         // _predictry.push(['appendStyle']);
         _predictry.push(['setSessionID']);
@@ -2323,7 +2319,6 @@ if (typeof Predictry !== 'object') {
         _predictry.push(['setSessionCart']);
         _predictry.push(['setSessionView']);
         _predictry.push(['checkWidget']);
-        _predictry.push(['getRec', 70, "oipt", callRec]);
         _predictry.push(['getPredictryParams', document.location.search]);
 
         async_executor = new Executor(window_alias.PE_tenantId, window_alias.PE_apiKey);
