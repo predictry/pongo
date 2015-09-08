@@ -574,7 +574,7 @@ if (typeof Predictry !== 'object') {
                     config_fisher_endpoint = "http://119.81.208.244:8090/fisher/items",
                     config_widget_type = [ "similar", "oivt", "oipt", "duo"],
                     config_recent_limit = 20,
-                    config_typed_titles = { similar: "Similar Items", oivt: "Viewed also viewed", oipt: "Bought also bought", duo: "Both" }
+                    config_typed_titles = { similar: "Similar Items", oivt: "Viewed also viewed", oipt: "Bought also bought", duo: "Combined" }
                 ;
 
             var recent_response;
@@ -2045,10 +2045,20 @@ if (typeof Predictry !== 'object') {
             function showTypedItems(typename) {
                 var ele = document.querySelectorAll(".predictry-" + typename)[0];
                 var item_id = ele.attributes['data-predictry-item-id'].value;
+                var title, hide;
+                if (isDefined(ele.attributes['data-predictry-title'])) {
+                    if (ele.attributes['data-predictry-title'].value !== "false") {
+                        title = ele.attributes['data-predictry-title'].value;
+                    } else {
+                        hide = true;
+                    }
+                }
+
                 var params = {
                     limit: ele.attributes['data-predictry-limit'].value,
                     typed: typename,
-                    title: config_typed_titles[typename]
+                    hide_title: hide,
+                    title: (isDefined(title) && (title !== "")) ? title : config_typed_titles[typename]
                 };
 
                 var load = function (items) {
