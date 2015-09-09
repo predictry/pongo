@@ -783,9 +783,7 @@ if (typeof Predictry !== 'object') {
                             }
 
                             elem.appendChild(predictryList);
-                            if (!params_tmp.typed) {
-                                elem.appendChild(createFooterDiv("by Predictry"));
-                            }
+                            elem.appendChild(createFooterDiv("by Predictry"));
                         }
                     }
 
