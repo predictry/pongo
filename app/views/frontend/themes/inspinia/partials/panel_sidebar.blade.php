@@ -13,7 +13,10 @@
                         <li><a href="<?php echo URL::to('v2/profile'); ?>">Profile</a></li>
                         <li><a href="<?php echo URL::to('v2/password'); ?>">Password</a></li>
                         <li class="divider"></li>
-                        <li><a href="login.html">Logout</a></li>
+                        <li>
+                            <a href="<?php echo URL::to('user/logout'); ?>">
+                            Logout</a>
+                        </li>
                     </ul>
                 </div>
                 <div class="logo-element">
