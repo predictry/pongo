@@ -108,14 +108,13 @@ class Home2Controller extends BaseController {
     public function getRegister() {
         $pricing_method = \Input::get("pricing");
 
-        if (!empty($pricing_method) && (strtoupper($pricing_method) !== "CPA" && strtoupper($pricing_method) !== "CPC")) {
+        if (!empty($pricing_method) && (strtoupper($pricing_method) !== "CPA" && strtoupper($pricing_method) !== "MFF")) {
             $pricing_method = "CPA";
         }
 
         $pricing_list = [
-            'choose' => 'Choose Preferred Pricing Model',
+            'MFF' => 'Monthly Fix Fee', 
             'CPA' => 'CPA – % of retail price only if product is sold by Predictry',
-            'CPC' => 'CPC – Charged by # of  recommended item clicks',
             'FREE' => 'I can’t decide now, just give me my FREE trial'
         ];
 
