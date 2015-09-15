@@ -1994,7 +1994,6 @@ if (typeof Predictry !== 'object') {
                                     var temp_ids = [];
                                     for ( var i = 0 ; i < limit ; i++) {
                                         temp_ids.push(item_ids[i]);
-                                        console.log(item_ids[i]);
                                     }
                                     callback(temp_ids);
                                 }
