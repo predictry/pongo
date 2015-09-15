@@ -53,7 +53,7 @@ if (typeof Predictry !== 'object') {
 
         /**
          * Is property object ?
-         * 
+         *
          * @param {type} property
          * @returns {Boolean}
          */
@@ -64,7 +64,7 @@ if (typeof Predictry !== 'object') {
 
         /**
          * Is property string ?
-         * 
+         *
          * @param {type} property
          * @returns {Boolean}
          */
@@ -73,7 +73,7 @@ if (typeof Predictry !== 'object') {
         }
 
         /**
-         * 
+         *
          * @param {string} url,
          * @param {callback} callback
          * @returns {Boolean}
@@ -240,7 +240,7 @@ if (typeof Predictry !== 'object') {
 
         /**
          * Extend object
-         * 
+         *
          * @param {type} options
          * @param {type} defaults
          * @returns {type} target
@@ -282,7 +282,7 @@ if (typeof Predictry !== 'object') {
 
         /**
          * Check needle in array haystack
-         * 
+         *
          * @param {String|Number} needle
          * @param {Array} haystack
          * @returns {Boolean}
@@ -299,7 +299,7 @@ if (typeof Predictry !== 'object') {
 
         /**
          * Clone object
-         * 
+         *
          * @param {object} obj
          * @returns {object}
          */
@@ -518,7 +518,7 @@ if (typeof Predictry !== 'object') {
 
         /**
          * Predictry Executor Class
-         * 
+         *
          * @param {string} tenant_id
          * @param {string} api_key
          * @returns {Predictry.Executor.Anonym$0}
@@ -622,7 +622,7 @@ if (typeof Predictry !== 'object') {
 
             /**
              * Generate Session ID
-             * 
+             *
              * @param {type} length
              * @returns {String} returnValue
              */
@@ -641,7 +641,7 @@ if (typeof Predictry !== 'object') {
 
             /**
              * Drawing recommendation as LIST
-             * 
+             *
              * @param {DOM} elem
              * @param {object} obj
              * @returns {void}
@@ -791,7 +791,7 @@ if (typeof Predictry !== 'object') {
             }
 
             /**
-             * 
+             *
              * @param {object} response
              * @param {integer} seq
              * @param {object} params
@@ -860,7 +860,7 @@ if (typeof Predictry !== 'object') {
 
             /**
              * Create Header
-             * 
+             *
              * @param {string} text
              * @returns {Element}
              */
@@ -943,7 +943,7 @@ if (typeof Predictry !== 'object') {
 
             /**
              * Set Session Cookie ID
-             * 
+             *
              * @param {string} unique_id
              * @returns {string}
              */
@@ -954,7 +954,7 @@ if (typeof Predictry !== 'object') {
 
             /**
              * Set Session User ID
-             * 
+             *
              * @param {string} unique_id
              * @returns {void}
              */
@@ -993,7 +993,7 @@ if (typeof Predictry !== 'object') {
 
             /**
              * Set view session cookie
-             * 
+             *
              * @param {object} v_obj
              * @returns {_L15.Executor.setViewSessionCookie.v_obj}
              */
@@ -1007,7 +1007,7 @@ if (typeof Predictry !== 'object') {
 
             /**
              * Set Cart Log
-             * 
+             *
              * @param {type} item_id
              * @param {type} qty
              * @param {type} event
@@ -1026,7 +1026,7 @@ if (typeof Predictry !== 'object') {
 
             /**
              * Update Cart Item Session
-             * 
+             *
              * @param {string} item_id
              * @returns {void}
              */
@@ -1042,7 +1042,7 @@ if (typeof Predictry !== 'object') {
 
             /**
              * Get Session ID
-             * 
+             *
              * @returns {String|Number}
              */
             function getSessionID() {
@@ -1068,7 +1068,7 @@ if (typeof Predictry !== 'object') {
             }
 
             /**
-             * getSessionCart 
+             * getSessionCart
              * @description get the current cart items
              *              from cookies
              */
@@ -1109,7 +1109,7 @@ if (typeof Predictry !== 'object') {
 
             /**
              * Call the callback
-             * 
+             *
              */
             function callCallback(callback, p){
                 if (isDefined(callback)) {
@@ -1125,7 +1125,7 @@ if (typeof Predictry !== 'object') {
             }
 
             /*
-             * 
+             *
              * @param {string} url
              * @param {function} callback
              * @returns {void|array}
@@ -1171,7 +1171,7 @@ if (typeof Predictry !== 'object') {
             }
 
             /**
-             * 
+             *
              * @param {object} reco_data
              * @param {function} callback
              * @returns {object}
@@ -1186,7 +1186,7 @@ if (typeof Predictry !== 'object') {
             }
 
             /**
-             * 
+             *
              * @param {object} data
              * @param {function} callback
              * @returns {object}
@@ -1256,7 +1256,7 @@ if (typeof Predictry !== 'object') {
             }
 
             /**
-             * 
+             *
              * @param {object} data
              * @param {function} callback
              * @returns {undefined}
@@ -1281,7 +1281,7 @@ if (typeof Predictry !== 'object') {
             }
 
             /**
-             * 
+             *
              * @param {string} item_id
              * @param {function} callback
              * @returns {object}
@@ -1327,7 +1327,7 @@ if (typeof Predictry !== 'object') {
             function getImage(resource, queries, callback) {
                 var image = new Image(1, 1);
                 image.onload = function () {
-                    iterator = 0; // To avoid JSLint warning of empty block 
+                    iterator = 0; // To avoid JSLint warning of empty block
                     if (typeof callback === 'function') {
                         callback();
                     }
@@ -1338,7 +1338,7 @@ if (typeof Predictry !== 'object') {
             }
 
             /** getPredictryParmas(uri)
-             * 
+             *
              * @param {string} uri
              * @returns {void}
              */
@@ -1364,7 +1364,7 @@ if (typeof Predictry !== 'object') {
 
             /**
              * Make A Call
-             * 
+             *
              * @param {string} url
              * @param {object} data
              * @param {boolean} async
@@ -1426,7 +1426,7 @@ if (typeof Predictry !== 'object') {
             }
 
             /**
-             * 
+             *
              * @param {object} data
              * @param {function} callback
              * @returns {void}
@@ -1455,7 +1455,7 @@ if (typeof Predictry !== 'object') {
             }
 
             /**
-             * 
+             *
              * @param {object} reco_data
              * @returns {object}
              */
@@ -1817,7 +1817,7 @@ if (typeof Predictry !== 'object') {
              * @param typename
              * @param callback
              */
-            function typedUniversalCallback(item_id, typename, callback) {
+            function typedUniversalCallback(item_id, typename, callback, limit) {
                 var recommended_item_id = item_id;
                 function items(data) {
                     if (isDefined(data) && isObject(data)) {
@@ -1861,7 +1861,7 @@ if (typeof Predictry !== 'object') {
                         callback(err_obj)
                     }
                 }
-                getItems(item_id, typename , items);
+                getItems(item_id, typename , items, limit);
             }
 
             /**
@@ -1979,7 +1979,7 @@ if (typeof Predictry !== 'object') {
              * @param callback
              * @returns {Array}
              */
-            function getItems(item_id, typename, callback) {
+            function getItems(item_id, typename, callback, limit) {
                 var item_ids = [];
                 if (typename == 'similar') {
 
@@ -1990,14 +1990,22 @@ if (typeof Predictry !== 'object') {
                         if (http.readyState == 4){
                             if(http.status == 200 && http.responseText.length > 0) {
                                 item_ids = JSON.parse(http.responseText).items;
+                                if (isDefined(limit)) {
+                                    var temp_ids = [];
+                                    for ( var i = 0 ; i < limit ; i++) {
+                                        temp_ids.push(item_ids[i]);
+                                        console.log(item_ids[i]);
+                                    }
+                                    callback(temp_ids);
+                                }
                                 callback(item_ids);
                             }else{
                                 callback(undefined);
                             }
-                            
+
                         }
                     }
-                    
+
                     http.send();
                     return item_ids;
 
@@ -2013,11 +2021,19 @@ if (typeof Predictry !== 'object') {
                         if (http.readyState == 4){
                             if(http.status == 200 && http.responseText.length > 0) {
                                 item_ids = JSON.parse(http.responseText).items;
+                                if (isDefined(limit)) {
+                                    var temp_ids = [];
+                                    for ( var i = 0 ; i < limit ; i++) {
+                                        temp_ids.push(item_ids[i]);
+                                        console.log(item_ids[i]);
+                                    }
+                                    callback(temp_ids);
+                                }
                                 callback(item_ids);
                             }else{
                                 callback(undefined);
                             }
-                            
+
                         }
                     }
                     http.send();
@@ -2312,8 +2328,8 @@ if (typeof Predictry !== 'object') {
                 recentlyViewed: function (callback, max) {
                     recentlyItemsCallback(callback, max);
                 },
-                getRec: function (item_id, typename , callback) {
-                    typedUniversalCallback(item_id, typename, callback);
+                getRec: function (item_id, typename , callback, limit) {
+                    typedUniversalCallback(item_id, typename, callback, limit);
                 },
                 getConfig: getConfig,
                 checkWidget: checkWidget,
