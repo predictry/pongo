@@ -97,20 +97,6 @@
                 </div>
               </div><!-- end of row -->
 
-              <div class="row">
-                <!--
-                <div class="well" style="margin: 40px 30px 0px 30px; vertical-align: baseline;">
-                  <i style="font-size: 3em; margin-right: 30px; float: left; color: rgba(124,181,236,1);" class="fa fa-shopping-cart"></i> 
-                  <h2 style="margin-top: 10px; font-size: 1.5em; text-align: left;">Your customers who interact with recommendations spend about <span class="label label-primary" style="font-size: 1em;">$112</span> more than users who don't</h2><br />
-                </div>        
-
-               
-                <div class="well" style="margin: 40px 30px 0px 30px; vertical-align: baseline;">
-                  <i style="font-size: 3em; margin-right: 30px; float: left; color: red;" class="fa fa-heart-o"></i> 
-                  <h2 style="margin-top: 10px; font-size: 1.5em; text-align: left;">Your customers who interact with recommendations buy about <span class="label label-primary" style="font-size: 1em;">2</span> more items than users who don't</h2><br />
-                </div>      -->
-              </div><!-- end of row -->
-
             </div>
         </div>
     </div>
@@ -300,7 +286,7 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/day/OVERALL', function(d
             },
             labels: {
                 formatter: function () {
-                    return this.value / 1000;
+                    return this.value / 1000 + 'k';
                 }
             }
         },
@@ -474,7 +460,7 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT/day/OVERALL', fun
             },
             labels: {
                 formatter: function () {
-                    return this.value / 1000;
+                    return this.value / 1000 + 'k';
                 }
             }
         },
