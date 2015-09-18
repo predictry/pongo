@@ -1992,12 +1992,13 @@ if (typeof Predictry !== 'object') {
                                 item_ids = JSON.parse(http.responseText).items;
                                 if (isDefined(limit)) {
                                     var temp_ids = [];
-                                    for ( var i = 0 ; i < limit ; i++) {
+                                    for (var i = 0; i < limit; i++) {
                                         temp_ids.push(item_ids[i]);
                                     }
                                     callback(temp_ids);
+                                } else {
+                                    callback(item_ids);
                                 }
-                                callback(item_ids);
                             }else{
                                 callback(undefined);
                             }

@@ -4845,4 +4845,9 @@ p.boots_no {
 .no_margin {
   margin: 0px!important;
   padding: 0px;
-} 
+}
+
+.items_wrapper {
+  margin-top: 50px;
+  margin-bottom: 50px;
+}

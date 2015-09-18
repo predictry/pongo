@@ -6,6 +6,7 @@ use App\Controllers\BaseController,
     App\Models\Item,
     App\Models\ItemMeta,
     App\Models\Rule,
+    Guzzle\Service\Client,
     Form,
     Input,
     Paginator,
@@ -31,27 +32,15 @@ class Items2Controller extends BaseController
      */
     public function index()
     {
-        $this->model = new Item();
-        $page        = Input::get('page', 1);
-        $data        = $this->getByPage($page, $this->manageViewConfig['limit_per_page'], "site_id", $this->active_site_id);
-        $message     = '';
+        $client = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'items/');
+        $current_site = \Session::get("active_site_name");
 
-        if (!is_array($data) && !is_object($data)) {
-            $message   = $data;
-            $paginator = null;
-        }
-        else {
-            $paginator = Paginator::make($data->items, $data->totalItems, $data->limit);
-        }
+        $response = $client->get($current_site . "?size=100")->send();
+        $arr_response = $response->json();
 
+        
         $output = array(
-            'paginator'    => $paginator,
-            "str_message"  => $message,
-            "pageTitle"    => "Manage Items",
-            "table_header" => $this->model->manage_table_header,
-            "page"         => $page,
-            "modalTitle"   => "View Item",
-            "upper"        => []
+          "items" => $arr_response
         );
         return View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.manage", $output);
     }
