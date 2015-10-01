@@ -151,13 +151,24 @@ class SitesController extends BaseController
     public function postEdit($id)
     {
         $site      = Site::find($id);
-        $input     = Input::only("name", "url");
-        $validator = Validator::make($input, $site->rules);
-        if ($validator->passes()) {
-            $site->name = $input['name'];
-            $site->url  = $input['url'];
-            $site->update();
 
+        $input     = Input::only("url","relative_url_desktop", "relative_url_mobile", "relative_url_others" , "site_category_id"); 
+     
+        $validator = Validator::make($input, array(
+          'url' => 'required|url',
+          'relative_url_desktop' => 'required|url',
+          'relative_url_mobile' => 'required|url',
+          'relative_url_others' => 'url', 
+          'site_category_id' => 'required'
+        ));
+        
+        if ($validator->passes()) {
+            $site->url  = $input['url'];
+            $site->relative_url_desktop  = $input['relative_url_desktop'];
+            $site->relative_url_mobile  = $input['relative_url_mobile'];
+            $site->relative_url_others = $input['relative_url_others'];
+            $site->site_category_id = $input['site_category_id'];
+            $site->update();
             return Redirect::back()->with("flash_message", "Data successfully updated.");
         }
         else {

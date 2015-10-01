@@ -4847,7 +4847,8 @@ p.boots_no {
   padding: 0px;
 }
 
+/* wrap item */
 .items_wrapper {
   margin-top: 50px;
-  margin-bottom: 50px;
+  padding-bottom: 50px;
 }

@@ -25,6 +25,7 @@ class Items2Controller extends BaseController
         View::share(array("ca" => get_class(), "moduleName" => "Item", "create" => false));
     }
 
+    
     /**
      * Display a listing of the resource.
      *
@@ -34,15 +35,41 @@ class Items2Controller extends BaseController
     {
         $client = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'items/');
         $current_site = \Session::get("active_site_name");
-
-        $response = $client->get($current_site . "?size=100")->send();
-        $arr_response = $response->json();
-
+ 
+        /* get the total items */
+        $total_items = $client->get($current_site . "/count")->send()->json();
+        $total_items = (string)$total_items;  
         
+        /* 
+        *  calculatePagination based 
+        *  on the item count
+        */
+        function calculatePagination($count) {
+          $page_count = $count / 10;
+          if ( is_float($page_count)) {
+            $page_count = intval($page_count) + 1; // get the integer value of a variable and append one
+          } 
+
+          $output = array(
+            "page_count" => $page_count, 
+            "link_array"  => []
+          );
+    
+          return $output;
+        }
+        
+      
+        $page_count = calculatePagination($total_items);
+      
+       
+        /* get the items */
+        $response = $client->get($current_site . "?size=100")->send(); 
+        $arr_response = $response->json();
+      
         $output = array(
           "items" => $arr_response
         );
-        return View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.manage", $output);
+        return View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.manageitems", $output);
     }
 
     public function getEdit($id)
@@ -106,6 +133,7 @@ class Items2Controller extends BaseController
         Item::find($id)->delete();
         return Redirect::back()->with("flash_message", "Data has been removed.");
     }
+
 
     function getItemMetas($key = null)
     {
