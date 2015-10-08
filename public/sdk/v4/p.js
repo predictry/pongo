@@ -2094,6 +2094,14 @@ if (typeof Predictry !== 'object') {
                 });
             }
 
+            /**
+             * getItem (id)
+             */
+            function getItem(id) {
+
+            }
+
+
             return {
                 bookmark: function(data){
                     if (isDefined(data) && isObject(data)) {
@@ -2333,6 +2341,7 @@ if (typeof Predictry !== 'object') {
                 },
                 getConfig: getConfig,
                 checkWidget: checkWidget,
+                getItem: getItemDetail,
                 setBaseURL: function(url) {
                     baseURL = url;
                 }
