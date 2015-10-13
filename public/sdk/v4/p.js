@@ -1797,6 +1797,11 @@ if (typeof Predictry !== 'object') {
              */
             function recentlyItemsCallback(callback, max) {
                 var recentlyViewedItems = eval(localStorage.getItem("recentlyViewedItems"));
+
+                if (recentlyViewedItems.length == 1) {
+                    recentlyViewedItems.length = 0;
+                }
+
                 if (max) {
                     var limitedItems = [];
                     for (var i = 0; i < max; i++) {
@@ -2092,13 +2097,6 @@ if (typeof Predictry !== 'object') {
                         showTypedItems(typename);
                     }
                 });
-            }
-
-            /**
-             * getItem (id)
-             */
-            function getItem(id) {
-
             }
 
 
