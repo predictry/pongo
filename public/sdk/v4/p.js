@@ -912,6 +912,26 @@ if (typeof Predictry !== 'object') {
             }
 
             /**
+             * Get only domain name used for cookie.  For example, host is "secured.host.com" then
+             * this function will return ".host.com".
+             *
+             * @param host {string] complete host name
+             * @returns {string}
+             */
+            function getOnlyDomain(host) {
+                if (host) {
+                    var s = host.split('.');
+                    if (s.length > 2) {
+                        s.shift();
+                        return "." + s.join('.');
+                    } else {
+                        return "." + host;
+                    }
+                }
+                return host? host: '';
+            }
+
+            /**
              * Set cookie value
              * @params {string} cookie name
              * @params {string} value
@@ -936,8 +956,8 @@ if (typeof Predictry !== 'object') {
 
                 document_alias.cookie = cookie_name + '=' + encode_wrapper(value) +
                         (ms_to_expire ? ';expires=' + expiry_date.toGMTString() : '') +
-                        ';path=' + (path || '/') +
-                        (domain ? ';domain=' + domain : '') +
+                        ';path=' + (path || '/') + ';domain=' +
+                        (domain ? domain : getOnlyDomain(window.location.hostname)) +
                         (secure ? ';secure' : '');
             }
 
