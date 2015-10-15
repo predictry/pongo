@@ -133,6 +133,7 @@ class Home2Controller extends BaseController {
     }
 
     public function postRegister() {
+      $client = new Client($_ENV['ACTIVE_ENDPOINT']);
       $input = Input::only(
                       "name", 
                       "email", 
@@ -157,6 +158,16 @@ class Home2Controller extends BaseController {
           'name' => $site_name,
           'url'  => $site_host
         );
+        
+        $active_q = array( 
+          'tenantId'  =>  $site_name ,
+          'action'    => 'new'
+        );
+
+        $request = $client->post();
+        $request->setBody(json_encode($active_q), 'application/json');
+        $request->setAuth('admin', 'admin');
+        $response = $request->send();
 
         $rules = array_merge(App\Models\Account::$rules, [
             'range_number_of_items' => 'required|in:less_than_5k,5k_to_499k,500k_to_999k,more_than_1mil',
@@ -166,9 +177,8 @@ class Home2Controller extends BaseController {
     
         $account_validator = $this->account_repository->validate($input, $rules); 
         $site_validator = $this->account_repository->siteValidate($input_site, $site_rules);
-        
-       
 
+        
         if ( ($account_validator->passes()) && ($site_validator->passes()) ) {
             try {
                 // add necessary info for new account

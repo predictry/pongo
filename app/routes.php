@@ -34,6 +34,7 @@ Route::pattern('action_name', '[A-Za-z0-9_]+');
 #Items
 Route::pattern('item_id', '[A-Za-z0-9]+');
 
+
 /*
   |--------------------------------------------------------------------------
   | Frontend Routes V2

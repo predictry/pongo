@@ -2352,9 +2352,6 @@ if (typeof Predictry !== 'object') {
             };
         }
 
-        function callBack(data) {
-
-        }
 
         //INIT CALLS
         // _predictry.push(['appendStyle']);
