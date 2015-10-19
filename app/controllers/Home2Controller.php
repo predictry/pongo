@@ -133,8 +133,8 @@ class Home2Controller extends BaseController {
     }
 
     public function postRegister() {
-      $client = new Client($_ENV['ACTIVE_ENDPOINT']);
-      $input = Input::only(
+        $client = new Client($_ENV['ACTIVE_ENDPOINT']);
+        $input = Input::only(
                       "name", 
                       "email", 
                       "password", 
