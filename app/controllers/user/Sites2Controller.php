@@ -595,5 +595,3 @@ class Sites2Controller extends BaseController
 
 }
 
-/* End of file Sites2Controller.php */
-/* Location: ./application/controllers/Sites2Controller.php */

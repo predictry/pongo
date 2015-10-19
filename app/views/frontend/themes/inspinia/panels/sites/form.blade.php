@@ -25,33 +25,42 @@
                     </div>
                     <div class="hr-line-dashed"></div>
                     
-                    <div class="form-group {{$var = $errors->first('url')}} {{ ($var !== '') ? 'has-error' : ''}}">
+                    <div class="form-group {{$var = $errors->first('relative_url_desktop')}} {{ ($var !== '') ? 'has-error' : ''}}">
                         <label for="relative_url_desktop" class="col-sm-2 control-label">Relative URL for Desktop</label>
                         <div class="col-sm-10">
                             <?php echo Form::text('relative_url_desktop', null, array('class' => 'form-control', 'placeholder' => 'http://www.website.com', 'id' => 'relative_url_desktop')); ?>
-                            <span class="help-block">{{$errors->first('url')}}</span>
+                            <span class="help-block">{{$errors->first('relative_url_desktop')}}</span>
                         </div>
                     </div>
                     <div class="hr-line-dashed"></div>
 
-                    <div class="form-group {{$var = $errors->first('url')}} {{ ($var !== '') ? 'has-error' : ''}}">
+                    <div class="form-group {{$var = $errors->first('relative_url_mobile')}} {{ ($var !== '') ? 'has-error' : ''}}">
                         <label for="relative_url_mobile" class="col-sm-2 control-label">For Mobile</label>
                         <div class="col-sm-10">
                             <?php echo Form::text('relative_url_mobile', null, array('class' => 'form-control', 'placeholder' => 'http://www.website.com', 'id' => 'relative_url_mobile')); ?>
-                            <span class="help-block">{{$errors->first('url')}}</span>
+                            <span class="help-block">{{$errors->first('relative_url_mobile')}}</span>
                         </div>
                     </div>
                     <div class="hr-line-dashed"></div>
                     
-                    <div class="form-group {{$var = $errors->first('url')}} {{ ($var !== '') ? 'has-error' : ''}}">
+                    <div class="form-group {{$var = $errors->first('relative_url_others')}} {{ ($var !== '') ? 'has-error' : ''}}">
                         <label for="relative_url_others" class="col-sm-2 control-label">For Other Platforms</label>
                         <div class="col-sm-10">
                             <?php echo Form::text('relative_url_others', null, array('class' => 'form-control', 'placeholder' => 'http://www.website.com', 'id' => 'relative_url_other')); ?>
-                            <span class="help-block">{{$errors->first('url')}}</span>
+                            <span class="help-block">{{$errors->first('relative_url_others')}}</span>
                         </div>
                     </div>
                     <div class="hr-line-dashed"></div>
 
+                    <div class="form-group {{$var = $errors->first('currency')}} {{ ($var !== '') ? 'has-error' : ''}}">
+                        <label for="currency" class="col-sm-2 control-label">Currency</label>
+                        <div class="col-sm-10">
+                            <?php echo Form::text('currency', null, array('class' => 'form-control', 'placeholder' => 'USD,RM,SGD ...', 'id' => 'currency')); ?>
+                            <span class="help-block">{{$errors->first('currency')}}</span>
+                        </div>
+                    </div>
+                    <div class="hr-line-dashed"></div>
+                    
                     <div class="form-group {{$var = $errors->first('site_category_id')}} {{ ($var !== '') ? 'has-error' : ''}}">
                         <label for="email" class="col-sm-2 control-label">Site Category</label>
                         <div class="col-sm-10">

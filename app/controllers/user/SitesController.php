@@ -152,14 +152,15 @@ class SitesController extends BaseController
     {
         $site      = Site::find($id);
 
-        $input     = Input::only("url","relative_url_desktop", "relative_url_mobile", "relative_url_others" , "site_category_id"); 
+        $input     = Input::only("url","relative_url_desktop", "relative_url_mobile", "relative_url_others" , "site_category_id", "currency"); 
      
         $validator = Validator::make($input, array(
           'url' => 'required|url',
           'relative_url_desktop' => 'required|url',
           'relative_url_mobile' => 'required|url',
           'relative_url_others' => 'url', 
-          'site_category_id' => 'required'
+          'site_category_id' => 'required',
+          'currency'         => 'required'
         ));
         
         if ($validator->passes()) {
@@ -168,6 +169,7 @@ class SitesController extends BaseController
             $site->relative_url_mobile  = $input['relative_url_mobile'];
             $site->relative_url_others = $input['relative_url_others'];
             $site->site_category_id = $input['site_category_id'];
+            $site->currency         = $input['currency'];
             $site->update();
             return Redirect::back()->with("flash_message", "Data successfully updated.");
         }

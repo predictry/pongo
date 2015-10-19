@@ -7,9 +7,9 @@
             </div>
             <div id="visualOne"></div>
             <div class="ibox-content">
-                <h1 class="no-margins">{{ number_format($overviews['total_sales_amount']) }}</h1>
+                <h1 class="no-margins">{{ number_format($overviews['total_sales_amount']) }} {{ $currency }}</h1>
               
-                  <small>Overall sales in local currency</small>
+                  <small>Overall sales in local currency </small>
             </div>
         </div>
     </div>

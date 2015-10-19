@@ -3,6 +3,7 @@ namespace App\Controllers\User;
 
 use App\Controllers\BaseController,
     App\Pongo\Libraries\Helper,
+    App\Models\Site,
     App\Pongo\Repository\PanelRepository,
     Cache,
     Guzzle\Service\Client,
@@ -23,6 +24,8 @@ class Panel2Controller extends BaseController   {
     public function index($dt_range_group = "31_days_ago", $dt_start = null, $dt_end = null)  {
         $client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'stat/');
         $top_client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'top/');
+        // current site object
+        $site     = Site::find($this->active_site_id);
 
         // active_site_name
         $current_site = \Session::get("active_site_name");
@@ -173,7 +176,7 @@ class Panel2Controller extends BaseController   {
                   'start' => date("F d, Y", $tstart),
                   'end'   => date("F d, Y", $tend)
                 ],
-
+              'currency'            => $site['currency'],
               'dt_start'            => $dt_start,
               'dt_end'              => $dt_end,
               'top_purchased_items' => $tpi,
