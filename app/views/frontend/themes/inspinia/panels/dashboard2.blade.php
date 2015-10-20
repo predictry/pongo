@@ -16,7 +16,7 @@
     
     <div class="ibox float-e-margins">
         <div class="ibox-title">
-            <h5>Overview Summary of ({{$activeSiteName}})</h5>
+            <h5>Overview Summary of ({{ $site['name'] }})</h5>
             <div class="pull-right">
                 @include(getenv('FRONTEND_SKINS') . $theme . '.panels.filter_date')
             </div>

@@ -14,6 +14,7 @@ use Password;
 use Redirect;
 use Response;
 use Session;
+use App\Models\Site;
 use Validator;
 use View;
 use Request;
@@ -334,9 +335,15 @@ class Home2Controller extends BaseController {
         return Redirect::to('v2/password/reset/' . $token)->withInput()->withErrors($validator);
     }
 
-    public function bucket($start, $end , $action, $interval, $value ="overall") {
+    public function bucket($start, $end , $action, $interval, $value ="overall", $tenantID) {
       $client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'stat/combined');
-      $current_site =   \Session::get("active_site_name"); 
+      if ($tenantID) {
+        $site         = Site::find($tenantID);
+        $current_site = $site['name'];
+      } else {
+        $current_site =   \Session::get("active_site_name");
+      }
+
       $response = $client->get("?tenantId=". $current_site . "&startDate=" . $start . "&endDate=" . $end . "&metric=". $action . "&interval=" .$interval . "&valueType=" . $value)->send(); 
       return $response->json();
     }

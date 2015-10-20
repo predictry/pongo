@@ -54,7 +54,7 @@ Route::group(array('prefix' => 'v2', 'namespace' => 'App\Controllers'), function
 
     Route::get('password/reset/{token}', 'Home2Controller@getReset');
     Route::post('password/reset/submit', 'Home2Controller@postReset'); 
-    Route::get('bucket/{start}/{end}/{view}/{interval}/{value}', 'Home2Controller@bucket');
+    Route::get('bucket/{start}/{end}/{view}/{interval}/{value}/{tenantID?}', 'Home2Controller@bucket');
     Route::get('verify/{confirmation_code}', 'Home2Controller@getConfirmation');
 });
 
@@ -84,6 +84,7 @@ Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Con
 
             #Dashboard
             Route::get('home/{type?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'Panel2Controller@index'));
+            Route::get('admin/{tenantID}',  array('as' => 'admin', 'uses' => 'Panel2Controller@adminPanel'));
 
             #Sites Management
             Route::get("sites", array("as" => "sites", "uses" => "Sites2Controller@index"));

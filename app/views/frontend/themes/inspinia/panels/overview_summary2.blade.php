@@ -1,3 +1,21 @@
+@if ($admin) 
+<div class="col-md-12 no_margin">
+
+    <div class="dropdown">
+      <button class="btn btn-lg dropdown-toggle" type="button" id="tenantList" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+        Tenants
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="tenantList">
+        @foreach ($sites as $tenant)
+          <li><a href="/v2/admin/{{ $tenant['id'] }}">{{ $tenant['name'] }}</a></li>
+        @endforeach
+      </ul>
+    </div>
+
+</div>
+@endif
+
 <div class="row overview_datacells">     
     <div class="col-md-12 no_margin">
     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 data_cell">
@@ -137,14 +155,14 @@
         </div>
     </div>
 
-    
+<h1>{{ $site['id'] }}</h1>    
 </div>
 
 
 <script type="text/javascript">
 document.addEventListener('DOMContentLoaded', function(){ 
 
-d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/day/OVERALL', function(data) { 
+d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/day/OVERALL/{{ $site['id'] }}', function(data) { 
     var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     ];
@@ -318,7 +336,7 @@ d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/VIEWS/day/OVERALL', function(d
 });
 
 
-d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT/day/OVERALL', function(data) {
+d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/SALES_AMOUNT/day/OVERALL/{{ $site['id'] }}', function(data) {
     var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     ];
@@ -544,7 +562,7 @@ $('#saleChart').highcharts({
         }]
 });
 
-d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/ITEM_PURCHASED/day/OVERALL', function(data) {
+d3.json('/v2/bucket/{{ $dt_start }}/{{ $dt_end }}/ITEM_PURCHASED/day/OVERALL/{{ $site['id'] }}', function(data) {
     var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     ];
