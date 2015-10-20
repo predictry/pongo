@@ -213,6 +213,10 @@ class Panel2Controller extends BaseController   {
         $site     = Site::find($tenantID);
      
         $sites    = Site::all();
+        $user = Auth::user();
+        if ( substr( $user['email'], -14) == "vventures.asia" ) {
+            $admin = 1;
+        } else { $admin = 0; }
 
         // active_site_name
         $current_site = $site['name']; 
@@ -367,7 +371,7 @@ class Panel2Controller extends BaseController   {
               'dt_start'            => $dt_start,
               'sites'               => $sites,
               'site'                => $site,   
-
+              'admin'               => $admin,
               'dt_end'              => $dt_end,
               'top_purchased_items' => $tpi,
               'top_viewed_items'    => $tvi,
