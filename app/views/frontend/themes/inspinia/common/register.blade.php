@@ -30,7 +30,7 @@
             <span class="help-block">{{$errors->first('password_confirmation')}}</span>
         </div>
         <div class="form-group {{$var = $errors->first('url')}} {{ ($var !== '') ? 'has-error' : ''}}">            
-            <?php echo Form::url('url', null, array('class' => 'form-control', 'placeholder' => 'Your Website URL', 'id' => 'url', "tabindex" => 5)); ?>
+            <?php echo Form::text('url', null, array('class' => 'form-control', 'placeholder' => 'Your Website URL','id' => 'url', "tabindex" => 5)); ?>
             <span class="help-block">{{$errors->first('url')}}</span>
         </div>
         <div class="form-group {{$var = $errors->first('range_number_of_items')}} {{ ($var !== '') ? 'has-error' : ''}}">
@@ -54,8 +54,7 @@
                 {{ Lang::get('home.info.pre.register_suf') }} 
             </small> 
         </p>
-        <p class="text-muted text-center"><small>Already have an account?</small></p>
-        <a class="btn btn-sm btn-primary btn-block" href="{{ URL::to('v2/login') }}">Login</a>
+        <p class="text-muted text-center"><small><a  href="{{ URL::to('v2/login')">Already have an account? Login</a></small></p>
     </div>
 </div>
 @stop

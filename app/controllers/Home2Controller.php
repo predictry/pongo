@@ -114,14 +114,14 @@ class Home2Controller extends BaseController {
         }
 
         $pricing_list = [
-            'MFF' => 'Monthly Fix Fee', 
+            'MFF' => 'Monthly Fixed Fee', 
             'CPA' => 'CPA – % of retail price only if product is sold by Predictry',
             'FREE' => 'I can’t decide now, just give me my FREE trial'
         ];
 
         $industries = App\Models\Industry::all()->lists("name", "id");
         $output = [
-            'range_number_of_items' => ['choose' => 'Select the range of SKUs/listings on site', 'less_than_5k' => '< 5000', '5k_to_499k' => '5k to 499k', '500k_to_999k' => '500k to 999k', 'more_than_1mil' => '> 1mil'],
+            'range_number_of_items' => ['choose' => 'Select the range of Page View Per Month', 'less_than_5k' => '< 20K', '20k_to_100k' => '20k to 100k', '100k_to_500k' => '100k to 500k', '500k_to_1M' => '500k to 1M', 'more_than_1mil' => '> 1M < 5M'],
             'selected_range_number_of_items' => '0_to_500',
             'selected_industry_id' => 1,
             'pricing_list' => $pricing_list,
