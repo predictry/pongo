@@ -58,6 +58,7 @@ class Sites2Controller extends BaseController
         $page        = Input::get('page', 1);
         $data        = $this->getByPage($page, $this->manageViewConfig['limit_per_page'], "account_id", Auth::user()->id, 'id', 'ASC');
         $message     = '';
+        $current_site = \Session::get("active_site_name");
 
         if (!is_array($data) && !is_object($data)) {
             $message   = $data;
@@ -68,7 +69,8 @@ class Sites2Controller extends BaseController
         }
 
         $output = array(
-            'paginator'          => $paginator,
+          'paginator'          => $paginator,
+            'current_site'              => $current_site,
             'str_message'        => $message,
             "pageTitle"          => "Manage Sites",
             "table_header"       => $this->model->manage_table_header,
@@ -97,8 +99,19 @@ class Sites2Controller extends BaseController
       return Redirect::to('v2/sites')->with("flash_message", "Successfully delete the site.");
     }
 
+    public function intWOO($tenant_id) {
+      $output = array( 
+        'current_site' => $tenant_id
+      );
+      return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.sites.wizard.woocommerce', $output);
+    }
 
-
+    public function intMagento($tenant_id) {
+      $output = array( 
+        'current_site' => $tenant_id
+      );
+      return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.sites.wizard.magento', $output);
+    }
 
     public function postCreate()
     {
@@ -227,6 +240,7 @@ class Sites2Controller extends BaseController
                 $output = [
                     'reco_js_url' => $reco_js_url,
                     'site'        => $site,
+                    'current_site'  => $tenant_id,
                     'data'        => $data,
                     'tenant_id'   => $tenant_id,
                     'pageTitle'   => "Implementation Wizard",

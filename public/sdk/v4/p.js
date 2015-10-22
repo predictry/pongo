@@ -572,9 +572,9 @@ if (typeof Predictry !== 'object') {
                     config_cls_prefix = "pry-",
                     config_prefix_param = "p_",
                     config_fisher_endpoint = "http://119.81.208.244:8090/fisher/items",
-                    config_widget_type = [ "similar", "oivt", "oipt", "duo"],
+                    config_widget_type = [ "similar", "oivt", "oipt", "duo", "oip" , "oiv"],
                     config_recent_limit = 20,
-                    config_typed_titles = { similar: "Similar Items", oivt: "Viewed also viewed", oipt: "Bought also bought", duo: "Combined" }
+                    config_typed_titles = { similar: "Similar Items", oivt: "Viewed also viewed", oipt: "Bought also bought", duo: "Combined" , oiv: "Other Items Viewed" , oip: "Other Items Purchase" }
                 ;
 
             var recent_response;
@@ -2007,7 +2007,6 @@ if (typeof Predictry !== 'object') {
             function getItems(item_id, typename, callback, limit) {
                 var item_ids = [];
                 if (typename == 'similar') {
-
                     var end_point = config_fisher_endpoint + "/" + tenant_id + "/related/" + item_id ;
                     var http = new XMLHttpRequest();
                     http.open("GET", end_point, true);
@@ -2030,17 +2029,12 @@ if (typeof Predictry !== 'object') {
 
                         }
                     }
-
                     http.send();
                     return item_ids;
-
                 } else {
-
                     var s3_data_tenant_recommendation_path = config_s3_data_recommendation_path.replace("{tenant}", tenant_id);
                     var end_point = config_s3_resource_url + s3_data_tenant_recommendation_path + typename + "/" + item_id + ".json";
-
                     var http = new XMLHttpRequest();
-
                     http.open("GET", end_point, true);
                     http.onreadystatechange = function () {
                         if (http.readyState == 4){

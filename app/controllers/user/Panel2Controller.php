@@ -185,6 +185,7 @@ class Panel2Controller extends BaseController   {
               'currency'            => $site['currency'],
               'sites'               => $sites,
               'site'                => $site,
+              'current_site'        => $current_site,
               'admin'               => $admin,
               'dt_start'            => $dt_start,
               'dt_end'              => $dt_end,

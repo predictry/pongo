@@ -144,8 +144,11 @@ Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Con
             Route::get("demo", ['as' => 'demo', 'uses' => 'DemoController@index']);
             Route::get("demo/show/{id}", ['as' => 'demo.show.{id}', 'uses' => 'DemoController@show']);
 
-            # Data Collections
+            # Data Collections & Integration
             Route::get("sites/{tenant_id}/integration", "Sites2Controller@getImplementationWizard");
+            Route::get("sites/{tenant_id}/woocommerce", "Sites2Controller@intWOO");
+            Route::get("sites/{tenant_id}/magento",     "Sites2Controller@intMagento");
+
             Route::get("sites/{tenant_id}/data_collection", "Sites2Controller@getDataCollection");
 
             Route::group(array('before' => 'site.ajax'), function() {
