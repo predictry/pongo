@@ -26,6 +26,9 @@
             <li class="<?php if ($ca === 'App\Controllers\User\Panel2Controller') echo 'active'; ?>">
                 <a href="<?php echo URL::to('v2/home'); ?>"><i class="fa fa-th-list"></i> <span class="nav-label">Dashboard </span> </a>
             </li>
+            <li class="<?php if ($ca === 'App\Controllers\User\Sites2Controller') echo 'active'; ?>">
+                <a href="/v2/sites/{{ $site['name'] }}/integration"><i class="fa fa-wrench"></i> <span class="nav-label">Integration</span> </a>
+            </li>
             <!--
             <li class="<?php if ($ca === 'App\Controllers\User\Items2Controller') echo 'active'; ?>">
                 <a href="<?php echo URL::to('v2/items'); ?>"><i class="fa fa-table"></i> <span class="nav-label">Your Items</span> </a>

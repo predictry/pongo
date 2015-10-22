@@ -171,7 +171,7 @@ class Home2Controller extends BaseController {
         $response = $request->send();
 
         $rules = array_merge(App\Models\Account::$rules, [
-            'range_number_of_items' => 'required|in:less_than_5k,5k_to_499k,500k_to_999k,more_than_1mil',
+            'range_number_of_items' => 'required|in:less_than_5k,20k_to_100k,100k_to_500k,500k_to_1M,more_than_1mil',
         ]);
         
         $site_rules = App\Models\Site::$rules;
