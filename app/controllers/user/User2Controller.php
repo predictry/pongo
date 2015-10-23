@@ -25,12 +25,14 @@ class User2Controller extends BaseController
 
     public function getProfile()
     {
-        return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.users.profile', ['pageTitle' => 'Edit Profile']);
+        $current_site = \Session::get("active_site_name");
+        return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.users.profile', ['pageTitle' => 'Edit Profile', 'current_site' => $current_site]);
     }
 
     public function getPassword()
     {
-        return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.users.password', ['pageTitle' => 'Edit Password']);
+        $current_site = \Session::get("active_site_name");
+        return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.users.password', ['pageTitle' => 'Edit Password', 'current_site' => $current_site]);
     }
 
     public function logout()
