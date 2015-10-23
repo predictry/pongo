@@ -212,7 +212,7 @@ class Panel2Controller extends BaseController   {
         $top_client   = new Client($_ENV['PREDICTRY_ANALYTICS_URL'] . 'top/');
         // current site object
         $site     = Site::find($tenantID);
-     
+        $current_site = \Session::get("active_site_name");
         $sites    = Site::all();
         $user = Auth::user();
         if ( substr( $user['email'], -14) == "vventures.asia" ) {
@@ -372,6 +372,7 @@ class Panel2Controller extends BaseController   {
               'dt_start'            => $dt_start,
               'sites'               => $sites,
               'site'                => $site,   
+              'current_site'        => $current_site,
               'admin'               => $admin,
               'dt_end'              => $dt_end,
               'top_purchased_items' => $tpi,
