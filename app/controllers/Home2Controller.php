@@ -10,6 +10,7 @@ use DateTime;
 use Event;
 use Input;
 use Lang;
+use Mail;
 use Password;
 use Redirect;
 use Response;
@@ -154,12 +155,20 @@ class Home2Controller extends BaseController {
 
         $site_host =  parse_url($url)['host'];
         $site_name = strtoupper(str_replace('.', '', $site_host));
-        
         $input_site = array(
           'name' => $site_name,
           'url'  => $site_host
         );
         
+        $email = array(
+          'name'      => $input['name'],
+          'email'     => $input['email'],
+          'tenantID'  => $input_site['name'],
+          'pricing'   => $input['pricing_method'],
+          'skuCount'  => $input['range_number_of_items'],
+          'industry'  => $input['industry_id']
+        );
+          
         $active_q = array( 
           'tenantId'  =>  $site_name ,
           'action'    => 'new'
@@ -223,8 +232,11 @@ class Home2Controller extends BaseController {
                         App\Models\Account::where('email', $input['email'])->delete();
                         return Redirect::to('v2/register')->withInput()->withErrors("We are unable to process the data. Please try again.");
                     }
-
+                    
                     Event::fire("account.registration_confirmed", $account);  //send verification email (skip to confirmation)
+                    Mail::send('emails.workers.noti', $email, function($message) {
+                      $message->to('stewart@predictry.com', 'Stewart')->subject('New user on-boarded!');
+                    });
                 } else
                     return Redirect::to('v2/register')->withInput()->withErrors("We are unable to process the data. Please try again.");
                 return Redirect::to('v2/login')->with('flash_message', \Lang::get("home.success.register"));
@@ -240,11 +252,6 @@ class Home2Controller extends BaseController {
             return Redirect::back()->withInput()->withErrors($valudation_message);
     }
 
-    /**
-     * Display forgot password view.
-     * 
-     * @return Response
-     */
     public function getForgotPassword() {
         return View::make(getenv('FRONTEND_SKINS') . $this->theme . ".common.forgot", ['pageTitle' => \Lang::get("home.reset.password")]);
     }
