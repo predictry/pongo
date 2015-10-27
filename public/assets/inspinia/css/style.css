@@ -4863,3 +4863,8 @@ p.boots_no {
   font-size: 12px;
   margin-bottom: 20px;
 }
+
+.woo_docs img { 
+    margin-top: 20px;
+    margin-bottom: 20px;
+}

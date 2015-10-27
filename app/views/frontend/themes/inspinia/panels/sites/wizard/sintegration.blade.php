@@ -45,12 +45,13 @@ HTML::script('assets/js/visual.js')])
     <p>If you prefer you can opt for a minified version</p>
     
     <pre class="line-numbers prettyprint"><code class="language-javascript hljs "><span class="hljs-keyword">var</span> _predictry=_predictry||[];(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>_predictry.push([<span class="hljs-string">"setTenantId"</span>,<span class="hljs-string">"{{ $site->name }}"</span>],[<span class="hljs-string">"setApiKey"</span>,<span class="hljs-string">"{{ $site->api_key }}"</span>]);<span class="hljs-keyword">var</span> e=document,c=e.createElement(<span class="hljs-string">"script"</span>),b=e.getElementsByTagName(<span class="hljs-string">"script"</span>)[<span class="hljs-number">0</span>];c.type=<span class="hljs-string">"text/javascript"</span>;c.defer=<span class="hljs-literal">true</span>;c.async=<span class="hljs-literal">true</span>;c.src=<span class="hljs-string">"//d2gq0qsnoi5tbv.cloudfront.net/v3/p.min.js"</span>;b.parentNode.insertBefore(c,b)})();</code></pre>
-    
+
+    <!--
     <div class="checkbox">
         <input id="step_one" type="checkbox" value="step_one" name="step_one"> 
         <label for="step_one" class="checkbox_label">Check this if you have done step one.</label> 
     </div>
-  
+    -->
   </div><!-- end of step one -->
   
   <div id="step_two" class="modular_step col-sm-12 col-xs-12 col-md-12 col-lg-12">
@@ -91,12 +92,12 @@ HTML::script('assets/js/visual.js')])
     };
     
     _predictry.push([<span class="hljs-string">'track'</span>, view_data]);</code></pre>
-    
+    <!--
     <div class="checkbox"> 
         <input id="step_two" type="checkbox" value="step_two" name="step_one"> 
         <label for="step_two" class="checkbox_label">Check this if you have done step two.
       </label> 
-    </div>
+    </div> -->
 
   </div><!-- end of step two -->
 
@@ -124,11 +125,11 @@ HTML::script('assets/js/visual.js')])
     };
     
     _predictry.push([<span class="hljs-string">'track'</span>, add_to_cart_data]);</code></pre>
-    
+    <!--
     <div class="checkbox">
         <input id="step_three" type="checkbox" value="step_three" name="step_three"> 
         <label for="step_three" class="checkbox_label">Check this if you have done step three.</label> 
-    </div>
+    </div> -->
   </div>
 
   <div id="step_four" class="modular_step col-sm-12 col-xs-12 col-md-12 col-lg-12">
@@ -157,11 +158,11 @@ HTML::script('assets/js/visual.js')])
     };
     
     _predictry.push([<span class="hljs-string">'track'</span>, started_checkout_data]);</code></pre>
-    
+    <!--
     <div class="checkbox">
         <input id="step_four" type="checkbox" value="step_four" name="step_four"> 
         <label for="step_four" class="checkbox_label">Check this if you have done step four.</label> 
-    </div>
+    </div> -->
   </div>
   
   <div step="step_fourb" class="modular_step col-sm-12 col-xs-12 col-md-12 col-lg-12">
@@ -192,11 +193,12 @@ HTML::script('assets/js/visual.js')])
     };
     
     _predictry.push([<span class="hljs-string">'track'</span>, buy_data]);</code></pre>
-    
+    <!--
     <div class="checkbox">
         <input id="step_fourb" type="checkbox" value="step_fourb" name="step_fourb"> 
         <label for="step_fourb" class="checkbox_label">Check this if you have done step four[B].</label> 
     </div>
+    -->
   </div>
   
   <div id="step_five" class="modular_step col-sm-12 col-xs-12 col-md-12 col-lg-12">
@@ -205,15 +207,18 @@ HTML::script('assets/js/visual.js')])
     <pre class="line-numbers prettyprint"><code class="language-javascript hljs "><span class="hljs-keyword">var</span> item_id = <span class="hljs-number">100</span>; <span class="hljs-comment">//item_id that will be removed</span>
 
     _predictry.push([<span class="hljs-string">'removeItem'</span>, item_id]);</code></pre>
+    <!--
     <div class="checkbox">
         <input id="step_five" type="checkbox" value="step_five" name="step_five"> 
         <label for="step_five" class="checkbox_label">Check this if you have done step five.</label> 
     </div>
+    -->
   </div>
-  
+  <!--
   <div class="modular_step sint_save col-sm-12 col-xs-12 col-md-12 col-lg-12">
     <a id="s_save" class="btn btn-primary btn-lg btn-block" onclick="saveintConfig('{{ $tenant_id }}', '{{ $site->api_key }}')">Save Configuration</a>
   </div>
+  -->
 </div>
 
 <script type="text/javascript">

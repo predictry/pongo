@@ -25,13 +25,7 @@ use App\Controllers\BaseController,
     Validator,
     View;
 
-/**
- * Author       : Rifki Yandhi
- * Date Created : Jan 13, 2015 5:16:06 PM
- * File         : app/controllers/Sites2Controller.php
- * Copyright    : rifkiyandhi@gmail.com
- * Function     : 
- */
+
 class Sites2Controller extends BaseController
 {
 
@@ -104,7 +98,8 @@ class Sites2Controller extends BaseController
 
     public function intWOO($tenant_id) {
       $output = array( 
-        'current_site' => $tenant_id
+        'current_site' => $tenant_id,
+        'pageTitle'    => 'Predictry Wordpress Integration'
       );
       return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.sites.wizard.woocommerce', $output);
     }
