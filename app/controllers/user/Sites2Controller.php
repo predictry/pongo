@@ -84,10 +84,13 @@ class Sites2Controller extends BaseController
 
     public function getCreate()
     {
-        $site_category_list = Industry::all()->lists("name", "id");
+      $site_category_list = Industry::all()->lists("name", "id");
+      $current_site = \Session::get("active_site_name");
+
         return View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.sites.form", array(
                     "type"               => "create",
                     "pageTitle"          => \Lang::get("panel.add.new.site"),
+                    "current_site"        => $current_site,
                     "site_category_list" => $site_category_list));
     }
 
