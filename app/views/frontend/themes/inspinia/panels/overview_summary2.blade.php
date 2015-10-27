@@ -108,8 +108,6 @@
                     <small>Recommended Orders</small>
                     @if ($overviews['total_sales_amount'] > 0 )  
                       <h1 style="color:green;">{{ number_format((( $overviews['total_sales_recommended'] / $overviews['total_sales_amount'] ) * 100), 2, '.', '') }} % lift</h1>
-                    @else
-                      <h1 style="color:green;">Pending Metrics</h1>
                     @endif
                   </div>
                 </div>
@@ -144,8 +142,6 @@
                     <small>recommended view actions received</small><br /><br />
                     @if ($overviews['total_pageviews'] > 0 )  
                       <h1 class="boots_no no-margin green" style="color: green;">{{ sprintf("%.2f", ($overviews['total_pageviews_recommended'] / $overviews['total_pageviews'] ) * 100) }} % lift</h1>
-                    @else
-                      <p class="boots_no">No Data</p>
                     @endif
                   </div>
                 </div>

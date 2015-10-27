@@ -15,7 +15,7 @@ class AddCurrencyIntoSite extends Migration {
     //
     Schema::table('sites', function(Blueprint $table)
 		{ 
-      $table->string('currency')->default('USD');
+      $table->string('currency')->default(' ');
 		});
 
 	}

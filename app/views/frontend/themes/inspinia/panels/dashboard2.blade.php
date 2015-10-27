@@ -16,10 +16,26 @@
     
     <div class="ibox float-e-margins">
         <div class="ibox-title">
+          <div class="pull-left">
             <h5>Overview Summary of ({{ $site['name'] }})</h5>
-            <div class="pull-right">
-                @include(getenv('FRONTEND_SKINS') . $theme . '.panels.filter_date')
-            </div>
+          </div>
+          
+          <div class="pull-right">
+              @include(getenv('FRONTEND_SKINS') . $theme . '.panels.filter_date')
+          </div>
+        </div>
+        <div class="ibox-content">
+          <p>
+            Ok, so what's next ?
+            <ol>
+              <li><strike>Sign up</strike></li>
+              <li>Put the tracking script and get analytics on your dashboard</li>
+              <li>Wait for a week as our owls get more data from your traffic</li>
+              <li>View a demo of the recommendations on our site</li>
+              <li>Insert the recommendation script on your site and win more customers</li>
+            </ol>
+            Questions? Need help?
+          </p>
         </div>
     </div>
 
