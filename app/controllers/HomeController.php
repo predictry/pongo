@@ -220,7 +220,7 @@ class HomeController extends BaseController
                 return Redirect::to('forgot')->with('flash_error', "error.email.doesnt.exists");
             else {
                 $response = Password::remind(Input::only('email'), function($message) {
-                            $message->subject = "subject.password.reminder";
+                            $message->subject = "Reset Your Password";
                         });
                 switch ($response) {
                     case Password::INVALID_USER:

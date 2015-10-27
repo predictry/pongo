@@ -23,6 +23,6 @@ return array(
     "success.register"                 => "You have sucessfully registered.",
     "success.confirmation.correct"     => "Well done!. You've been confirmed to be part of us.",
     "success.password.changed"         => "Password has been changed. You can login now.",
-    "subject.password.reminder"        => "Password Reminder",
+    "subject.reminder"                 => "Password Reminder",
     "info.top.register_pref"           => "Already have an account ? You can "
 );

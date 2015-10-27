@@ -277,7 +277,7 @@ class Home2Controller extends BaseController {
                 return Redirect::to('v2/forgot')->with('flash_error', \Lang::get("error.email.doesnt.exists"));
             else {
                 $response = Password::remind(Input::only('email'), function($message) {
-                            $message->subject = \Lang::get("home.subject.password.reminder");
+                            $message->subject(\Lang::get("home.subject.reminder"));
                         });
                 switch ($response) {
                     case Password::INVALID_USER:
