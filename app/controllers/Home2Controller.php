@@ -16,6 +16,7 @@ use Redirect;
 use Response;
 use Session;
 use App\Models\Site;
+use App\Models\Industry;
 use Validator;
 use View;
 use Request;
@@ -159,14 +160,16 @@ class Home2Controller extends BaseController {
           'name' => $site_name,
           'url'  => $site_host
         );
-        
+
+        $industry = Industry::find($input['industry_id']);
+
         $email = array(
           'name'      => $input['name'],
           'email'     => $input['email'],
           'tenantID'  => $input_site['name'],
           'pricing'   => $input['pricing_method'],
           'skuCount'  => $input['range_number_of_items'],
-          'industry'  => $input['industry_id']
+          'industry'  => $industry['name']
         );
           
         $active_q = array( 
@@ -174,10 +177,6 @@ class Home2Controller extends BaseController {
           'action'    => 'new'
         );
 
-        $request = $client->post();
-        $request->setBody(json_encode($active_q), 'application/json');
-        $request->setAuth('admin', 'admin');
-        $response = $request->send();
 
         $rules = array_merge(App\Models\Account::$rules, [
             'range_number_of_items' => 'required|in:less_than_5k,20k_to_100k,100k_to_500k,500k_to_1M,more_than_1mil',
@@ -234,6 +233,11 @@ class Home2Controller extends BaseController {
                     }
                     
                     Event::fire("account.registration_confirmed", $account);  //send verification email (skip to confirmation)
+                    $request = $client->post();
+                    $request->setBody(json_encode($active_q), 'application/json');
+                    $request->setAuth('admin', 'admin');
+                    $response = $request->send();
+
                     Mail::send('emails.workers.noti', $email, function($message) {
                       $message->to('stewart@predictry.com', 'Stewart')->subject('New user on-boarded!');
                     });
