@@ -106,7 +106,8 @@ class Sites2Controller extends BaseController
 
     public function intMagento($tenant_id) {
       $output = array( 
-        'current_site' => $tenant_id
+        'current_site' => $tenant_id,
+        'pageTitle' => 'Predictry Magento Integration'
       );
       return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.sites.wizard.magento', $output);
     }
