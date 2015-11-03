@@ -20,7 +20,7 @@ HTML::script('assets/js/visual.js')])
   <div class="modular_step col-sm-12 col-xs-12 col-md-12 col-lg-12" id="woo_1">
     <h2 class="step_head">STEP 1: Download The Plugin</h2>
     <p>
-      Download the plugin from our server and go to System >> Magento Connect >> Magento Connect Manager.</p>
+      Download the plugin from our <a href="/files/magento/release.tgz">server</a> and go to System >> Magento Connect >> Magento Connect Manager.</p>
 
       <img src="/assets/img/files/srcm_one.png" class="img-responsive" style="max-width: 600px; width: 100%;" />
     </p>    
