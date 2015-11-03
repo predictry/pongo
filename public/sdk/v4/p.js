@@ -841,10 +841,17 @@ if (typeof Predictry !== 'object') {
                     str_desc += "</a>";
                     div_description.innerHTML = str_desc;
 
-                    var str_price = "";
-                    str_price += "<span class='priceCurrency'>" + price_currency + "</span>";
-                    str_price += "<span class='price'>" + response.price + "</span>";
-                    div_price.innerHTML = str_price;
+                    if (response.net_price) {
+                        var str_price = "";
+                        str_price += "<span class='priceCurrency'>" + price_currency + "</span>";
+                        str_price += "<span class='price net_price'>" + response.net_price + "</span>";
+                        div_price.innerHTML = str_price;
+                    } else {
+                        var str_price = "";
+                        str_price += "<span class='priceCurrency'>" + price_currency + "</span>";
+                        str_price += "<span class='price'>" + response.price + "</span>";
+                        div_price.innerHTML = str_price;
+                    }
 
                     div_item_wrapper.appendChild(div_thumb);
                     div_item_wrapper.appendChild(div_description);
