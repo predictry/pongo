@@ -29,7 +29,7 @@ HTML::script('assets/js/visual.js')])
   <div class="modular_step col-sm-12 col-xs-12 col-md-12 col-lg-12" id="woo_2">
     <h2 class="step_head">STEP 2: Install The Plugin</h2>
     <p>
-      Upload the zipped plugin you just downloaded through Magento Connect. Browser the zip file by pressing "Choose File" by "Direct File Upload".
+      Upload the zipped plugin you just downloaded to Magento Connect Manager. Browser the zip file by pressing "Choose File" by "Direct File Upload".
 
       <img src="/assets/img/files/srcm_two.png" class="img-responsive" style="max-width: 600px; width: 100%;" />
 
@@ -39,10 +39,22 @@ HTML::script('assets/js/visual.js')])
     </p>
   </div>
 
-   <div class="modular_step col-sm-12 col-xs-12 col-md-12 col-lg-12" id="woo_2">
+  <div class="modular_step col-sm-12 col-xs-12 col-md-12 col-lg-12" id="woo_2">
     <h2 class="step_head">STEP 3: Fill in the credentials</h2>
-    <p> Go to System >> Configuration >> Predictry Recommendation and fill in the credentials to start using our service.</p>
+    <p> Go to System >> Configuration >> Predictry Recommendation and fill in the credentials to start using our service.Make sure plugin is enabled.</p>
       <img src="/assets/img/files/srcm_four.png" class="img-responsive" style="max-width: 600px; width: 100%;" />
+    <p>supported magento versions: </p> 
   </div>
+   
+  <div class="modular_step col-sm-12 col-xs-12 col-md-12 col-lg-12" id="woo_2">
+    <h2 class="step_head">STEP 4: View Source Your Website To Check Predictry is present</h2>
+    <img src="/assets/img/files/srcm_five.png" class="img-responsive" style="max-width: 600px; width: 100%;" /> 
+  </div>
+
+  <div class="modular_step col-sm-12 col-xs-12 col-md-12 col-lg-12" id="woo_2">
+    <h2 class="step_head">STEP 5: Go to your dashboard wait for your data to come in</h2>
+    <p>Recommendations will be shown when enough data is collected.</p>
+  </div>
+
 </div>
 @stop
