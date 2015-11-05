@@ -42,11 +42,11 @@
                 </ul> 
             </li>
             
-            <!--
+         
             <li class="<?php if ($ca === 'App\Controllers\User\Items2Controller') echo 'active'; ?>">
                 <a href="<?php echo URL::to('v2/items'); ?>"><i class="fa fa-table"></i> <span class="nav-label">Your Items</span> </a>
             </li>
-            -->
+        
         </ul>
 
     </div>

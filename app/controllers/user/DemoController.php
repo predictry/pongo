@@ -9,6 +9,7 @@ use App\Controllers\BaseController,
     Input,
     Paginator,
     Redirect,
+    Session,
     Response,
     View;
 
@@ -42,6 +43,8 @@ class DemoController extends BaseController
         $data        = $this->getByPage($page, 16, "site_id", $this->active_site_id);
         $message     = '';
         $metas       = [];
+        $current_site = \Session::get("active_site_name");
+
 
         if (!is_array($data) && !is_object($data)) {
             $message   = $data;
@@ -67,6 +70,7 @@ class DemoController extends BaseController
             "table_header" => $this->model->manage_table_header,
             "page"         => $page,
             "modalTitle"   => "View Item",
+            "current_site" => $current_site,
             "upper"        => [],
             'widgets'      => $widgets
         );

@@ -47,13 +47,13 @@ HTML::script('assets/js/visual.js')])
   </div>
    
   <div class="modular_step col-sm-12 col-xs-12 col-md-12 col-lg-12" id="woo_2">
-    <h2 class="step_head">STEP 4: View Source Your Website To Check Predictry is present</h2>
+    <h2 class="step_head">STEP 4: View the source of your site to check predictry script is present</h2>
     <img src="/assets/img/files/srcm_five.png" class="img-responsive" style="max-width: 600px; width: 100%;" /> 
   </div>
 
   <div class="modular_step col-sm-12 col-xs-12 col-md-12 col-lg-12" id="woo_2">
-    <h2 class="step_head">STEP 5: Go to your dashboard wait for your data to come in</h2>
-    <p>Recommendations will be shown when enough data is collected.</p>
+    <h2 class="step_head">STEP 5:If everything is ok data will appear in 24 hours on your dashboard</h2>
+    <p>Recommendations will be shown when enough data is collected. Email support@predicty.com if you need any help.</p>
   </div>
 
 </div>

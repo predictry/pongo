@@ -47,7 +47,8 @@ class Items2Controller extends BaseController
         $site = Site::where('name', $current_site)->first();
         $output = array(
           "items" => $arr_response,
-          "site"  => $site
+          "site"  => $site,
+          "current_site" => $current_site
         );
 
         return View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.manageitems", $output);
