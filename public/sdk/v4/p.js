@@ -564,7 +564,7 @@ if (typeof Predictry !== 'object') {
                     config_session_cookie_timeout = 63072000000, // 2 years
                     config_tracking_session_cookie_timeout = 1200000, //20 minutes
                     config_do_not_track = false,
-                    config_s3_data_similar_path = "data/tenants/{tenant}/similiar/",
+                    config_s3_data_similar_path = "data/tenants/{tenant}/recommendations/similiar/",
                     config_s3_data_recommendation_path = "data/tenants/{tenant}/recommendations/",
                     config_s3_data_items_path = "data/tenants/{tenant}/items/",
                     config_s3_data_category_items_path = "data/tenants/{tenant}/categories/",
