@@ -563,15 +563,15 @@ if (typeof Predictry !== 'object') {
                     config_default_actions = ["view", "add_to_cart", "buy", "started_checkout", "started_payment", "check_delete_item", "delete_item", "custom", "bookmark"],
                     config_session_cookie_timeout = 63072000000, // 2 years
                     config_tracking_session_cookie_timeout = 1200000, //20 minutes
-                    config_recently_session_cookie_timeout = 2592000000, // 30 days
                     config_do_not_track = false,
+                    config_s3_data_similar_path = "data/tenants/{tenant}/similiar/",
                     config_s3_data_recommendation_path = "data/tenants/{tenant}/recommendations/",
                     config_s3_data_items_path = "data/tenants/{tenant}/items/",
                     config_s3_data_category_items_path = "data/tenants/{tenant}/categories/",
                     config_default_s3_resource_ext = ".json",
                     config_cls_prefix = "pry-",
                     config_prefix_param = "p_",
-                    config_fisher_endpoint = "http://119.81.208.244:8090/fisher/items",
+                    config_fisher_endpoint = "http://fisher.predictry.com:8090/fisher/items",
                     config_widget_type = [ "similar", "oivt", "oipt", "duo", "oip" , "oiv"],
                     config_recent_limit = 20,
                     config_typed_titles = { similar: "Similar Items", oivt: "Viewed also viewed", oipt: "Bought also bought", duo: "Combined" , oiv: "Other Items Viewed" , oip: "Other Items Purchase" }
@@ -2014,12 +2014,12 @@ if (typeof Predictry !== 'object') {
             function getItems(item_id, typename, callback, limit) {
                 var item_ids = [];
                 if (typename == 'similar') {
-                    var end_point = config_fisher_endpoint + "/" + tenant_id + "/related/" + item_id ;
+                    var s3_similar_end_point = config_s3_resource_url+ config_s3_data_similar_path.replace("{tenant}", tenant_id) + item_id + config_default_s3_resource_ext;
                     var http = new XMLHttpRequest();
-                    http.open("GET", end_point, true);
+                    http.open("GET", s3_similar_end_point, true);
                     http.onreadystatechange = function () {
-                        if (http.readyState == 4){
-                            if(http.status == 200 && http.responseText.length > 0) {
+                        if (http.readyState == 4) {
+                            if (http.status == 200 && http.responseText.length > 0) {
                                 item_ids = JSON.parse(http.responseText).items;
                                 if (isDefined(limit)) {
                                     var temp_ids = [];
@@ -2030,10 +2030,36 @@ if (typeof Predictry !== 'object') {
                                 } else {
                                     callback(item_ids);
                                 }
-                            }else{
+                            } else if(http.status == 403) {
+                                var end_point = config_fisher_endpoint + "/" + tenant_id + "/related/" + item_id ;
+                                console.log(end_point);
+                                http.open("GET", end_point, true);
+                                http.onreadystatechange = function () {
+                                    if (http.readyState == 4) {
+                                        if (http.status == 200 && http.responseText.length > 0) {
+                                            item_ids = JSON.parse(http.responseText).items;
+                                            if (isDefined(limit)) {
+                                                var temp_ids = [];
+                                                for (var i = 0; i < limit; i++) {
+                                                    temp_ids.push(item_ids[i]);
+                                                }
+                                                callback(temp_ids);
+                                                console.log(temp_ids);
+                                            } else {
+                                                console.log(item_ids);
+                                                callback(item_ids);
+                                            }
+                                        } else {
+                                            callback(undefined);
+                                        }
+
+                                    }
+                                }
+                                http.send();
+                                return item_ids;
+                            } else {
                                 callback(undefined);
                             }
-
                         }
                     }
                     http.send();
