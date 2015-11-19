@@ -2032,7 +2032,6 @@ if (typeof Predictry !== 'object') {
                                 }
                             } else if(http.status == 403) {
                                 var end_point = config_fisher_endpoint + "/" + tenant_id + "/related/" + item_id ;
-                                console.log(end_point);
                                 http.open("GET", end_point, true);
                                 http.onreadystatechange = function () {
                                     if (http.readyState == 4) {
@@ -2044,9 +2043,7 @@ if (typeof Predictry !== 'object') {
                                                     temp_ids.push(item_ids[i]);
                                                 }
                                                 callback(temp_ids);
-                                                console.log(temp_ids);
                                             } else {
-                                                console.log(item_ids);
                                                 callback(item_ids);
                                             }
                                         } else {
