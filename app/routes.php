@@ -17,7 +17,6 @@ Route::pattern('action_name', '[A-Za-z0-9_]+');
 #Items
 Route::pattern('item_id', '[A-Za-z0-9]+');
 
-
 /*
   |--------------------------------------------------------------------------
   | Frontend Routes V2
@@ -28,7 +27,8 @@ Route::group(array('prefix' => 'v2', 'namespace' => 'App\Controllers'), function
     Route::post('login/submit', 'Home2Controller@postLogin');
     
     Route::post('check/config/', 'Check@config');
-
+    
+    
     Route::get('register', 'Home2Controller@getRegister');
     Route::post('register/submit', 'Home2Controller@postRegister');
 
@@ -42,6 +42,9 @@ Route::group(array('prefix' => 'v2', 'namespace' => 'App\Controllers'), function
 });
 
 
+Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\Billing'), function () {
+  Route::get('billing', 'InvoicesController@index');
+});
 /*
   |------------------------------------ --------------------------------------
   | User Dashboard Routing V2
@@ -248,7 +251,7 @@ Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), f
 
     #Dashboard
     $role = Session::get("role");
-
+  
     Route::get('user', 'UserController@getDashboard');
     Route::get('home2', array('as' => 'home2', 'uses' => 'PanelController@index'));
     Route::get('home/{selected_comparison?}/{type?}/{date_unit?}/{dt_start?}/{dt_end?}', array('as' => 'home', 'uses' => 'PanelController@index2'));
@@ -379,3 +382,4 @@ Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\User'), f
     #Logout
     Route::get('user/logout', 'UserController@logout');
 });
+

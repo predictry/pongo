@@ -8,6 +8,7 @@
         "unikent/curl": "dev-master",
         "doctrine/dbal": "2.4.*",
         "aws/aws-sdk-php": "~2.7",
+        "mschinis/braintree": "dev-master",
         "zizaco/entrust": "1.2.*@dev",
         "monashee/php-simple-html-dom-parser": "dev-master"
     },

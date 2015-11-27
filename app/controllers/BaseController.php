@@ -28,7 +28,7 @@ class BaseController extends \Controller
         $this->siteInfo['custom_script'] = '';
         $this->siteInfo['theme']         = $this->theme;
         $this->siteInfo['ca']            = '';
-
+  
         $this->manageViewConfig['isManage']       = true;
         $this->manageViewConfig['create']         = true;
         $this->manageViewConfig['edit']           = true;

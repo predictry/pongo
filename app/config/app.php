@@ -97,7 +97,8 @@ return array(
         'Illuminate\View\ViewServiceProvider',
         'Illuminate\Workbench\WorkbenchServiceProvider',
         'Zizaco\Entrust\EntrustServiceProvider',
-        'Monashee\PhpSimpleHtmlDomParser\PhpSimpleHtmlDomParserServiceProvider'
+        'Monashee\PhpSimpleHtmlDomParser\PhpSimpleHtmlDomParserServiceProvider',
+        'Mschinis\Braintree\BraintreeServiceProvider'
     ),
     /*
       |--------------------------------------------------------------------------
