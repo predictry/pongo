@@ -13,4 +13,49 @@
 @section('content')
 <h1>Billing</h1>
 
+<div class="row">
+  
+  <div class="col-md-12">
+    <h2>Current Payment and Charges</h2>
+
+    <table class="table">
+      <tbody>
+        <tr>
+          <td>Latest Payment Received (9/10/2015)</td>
+          <td>200 USD</td>
+        </tr>
+        <tr>
+          <td>Total Amount Due (Payment Due 10/11/2015)</td>
+          <td>500 USD</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-md-12">
+
+    <h2>Billing History</h2>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <td>Invoice Number</td>
+          <td>Date</td>
+          <td>Amount</td>
+          <td>Status</td>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach($invoices as $invoice)
+        <tr>
+          <td>{{ $invoice['invoice_number']}}</td>
+          <td>{{ date('d-m-Y', $invoice['created_at']) }}</td>
+          <td>{{ $invoice['amount'] }} USD</td>
+          <td>PAID</td>
+        </tr>
+        @endforeach
+      </tbody>
+    </table>
+  </div>
+</div>
 @stop

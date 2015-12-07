@@ -28,14 +28,23 @@ class InvoicesController extends BaseController
   { 
     parent::__construct();
     $this->current_site = \Session::get("active_site_name");
+    $this->billing_endpoint = $_ENV['BILLING_ENDPOINT'];
   }
 
   public function index()
   {
+
+    $client= new Client($this->billing_endpoint);
+    $request = $client->get("/get_invoices?tenant_name=CLIENT2DEV");
+    $response = $request->send();
+    $arr_response = $response->json();
+
     $output = array(
       'title' => 'Google',
-      'current_site' => $this->current_site
+      'current_site' => $this->current_site,
+      'invoices' => $arr_response
     );
+    
     return View::make(getenv('FRONTEND_SKINS') . $this->theme .  '.billing.invoices.index', $output); 
   }
 }
