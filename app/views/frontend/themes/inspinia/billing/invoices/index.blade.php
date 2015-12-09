@@ -51,7 +51,14 @@
           <td>{{ $invoice['invoice_number']}}</td>
           <td>{{ date('d-m-Y', $invoice['created_at']) }}</td>
           <td>{{ $invoice['amount'] }} USD</td>
-          <td>PAID</td>
+          <td>
+            @if ($invoice['status'])
+              <span class="paid">PAID</span>
+            @else
+              <span class="unpaid">UNPAID</span>
+              <a href="/invoice/{{ $invoice['invoice_number'] }}">PAY</a>
+            @endif
+          </td>
         </tr>
         @endforeach
       </tbody>

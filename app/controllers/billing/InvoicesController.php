@@ -13,14 +13,12 @@ use App\Controllers\BaseController,
     Input,
     Redirect,
     Response,
+    Request,
     Str,
     Validator,
     View;
 
-/* 
- *  InvoicesController params
- *  null
- */
+
 class InvoicesController extends BaseController
 {
 
@@ -32,8 +30,7 @@ class InvoicesController extends BaseController
   }
 
   public function index()
-  {
-
+  {    
     $client= new Client($this->billing_endpoint);
     $request = $client->get("/get_invoices?tenant_name=CLIENT2DEV");
     $response = $request->send();
@@ -42,9 +39,50 @@ class InvoicesController extends BaseController
     $output = array(
       'title' => 'Google',
       'current_site' => $this->current_site,
-      'invoices' => $arr_response
+      'invoices' => $arr_response,
+      'pageTitle' => 'Billing'
     );
-    
     return View::make(getenv('FRONTEND_SKINS') . $this->theme .  '.billing.invoices.index', $output); 
   }
+ 
+  
+  public function show($invoice_number)
+  {
+    
+    $client= new Client($this->billing_endpoint);
+    $output = array(
+      'invoice_number' => $invoice_number,
+      'current_site' => $this->current_site,
+      'pageTitle' => 'Invoice Number - '. $invoice_number
+    );
+    return View::make(getenv('FRONTEND_SKINS') . 
+                      $this->theme .  '.billing.invoices.show', 
+                      $output); 
+  }
+
+
+  public function pay($invoice_number)
+  {
+    $client= new Client($this->billing_endpoint);
+    $request = $client->get("/bt_token");
+    $response = $request->send();
+    $braintree_client_token = $response->getBody();
+    
+    $output = array(
+      'invoice_number' => $invoice_number,
+      'current_site' => $this->current_site,
+      'bt_token' => $braintree_client_token,
+      'pageTitle' => 'Payment for - ' 
+    );
+    return View::make(getenv('FRONTEND_SKINS') . 
+                      $this->theme .  '.billing.invoices.pay', 
+                      $output); 
+  }
+  
+  public function checkout($invoice_number)
+  {
+    $nounce = Input::get('payment_method_nonce');
+    return $invoice_number .  ' '  . $nounce;
+  }
+  
 }

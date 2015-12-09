@@ -44,6 +44,9 @@ Route::group(array('prefix' => 'v2', 'namespace' => 'App\Controllers'), function
 
 Route::group(array('before' => 'auth', 'namespace' => 'App\Controllers\Billing'), function () {
   Route::get('billing', 'InvoicesController@index');
+  Route::get('invoice/{invoice_number}', 'InvoicesController@show');
+  Route::get('invoice/{invoice_number}/pay', 'InvoicesController@pay');
+  Route::post('checkout/{invoice_number}', 'InvoicesController@checkout');
 });
 /*
   |------------------------------------ --------------------------------------
