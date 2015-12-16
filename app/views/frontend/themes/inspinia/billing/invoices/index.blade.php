@@ -12,7 +12,7 @@
 ])
 @section('content')
 <h1>Billing</h1>
-
+@include('frontend.partials.notification')
 <div class="row">
   
   <div class="col-md-12">

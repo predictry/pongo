@@ -4868,3 +4868,18 @@ p.boots_no {
     margin-top: 20px;
     margin-bottom: 20px;
 }
+td.total {
+  text-align: right;
+}
+
+table.invoice {
+  margin: 70px 0px 70px 0px;
+}
+
+a.invoice_pay {
+  
+}
+
+.payment-container {
+  background: transparent;
+}
