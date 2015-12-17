@@ -72,7 +72,7 @@ class InvoicesController extends BaseController
     );
     return View::make(getenv('FRONTEND_SKINS') . 
                       $this->theme .  '.billing.invoices.show', 
-                      $output); 
+                      $output);
   }
 
   public function checkout($invoice_number)
@@ -80,16 +80,13 @@ class InvoicesController extends BaseController
     $nounce = Input::get('payment_method_nonce');
     $payload = [ "nounce" => $nounce, "invoice_number" => $invoice_number ];
     $client = new Client($this->billing_endpoint);
-    $request = $client->post("/post_nounce",array(
-                      'content-type' => 'application/json'
-                    ),array());
+    $request = $client->get("/post_nounce?nounce=".$nounce."&invoice_number=".$invoice_number);
 
-    $request->setBody($payload);
     $response = $request->send();
     if ($response->getStatusCode() == '200') {
       return Redirect::to('billing')->with('flash_message', 'Your payment has been accepted. We will schedule the transcation once a day and update your inoivce status based on the transcation result not later than 24 hours!');
     } else {
-      return Redirect::to('billing')->with('flash_message', 'Payment Failed!');
+      return Redirect::to('billing')->with('flash_message', 'Payment Failed. Try Again!');
     }
   }
   
