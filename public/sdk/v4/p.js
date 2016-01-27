@@ -783,7 +783,9 @@ if (typeof Predictry !== 'object') {
                             }
 
                             elem.appendChild(predictryList);
+                            if (params_tmp.showBranding=="true"){
                             elem.appendChild(createFooterDiv("by Predictry"));
+                            }
                         }
                     }
 
@@ -2108,6 +2110,13 @@ if (typeof Predictry !== 'object') {
             function showTypedItems(typename) {
                 var ele = document.querySelectorAll(".predictry-" + typename)[0];
                 var item_id = ele.attributes['data-predictry-item-id'].value;
+                var showBranding = "true";
+                if (isDefined(ele.attributes['data-predictry-show-branding'])){
+                    showBranding = ele.attributes['data-predictry-show-branding'].value;
+                }
+                else{
+                    showBranding = "true";
+                }
                 var title, hide;
                 if (isDefined(ele.attributes['data-predictry-title'])) {
                     if (ele.attributes['data-predictry-title'].value !== "false") {
@@ -2121,7 +2130,8 @@ if (typeof Predictry !== 'object') {
                     limit: ele.attributes['data-predictry-limit'].value,
                     typed: typename,
                     hide_title: hide,
-                    title: (isDefined(title) && (title !== "")) ? title : config_typed_titles[typename]
+                    title: (isDefined(title) && (title !== "")) ? title : config_typed_titles[typename],
+                    showBranding: showBranding
                 };
 
                 var load = function (items) {
