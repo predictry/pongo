@@ -56,5 +56,29 @@ HTML::script('assets/js/visual.js')])
     <p>Recommendations will be shown when enough data is collected. Email support@predicty.com if you need any help.</p>
   </div>
 
+  <div class="modular_step col-sm-12 col-xs-12 col-md-12 col-lg-12" id="woo_2">
+    <h2 class="step_head">STEP 6:Add Predictry widget to display recommendation</h2>
+    <p>
+      Select <strong>CMS</strong>, <strong>Widgets</strong> menu from Magento Admin Panel and click on <strong>Add New Widget Instance</strong> button.
+    </p>
+
+    <p>In <em>Type</em> drop down, select <strong>Predictry Recommendation</strong>.</p>
+    <p>In <em>Design Package/Theme</em> drop down, select <em>default/default</em> and click on <strong>Continue</strong> button.</p>
+
+    <p>In <em>Frontend Properties</em>, <em>Layout Updates</em>, click on <strong>Add Layout Update</strong> button.</p>
+    <p>In <em>Display On</em> drop down, select on what page recommendations is supposed to appear.</p>
+    <p>In <strong>Block Reference</strong> drop down, select where recommendation should be located on a page (for example, <em>Main Content Area</em>, <em>Page Top</em>, etc).</p>
+
+    <p>
+      In <em>Widget Options</em>, <em>Recommendation Type</em>, you can select one of the following recommendation types:
+      <ul>
+        <li><strong>Recommended Items</strong> - This is the general recommendation based on view and purchase behavior.</li>
+        <li><strong>Other Users Who Viewed This Also Viewed</strong> - Recommendation based on view behavior.</li>
+        <li><strong>Other Users Who Bought This Also Bought</strong> - Recommendation based on purchase behavior.</li>
+        <li><strong>Similar Items</strong> - Recommendation based on similarity of items.</li>
+      </ul>
+    </p>
+  </div>
+
 </div>
 @stop

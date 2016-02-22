@@ -26,7 +26,7 @@ $app = new Illuminate\Foundation\Application;
 
 $env = $app->detectEnvironment(array(
 
-	'local' => array(''), // empty string make Laravel to default to 'local'
+	'local' => array('dell-sunway'), // empty string make Laravel to default to 'local'
 	'production' => array('perfectsen2'), // hostname of the Production server
 
 ));
