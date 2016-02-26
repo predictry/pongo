@@ -98,7 +98,8 @@ return array(
         'Illuminate\Workbench\WorkbenchServiceProvider',
         'Zizaco\Entrust\EntrustServiceProvider',
         'Monashee\PhpSimpleHtmlDomParser\PhpSimpleHtmlDomParserServiceProvider',
-        'Mschinis\Braintree\BraintreeServiceProvider'
+        'Mschinis\Braintree\BraintreeServiceProvider',
+        Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class
     ),
     /*
       |--------------------------------------------------------------------------

@@ -10,12 +10,12 @@
         "aws/aws-sdk-php": "~2.7",
         "mschinis/braintree": "dev-master",
         "zizaco/entrust": "1.2.*@dev",
-        "monashee/php-simple-html-dom-parser": "dev-master"
+        "monashee/php-simple-html-dom-parser": "dev-master",
+        "barryvdh/laravel-ide-helper": "2.1-dev"
     },
     "require-dev": {
         "way/generators": "2.*",
         "fzaninotto/faker": "v1.3.0",
-        "barryvdh/laravel-ide-helper": "1.*",
         "codeception/codeception": "dev-master",
         "panique/laravel-sass": "1.0"
     },
