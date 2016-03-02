@@ -34,12 +34,16 @@
                     <a href="/v2/sites/{{ $current_site }}/integration"><span class="nav-label">Javascript <i class="fa fa-code"></i> </span> </a>
                   <li>
                   <li>
-                      <a href="/v2/sites/{{ $current_site }}/woocommerce"><span class"nav-label">WooCommerce </span></a>
+                      <a href="/v2/sites/{{ $current_site }}/woocommerce"><span class="nav-label">WooCommerce </span></a>
                   </li>
                   <li>
-                      <a href="/v2/sites/{{ $current_site }}/magento"><span class"nav-label">Magento </span></a>
+                      <a href="/v2/sites/{{ $current_site }}/magento"><span class="nav-label">Magento </span></a>
                   </li>
                 </ul> 
+            </li>
+
+            <li class="<?php if ($ca === 'App\Controllers\Email\EmailTargeting') echo 'active'; ?>">
+                <a href="/v2/email/new"><i class="fa fa-envelope"></i> <span class="nav-label">Email Targeting </span> </a>
             </li>
             
             <!--
