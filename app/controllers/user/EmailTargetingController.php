@@ -16,6 +16,7 @@ class EmailTargetingController extends BaseController
 
     public function __construct(EmailTargetingRepository $repository)
     {
+        parent::__construct();
         $this->repository  = $repository;
         $this->http_status = 200;
     }
@@ -42,11 +43,7 @@ class EmailTargetingController extends BaseController
             $campaignDraft->subject  = $input['subject'];
             $campaignDraft->template = $input['template'];
 
-            if ($this->repository->save($campaignDraft)) {
-                $response = ['error'=> false];
-            } else {
-                $response = ['error'=> true];
-            }
+            $response = ['success' => $this->repository->save($campaignDraft)];
         }else {
             $response = ['error'=>true, 'description'=> 'validation failed!'];
         }
