@@ -22,7 +22,7 @@
         {{ HTML::style('assets/inspinia/css/style.css') }}
         {{ HTML::script('assets/js/d3.js') }}
         {{ HTML::script('assets/js/metricsgraphics.js') }}
-
+        {{ HTML::style('assets/css/summernote.css') }}
         @if(count($styles) > 0)
 
         @foreach ($styles as $style)

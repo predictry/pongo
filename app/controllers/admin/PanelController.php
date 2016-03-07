@@ -16,7 +16,6 @@ class PanelController extends AdminBaseController
     public function __construct()
     {
         parent::__construct();
-
         $custom_script = "var site_url = '" . URL::to('/v2/admin') . "';";
         \View::share(array("ca" => get_class(), "custom_script" => $custom_script));
     }
