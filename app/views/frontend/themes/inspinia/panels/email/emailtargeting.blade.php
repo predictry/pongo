@@ -1,17 +1,23 @@
-@extends(getenv('FRONTEND_SKINS') . $theme . '.layouts.dashboard', ['scripts' => array(
-HTML::script('assets/js/script.helper.js'),
-HTML::script('assets/js/data_collection.js'),
-HTML::script('assets/js/prism.js')),
-HTML::script('assets/js/chosen-1.1.0/chosen.jquery.min.js'),
-HTML::script('assets/js/moment.min.js'),
-HTML::script('assets/js/daterangepicker.js'),
-HTML::script('assets/js/highcharts.js'),
-HTML::script('assets/inspinia/js/plugins/chartJs/Chart.min.js'),
-HTML::script('assets/js/bootstrap-datetimepicker.min.js'),
-HTML::script('assets/js/script.helper.js'),
-HTML::script('assets/js/script.panel.filters.js'),
-HTML::script('assets/js/visual.js'),
-HTML::script('http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js')])
+@extends(getenv('FRONTEND_SKINS') . $theme . '.layouts.dashboard', [
+    'scripts' => [
+        HTML::script('assets/js/script.helper.js'),
+        HTML::script('assets/js/data_collection.js'),
+        HTML::script('assets/js/prism.js'),
+        HTML::script('assets/js/chosen-1.1.0/chosen.jquery.min.js'),
+        HTML::script('assets/js/moment.min.js'),
+        HTML::script('assets/js/daterangepicker.js'),
+        HTML::script('assets/js/highcharts.js'),
+        HTML::script('assets/inspinia/js/plugins/chartJs/Chart.min.js'),
+        HTML::script('assets/js/bootstrap-datetimepicker.min.js'),
+        HTML::script('assets/js/script.helper.js'),
+        HTML::script('assets/js/script.panel.filters.js'),
+        HTML::script('assets/js/visual.js'),
+        HTML::script('assets/js/summernote.js')
+    ],
+    'styles' => [
+         HTML::style('assets/css/summernote.css')
+    ]
+])
 @section('content')
     @include(getenv('FRONTEND_SKINS') . $theme . '.partials.page_heading_without_action', ['upper' => ['Sites' => 'v2/sites']])
     <div class="wrapper wrapper-content animated fadeInRight">
