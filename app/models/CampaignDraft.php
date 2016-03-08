@@ -12,12 +12,12 @@ class CampaignDraft extends \Eloquent
     protected $table = 'draft';
 
     static $rules = array(
-        'campaignname'          => 'required|min:4',
+        'campaignname'          => 'required',
         'apikey'                => 'required',
         'usersname'             => 'required',
         'subject'               => 'required',
-        'template'              => 'required'
-
+        'template'              => 'required',
+        'status'                => 'in:draft,pending,delivered'
     );
 
 
