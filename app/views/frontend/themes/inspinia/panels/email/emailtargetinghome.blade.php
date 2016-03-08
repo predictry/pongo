@@ -45,6 +45,7 @@ HTML::script('http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js')])
                             </tr>
                             </thead>
                             <tbody>
+                            @if (isset($paginator))
                             @foreach($paginator as $o)
                                 <tr>
                                     <td class="footable-visible footable-first-column"><span class="footable-toggle"></span>{{ $o->campaignname }}</td>
@@ -53,6 +54,7 @@ HTML::script('http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js')])
                                     <td class="footable-visible footable-last-column">{{ $o->status }}</td>
                                 </tr>
                             @endforeach
+                            @endif
 
                             </tbody>
                         </table>

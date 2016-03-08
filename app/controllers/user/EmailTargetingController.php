@@ -74,6 +74,7 @@ class EmailTargetingController extends BaseController
             $campaignDraft->template = $input['template'];
             $campaignDraft->status = 'draft';
             $campaignDraft->timeframe = $input['timeframe'];
+            $campaignDraft->site_id = $this->active_site_id;
             // save the campaign
             if ($this->repository->save($campaignDraft)) {
 
@@ -96,13 +97,17 @@ class EmailTargetingController extends BaseController
                 ]]);
 
                 // check response from oms
-                $jsonResponse = json_decode($response->getBody());
-                if ($jsonResponse->status == 'created') {
-                    $data['message'] = 'Your campaign has been created.';
-                } else if ($jsonResponse->status == 'error') {
-                    $data['message'] = 'Error while processing your campaign: ' . $jsonResponse->message;
+                if ($response->getStatusCode() == '404') {
+                    $data['message'] = 'There was an error in creating your Campaign';
                 } else {
-                    $data['message'] = 'Unknown response';
+                    $jsonResponse = json_decode($response->getBody());
+                    if ($jsonResponse->status == 'created') {
+                        $data['message'] = 'Your campaign has been created.';
+                    } else if ($jsonResponse->status == 'error') {
+                        $data['message'] = 'Error while processing your campaign: ' . $jsonResponse->message;
+                    } else {
+                        $data['message'] = 'Unknown response';
+                    }
                 }
             } else {
                 $data['message'] = 'There is a problem in saving your campaign.';
