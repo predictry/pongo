@@ -43,7 +43,7 @@
             </li>
 
             <li class="<?php if ($ca === 'App\Controllers\Email\EmailTargeting') echo 'active'; ?>">
-                <a href="/v2/email/new"><i class="fa fa-envelope"></i> <span class="nav-label">Email Targeting </span> </a>
+                <a href="/v2/email/home"><i class="fa fa-envelope"></i> <span class="nav-label">Email Targeting </span> </a>
             </li>
             
             <!--

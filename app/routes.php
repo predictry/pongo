@@ -134,6 +134,7 @@ Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Con
             Route::get("demo/show/{id}", ['as' => 'demo.show.{id}', 'uses' => 'DemoController@show']);
 
             # Email Targeting
+            Route::get("email/home", 'EmailTargetingController@home');
             Route::get("email/new", 'EmailTargetingController@index');
             Route::post("email/draft", 'EmailTargetingController@store');
 

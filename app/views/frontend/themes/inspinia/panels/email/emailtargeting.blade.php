@@ -22,7 +22,11 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="float-e-margins">
-                    <div class="ibox-title"><h5>Email Targeting Details</h5></div>
+                    <button type="button" class="btn btn-w-m btn-primary" onclick="location.href='home'">< Back</button>
+
+                    <div class="ibox-title">
+                        <h5>Email Targeting Details</h5>
+                    </div>
                     <div class="ibox-content">
 
                         <form method="get" class="form-horizontal">
