@@ -72,9 +72,8 @@ class EmailTargetingController extends BaseController
             $campaignDraft->usersname = $input['usersname'];
             $campaignDraft->subject  = $input['subject'];
             $campaignDraft->template = $input['template'];
-            $campaignDraft->status = $input['status'];
+            $campaignDraft->status = 'draft';
             $campaignDraft->timeframe = $input['timeframe'];
-
             // save the campaign
             if ($this->repository->save($campaignDraft)) {
 
