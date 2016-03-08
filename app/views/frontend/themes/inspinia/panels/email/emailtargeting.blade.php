@@ -25,11 +25,11 @@
                     <div class="ibox-title"><h5>Email Targeting Details</h5></div>
                     <div class="ibox-content">
 
-                        <form method="get" class="form-horizontal">
+                        <form id="entry-form" name="entry-form" method="post" action="{{ URL::action('emailSave') }}" class="form-horizontal">
                             <div class="form-group">
                                 <label class="col-sm-2 control-label" style="font-weight: bold;">Campaign Name:</label>
                                 <div class="col-sm-6">
-                                    <input type="text" placeholder="Your Campaign Name" id="campaignname"
+                                    <input type="text" placeholder="Your Campaign Name" id="campaignname" name="campaignname"
                                            class="form-control">
                                 </div>
                             </div>
@@ -38,56 +38,45 @@
                                     <h5>Target</h5>
                                 </div>
                                 <div class="ibox-content">
-                                    <form class="form-horizontal">
-                                        <p>Customers with ALL the following Conditions:</p>
-                                        <div class="form-group">
-                                            <label class="col-sm-2 control-label"
-                                                   style="font-weight: bold;">Purchased: </label>
-                                            <div class="col-sm-6">
-                                                <select class="form-control m-b" id="timeframe" name="timeframe">
-                                                    <option selected="selected" style="display:none; font-size:15px;">
-                                                        Timeframe
-                                                    </option>
-                                                    <option value="7">7 days ago</option>
-                                                    <option value="14">14 days ago</option>
-                                                    <option value="30">30 days ago</option>
-                                                </select>
-                                            </div>
+                                    <p>Customers with ALL the following Conditions:</p>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label"
+                                               style="font-weight: bold;">Purchased: </label>
+                                        <div class="col-sm-6">
+                                            <select class="form-control m-b" id="timeframe" name="timeframe">
+                                                <option selected="selected" style="display:none; font-size:15px;">
+                                                    Timeframe
+                                                </option>
+                                                <option value="7">7 days ago</option>
+                                                <option value="14">14 days ago</option>
+                                                <option value="30">30 days ago</option>
+                                            </select>
                                         </div>
-                                    </form>
+                                    </div>
                                 </div>
                                 <div class="hr-line-dashed"></div>
                             </div>
                             <div class="form-group">
+                                <div class="ibox-title">
+                                    <h5>Email Composer</h5>
+                                </div>
                                 <label class="col-sm-2 control-label" style="font-weight: bold;">Delivery
                                     Account: </label>
                                 <div class="col-sm-6">
-                                    <input type="text" id="apikey" class="form-control"
+                                    <input type="text" id="apikey" class="form-control" name="apikey"
                                            placeholder="Your API Mandrill Key">
                                 </div>
                             </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="float-e-margins">
-                    <div class="ibox-title"><h5>Email Composer</h5></div>
-                    <div class="ibox-content">
-                        <form method="get" class="form-horizontal">
                             <div class="form-group">
                                 <label class="col-sm-2 control-label" style="font-weight: bold;">From:</label>
                                 <div class="col-sm-6">
-                                    <input type="text" id="usersname" placeholder="Your Email" class="form-control">
+                                    <input type="text" id="usersname" name="usersname" placeholder="Your Email" class="form-control">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-2 control-label" style="font-weight: bold;">Subject:</label>
                                 <div class="col-sm-6">
-                                    <input type="text" id="subject" placeholder="Subject" class="form-control">
+                                    <input type="text" id="subject" name="subject" placeholder="Subject" class="form-control">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -106,6 +95,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <input type="hidden" name="template" id="template" />
                         </form>
                     </div>
                 </div>
@@ -185,22 +175,8 @@
                 });
 
                 $("#send_email").click(function() {
-                    var data = {
-                        "pongoUserId": {{ Auth::user()->id }},
-                        "campaignName": document.getElementById("campaignname").value,
-                        "targets": [{"action": "BUY", "day": document.getElementById("timeframe").value}],
-                        "mandrillAPIKey": document.getElementById("apikey").value,
-                        "emailFrom": document.getElementById("usersname").value,
-                        "emailSubject": document.getElementById("subject").value,
-                        "template": editor.getValue()
-                    };
-                    $.post("fisher.predictry.com:8090/oms", function (data) {
-                        if (data.status == 'created') {
-                            toastr.success('Your Email Campaign has Started', 'Success!');
-                        } else {
-                            toastr.warning('Your Email Campaign has failed to Start', 'Error');
-                        }
-                    });
+                    $("#template").val(editor.getValue());
+                    $("#entry-form").submit();
                 });
             });
 

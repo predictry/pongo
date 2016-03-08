@@ -135,7 +135,7 @@ Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Con
 
             # Email Targeting
             Route::get("email/new", 'EmailTargetingController@index');
-            Route::post("email/draft", 'EmailTargetingController@store');
+            Route::post("email/save", ['uses'=>'EmailTargetingController@save', 'as'=>'emailSave']);
 
             # Data Collections & Integration
             Route::get("sites/{tenant_id}/integration", "Sites2Controller@getImplementationWizard");
