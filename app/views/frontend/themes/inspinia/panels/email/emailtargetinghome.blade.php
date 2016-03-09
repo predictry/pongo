@@ -38,6 +38,10 @@ HTML::script('http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js')])
                                     Modified Date
                                     <span class="footable-sort-indicator"></span>
                                 </th>
+                                <th class="footable-visible footable-sortable">
+                                    Number of Recipients
+                                    <span class="footable-sort-indicator"></span>
+                                </th>
                                 <th class="footable-visible footable-last-column footable-sortable">
                                     Status
                                     <span class="footable-sort-indicator"></span>
@@ -51,6 +55,7 @@ HTML::script('http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js')])
                                     <td class="footable-visible footable-first-column"><a href="view/{{$o->id}}"><span class="footable-toggle"></span>{{ $o->campaignname }}</a></td>
                                     <td class="footable-visible">{{ $o->created_at }}</td>
                                     <td class="footable-visible">{{ $o->updated_at }}</td>
+                                    <td class="footable-visible">{{ $o->recipients }}</td>
                                     <td class="footable-visible footable-last-column">{{ $o->status }}</td>
                                 </tr>
                             @endforeach

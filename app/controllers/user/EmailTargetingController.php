@@ -36,6 +36,14 @@ class EmailTargetingController extends BaseController
         }
         else {
             $paginator = Paginator::make($data->items, $data->totalItems, $data->limit);
+            foreach($data->items as $campaign) {
+                if($campaign->request_id != '') {
+                    $client = new GuzzleHttp\Client(['base_uri' => 'http://fisher.predictry.com:8090/oms/email_campaign/']);
+                    $response = $client->request('GET', $campaign->request_id);
+                    $jsonResponse = json_decode($response->getBody());
+                    $this->repository->updateRecipients($campaign, $jsonResponse->numberOfEmail);
+                }
+            }
         }
 
         $output = array(
@@ -103,6 +111,7 @@ class EmailTargetingController extends BaseController
                     $jsonResponse = json_decode($response->getBody());
                     if ($jsonResponse->status == 'created') {
                         $data['message'] = 'Your campaign has been created.';
+                        $this->repository->updateRequestId($campaignDraft, $jsonResponse->id);
                     } else if ($jsonResponse->status == 'error') {
                         $data['message'] = 'Error while processing your campaign: ' . $jsonResponse->message;
                     } else {

@@ -17,7 +17,7 @@ class CampaignDraft extends \Eloquent
         'usersname'             => 'required',
         'subject'               => 'required',
         'template'              => 'required',
-        'status'                => 'in:draft,pending,delivered',
+        'status'                => 'in:draft,delivered',
         'timeframe'             => 'required'
     );
 

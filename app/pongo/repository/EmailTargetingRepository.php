@@ -39,5 +39,20 @@ class EmailTargetingRepository
         return $campaignDraft->save();
     }
 
+    public function updateRequestId(CampaignDraft $campaignDraft, $request_id)
+    {
+        $campaignDraft = CampaignDraft::find($campaignDraft->id);
+        $campaignDraft->request_id = $request_id;
+        return $campaignDraft->save();
+    }
+
+    public function updateRecipients(CampaignDraft $campaignDraft, $recipients)
+    {
+        $campaignDraft = CampaignDraft::find($campaignDraft->id);
+        $campaignDraft->recipients = $recipients;
+        $campaignDraft->status = 'delivered';
+        return $campaignDraft->save();
+    }
+
 
 }
