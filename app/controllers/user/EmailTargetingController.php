@@ -41,7 +41,9 @@ class EmailTargetingController extends BaseController
                     $client = new GuzzleHttp\Client(['base_uri' => 'http://fisher.predictry.com:8090/oms/email_campaign/']);
                     $response = $client->request('GET', $campaign->request_id);
                     $jsonResponse = json_decode($response->getBody());
-                    $this->repository->updateRecipients($campaign, $jsonResponse->numberOfEmail);
+                    if (!array_key_exists('status', $jsonResponse) && ($campaign->status != 'draft')) {
+                        $this->repository->updateRecipients($campaign, $jsonResponse->numberOfEmail);
+                    }
                 }
             }
         }
