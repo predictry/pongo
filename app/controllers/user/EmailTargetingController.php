@@ -42,7 +42,7 @@ class EmailTargetingController extends BaseController
             "current_site" => 'test',
             'paginator'    => $paginator,
             "str_message"  => $message,
-            "pageTitle"    => "Manage Items",
+            "pageTitle"    => "Campaign Homepage",
             "table_header" => $this->model->manage_table_header,
             "page"         => $page,
             "modalTitle"   => "View Item"
@@ -53,14 +53,14 @@ class EmailTargetingController extends BaseController
 
     public function index()
     {
-        $data = ['current_site' => 'test'];
+        $data = ['current_site' => 'test',"pageTitle" => "New Campaign", 'campaignDraft' => new CampaignDraft()];
         return View::make(getenv('FRONTEND_SKINS') . $this->theme . ".panels.email.emailtargeting", $data);
 
     }
 
     public function save()
     {
-        $data = ['current_site' => 'test'];
+        $data = ['current_site' => 'test', "pageTitle" => "Campaign Result"];
         $validator = $this->repository->validate(Input::all(), CampaignDraft::$rules);
         if ($validator->passes()) {
             $input   = Input::all();
@@ -118,5 +118,48 @@ class EmailTargetingController extends BaseController
         }
         return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.email.sent', $data);
     }
+
+    public function fetchdata($campaignId)
+    {
+        $campaignDraft = CampaignDraft::find($campaignId);
+        $data = ['current_site' => 'test', "pageTitle" => "View Campaign", 'campaignDraft' => $campaignDraft];
+        return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.email.emailtargeting', $data);
+
+    }
+
+    public function datahandling()
+    {
+        $data = ['current_site' => 'test', "pageTitle" => "Campaign Result"];
+        $validator = $this->repository->validate(Input::all(), CampaignDraft::$rules);
+        if ($validator->passes()) {
+            $input   = Input::all();
+            $campaignDraft = new CampaignDraft();
+
+            // define the accounts' params
+            $campaignDraft->campaignname     = $input['campaignname'];
+            $campaignDraft->apikey    = $input['apikey'];
+            $campaignDraft->usersname = $input['usersname'];
+            $campaignDraft->subject  = $input['subject'];
+            $campaignDraft->template = $input['template'];
+            $campaignDraft->status = 'draft';
+            $campaignDraft->timeframe = $input['timeframe'];
+            $campaignDraft->site_id = $this->active_site_id;
+            // save the campaign
+
+            if (isset($input['id']) && ($input['id'] == '')){
+                $result = $this->repository->save($campaignDraft);
+            } else{
+                $campaignDraft->id = $input['id'];
+                $result= $this->repository->update($campaignDraft);
+            }
+            if ($result) {
+                $data['message'] = 'Your Draft has been saved!';
+            } else {
+                $data['message'] = 'There was an error in saving your Draft';
+            }
+            return View::make(getenv('FRONTEND_SKINS') . $this->theme . '.panels.email.sent', $data);
+        }
+    }
+
 
 }

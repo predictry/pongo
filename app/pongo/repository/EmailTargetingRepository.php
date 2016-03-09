@@ -27,5 +27,17 @@ class EmailTargetingRepository
         return $campaignDraft->save();
     }
 
+    public function update(CampaignDraft $newCampaignDraft)
+    {
+        $campaignDraft = CampaignDraft::find($newCampaignDraft->id);
+        $campaignDraft->campaignname = $newCampaignDraft->campaignname;
+        $campaignDraft->apikey = $newCampaignDraft->apikey;
+        $campaignDraft->usersname = $newCampaignDraft->usersname;
+        $campaignDraft->template = $newCampaignDraft->template;
+        $campaignDraft->timeframe = $newCampaignDraft->timeframe;
+        $campaignDraft->subject = $newCampaignDraft->subject;
+        return $campaignDraft->save();
+    }
+
 
 }

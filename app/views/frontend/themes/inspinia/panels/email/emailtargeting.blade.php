@@ -17,12 +17,12 @@
     ]
 ])
 @section('content')
-    @include(getenv('FRONTEND_SKINS') . $theme . '.partials.page_heading_without_action', ['upper' => ['Sites' => 'v2/sites']])
+    @include(getenv('FRONTEND_SKINS') . $theme . '.partials.page_heading_without_action', ['upper' => ['Email Targeting' => 'v2/email/new']])
     <div class="wrapper wrapper-content animated fadeInRight">
         <div class="row">
             <div class="col-lg-12">
                 <div class="float-e-margins">
-                    <button type="button" class="btn btn-w-m btn-primary" onclick="location.href='home'">< Back</button>
+                    <a class="btn btn-w-m btn-primary" href="{{route('emailHome')}}">Back</a>
 
                     <div class="ibox-title">
                         <h5>Email Targeting Details</h5>
@@ -34,7 +34,7 @@
                                 <label class="col-sm-2 control-label" style="font-weight: bold;">Campaign Name:</label>
                                 <div class="col-sm-6">
                                     <input type="text" placeholder="Your Campaign Name" id="campaignname" name="campaignname"
-                                           class="form-control">
+                                           value="{{{$campaignDraft->campaignname or ''}}}" class="form-control">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -48,12 +48,12 @@
                                                style="font-weight: bold;">Purchased: </label>
                                         <div class="col-sm-6">
                                             <select class="form-control m-b" id="timeframe" name="timeframe">
-                                                <option selected="selected" style="display:none; font-size:15px;">
+                                                <option {{ $campaignDraft->timeframe ? '' : "selected='selected'" }} style="display:none; font-size:15px;">
                                                     Timeframe
                                                 </option>
-                                                <option value="7">7 days ago</option>
-                                                <option value="14">14 days ago</option>
-                                                <option value="30">30 days ago</option>
+                                                <option {{ $campaignDraft->timeframe == 7 ? "selected='selected'" : ''}} value="7">7 days ago</option>
+                                                <option {{ $campaignDraft->timeframe == 14 ? "selected='selected'" : '' }} value="14">14 days ago</option>
+                                                <option {{ $campaignDraft->timeframe == 30 ? "selected='selected'" : ''}} value="30">30 days ago</option>
                                             </select>
                                         </div>
                                     </div>
@@ -67,20 +67,20 @@
                                 <label class="col-sm-2 control-label" style="font-weight: bold;">Delivery
                                     Account: </label>
                                 <div class="col-sm-6">
-                                    <input type="text" id="apikey" class="form-control" name="apikey"
+                                    <input type="text" id="apikey" class="form-control" name="apikey" value="{{{$campaignDraft->apikey or ''}}}"
                                            placeholder="Your API Mandrill Key">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-2 control-label" style="font-weight: bold;">From:</label>
                                 <div class="col-sm-6">
-                                    <input type="text" id="usersname" name="usersname" placeholder="Your Email" class="form-control">
+                                    <input type="text" id="usersname" name="usersname" placeholder="Your Email" value="{{{$campaignDraft->usersname or ''}}}" class="form-control">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-2 control-label" style="font-weight: bold;">Subject:</label>
                                 <div class="col-sm-6">
-                                    <input type="text" id="subject" name="subject" placeholder="Subject" class="form-control">
+                                    <input type="text" id="subject" name="subject" placeholder="Subject" value="{{{$campaignDraft->subject or ''}}}" class="form-control">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -100,6 +100,7 @@
                                 </div>
                             </div>
                             <input type="hidden" name="template" id="template" />
+                            <input type="hidden" name="id" id="id" value="{{$campaignDraft->id}}" />
                         </form>
                     </div>
                 </div>
@@ -116,7 +117,7 @@
                     <div class="tab-content">
                         <div id="email-html" class="tab-pane active">
                             <div class="panel-body">
-                                <div id="editor" style="width: 100%; height: 300px; margin-bottom: 10px;"></div>
+                                <div id="editor" style="width: 100%; height: 300px; margin-bottom: 10px;">{{{$campaignDraft->template or ''}}}</div>
                             </div>
                         </div>
                         <div id="email-preview" class="tab-pane">
@@ -141,16 +142,19 @@
         <script>
             $(document).ready(function() {
 
-                var defaultMailMessage = '<!DOCTYPE html>\n<html lang="en">\n<head>\n\t<meta charset="UTF-8">\n</head>\n<body>\n\t<h1>Replace your message here!</h1>\n</body>\n</html>';
+                var defaultMailMessage = '<!DOCTYPE html>\n<html lang="en">\n<head>\n\t<meta charset="UTF-8" />\n</head>\n<body>\n\t<h1>Replace your message here!</h1>\n</body>\n</html>';
                 var previewFrameHtml = $('#email-preview-frame').contents().find('html');
+                var isEmpty = ($("#editor").html() == '');
                 var editor = ace.edit("editor");
                 editor.setTheme("ace/theme/chrome");
                 editor.getSession().setMode("ace/mode/html");
-                editor.setValue(defaultMailMessage);
                 editor.getSession().on('change', function() {
                     previewFrameHtml.html(editor.getSession().getValue());
                 });
-                previewFrameHtml.html(defaultMailMessage);
+                if (isEmpty) {
+                    editor.setValue(defaultMailMessage);
+                }
+                previewFrameHtml.html(editor.getSession().getValue());
 
                 $("#insert_rec_4").click(function() {
                     editor.insert(
@@ -179,6 +183,13 @@
                 });
 
                 $("#send_email").click(function() {
+                    $("#entry-form").attr("action", "{{ URL::action('emailSave') }}");
+                    $("#template").val(editor.getValue());
+                    $("#entry-form").submit();
+                });
+
+                $("#sdraft").click(function(){
+                    $("#entry-form").attr("action", "{{ URL::action('dataHandling') }}");
                     $("#template").val(editor.getValue());
                     $("#entry-form").submit();
                 });

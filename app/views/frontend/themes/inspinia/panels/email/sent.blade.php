@@ -15,7 +15,7 @@
     ]
 ])
 @section('content')
-    @include(getenv('FRONTEND_SKINS') . $theme . '.partials.page_heading_without_action', ['upper' => ['Sites' => 'v2/sites']])
+    @include(getenv('FRONTEND_SKINS') . $theme . '.partials.page_heading_without_action', ['upper' => ['Email Targeting' => 'v2/email/home']])
     <div class="wrapper wrapper-content animated fadeInRight">
         <div class="row">
             <div class="col-lg-12">
@@ -30,6 +30,7 @@
                             @endforeach
                             </ul>
                         @endif
+                        <button type="button" class="btn btn-primary fa fa-home" onclick="location.href='home'">&nbsp;Home</button>
                     </div>
                 </div>
             </div>

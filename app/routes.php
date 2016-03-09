@@ -134,9 +134,11 @@ Route::group(array('prefix' => 'v2', 'before' => 'auth', 'namespace' => 'App\Con
             Route::get("demo/show/{id}", ['as' => 'demo.show.{id}', 'uses' => 'DemoController@show']);
 
             # Email Targeting
-            Route::get("email/home", 'EmailTargetingController@home');
-            Route::get("email/new", 'EmailTargetingController@index');
+            Route::get("email/home", ['uses'=> 'EmailTargetingController@home', 'as'=>'emailHome']);
+            Route::get("email/new", ['uses'=> 'EmailTargetingController@index', 'as'=>'emailNew']);
+            Route::get("email/view/{campaignId}", 'EmailTargetingController@fetchdata');
             Route::post("email/save", ['uses'=>'EmailTargetingController@save', 'as'=>'emailSave']);
+            Route::post("email/datahandling", ['uses'=> 'EmailTargetingController@datahandling', 'as'=>'dataHandling']);
 
             # Data Collections & Integration
             Route::get("sites/{tenant_id}/integration", "Sites2Controller@getImplementationWizard");
