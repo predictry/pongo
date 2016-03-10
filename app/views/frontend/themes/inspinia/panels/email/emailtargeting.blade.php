@@ -141,8 +141,18 @@
 
         <script>
             $(document).ready(function() {
+                var defaultHtml = "";
+                defaultHtml += "<!DOCTYPE html>\n";
+                defaultHtml += "<html lang=\"en\">\n";
+                defaultHtml += " <head>\n";
+                defaultHtml += " 	<meta charset=\"UTF-8\" />\n";
+                defaultHtml += "	<link rel=\"stylesheet\" href=\"https:\/\/maxcdn.bootstrapcdn.com\/bootstrap\/3.3.6\/css\/bootstrap.min.css\" integrity=\"sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7\" crossorigin=\"anonymous\" />\n";;
+                defaultHtml += " <\/head>\n";
+                defaultHtml += " <body>\n";
+                defaultHtml += "	<h1>Replace this your template<\/h1>\n";
+                defaultHtml += " <\/body>\n";
+                defaultHtml += "<\/html>\n";
 
-                var defaultMailMessage = '<!DOCTYPE html>\n<html lang="en">\n<head>\n\t<meta charset="UTF-8" />\n</head>\n<body>\n\t<h1>Replace your message here!</h1>\n</body>\n</html>';
                 var previewFrameHtml = $('#email-preview-frame').contents().find('html');
                 var isEmpty = ($("#editor").html() == '');
                 var editor = ace.edit("editor");
@@ -152,34 +162,39 @@
                     previewFrameHtml.html(editor.getSession().getValue());
                 });
                 if (isEmpty) {
-                    editor.setValue(defaultMailMessage);
+                    editor.setValue(defaultHtml);
                 }
                 previewFrameHtml.html(editor.getSession().getValue());
 
                 $("#insert_rec_4").click(function() {
-                    editor.insert(
-                        '<div id="duo4">\n' +
-                        '\t<div>\n' +
-                        '\t\t<h3>You Bought</h3>\n' +
-                        '\t\t<div>\n' +
-                        '\t\t\t<a th:href="${products[0].item_url}"><img th:src="${products[0].img_url}" src="https://placehold.it/350x150"/></a>\n' +
-                        '\t\t\t<div><a th:href="${products[0].item_url}"><span th:text="${products[0].name}">Item1</span></a></div>\n' +
-                        '\t\t\t<div>RM <span th:text="${products[0].price}">123</span></div>\n' +
-                        '\t\t</div>\n' +
-                        '\t</div>\n' +
-                        '\t<div class="recommendations">\n' +
-                        '\t\t<h3>Other People Also Bought</h3>\n' +
-                        '\t\t<ul>\n' +
-                        '\t\t\t<li th:each="rec : ${products[0].recs}">\n' +
-                        '\t\t\t\t<div>\n' +
-                        '\t\t\t\t\t<a th:href="${rec.item_url}"><img th:src="${rec.img_url}" src="https://placehold.it/350x150"/></a>\n' +
-                        '\t\t\t\t\t<div><a th:href="${rec.item_url}"><span th:text="${rec.name}">Item2</span></a></div>\n' +
-                        '\t\t\t\t\t<div>RM <span th:text="${rec.price}">123</span></div>\n' +
-                        '\t\t\t\t</div>\n' +
-                        '\t\t\t</li>\n' +
-                        '\t\t</ul>\n' +
-                        '\t</div>\n' +
-                        '</div>');
+                    var defaultTemplate="";
+                    defaultTemplate += "	<div class=\"row\">\n";
+                    defaultTemplate += " 		<div class=\"product col-md-3 text-center\" style=\"background-color: #eee;\">\n";
+                    defaultTemplate += " 			<h4>You Bought<\/h4>\n";
+                    defaultTemplate += " 			<a th:href=\"${products[0].item_url}\">\n";
+                    defaultTemplate += "				<img src=\"https:\/\/placehold.it\/200x200\" th:src=\"${products[0].img_url}\" class=\"img-responsive center-block\" \/>\n";
+                    defaultTemplate += "			<\/a>\n";
+                    defaultTemplate += " 			<a th:href=\"${products[0].item_url}\">\n";
+                    defaultTemplate += "				<div th:text=\"${products[0].name}\">Item name<\/div>\n";
+                    defaultTemplate += "			<\/a>\n";
+                    defaultTemplate += " 			RM <span th:text=\"${products[0].price}\">99.99<\/span>\n";
+                    defaultTemplate += " 		<\/div>\n";
+                    defaultTemplate += "		<div class=\"recommendations col-md-9\">\n";
+                    defaultTemplate += "			<h4>Other People Also Bought<\/h4>\n";
+                    defaultTemplate += "			<div class=\"row\">\n";
+                    defaultTemplate += "				<div class=\"col-md-3 text-center\" th:each=\"rec,i: ${products[0].recs}\" th:if=\"${i.index} lt 3\">\n";
+                    defaultTemplate += "					<a th:href=\"${rec.item_url}\">\n";
+                    defaultTemplate += "						<img src=\"https:\/\/placehold.it\/200x200\" th:src=\"${rec.img_url}\" class=\"img-responsive center -block\" \/>\n";
+                    defaultTemplate += "					<\/a>\n";
+                    defaultTemplate += "					<a th:href=\"${rec.item_url}\">\n";
+                    defaultTemplate += "						<div th:text=\"${rec.name}\">Recommended Item Name<\/div>\n";
+                    defaultTemplate += "					<\/a>\n";
+                    defaultTemplate += "					RM <span th:text=\"${rec.price}\">99.99<\/span>\n";
+                    defaultTemplate += "				<\/div>\n";
+                    defaultTemplate += "			<\/div>\n";
+                    defaultTemplate += "		<\/div>\n";
+                    defaultTemplate += " 	<\/div>\n";
+                    editor.insert(defaultTemplate);
                 });
 
                 $("#send_email").click(function() {
