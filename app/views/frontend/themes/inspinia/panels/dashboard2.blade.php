@@ -25,16 +25,16 @@
           </div>
         </div>
         <div class="ibox-content">
-          <p>
+          <p style="font-size:15px;">
             Ok, so what's next ?
             <ol>
-              <li><strike>Sign up</strike></li>
-              <li>Put the tracking script and get analytics on your dashboard</li>
-              <li>Wait for a week as our owls get more data from your traffic</li>
-              <li>View a demo of the recommendations on our site</li>
-              <li>Insert the recommendation script on your site and win more customers</li>
+              <li style="font-size:15px;"><strike>Sign up</strike></li>
+              <li style="font-size:15px;">Put the <a href="sites/{{ $current_site  }}/integration">tracking script</a> and get analytics on your dashboard</li>
+              <li style="font-size:15px;">Wait for a week as our owls get more data from your traffic</li>
+              <li style="font-size:15px;">View a demo of the recommendations on our site</li>
+              <li style="font-size:15px;">Insert the  <a href="sites/{{ $current_site  }}/integration">recommendation script</a> on your site and win more customers</li>
             </ol>
-            Questions? Need help?
+            Questions? <a href="mailto:[prawn9189@hotmail.com]?Subject=Predictry Question" target="_top">Need Help?</a>
           </p>
         </div>
     </div>

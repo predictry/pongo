@@ -28,7 +28,7 @@
             </li>
           
             <li class="<?php if ($ca === 'App\Controllers\User\Sites2Controller') echo 'active'; ?>">
-                <a href="#"><i class="fa fa-cogs"></i> <span class="nav-label">Integration</span> </a>
+                <a href="#"><i class="fa fa-cogs"></i> <span class="nav-label">Integration</span>
                 <ul class="nav nav-second-level">
                   <li>
                     <a href="/v2/sites/{{ $current_site }}/integration"><span class="nav-label">Javascript <i class="fa fa-code"></i> </span> </a>
@@ -39,7 +39,8 @@
                   <li>
                       <a href="/v2/sites/{{ $current_site }}/magento"><span class="nav-label">Magento </span></a>
                   </li>
-                </ul> 
+                </ul>
+                </a>
             </li>
 
             <li class="<?php if ($ca === 'App\Controllers\Email\EmailTargeting') echo 'active'; ?>">
