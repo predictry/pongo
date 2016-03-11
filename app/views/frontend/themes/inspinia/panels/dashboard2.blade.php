@@ -34,7 +34,7 @@
               <li style="font-size:15px;">View a demo of the recommendations on our site</li>
               <li style="font-size:15px;">Insert the  <a href="sites/{{ $current_site  }}/integration">recommendation script</a> on your site and win more customers</li>
             </ol>
-            Questions? <a href="mailto:[prawn9189@hotmail.com]?Subject=Predictry Question" target="_top">Need Help?</a>
+            Questions? <a href="mailto:[stewartchen@gmail.com]?Subject=Predictry Question" target="_top">Need Help?</a>
           </p>
         </div>
     </div>
