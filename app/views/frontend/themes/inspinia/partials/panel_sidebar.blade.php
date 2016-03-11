@@ -42,10 +42,11 @@
                 </ul>
                 </a>
             </li>
-
+            @if (array_search(Auth::user()->email, ['jocki.predictry@gmail.com', 'jocki@vventures.asia', 'prawn9189@hotmail.com', 'stewart@vventures.asia', 'stewartchen@gmail.com']))
             <li class="<?php if ($ca === 'App\Controllers\Email\EmailTargeting') echo 'active'; ?>">
-                <a href="/v2/email/home"><i class="fa fa-envelope"></i> <span class="nav-label">Email Targeting </span> </a>
+                <a href="/v2/email/home"><i class="fa fa-envelope"></i> <span class="nav-label">Email Targeting<span class="badge badge-primary">Beta</span></span> </a>
             </li>
+            @endif
             
             <!--
             <li class="<?php if ($ca === 'App\Controllers\User\Items2Controller') echo 'active'; ?>">
