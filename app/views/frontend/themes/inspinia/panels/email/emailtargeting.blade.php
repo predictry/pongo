@@ -98,6 +98,10 @@
                                         </ul>
                                     </div>
                                 </div>
+                                <div id="step_one" class="modular_step col-sm-12 col-xs-12 col-md-12 col-lg-12">
+                                    <h5 style="font-size:15px;"> Just a tip to customize your own email: </h5>
+                                <p>In order to customize your own message, replace the <code>&lt;h1&gt;</code>Replace your message here!<code>&lt;/h1&gt;</code> with anything you want,<br> DO NOT REMOVE THE <code>&lt;h1&gt;&lt;/h1&gt;</code> though.<br> After you have replaced the message with your message, click the part below <code>&lt;/html&gt;</code> and insert your rec block there.</p>
+                                </div>
                             </div>
                             <input type="hidden" name="template" id="template" />
                             <input type="hidden" name="id" id="id" value="{{$campaignDraft->id}}" />
