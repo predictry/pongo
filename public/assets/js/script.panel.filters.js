@@ -32,7 +32,7 @@ jQuery(document).ready(function () {
         endDate: moment(),
         minDate: moment().subtract(220, 'days'),
         maxDate: moment(),
-        dateLimit: {month: 1},
+        dateLimit: {month: 3},
         applyClass: 'btnApplyRange btn btn-primary btn-sm',
         cancelClass: 'btnCancelRange btn btn-default btn-sm pull-right'
     }, function (start, end) {
@@ -47,7 +47,7 @@ jQuery(document).ready(function () {
         console.log(picker);
 
         var chosenLabel = picker.chosenLabel.toLowerCase().replace(/ /g, "_");
-        if (chosenLabel !== "custom_range")
+        if (chosenLabel !== "custom_30_days")
             window.location = site_url + '/v2/home/' + chosenLabel;
         else
             window.location = site_url + '/v2/home/' + chosenLabel + "/" + picker.startDate.format('YYYY-MM-DD') + "/" + picker.endDate.format('YYYY-MM-DD');
